@@ -54,6 +54,8 @@
 - 2026-10-06 | GitHub | репозиторий подключён: `origin` → github.com/Razmik-Kutinava/armenian-parkour-union, ветка `master` | — | `git remote -v`
 - 2026-10-06 | 0.6 (частично) | CI по образцу CoffeeOS: `ci.yml` (docs, lint, typecheck, scan_deps, test с Postgres, e2e с Postgres), `codeql.yml` (actions, javascript-typescript), `semgrep.yml`. Dependabot не подключён: он создаёт свои ветки и PR, а работаем в одной ветке `master`. Пока нет `package.json`, задачи с кодом пропускаются с notice и остаются зелёными; после задачи 0.3 начинают проверять по-настоящему | `.github/*` | вкладка Actions на GitHub — все запуски зелёные
 
+- 2026-10-06 | процесс | SBR по образцу CoffeeOS: правило `sbr.mdc`, команды `/start` `/spec` `/sbr` `/regress` `/review` `/deploy` `/patch`, трекер `docs/todo.md`; REVIEW с двумя субагентами (`bugbot`, `security-review`), push внутри REVIEW, деплой по апруву | `.cursor/rules/sbr.mdc`, `.cursor/commands/*`, `docs/todo.md`, `main.mdc`, `09` | набрать `/` в чате Cursor — команды видны
+
 ## В работе
 
 (пока пусто)
