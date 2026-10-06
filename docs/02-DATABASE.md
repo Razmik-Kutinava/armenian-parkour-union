@@ -254,10 +254,14 @@
 | paid_at | timestamptz null | |
 | refunded_at | timestamptz null | |
 | confirmed_by | uuid FK users null | кто подтвердил вручную |
+| expires_at | timestamptz null | до какого времени ждём оплату (для `pending`) |
+| failure_reason | text null | `amount_mismatch`, `provider_error`, `declined` и т. п. |
+| needs_review | boolean default false | флаг «требует проверки админом» |
+| membership_id | uuid FK memberships null | связь с членством (если нужна прямая ссылка) |
 | created_at, updated_at | timestamptz | |
 
 Ограничения: unique(`provider`, `provider_payment_id`) where `provider_payment_id is not null`.
-Индексы: `user_id`, (`kind`, `status`), `paid_at`.
+Индексы: `user_id`, (`kind`, `status`), `paid_at`, (`status`, `expires_at`) для фоновой сверки.
 Правила:
 - Членский взнос и донат это **разные** `kind`, обрабатываются разными сценариями.
 - Статус меняется только сервисом платежей или ручным подтверждением админом (с записью в `audit_log`).
@@ -539,12 +543,13 @@
 
 ## Начальные данные (seed)
 
-Скрипт `scripts/seed.ts` создаёт: правила баллов (коды выше), ключи `site_settings`, несколько `donation_purposes`, первого админа (из переменных окружения). Тестовые события, участников и товары скрипт создаёт только в `development`. Фальшивые данные в рабочем коде запрещены — только здесь.
+Скрипт `scripts/seed.ts` создаёт: правила баллов (коды выше), ключи `site_settings`, несколько `donation_purposes`, системные страницы `pages` (`about`, `rules`, `contacts`, `privacy`, `offer`, `refund-policy`), первого админа (из `SEED_ADMIN_EMAIL`, `SEED_ADMIN_PASSWORD`, `01-STACK.md`). Тестовые события, участников и товары скрипт создаёт только в `development`. Фальшивые данные в рабочем коде запрещены — только здесь.
 
 ## Что нужно уточнить у владельца
 1. Значения баллов за каждое правило.
 2. Размер членского взноса и валюта (по умолчанию годовой).
 3. Список начальных назначений донатов.
-4. Роль `editor` есть в `user_role`, но не описана в `00-PROJECT.md` (там гость, участник, тренер, судья, модератор, админ). Подтвердить роль и описать её в `04-ROLES-PERMISSIONS.md`.
-5. Кто может быть экзаменатором (`exams.examiner_id`): любой пользователь, только судья/тренер с действующим сертификатом или только админ.
-6. Переменные окружения для первого админа (например `SEED_ADMIN_EMAIL`, `SEED_ADMIN_PASSWORD`) — добавить в `01-STACK.md` и `.env.example`.
+
+Уже решено: роль `editor` описана в `04` и `00`; экзаменатор (`exams.examiner_id`) — пользователь с ролью `moderator` или `admin` (`04`); переменные первого админа — в `01-STACK.md`.
+
+Поля и статусы, которых требуют другие документы, но которых пока нет в схеме, собраны в `PROGRESS.md` («Открытые вопросы», расхождения схемы). Схема дополняется только после решения владельца и через Migration Gate.
