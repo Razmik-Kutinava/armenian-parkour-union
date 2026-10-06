@@ -4,8 +4,8 @@ primary_region = "fra"
 [build]
 
 [deploy]
-  # Until db:migrate exists (task 0.4) --if-present makes this a no-op.
-  release_command = "npm run db:migrate --if-present"
+  # scripts/migrate.js: drizzle-orm migrator, skips when drizzle/ has no migrations yet.
+  release_command = "node scripts/migrate.js"
 
 [env]
   PORT = "3000"

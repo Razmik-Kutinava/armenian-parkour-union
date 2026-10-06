@@ -62,11 +62,13 @@
 
 - 2026-10-06 | 0.7 (часть 1: подготовка к деплою) | `Dockerfile` (node 22 slim, двухэтапная сборка, запуск от `node`), `.dockerignore`, `fly.toml` (app `armenian-parkour-union`, регион `fra`, порт 3000, HTTPS, `release_command = npm run db:migrate --if-present`, 512 МБ, машина засыпает без трафика), ручной workflow `deploy.yml` (только `workflow_dispatch`, ветка `master`, environment `production`, секрет `FLY_API_TOKEN`); приложение создано на Fly (`fly apps create`), деплоя ещё не было | `Dockerfile`, `.dockerignore`, `fly.toml`, `.github/workflows/deploy.yml` | `npm run build`, затем `node build` → http://localhost:3000; `fly config validate` |
 
+- 2026-10-06 | fix деплоя | миграции через `scripts/migrate.js` (drizzle-orm migrator, без drizzle-kit в проде; пропуск, если миграций нет); `db:migrate` и `release_command` используют его; в образ копируются `drizzle/` и скрипт; `DATABASE_URL` необязателен при сборке (Docker, CI), обязателен при обращении к БД | `scripts/migrate.js`, `Dockerfile`, `fly.toml`, `src/env.ts`, `src/lib/server/db/index.ts` | сборка и запуск без `.env` → 200 |
+
 ## В работе
 
 - 0.7 (часть 2): первый `fly deploy` (по апруву владельца), затем домен `parkour.am` (`fly certs add`, DNS), `FLY_API_TOKEN` в GitHub Secrets. Боевые секреты (`DATABASE_URL` → `parkour_prod` и др.) — через `fly secrets set`, когда появятся (после 0.4).
 - 0.4: Drizzle подключён, соединение с `parkour_dev` проверено. Первая (пустая) миграция ждёт «go» по Migration Gate. Коммит не запушен: CI с `db:migrate` без папки миграций упадёт — push вместе с миграцией.
-- **Конфликт 0.4 и 0.7, решить до первого деплоя:** `release_command = npm run db:migrate` запускает `drizzle-kit`, а он в devDependencies, и образ ставит только `--omit=dev`; папка `drizzle/` и `drizzle.config.ts` в финальный образ тоже не копируются. Варианты: скрипт миграций на `drizzle-orm/postgres-js/migrator` (без drizzle-kit в проде) или перенести drizzle-kit в dependencies.
+- Fly: два приложения — `armenian-parkour-union` (наше, из `fly.toml`) и `armenian-parkour-union-rhzcwq` (создано интеграцией GitHub в панели Fly, деплоит само на каждый push — противоречит «деплой по апруву»). Владельцу: отключить интеграцию и удалить `-rhzcwq`.
 
 ## Открытые вопросы к владельцу
 
