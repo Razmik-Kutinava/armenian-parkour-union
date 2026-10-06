@@ -51,6 +51,8 @@
 Формат записи: `дата | задача | что сделано | затронутые файлы | как проверить`
 
 - 2026-10-06 | документация | правила агента и документы 00–09, PROGRESS; документы связаны ссылками, согласованные правки внесены | `.cursor/rules/main.mdc`, `docs/*` | открыть `docs/`, проверить ссылки между документами
+- 2026-10-06 | GitHub | репозиторий подключён: `origin` → github.com/Razmik-Kutinava/armenian-parkour-union, ветка `master` | — | `git remote -v`
+- 2026-10-06 | 0.6 (частично) | CI по образцу CoffeeOS: `ci.yml` (docs, lint, typecheck, scan_deps, test с Postgres, e2e с Postgres), `codeql.yml` (actions, javascript-typescript), `semgrep.yml`, `dependabot.yml`. Пока нет `package.json`, задачи с кодом пропускаются с notice и остаются зелёными; после задачи 0.3 начинают проверять по-настоящему | `.github/*` | вкладка Actions на GitHub — все запуски зелёные
 
 ## В работе
 

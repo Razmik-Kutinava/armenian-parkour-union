@@ -1,0 +1,230 @@
+# Пока нет package.json (этап 0 не начат), шаги с кодом пропускаются с notice, job остаётся зелёным.
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  NODE_VERSION: "22"
+
+jobs:
+  docs:
+    name: docs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Required docs and rules exist
+        run: |
+          set -e
+          missing=0
+          for f in \
+            .cursor/rules/main.mdc \
+            docs/00-PROJECT.md docs/01-STACK.md docs/02-DATABASE.md \
+            docs/03-BUSINESS-RULES.md docs/04-ROLES-PERMISSIONS.md \
+            docs/05-ADMIN-PANEL.md docs/06-PUBLIC-SITE.md docs/07-PAYMENTS.md \
+            docs/08-DESIGN.md docs/09-ROADMAP.md docs/PROGRESS.md; do
+            if [ ! -s "$f" ]; then echo "::error file=$f::missing or empty"; missing=1; fi
+          done
+          exit $missing
+
+      - name: No secrets files committed
+        run: |
+          if git ls-files | grep -E '(^|/)\.env($|\.)' | grep -v '\.env\.example$'; then
+            echo "::error::.env file is committed"; exit 1
+          fi
+
+  lint:
+    name: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: detect
+        run: |
+          if [ -f package.json ]; then echo "app=true" >> "$GITHUB_OUTPUT"
+          else echo "app=false" >> "$GITHUB_OUTPUT"; echo "::notice::package.json not found — lint skipped"; fi
+
+      - if: steps.detect.outputs.app == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - if: steps.detect.outputs.app == 'true'
+        run: npm ci
+
+      - name: ESLint + Prettier
+        if: steps.detect.outputs.app == 'true'
+        run: npm run lint
+
+  check:
+    name: typecheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: detect
+        run: |
+          if [ -f package.json ]; then echo "app=true" >> "$GITHUB_OUTPUT"
+          else echo "app=false" >> "$GITHUB_OUTPUT"; echo "::notice::package.json not found — typecheck skipped"; fi
+
+      - if: steps.detect.outputs.app == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - if: steps.detect.outputs.app == 'true'
+        run: npm ci
+
+      - name: svelte-check
+        if: steps.detect.outputs.app == 'true'
+        run: npm run check
+
+      - name: Build
+        if: steps.detect.outputs.app == 'true'
+        run: npm run build
+
+  scan_deps:
+    name: scan_deps
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: detect
+        run: |
+          if [ -f package-lock.json ]; then echo "app=true" >> "$GITHUB_OUTPUT"
+          else echo "app=false" >> "$GITHUB_OUTPUT"; echo "::notice::package-lock.json not found — dependency audit skipped"; fi
+
+      - if: steps.detect.outputs.app == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      # npm audit API бывает недоступен: повтор 3 раза, транспортная ошибка — warning; реальные уязвимости роняют job.
+      - name: npm audit (high+)
+        if: steps.detect.outputs.app == 'true'
+        run: |
+          set +e
+          for i in 1 2 3; do
+            out="$(npm audit --omit=dev --audit-level=high 2>&1)"; ec=$?
+            printf '%s\n' "$out"
+            [ "$ec" -eq 0 ] && exit 0
+            if printf '%s' "$out" | grep -qiE 'ETIMEDOUT|ECONNRESET|EAI_AGAIN|network'; then
+              [ "$i" -lt 3 ] && { echo "::warning::npm audit transport error (attempt $i/3)"; sleep $((i * 15)); continue; }
+              echo "::warning::npm audit unreachable after 3 attempts — skipped"; exit 0
+            fi
+            exit "$ec"
+          done
+
+  test:
+    name: test
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: apu_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+    env:
+      DATABASE_URL: postgres://postgres:postgres@localhost:5432/apu_test
+      BETTER_AUTH_SECRET: ci-only-not-a-secret
+      PUBLIC_SITE_URL: http://localhost:4173
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: detect
+        run: |
+          if [ -f package.json ]; then echo "app=true" >> "$GITHUB_OUTPUT"
+          else echo "app=false" >> "$GITHUB_OUTPUT"; echo "::notice::package.json not found — tests skipped"; fi
+
+      - if: steps.detect.outputs.app == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - if: steps.detect.outputs.app == 'true'
+        run: npm ci
+
+      - name: Migrate test DB
+        if: steps.detect.outputs.app == 'true'
+        run: npm run db:migrate
+
+      - name: Vitest
+        if: steps.detect.outputs.app == 'true'
+        run: npm run test
+
+  e2e:
+    name: e2e
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: apu_e2e
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+    env:
+      DATABASE_URL: postgres://postgres:postgres@localhost:5432/apu_e2e
+      BETTER_AUTH_SECRET: ci-only-not-a-secret
+      PUBLIC_SITE_URL: http://localhost:4173
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: detect
+        run: |
+          if [ -d tests/e2e ] && [ -n "$(find tests/e2e -name '*.spec.ts' 2>/dev/null)" ]; then echo "app=true" >> "$GITHUB_OUTPUT"
+          else echo "app=false" >> "$GITHUB_OUTPUT"; echo "::notice::no Playwright specs in tests/e2e — e2e skipped"; fi
+
+      - if: steps.detect.outputs.app == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - if: steps.detect.outputs.app == 'true'
+        run: npm ci
+
+      - if: steps.detect.outputs.app == 'true'
+        run: npx playwright install --with-deps chromium
+
+      - if: steps.detect.outputs.app == 'true'
+        run: npm run db:migrate
+
+      - name: Playwright
+        if: steps.detect.outputs.app == 'true'
+        run: npm run test:e2e
+
+      - name: Keep Playwright report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report
+          if-no-files-found: ignore
