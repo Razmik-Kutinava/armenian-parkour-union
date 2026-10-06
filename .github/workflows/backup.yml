@@ -1,0 +1,97 @@
+# Ежедневный бэкап parkour_prod: pg_dump → проверка восстановления во временный Postgres → шифрование → артефакт (30 дней).
+# Репозиторий публичный: наружу уходит только зашифрованный файл. Пароль — BACKUP_PASSPHRASE (копия у владельца).
+# Восстановление: gh run download <run-id> → gpg --decrypt parkour_prod-*.dump.gpg > backup.dump →
+#   pg_restore (версии 18) --no-owner --no-privileges --dbname=<пустая база> backup.dump
+name: Backup
+
+on:
+  schedule:
+    - cron: "0 1 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: backup-production
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  PG_MAJOR: "18"
+  PG_BIN: /usr/lib/postgresql/18/bin
+  RESTORE_URL: postgres://postgres:postgres@localhost:5432/restore_check
+
+jobs:
+  backup:
+    name: pg_dump + restore check
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master'
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: restore_check
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+    env:
+      PROD_DATABASE_URL: ${{ secrets.PROD_DATABASE_URL }}
+      BACKUP_PASSPHRASE: ${{ secrets.BACKUP_PASSPHRASE }}
+    steps:
+      - name: Secrets present
+        run: |
+          [ -n "$PROD_DATABASE_URL" ] || { echo "::error::PROD_DATABASE_URL is not set"; exit 1; }
+          [ -n "$BACKUP_PASSPHRASE" ] || { echo "::error::BACKUP_PASSPHRASE is not set"; exit 1; }
+
+      - name: Install postgresql-client-${{ env.PG_MAJOR }}
+        run: |
+          sudo install -d /usr/share/postgresql-common/pgdg
+          sudo curl -fsSo /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc https://www.postgresql.org/media/keys/ACCC4CF8.asc
+          echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" \
+            | sudo tee /etc/apt/sources.list.d/pgdg.list > /dev/null
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq "postgresql-client-$PG_MAJOR"
+          "$PG_BIN/pg_dump" --version
+
+      - name: pg_dump
+        run: |
+          echo "STAMP=$(date -u +%Y-%m-%dT%H%MZ)" >> "$GITHUB_ENV"
+          "$PG_BIN/pg_dump" --format=custom --no-owner --no-privileges --file=backup.dump "$PROD_DATABASE_URL"
+          ls -l backup.dump
+
+      - name: Restore into temporary Postgres
+        run: |
+          "$PG_BIN/pg_restore" --no-owner --no-privileges --exit-on-error --dbname="$RESTORE_URL" backup.dump
+
+      - name: Compare row counts (prod vs restored)
+        run: |
+          q="select table_schema || '.' || table_name || ' ' ||
+               (xpath('/row/c/text()', query_to_xml(format('select count(*) as c from %I.%I', table_schema, table_name), false, true, '')))[1]::text
+             from information_schema.tables
+             where table_type = 'BASE TABLE' and table_schema not in ('pg_catalog', 'information_schema')
+             order by 1"
+          "$PG_BIN/psql" "$PROD_DATABASE_URL" -Atc "$q" > prod.txt
+          "$PG_BIN/psql" "$RESTORE_URL" -Atc "$q" > restored.txt
+          cat restored.txt
+          [ -s prod.txt ] || { echo "::error::no tables found in prod"; exit 1; }
+          diff prod.txt restored.txt || { echo "::error::restored copy differs from prod"; exit 1; }
+
+      - name: Encrypt
+        run: |
+          printf '%s' "$BACKUP_PASSPHRASE" | gpg --batch --yes --pinentry-mode loopback --passphrase-fd 0 \
+            --symmetric --cipher-algo AES256 --output "parkour_prod-$STAMP.dump.gpg" backup.dump
+          rm -f backup.dump prod.txt restored.txt
+          ls -l ./*.gpg
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: parkour_prod-${{ env.STAMP }}
+          path: parkour_prod-*.dump.gpg
+          retention-days: 30
+          if-no-files-found: error

@@ -23,4 +23,5 @@
 | 2026-10-06 | Документы состояния режутся командой `/trim`: `PROGRESS.md` — только текущее; история — `docs/archive/done-stage-N.md`, вопросы — `docs/questions.md`, решения — здесь |
 | 2026-10-06 | Хранилище файлов R2 (0.9) — отложено до этапа 2; до этого фото — заглушки |
 | 2026-10-06 | Отдельная роль Neon для прода — в чек-лист перед запуском (этап 8) |
+| 2026-10-06 | Бэкап (0.8): GitHub Actions `backup.yml` раз в сутки — `pg_dump` `parkour_prod` под ролью только на чтение `backup_reader`, проверка восстановления во временный Postgres, шифрование gpg, артефакт 30 дней. В GitHub Secrets дополнительно `PROD_DATABASE_URL`, `BACKUP_PASSPHRASE` |
 | 2026-10-06 | Из CoffeeOS взяты `/crit-audit` (журнал `docs/critical-ledger.md`, шаг 2 `/review`), `/trace-bug`, README команд, строка `Next:` в каждой команде |
