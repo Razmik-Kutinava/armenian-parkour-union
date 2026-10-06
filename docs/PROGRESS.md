@@ -65,7 +65,8 @@
 ## В работе
 
 - 0.7 (часть 2): первый `fly deploy` (по апруву владельца), затем домен `parkour.am` (`fly certs add`, DNS), `FLY_API_TOKEN` в GitHub Secrets. Боевые секреты (`DATABASE_URL` → `parkour_prod` и др.) — через `fly secrets set`, когда появятся (после 0.4).
-- 0.4: Drizzle + Neon. Ждём: владелец вставляет строку `parkour_dev` в `DATABASE_URL` в `.env` (после сброса пароля). Первая миграция — через Migration Gate.
+- 0.4: Drizzle подключён, соединение с `parkour_dev` проверено. Первая (пустая) миграция ждёт «go» по Migration Gate. Коммит не запушен: CI с `db:migrate` без папки миграций упадёт — push вместе с миграцией.
+- **Конфликт 0.4 и 0.7, решить до первого деплоя:** `release_command = npm run db:migrate` запускает `drizzle-kit`, а он в devDependencies, и образ ставит только `--omit=dev`; папка `drizzle/` и `drizzle.config.ts` в финальный образ тоже не копируются. Варианты: скрипт миграций на `drizzle-orm/postgres-js/migrator` (без drizzle-kit в проде) или перенести drizzle-kit в dependencies.
 
 ## Открытые вопросы к владельцу
 
