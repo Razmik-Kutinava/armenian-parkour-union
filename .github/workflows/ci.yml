@@ -21,7 +21,7 @@ jobs:
     name: docs
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Required docs and rules exist
         run: |
@@ -47,7 +47,7 @@ jobs:
     name: lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - id: detect
         run: |
@@ -71,7 +71,7 @@ jobs:
     name: typecheck
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - id: detect
         run: |
@@ -99,7 +99,7 @@ jobs:
     name: scan_deps
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - id: detect
         run: |
@@ -149,7 +149,7 @@ jobs:
       BETTER_AUTH_SECRET: ci-only-not-a-secret
       PUBLIC_SITE_URL: http://localhost:4173
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - id: detect
         run: |
@@ -195,7 +195,7 @@ jobs:
       BETTER_AUTH_SECRET: ci-only-not-a-secret
       PUBLIC_SITE_URL: http://localhost:4173
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - id: detect
         run: |

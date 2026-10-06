@@ -26,7 +26,7 @@ jobs:
           - language: javascript-typescript
             build-mode: none
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       # До этапа 0 JS/TS-кода нет — CodeQL падает на пустом репозитории, поэтому анализ JS пропускается.
       - id: detect
