@@ -21,7 +21,7 @@ jobs:
     name: docs
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Required docs and rules exist
         run: |
@@ -47,7 +47,7 @@ jobs:
     name: lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - id: detect
         run: |
@@ -55,7 +55,7 @@ jobs:
           else echo "app=false" >> "$GITHUB_OUTPUT"; echo "::notice::package.json not found — lint skipped"; fi
 
       - if: steps.detect.outputs.app == 'true'
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
@@ -71,7 +71,7 @@ jobs:
     name: typecheck
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - id: detect
         run: |
@@ -79,7 +79,7 @@ jobs:
           else echo "app=false" >> "$GITHUB_OUTPUT"; echo "::notice::package.json not found — typecheck skipped"; fi
 
       - if: steps.detect.outputs.app == 'true'
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
@@ -99,7 +99,7 @@ jobs:
     name: scan_deps
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - id: detect
         run: |
@@ -107,7 +107,7 @@ jobs:
           else echo "app=false" >> "$GITHUB_OUTPUT"; echo "::notice::package-lock.json not found — dependency audit skipped"; fi
 
       - if: steps.detect.outputs.app == 'true'
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: ${{ env.NODE_VERSION }}
 
@@ -149,7 +149,7 @@ jobs:
       BETTER_AUTH_SECRET: ci-only-not-a-secret
       PUBLIC_SITE_URL: http://localhost:4173
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - id: detect
         run: |
@@ -157,7 +157,7 @@ jobs:
           else echo "app=false" >> "$GITHUB_OUTPUT"; echo "::notice::package.json not found — tests skipped"; fi
 
       - if: steps.detect.outputs.app == 'true'
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
@@ -195,7 +195,7 @@ jobs:
       BETTER_AUTH_SECRET: ci-only-not-a-secret
       PUBLIC_SITE_URL: http://localhost:4173
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - id: detect
         run: |
@@ -203,7 +203,7 @@ jobs:
           else echo "app=false" >> "$GITHUB_OUTPUT"; echo "::notice::no Playwright specs in tests/e2e — e2e skipped"; fi
 
       - if: steps.detect.outputs.app == 'true'
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
@@ -223,7 +223,7 @@ jobs:
 
       - name: Keep Playwright report on failure
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: playwright-report
           path: playwright-report
