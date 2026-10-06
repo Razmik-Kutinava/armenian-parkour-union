@@ -35,10 +35,10 @@
 
 ## Хостинг и деплой
 - **Приложение:** Fly.io, Docker-образ (`Dockerfile` + `fly.toml`), адаптер `@sveltejs/adapter-node`. HTTPS и сертификат даёт Fly, свой прокси не нужен. Регион — ближайший к Армении (предварительно `fra`).
-- **База:** PostgreSQL, управляемая. Где именно (Fly Managed Postgres или внешняя: Neon, Supabase) — **открыто**. Ежедневные бэкапы с проверкой восстановления.
+- **База:** PostgreSQL в Neon (бесплатный тариф, регион Frankfurt). Один проект Neon, в нём две базы: `parkour_dev` (разработка) и `parkour_prod` (сайт). Это базы данных, не ветки git. Бэкапы — встроенные в Neon (несколько дней на бесплатном тарифе) плюс регулярный `pg_dump` с копией вне Neon.
 - **Файлы:** Cloudflare R2, не на диске сервера.
 - **Домен:** `parkour.am` (куплен), DNS указывает на Fly. Все ссылки и письма используют `PUBLIC_SITE_URL`.
-- **Окружения:** `development` (локально, Postgres в `docker compose`), `production` (Fly). Отдельный `staging` по желанию позже.
+- **Окружения:** `development` (локально, база `parkour_dev` в Neon), `production` (Fly + `parkour_prod`). CI поднимает свой временный Postgres. Отдельный `staging` по желанию позже.
 - **Деплой:** `fly deploy` (из CI или локально), миграции запускаются перед стартом новой версии (`release_command`). Деплой — только по апруву владельца (`/deploy`).
 - **Мониторинг:** Sentry — подключается после первого деплоя.
 
@@ -84,7 +84,7 @@
 │     ├─ api/                    вебхуки платежей и внутренние эндпоинты
 │     └─ dev/design/             страница-образец дизайна (только development, `08`, раздел 14)
 ├─ .env.example                  список переменных без значений
-├─ docker-compose.yml            локальный Postgres
+├─ docker-compose.yml            (необязательно) локальный Postgres, если есть Docker
 ├─ drizzle.config.ts
 ├─ svelte.config.js
 ├─ Dockerfile
@@ -134,7 +134,7 @@ PAYMENT_{PROVIDER}_*     # заполняется по 07-PAYMENTS.md, разд�
 | `npm run db:studio` | Drizzle Studio (просмотр данных) |
 | `npm run db:seed` | Наполнить БД тестовыми данными (`scripts/seed.ts`) |
 
-Локальная база поднимается через `docker compose up -d` (Postgres в контейнере, `docker-compose.yml` в корне).
+Локально приложение подключается к базе `parkour_dev` в Neon (`DATABASE_URL` в `.env`). Docker не обязателен; если он есть, можно поднять Postgres через `docker compose up -d`.
 
 **Проверка перед коммитом** (для отчёта «Проверка» из правил): `npm run check`, `npm run lint`, `npm run test`; для баллов, платежей и прав — плюс тесты этой зоны.
 
@@ -148,7 +148,7 @@ PAYMENT_{PROVIDER}_*     # заполняется по 07-PAYMENTS.md, разд�
 - Размер файлов — по лимитам из правил (цель ≤ 50 строк, > 200 — сначала план сплита).
 
 ## Открытые решения (подтвердить у владельца)
-1. **Хостинг:** решено — Fly.io, домен `parkour.am`. Открыто: где база (Fly Managed Postgres или Neon / Supabase).
+1. **Хостинг:** решено — Fly.io, домен `parkour.am`, база в Neon (бесплатный тариф).
 2. **Авторизация:** решено — Better Auth, email + пароль и вход через Google на этапе 1.
 3. **Почта:** отложена отдельной задачей; до подключения письма пишутся в лог. Resend — кандидат.
 4. **Платежи:** провайдер не выбран. Решение фиксируется в `07-PAYMENTS.md` и определяет раздел `PAYMENT_*` в окружении.
