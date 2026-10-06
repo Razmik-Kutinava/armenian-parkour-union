@@ -19,6 +19,9 @@
 - 2026-10-06 | 0.7 (деплой из GitHub) | владелец добавил `FLY_API_TOKEN` в GitHub Secrets; workflow Deploy (ручной запуск) прошёл, `release_command` → `Migrations applied` на `parkour_prod`. Контур замкнут: код → GitHub (CI) → Deploy → Fly → Neon (dev и prod на одной миграции `0000_init`) | `.github/workflows/deploy.yml` | сайт по имени → 200
 - 2026-10-06 | 0.4 («go» владельца) | пустая миграция `drizzle/0000_init.sql` (`drizzle-kit generate --custom`), применена к `parkour_dev` — `drizzle.__drizzle_migrations` = 1 запись. На `parkour_prod` применяется при деплое (`release_command`) | `drizzle/` | `npm run db:migrate`
 - 2026-10-06 | Fly | лишнее приложение `armenian-parkour-union-rhzcwq` (автодеплой из GitHub через панель Fly) удалено владельцем; остаётся одно — `armenian-parkour-union` | — | `fly apps list`
+- 2026-10-06 | процесс | `/trim`: PROGRESS порезан, архив этапа 0, `questions.md`, `decisions.md`, оглавления в больших документах | `docs/*`, `.cursor/commands/trim.md` | `PROGRESS.md` ≤ 80 строк
+- 2026-10-06 | 0.7 (домен) | `parkour.am` подключён владельцем: сертификат Fly `Issued`, `https://parkour.am` → 200. `www.parkour.am` без сертификата; `PUBLIC_SITE_URL`/`ORIGIN` на Fly не заданы — в «Известные проблемы» | — | `fly certs list -a armenian-parkour-union`; открыть https://parkour.am
+- 2026-10-06 | процесс | из CoffeeOS: `/crit-audit` (K1–K5 из `sbr.mdc`, падающий тест обязателен, вердикт CLEAN/BLOCKED, журнал `docs/critical-ledger.md`), встроен в шаг 2 `/review`; `/trace-bug` для оплаты, прав, баллов; `.cursor/commands/README.md`; `Next:` в `/trim` | `.cursor/commands/*`, `.cursor/rules/sbr.mdc`, `main.mdc`, `docs/critical-ledger.md` | набрать `/` в чате — видны `crit-audit`, `trace-bug`
 
 ## Статус документации на конец этапа 0
 
