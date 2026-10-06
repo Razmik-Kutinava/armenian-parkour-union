@@ -17,7 +17,7 @@
 
 | Этап | Название | Статус |
 |---|---|---|
-| 0 | Подготовка | в работе (сделаны 0.1, 0.2, 0.3, 0.5; 0.6 частично) |
+| 0 | Подготовка | в работе (сделаны 0.1–0.6; 0.7 без домена; осталось 0.8 бэкапы, 0.9 R2; 0.10 почта отложена) |
 | 1 | Каркас | не начат |
 | 2 | Контент | не начат |
 | 3 | Членство и платежи | не начат |
@@ -67,7 +67,8 @@
 ## В работе
 
 - 0.7 (часть 2, сделано 2026-10-06): первый `fly deploy` по апруву владельца — образ 68 МБ, `release_command` прошёл (миграций нет — пропуск), машина `fra` запущена, health check проходит; секрет `DATABASE_URL` (`parkour_prod`) задан владельцем в панели Fly. IP при первом деплое не выдались автоматически — выделены вручную: shared IPv4 `66.241.125.31`, IPv6 `2a09:8280:1::1a9:6a4a:0`. Проверка: запрос по IP → 200, заголовок «Armenian Parkour Union».
-- 0.7 (осталось): домен `parkour.am` (`fly certs add`, DNS у регистратора), `FLY_API_TOKEN` в GitHub Secrets для деплоя кнопкой.
+- 0.7 (деплой из GitHub, 2026-10-06): владелец добавил `FLY_API_TOKEN` в GitHub Secrets; workflow Deploy (ручной запуск) прошёл, `release_command` → `Migrations applied` на `parkour_prod`. Контур замкнут: код → GitHub (CI) → Deploy → Fly → Neon (dev и prod на одной миграции `0000_init`). Сайт по имени → 200.
+- 0.7 (осталось): домен `parkour.am` (`fly certs add`, DNS у регистратора) — нужен регистратор от владельца.
 - 0.4 (сделано 2026-10-06, «go» владельца): пустая миграция `drizzle/0000_init.sql` (`drizzle-kit generate --custom`), применена к `parkour_dev` — `drizzle.__drizzle_migrations` = 1 запись. На `parkour_prod` применяется при деплое (`release_command`).
 - Локальное окружение: на компьютере ARM64 стоят Node 24 arm64 (`C:\Program Files\nodejs`) и nvm (сейчас Node 20 x64, стоит первым в PATH). Проект ставился под Node 24 arm64; под Node 20 x64 drizzle-kit падает (esbuild не той архитектуры). Для проекта запускать команды под Node 24 (`nvm use` на 24 arm64 или Program Files первым в PATH).
 - Fly: лишнее приложение `armenian-parkour-union-rhzcwq` (автодеплой из GitHub через панель Fly) удалено владельцем 2026-10-06; остаётся одно — `armenian-parkour-union`.
