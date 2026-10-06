@@ -155,3 +155,5 @@
 - Обе базы Neon (`parkour_dev`, `parkour_prod`) под одной ролью `neondb_owner`: до запуска завести для прода отдельную роль.
 - Пароль `neondb_owner` попадал в чат 2026-10-06 — владелец сбрасывает его; старая строка подключения недействительна.
 - Версии из `sv create`: SvelteKit 3, Vite 8, TypeScript 6, Tailwind 4, ESLint 10 — актуальные на дату установки.
+- `npm audit`: 4 moderate в esbuild внутри drizzle-kit (только dev, на сайт не попадает; CI проверяет prod-зависимости уровня high). Следить за обновлением drizzle-kit.
+- Драйвер `postgres` (postgres.js) добавлен как часть Drizzle; в таблице стека `01` отдельной строкой не указан.
