@@ -1,0 +1,17 @@
+node_modules
+build
+.svelte-kit
+.git
+.github
+.cursor
+.vscode
+docs
+tests
+test-results
+playwright-report
+.env
+.env.*
+!.env.example
+Dockerfile
+.dockerignore
+fly.toml

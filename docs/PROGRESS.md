@@ -60,8 +60,11 @@
 
 - 2026-10-06 | 0.1, 0.3, 0.5 | `.gitignore` (его не было), `.env.example`, локальный `.env` (не в git); SvelteKit + TS strict, Tailwind, ESLint, Prettier, Vitest (unit), Playwright, adapter-node через `sv create`; папки из `01`, заглушка на `/` в `(site)`, e2e `tests/e2e/home.spec.ts`; Prettier не трогает `docs/`, `.cursor/`, `.github/`; в CI `db:migrate --if-present` до задачи 0.4 | корень, `src/`, `tests/`, `.github/workflows/ci.yml` | `npm run dev` → http://localhost:5173 |
 
+- 2026-10-06 | 0.7 (часть 1: подготовка к деплою) | `Dockerfile` (node 22 slim, двухэтапная сборка, запуск от `node`), `.dockerignore`, `fly.toml` (app `armenian-parkour-union`, регион `fra`, порт 3000, HTTPS, `release_command = npm run db:migrate --if-present`, 512 МБ, машина засыпает без трафика), ручной workflow `deploy.yml` (только `workflow_dispatch`, ветка `master`, environment `production`, секрет `FLY_API_TOKEN`); приложение создано на Fly (`fly apps create`), деплоя ещё не было | `Dockerfile`, `.dockerignore`, `fly.toml`, `.github/workflows/deploy.yml` | `npm run build`, затем `node build` → http://localhost:3000; `fly config validate` |
+
 ## В работе
 
+- 0.7 (часть 2): первый `fly deploy` (по апруву владельца), затем домен `parkour.am` (`fly certs add`, DNS), `FLY_API_TOKEN` в GitHub Secrets. Боевые секреты (`DATABASE_URL` → `parkour_prod` и др.) — через `fly secrets set`, когда появятся (после 0.4).
 - 0.4: Drizzle + Neon. Ждём: владелец вставляет строку `parkour_dev` в `DATABASE_URL` в `.env` (после сброса пароля). Первая миграция — через Migration Gate.
 
 ## Открытые вопросы к владельцу
