@@ -45,7 +45,7 @@
 | `payment_kind` | `membership`, `donation`, `event_fee` |
 | `payment_status` | `pending`, `paid`, `failed`, `cancelled`, `refunded` |
 | `video_status` | `pending`, `approved`, `rejected` |
-| `points_reason` | `certificate`, `event_registration`, `event_participation`, `event_win`, `video`, `manual`, `shop_order`, `shop_refund`, `reversal` |
+| `points_reason` | `certificate`, `event_registration`, `event_participation`, `event_place`, `video`, `manual`, `shop_order`, `shop_refund`, `reversal` |
 | `order_status` | `new`, `confirmed`, `shipped`, `delivered`, `cancelled` |
 | `hero_type` | `event`, `presentation`, `video`, `person`, `custom` |
 | `consent_kind` | `parental`, `medical`, `privacy` |
@@ -305,7 +305,7 @@
 | updated_by | uuid FK users null | |
 | updated_at | timestamptz | |
 
-Коды правил (создаются seed-скриптом): `certificate_level_advanced`, `certificate_level_pro`, `certificate_trainer`, `certificate_judge`, `event_registration`, `event_participation`, `event_win`, `video_approved`. Значения баллов на старте задаёт владелец проекта.
+Коды правил (создаются seed-скриптом): `certificate_level_advanced`, `certificate_level_pro`, `certificate_trainer`, `certificate_judge`, `event_registration`, `event_participation`, `event_place_1`, `event_place_2`, `event_place_3`, `video_approved`. Стартовые значения — `03`, раздел 6.1.
 
 ### `points_ledger`
 Журнал начислений. **Append-only.**
