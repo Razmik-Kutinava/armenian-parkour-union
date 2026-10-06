@@ -1,4 +1,4 @@
-# Пока нет package.json (этап 0 не начат), шаги с кодом пропускаются с notice, job остаётся зелёным.
+# Шаги без нужных файлов пропускаются с notice; db:migrate — только когда скрипт появится (задача 0.4).
 name: CI
 
 on:
@@ -167,7 +167,7 @@ jobs:
 
       - name: Migrate test DB
         if: steps.detect.outputs.app == 'true'
-        run: npm run db:migrate
+        run: npm run db:migrate --if-present
 
       - name: Vitest
         if: steps.detect.outputs.app == 'true'
@@ -215,7 +215,7 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       - if: steps.detect.outputs.app == 'true'
-        run: npm run db:migrate
+        run: npm run db:migrate --if-present
 
       - name: Playwright
         if: steps.detect.outputs.app == 'true'
