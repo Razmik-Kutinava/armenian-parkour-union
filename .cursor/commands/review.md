@@ -12,20 +12,29 @@
 
 ## Фильтр диффа для субагентов
 
-Субагенты видят только `src`, `tests`, `scripts`, `drizzle/*.sql`. Не видят: `docs`, `package-lock.json`, `drizzle/meta`, `src/lib/i18n`, прочие файлы корня. Cursor собирает дифф сам, поэтому лишнее временно прячется в локальный коммит (не пушится):
+Субагенты видят: `src`, `tests`, `scripts`, `drizzle/*.sql` и инфраструктуру — `package.json`, `Dockerfile`, `.dockerignore`, `fly.toml`, `.github`, `.env.example`, `*.config.ts`. Не видят: `docs`, `package-lock.json`, `drizzle/meta`, `src/lib/i18n`. Cursor собирает дифф сам, поэтому лишнее временно прячется в локальный коммит (не пушится).
+
+**До субагентов** (одним вызовом; упало — субагентов не запускать):
 
 ```powershell
-$S = git rev-parse HEAD                      # рабочее дерево должно быть чистым
+if (git status --porcelain) { throw 'Незакоммиченные изменения: сначала коммит (GREEN), потом ревью' }
+git rev-parse HEAD > .git/review-base-sha
 git reset -q '@{u}'
-git add -A -- . ':(exclude)src' ':(exclude)tests' ':(exclude)scripts' ':(exclude,glob)drizzle/*.sql'
+git add -A -- . ':(exclude)src' ':(exclude)tests' ':(exclude)scripts' ':(exclude,glob)drizzle/*.sql' `
+  ':(exclude)package.json' ':(exclude)Dockerfile' ':(exclude).dockerignore' ':(exclude)fly.toml' `
+  ':(exclude).github' ':(exclude).env.example' ':(exclude,glob)*.config.ts'
 git add -A -- src/lib/i18n
 git diff --cached --quiet; if ($LASTEXITCODE) { git commit -q --no-verify -m "tmp: review base" }
 git add -A
-# → субагенты по уровню риска с Diff: uncommitted changes
-git reset -q $S                              # сразу после ответа субагентов
+git diff --cached --name-only HEAD          # это и увидят субагенты; пусто — субагенты не нужны
 ```
 
-После возврата: `git rev-parse HEAD` = `$S`, `git status` пуст. Иначе — стоп и вернуть `git reset -q $S`. Фиксы по находкам — только после возврата.
+**После субагентов** (сразу, до любых фиксов; также если что-то упало посередине):
+
+```powershell
+git reset -q (Get-Content .git/review-base-sha); Remove-Item .git/review-base-sha
+git status --porcelain                       # должно быть пусто
+```
 
 ## Отчёт
 Сделано · Не сделано · Local PASS/FAIL · `Риск: high | normal | low` · `Субагенты: bugbot (критичных N) | security-review (критичных N) | нет — low` · `crit-audit: CLEAN | BLOCKED: N` · CI green + ссылка · `Коммит: <хеш>`

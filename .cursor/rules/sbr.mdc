@@ -53,7 +53,7 @@ alwaysApply: false
 | # | Шаг | Стоп если |
 |---|---|---|
 | 1 | Local: `npm run check`, `npm run lint`, `npm run test` (+ «Проверка» из todo) | FAIL → назад в GREEN |
-| 2 | **Субагенты по уровню риска** (таблица ниже), `Diff: uncommitted changes` на отфильтрованном диффе: только `src`, `tests`, `scripts`, `drizzle/*.sql`, без `docs`, lock, `drizzle/meta`, `i18n` — процедура в `.cursor/commands/review.md`. Находки + свой проход по диффу → `/crit-audit` (список «критично» ниже, журнал `docs/critical-ledger.md`) | `BLOCKED` → фикс, к шагу 1 |
+| 2 | **Субагенты по уровню риска** (таблица ниже), `Diff: uncommitted changes` на отфильтрованном диффе: `src`, `tests`, `scripts`, `drizzle/*.sql` и инфраструктура, без `docs`, lock, `drizzle/meta`, `i18n`; рабочее дерево перед ревью чистое — процедура в `.cursor/commands/review.md`. Находки + свой проход по диффу → `/crit-audit` (список «критично» ниже, журнал `docs/critical-ledger.md`) | `BLOCKED` → фикс, к шагу 1 |
 | 3 | Сверка со SPEC: всё из todo и «Готово, когда» задачи сделано, документы не нарушены | дыра → `/sbr` |
 | 4 | Обновить `PROGRESS.md` («Сделано», убрать из «В работе»), закрыть todo; триггер `/trim` — выполнить. Коммит | — |
 | 5 | **`git push`** без вопроса. Смотреть **все** job: `gh run watch` / `gh run view` | — |
@@ -64,7 +64,7 @@ alwaysApply: false
 
 | Уровень | Что в диффе | Субагенты |
 |---|---|---|
-| `high` | права и роли, авторизация и сессии (`server/auth`, `hooks.server.ts`), платежи и вебхуки, баллы, степени, взносы, миграции (`drizzle/*.sql`), личные данные и данные до 18 (`services/users`, `profile`), журнал действий (`audit*`), `+server.ts` | `bugbot` + `security-review` параллельно |
+| `high` | права и роли, авторизация и сессии (`server/auth`, `hooks.server.ts`), платежи и вебхуки, баллы, степени, взносы, миграции (`drizzle/*.sql`), личные данные и данные до 18 (`services/users`, `profile`), журнал действий (`audit*`), `+server.ts`, инфраструктура (`package.json`, `Dockerfile`, `fly.toml`, `.github`, `.env.example`, `*.config.ts`) | `bugbot` + `security-review` параллельно |
 | `normal` | прочая серверная логика: сервисы, `+page.server.ts`, формы и валидация | только `bugbot` |
 | `low` | вёрстка, компоненты без серверной логики, каркас, тексты и переводы, стили | без субагентов: свой проход по диффу + `/crit-audit` |
 
