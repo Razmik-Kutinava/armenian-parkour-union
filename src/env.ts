@@ -4,5 +4,7 @@ import { defineEnvVars } from '@sveltejs/kit/env';
 const optional = (value: string | undefined) => value || undefined;
 
 export const variables = defineEnvVars({
-	DATABASE_URL: { schema: optional }
+	DATABASE_URL: { schema: optional },
+	BETTER_AUTH_SECRET: { schema: optional },
+	PUBLIC_SITE_URL: { schema: optional }
 });
