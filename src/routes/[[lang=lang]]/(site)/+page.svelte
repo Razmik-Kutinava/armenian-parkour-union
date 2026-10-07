@@ -6,7 +6,7 @@
 	<title>{t('site.name')}</title>
 </svelte:head>
 
-<main class="flex min-h-screen flex-col items-center justify-center gap-4 p-6 text-center">
+<section class="flex flex-col items-center justify-center gap-4 px-6 py-24 text-center">
 	<h1 class="text-3xl font-bold">{t('site.name')}</h1>
 	<p>{t('site.underConstruction')}</p>
-</main>
+</section>

@@ -27,7 +27,10 @@ async function registerAs(page: Page, role: 'member' | 'editor') {
 test('guest sees the site menu, log in and join, footer page links', async ({ page }) => {
 	await page.goto('/');
 	const header = page.getByRole('banner');
-	await expect(header.getByRole('link', { name: 'Armenian Parkour Union' })).toHaveAttribute('href', '/');
+	await expect(header.getByRole('link', { name: 'Armenian Parkour Union' })).toHaveAttribute(
+		'href',
+		'/'
+	);
 	for (const [name, href] of [
 		['Events', '/events'],
 		['News', '/news'],
@@ -41,11 +44,20 @@ test('guest sees the site menu, log in and join, footer page links', async ({ pa
 	await expect(header.getByRole('link', { name: 'Join' })).toHaveAttribute('href', '/join');
 
 	const footer = page.getByRole('contentinfo');
-	await expect(footer.getByRole('link', { name: 'About the federation' })).toHaveAttribute('href', '/federation');
+	await expect(footer.getByRole('link', { name: 'About the federation' })).toHaveAttribute(
+		'href',
+		'/federation'
+	);
 	await expect(footer.getByRole('link', { name: 'Rules' })).toHaveAttribute('href', '/pages/rules');
-	await expect(footer.getByRole('link', { name: 'Privacy policy' })).toHaveAttribute('href', '/pages/privacy');
+	await expect(footer.getByRole('link', { name: 'Privacy policy' })).toHaveAttribute(
+		'href',
+		'/pages/privacy'
+	);
 
-	await expect(page.getByRole('link', { name: 'Skip to content' })).toHaveAttribute('href', '#content');
+	await expect(page.getByRole('link', { name: 'Skip to content' })).toHaveAttribute(
+		'href',
+		'#content'
+	);
 	await expect(page.locator('main#content')).toHaveCount(1);
 });
 
@@ -53,7 +65,10 @@ test('language switcher keeps the page and changes <html lang>', async ({ page }
 	await page.goto('/ru/login');
 	const header = page.getByRole('banner');
 	await expect(header.getByRole('link', { name: 'События' })).toHaveAttribute('href', '/ru/events');
-	await expect(header.getByRole('link', { name: 'Русский' })).toHaveAttribute('aria-current', 'true');
+	await expect(header.getByRole('link', { name: 'Русский' })).toHaveAttribute(
+		'aria-current',
+		'true'
+	);
 	await expect(header.getByRole('link', { name: 'Հայերեն' })).toHaveAttribute('href', '/hy/login');
 
 	await header.getByRole('link', { name: 'English' }).click();
@@ -97,14 +112,20 @@ test('unknown page gives a branded 404 with a link home in the page language', a
 	const response = await page.goto('/no-such-page');
 	expect(response?.status()).toBe(404);
 	await expect(page.getByRole('heading', { name: 'Page not found' })).toBeVisible();
-	await expect(page.getByRole('link', { name: 'Go to the home page' })).toHaveAttribute('href', '/');
+	await expect(page.getByRole('banner')).toBeVisible();
+	await expect(page.getByRole('link', { name: 'Go to the home page' })).toHaveAttribute(
+		'href',
+		'/'
+	);
 
 	expect((await page.goto('/ru/no-such-page'))?.status()).toBe(404);
 	await expect(page.getByRole('heading', { name: 'Страница не найдена' })).toBeVisible();
 	await expect(page.getByRole('link', { name: 'На главную' })).toHaveAttribute('href', '/ru');
 });
 
-test('an expected error inside the site keeps the header and shows its message', async ({ page }) => {
+test('an expected error inside the site keeps the header and shows its message', async ({
+	page
+}) => {
 	const response = await page.goto('/verify-email?token=broken');
 	expect(response?.status()).toBe(400);
 	await expect(page.getByRole('banner')).toBeVisible();

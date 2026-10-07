@@ -49,7 +49,10 @@ describe.skipIf(!url)('footer settings from site_settings', () => {
 				address: { en: 'Yerevan', ru: 'Ереван' },
 				mapUrl: 'https://maps.example.com/apu'
 			});
-			await put(tx, 'socials', { telegram: 'https://t.me/apu', instagram: 'https://instagram.com/apu' });
+			await put(tx, 'socials', {
+				telegram: 'https://t.me/apu',
+				instagram: 'https://instagram.com/apu'
+			});
 			await put(tx, 'footer', { text: { en: 'Since 2010', ru: 'С 2010 года' } });
 			await put(tx, 'requisites', { text: { en: 'Tax ID 000' } });
 
