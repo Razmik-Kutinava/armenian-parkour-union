@@ -52,6 +52,12 @@ export const ru: Partial<Messages> = {
 	'auth.error.limited': 'Слишком много попыток. Попробуйте позже.',
 	'auth.error.exists': 'Аккаунт с таким email уже есть.',
 
+	'admin.title': 'Админ-панель',
+	'role.member': 'Участник',
+	'role.editor': 'Редактор',
+	'role.moderator': 'Модератор',
+	'role.admin': 'Администратор',
+
 	'mail.verify.subject': 'Подтвердите email',
 	'mail.verify.text': 'Откройте ссылку, чтобы подтвердить email: {url}',
 	'mail.reset.subject': 'Сброс пароля',

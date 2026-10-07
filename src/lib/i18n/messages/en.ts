@@ -52,6 +52,12 @@ export const en = {
 	'auth.error.limited': 'Too many attempts. Try again later.',
 	'auth.error.exists': 'An account with this email already exists.',
 
+	'admin.title': 'Admin panel',
+	'role.member': 'Member',
+	'role.editor': 'Editor',
+	'role.moderator': 'Moderator',
+	'role.admin': 'Administrator',
+
 	'mail.verify.subject': 'Confirm your email',
 	'mail.verify.text': 'Open this link to confirm your email: {url}',
 	'mail.reset.subject': 'Reset your password',
