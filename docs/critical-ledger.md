@@ -5,7 +5,7 @@
 
 | Параметр | Значение |
 |---|---|
-| `last_audited_sha` | `473d27f` |
+| `last_audited_sha` | `1b857a1` |
 | Дата | 2026-10-07 |
 | Вердикт | CLEAN |
 
@@ -30,3 +30,4 @@
 | 2026-10-07 | 1.6 сессия: `hooks.server.ts`, `auth/session.ts`, `canonical-host.ts` | CLEAN | 0 | `2d44b3f` |
 | 2026-10-07 | 1.7 права: `permissions.ts`, `guard.ts`, `role-rules.ts`, `routes/admin` | CLEAN | 0 | `c9555ff` |
 | 2026-10-07 | 1.8 каркас: `(site)/+layout*`, `components/site`, `services/site-settings.ts`, `validation/site-settings.ts`, `+error` | CLEAN | 0 критичных (C6 не K, исправлено) | `473d27f` |
+| 2026-10-07 | 1.9 оболочка админки: `server/admin/nav.ts`, `components/admin`, `routes/admin`, `admin/locale/+server.ts`, `hooks.server.ts` | CLEAN | 0 | `1b857a1` |

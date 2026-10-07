@@ -37,7 +37,7 @@
 - 1.6 закрыта: `hooks.server.ts` читает сессию на каждом запросе с cookie (без cookie — гость без запроса к БД), `locals.user` (`src/lib/server/auth/session.ts`, без контактов и даты рождения); `blocked` / `deleted_at` → гость сразу; 301 `www.` → голый домен; `/login`, `/register`, `/forgot-password` уводят вошедшего на главную.
 - 1.7 закрыта: `src/lib/server/auth/permissions.ts` (= `04` 5.1), `guard.ts` (`requireStaff`, `requirePermission` — **вызывать в каждом load и action админки**, layout на POST не срабатывает), `role-rules.ts` (считать активных админов в той же транзакции — 1.10). `/admin` — заглушка до 1.9.
 - 1.8 закрыта: layout `(site)` — шапка (`src/lib/components/site/`), подвал из `site_settings` (`services/site-settings.ts`, схемы `validation/site-settings.ts` — их же брать в админке 1.10), переключатель языка, 404 внутри сайта (`[...rest]`), `+error.svelte` (5xx без деталей). Меню ведёт на ещё не созданные страницы (404).
-- 1.9 оболочка админки — в работе (SBR, `docs/todo.md`).
+- 1.9 закрыта: `routes/admin/+layout*` (боковая и верхняя панель), меню `src/lib/server/admin/nav.ts` (адреса — `decisions.md`), компоненты `src/lib/components/admin/` + `list-state.ts` (25 на страницу, сортировка и фильтры только из списка разрешённых). Язык админки — `users.locale`, `currentLocale()` берёт `page.data.locale`. `/admin` — пока заглушка дашборда.
 - Google-вход — отдельный шаг, ждёт ключи владельца (`GOOGLE_CLIENT_ID/SECRET`).
 - 0.9 хранилище R2 — отложено владельцем до этапа 2 (до этого фото — заглушки).
 
@@ -59,11 +59,11 @@
 
 Формат: `дата | задача | итог | коммит`. Полные записи — `docs/archive/done-stage-N.md`.
 
+- 2026-10-07 | 1.9 | оболочка админки: меню по правам роли, крошки, язык из профиля (`/admin/locale`), DataTable, FilterBar, Pagination, FormLayout, ConfirmDialog (демо на `/dev/design`); unit 123 + e2e 35; REVIEW: 0 / 0 | `feat: …`
 - 2026-10-07 | 1.8 | шапка, подвал из `site_settings` (только `https:`-ссылки), переключатель языка, страницы 404/403/500; unit 107 + e2e 28; REVIEW: bugbot 0, security 1 (C6 исправлено) | `feat: …`
 - 2026-10-07 | 1.7 | матрица прав = `04` 5.1, `can`/`requirePermission`, `/admin`: гость → вход, участник → 404; правила смены роли и блокировки; unit 87 + e2e 21; REVIEW: 0 / 0 | `feat: …`
 - 2026-10-07 | 1.6 | сессия → `locals.user`, блокировка действует со следующего запроса, редирект `www`; unit 73 + e2e 15; REVIEW: bugbot 0, security 0 | `feat: …`
 - 2026-10-07 | 1.5 | авторизация на form actions + Better Auth, свои лимиты попыток, защита адреса возврата; unit 67 + e2e 13; REVIEW: bugbot 1 (исправлено), security 5 (C1 исправлено, остальные не K / приняты) | `feat: …`
-- 2026-10-07 | 1.4 | миграция `0001` (8 таблиц, 3 enum, триггер append-only) на `parkour_dev`; тесты БД в транзакции с откатом: 5 | `feat: …`
 ## Известные проблемы и долги
 
 - Локально: Node 24 arm64 (`C:\Program Files\nodejs`) и nvm (Node 20 x64 первым в PATH). Под Node 20 x64 drizzle-kit падает (esbuild не той архитектуры) — запускать под Node 24.
