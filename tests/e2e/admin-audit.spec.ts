@@ -39,6 +39,10 @@ test('every admin action leaves an audit entry with author and IP', async ({ pag
 		expect(res.ok(), path).toBe(true);
 	};
 	const card = `/admin/users/${target}`;
+	const [file] = await sql`
+		insert into media (key, original_name, mime, size_bytes, uploaded_by)
+		values (${`media/2026/10/${crypto.randomUUID()}.png`}, 'audit.png', 'image/png', 10, ${adminId})
+		returning id`;
 
 	/* Typed by the map: a new admin action does not compile until it is exercised here. */
 	const perform: Record<AdminAction, () => Promise<void>> = {
@@ -68,6 +72,25 @@ test('every admin action leaves an audit entry with author and IP', async ({ pag
 			const name = (await field.getAttribute('name'))!;
 			const phone = `+374 10 ${String(Math.floor(Math.random() * 1e6)).padStart(6, '0')}`;
 			await post('/admin/settings', { ...form, [name]: phone });
+		},
+		/* No bucket in tests: the object is never there, so complete is refused and logs nothing.
+		   media.upload with a stored object is covered by services/media/upload.test.ts. */
+		'/admin/media?/complete': async () => {
+			const key = `media/2026/10/${crypto.randomUUID()}.png`;
+			const res = await page.request.post('/admin/media?/complete', {
+				form: { key, name: 'audit.png' },
+				headers: ORIGIN
+			});
+			expect(res.status()).toBe(400);
+		},
+		'/admin/media/[id]?/alt': () => post(`/admin/media/${file.id}?/alt`, { 'alt.en': 'Audit' }),
+		'/admin/media/[id]?/delete': async () => {
+			const res = await page.request.post(`/admin/media/${file.id}?/delete`, {
+				form: {},
+				headers: ORIGIN,
+				maxRedirects: 0
+			});
+			expect(res.status()).toBeLessThan(400);
 		}
 	};
 
@@ -79,7 +102,7 @@ test('every admin action leaves an audit entry with author and IP', async ({ pag
 	const userCodes = rows.map((r) => r.action as string).filter((a) => a !== 'settings.update');
 	const expected = Object.values(ADMIN_AUDIT)
 		.flat()
-		.filter((a) => a !== 'settings.update');
+		.filter((a) => a !== 'settings.update' && a !== 'media.upload');
 	expect(userCodes.sort()).toEqual(expected.sort());
 	expect(rows.some((r) => r.action === 'settings.update')).toBe(true);
 });

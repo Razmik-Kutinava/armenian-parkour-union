@@ -29,13 +29,15 @@ export const media = pgTable(
 	{
 		id: uuid('id').primaryKey().defaultRandom(),
 		key: text('key').notNull().unique(),
+		originalName: text('original_name').notNull(),
 		mime: text('mime').notNull(),
 		sizeBytes: integer('size_bytes').notNull(),
 		alt: jsonb('alt'),
 		uploadedBy: uuid('uploaded_by')
 			.notNull()
 			.references(() => users.id),
-		createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow()
+		createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+		deletedAt: timestamp('deleted_at', { withTimezone: true })
 	},
 	(t) => [check('media_size_positive', sql`${t.sizeBytes} > 0`)]
 );

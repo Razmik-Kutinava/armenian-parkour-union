@@ -1,5 +1,5 @@
 import type { Permission } from '../../src/lib/server/auth/permissions';
-import type { AdminAction } from './admin-audit-map';
+import type { AdminAction, NotAuditedAction } from './admin-audit-map';
 
 /*
  * What each admin route asks for (docs/04 section 5): a permission code, or 'staff' for any of
@@ -17,7 +17,9 @@ export const ADMIN_READS = {
 	'/admin/audit': 'audit.read',
 	'/admin/audit/[id]': 'audit.read',
 	'GET /admin/audit/export': 'audit.read',
-	'/admin/settings': 'settings.write'
+	'/admin/settings': 'settings.write',
+	'/admin/media': 'media.write',
+	'/admin/media/[id]': 'media.write'
 } as const satisfies Record<string, Access>;
 
 export const ADMIN_WRITES = {
@@ -31,5 +33,9 @@ export const ADMIN_WRITES = {
 	'/admin/roles?/grant': 'users.set_role',
 	'/admin/roles?/revoke': 'users.set_role',
 	'/admin/settings?/default': 'settings.write',
+	'/admin/media?/sign': 'media.write',
+	'/admin/media?/complete': 'media.write',
+	'/admin/media/[id]?/alt': 'media.write',
+	'/admin/media/[id]?/delete': 'media.write',
 	'POST /admin/locale': 'staff'
-} as const satisfies Record<AdminAction | 'POST /admin/locale', Access>;
+} as const satisfies Record<AdminAction | NotAuditedAction, Access>;

@@ -13,12 +13,19 @@ export const ADMIN_AUDIT = {
 	'/admin/users/new?/default': ['user.create'],
 	'/admin/roles?/grant': ['user.role_change'],
 	'/admin/roles?/revoke': ['user.role_change'],
-	'/admin/settings?/default': ['settings.update']
+	'/admin/settings?/default': ['settings.update'],
+	'/admin/media?/complete': ['media.upload'],
+	'/admin/media/[id]?/alt': ['media.update'],
+	'/admin/media/[id]?/delete': ['media.delete']
 } as const;
 
 export type AdminAction = keyof typeof ADMIN_AUDIT;
 
 /* Admin endpoints that change nothing of the federation, with the reason. */
-export const NOT_AUDITED: Record<string, string> = {
-	'POST /admin/locale': 'own interface language of the staff member'
-};
+export const NOT_AUDITED = {
+	'POST /admin/locale': 'own interface language of the staff member',
+	'/admin/media?/sign':
+		'only issues an upload link; the file enters the library at complete (media.upload)'
+} as const satisfies Record<string, string>;
+
+export type NotAuditedAction = keyof typeof NOT_AUDITED;
