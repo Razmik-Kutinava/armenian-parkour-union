@@ -1,10 +1,12 @@
 import type { Messages } from '../translate';
+import { ruMedia } from './ru-media';
 import { ruSystem } from './ru-system';
 import { ruUsers } from './ru-users';
 
 export const ru: Partial<Messages> = {
 	...ruUsers,
 	...ruSystem,
+	...ruMedia,
 	'site.underConstruction': 'Сайт в разработке.',
 	'common.close': 'Закрыть',
 

@@ -1,0 +1,38 @@
+/** Admin "Media" (docs/05 section 20). Part of `en`. */
+export const enMedia = {
+	'media.upload.title': 'Upload files',
+	'media.upload.choose': 'Choose files',
+	'media.upload.hint':
+		'JPEG, PNG, WebP, AVIF or PDF, up to 10 MB each. You can also drop files here.',
+	'media.upload.uploading': 'Uploading…',
+	'media.upload.done': 'Uploaded',
+	'media.search': 'File name',
+	'media.filter.kind': 'Type',
+	'media.kind.image': 'Images',
+	'media.kind.pdf': 'PDF',
+	'media.empty': 'No files yet',
+	'media.back': 'All files',
+	'media.size': 'Size',
+	'media.type': 'Type',
+	'media.uploaded': 'Uploaded',
+	'media.alt': 'Alt text',
+	'media.altHint':
+		'Describe the image for people who cannot see it. Leave empty for a decorative image.',
+	'media.link': 'Link',
+	'media.copy': 'Copy link',
+	'media.copied': 'Link copied',
+	'media.noLink': 'The link appears when file storage is connected.',
+	'media.usage.title': 'Where it is used',
+	'media.usage.none': 'Not used anywhere.',
+	'media.usage.user_avatar': 'User avatar',
+	'media.delete': 'Delete',
+	'media.deleteTitle': 'Delete the file?',
+	'media.deleteText': 'The file disappears from the library and can no longer be chosen.',
+	'media.inUse': 'The file is in use and cannot be deleted.',
+	'media.error.type': 'This file type is not allowed',
+	'media.error.size': 'The file is larger than 10 MB',
+	'media.error.empty': 'The file is empty',
+	'media.error.storage': 'File storage is not connected yet.',
+	'media.error.missing': 'The file did not reach the storage. Try again.',
+	'media.error.failed': 'Upload failed. Try again.'
+} as const;

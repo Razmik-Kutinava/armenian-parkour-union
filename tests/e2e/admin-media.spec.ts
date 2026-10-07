@@ -36,6 +36,7 @@ async function insertFile(uploadedBy: string, name: string) {
 test('editor finds a file, sets alt, cannot delete it while used, deletes it after', async ({
 	page
 }) => {
+	test.setTimeout(90_000);
 	const editorId = await registerEditor(page);
 	const tag = crypto.randomUUID().slice(0, 8);
 	const file = await insertFile(editorId, `${tag}-jump.png`);

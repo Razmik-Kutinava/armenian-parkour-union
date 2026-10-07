@@ -1,3 +1,4 @@
+import { enMedia } from './en-media';
 import { enSystem } from './en-system';
 import { enUsers } from './en-users';
 
@@ -5,6 +6,7 @@ import { enUsers } from './en-users';
 export const en = {
 	...enUsers,
 	...enSystem,
+	...enMedia,
 	'site.name': 'Armenian Parkour Union',
 	'site.underConstruction': 'Site under construction.',
 	'common.close': 'Close',

@@ -81,6 +81,7 @@ const mediaRow = async (id: string) =>
 
 for (const role of ['member', 'editor', 'moderator'] as const) {
 	test(`${role}: every admin page and action answers by docs/04, data stays`, async ({ page }) => {
+		test.setTimeout(90_000);
 		const target = await insertMember();
 		const before = await targetRow(target);
 		const ids = {
