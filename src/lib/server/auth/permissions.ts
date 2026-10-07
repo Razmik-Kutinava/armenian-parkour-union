@@ -43,8 +43,12 @@ export type Permission = keyof typeof permissions;
 
 const STAFF_ROLES: readonly UserRole[] = ['editor', 'moderator', 'admin'];
 
+export function roleCan(role: UserRole, permission: Permission): boolean {
+	return (permissions[permission] as readonly UserRole[]).includes(role);
+}
+
 export function can(user: LocalsUser | null, permission: Permission): boolean {
-	return !!user && (permissions[permission] as readonly UserRole[]).includes(user.role);
+	return !!user && roleCan(user.role, permission);
 }
 
 /** Roles that may enter /admin (docs/04 section 5.2). */

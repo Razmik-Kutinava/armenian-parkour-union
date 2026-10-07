@@ -1,5 +1,8 @@
+import { enUsers } from './en-users';
+
 /** Source of truth for UI text keys. hy and ru may omit keys: English is shown instead. */
 export const en = {
+	...enUsers,
 	'site.name': 'Armenian Parkour Union',
 	'site.underConstruction': 'Site under construction.',
 	'common.close': 'Close',

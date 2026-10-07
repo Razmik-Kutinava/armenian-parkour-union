@@ -38,9 +38,10 @@ test('admin creates a user; the user is in the list and in the audit log', async
 	await registerAs(page, 'admin');
 	await page.goto('/admin/users');
 	await page.getByRole('link', { name: 'Create user' }).click();
+	await expect(page).toHaveURL('/admin/users/new');
 	const email = `e2e-created-${crypto.randomUUID()}@example.com`;
 	const tag = crypto.randomUUID().slice(0, 8);
-	await page.getByLabel('Email').fill(email);
+	await page.getByLabel('Email', { exact: true }).fill(email);
 	await page.getByLabel('First name').fill('Created');
 	await page.getByLabel('Last name').fill(tag);
 	await page.getByLabel('Date of birth').fill('1992-02-02');
@@ -59,7 +60,7 @@ test('admin changes a role; the card history shows it', async ({ page, browser }
 	await registerAs(page, 'admin');
 	const member = await memberInOwnContext(browser, `role-${crypto.randomUUID().slice(0, 8)}`);
 	await page.goto(`/admin/users/${member.id}`);
-	await page.getByLabel('Role').selectOption('editor');
+	await page.getByLabel('Role', { exact: true }).selectOption('editor');
 	await page.getByRole('button', { name: 'Change role' }).click();
 	await page.getByRole('dialog').getByRole('button', { name: 'Change role' }).click();
 	await expect(page.getByText('Saved.')).toBeVisible();
@@ -139,7 +140,7 @@ test('admins and roles: grant a role through search, then take it back', async (
 	await page.getByLabel('Find a member').fill(tag);
 	await page.getByRole('button', { name: 'Find' }).click();
 	const found = page.getByRole('listitem').filter({ hasText: `Users ${tag}` });
-	await found.getByLabel('Role').selectOption('moderator');
+	await found.getByLabel('Role', { exact: true }).selectOption('moderator');
 	await found.getByRole('button', { name: 'Grant role' }).click();
 	await page.getByRole('dialog').getByRole('button', { name: 'Grant role' }).click();
 	await expect(page.getByRole('row').filter({ hasText: `Users ${tag}` })).toContainText(

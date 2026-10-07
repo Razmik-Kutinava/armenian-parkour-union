@@ -11,11 +11,17 @@ import { PASSWORD_MAX, PASSWORD_MIN } from '#lib/validation/auth.ts';
 import { db } from '../db';
 import { account, session, users, verification } from '../db/schema';
 import { sendMail } from '../mail';
+import { hasPassword } from './credential';
 
 export const ACCOUNT_BLOCKED = 'ACCOUNT_BLOCKED';
 
 /** Mail in the language of the page the request came from; link to our own page with the token. */
-async function mailLink(to: string, path: string, token: string, kind: 'verify' | 'reset') {
+async function mailLink(
+	to: string,
+	path: string,
+	token: string,
+	kind: 'verify' | 'reset' | 'setup'
+) {
 	const { locals, url } = getRequestEvent();
 	const base = PUBLIC_SITE_URL ?? url.origin;
 	const link = `${base}${localizePath(path, locals.locale)}?token=${encodeURIComponent(token)}`;
@@ -64,8 +70,13 @@ const createAuth = () =>
 			maxPasswordLength: PASSWORD_MAX,
 			autoSignIn: true,
 			revokeSessionsOnPasswordReset: true,
-			sendResetPassword: ({ user, token }) =>
-				mailLink(user.email, '/reset-password', token, 'reset')
+			sendResetPassword: async ({ user, token }) =>
+				mailLink(
+					user.email,
+					'/reset-password',
+					token,
+					(await hasPassword(db, user.id)) ? 'reset' : 'setup'
+				)
 		},
 		emailVerification: {
 			sendOnSignUp: true,

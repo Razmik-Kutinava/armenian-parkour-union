@@ -7,7 +7,7 @@ const MAX_AGE = 120;
 
 const blankToUndefined = (v: unknown) => (typeof v === 'string' && v.trim() === '' ? undefined : v);
 
-const email = z
+export const email = z
 	.string({ error: 'auth.error.email' })
 	.trim()
 	.toLowerCase()
@@ -16,14 +16,14 @@ const password = z
 	.string({ error: 'auth.error.passwordLength' })
 	.min(PASSWORD_MIN, { error: 'auth.error.passwordLength' })
 	.max(PASSWORD_MAX, { error: 'auth.error.passwordLength' });
-const name = z
+export const name = z
 	.string({ error: 'auth.error.required' })
 	.trim()
 	.min(1, { error: 'auth.error.required' })
 	.max(100, { error: 'auth.error.tooLong' });
-const optional = <T extends z.ZodType>(schema: T) =>
+export const optional = <T extends z.ZodType>(schema: T) =>
 	z.preprocess(blankToUndefined, schema.optional());
-const phone = z
+export const phone = z
 	.string()
 	.trim()
 	.regex(/^\+?[\d\s()-]{6,20}$/, { error: 'auth.error.phone' });
@@ -38,7 +38,8 @@ function parseDate(value: string): { y: number; m: number; d: number } | null {
 	return real ? { y, m, d } : null;
 }
 
-function ageOn(birthDate: string, today: Date): number | null {
+/** Full years on `today` (UTC calendar date); null for a malformed date. */
+export function ageOn(birthDate: string, today: Date): number | null {
 	const b = parseDate(birthDate);
 	if (!b) return null;
 	const [ty, tm, td] = [today.getUTCFullYear(), today.getUTCMonth() + 1, today.getUTCDate()];
@@ -54,7 +55,37 @@ export function isMinor(birthDate: string, today: Date): boolean {
 
 const guardianFields = ['guardianName', 'guardianPhone', 'guardianEmail'] as const;
 
-/** docs/06 section 4.11, docs/03 sections 1 and 13: parent data is required under 18. */
+export const birthDate = (today: Date) =>
+	z.string({ error: 'auth.error.birthDate' }).refine((v) => {
+		const age = ageOn(v, today);
+		return age !== null && age >= 0 && age <= MAX_AGE;
+	}, 'auth.error.birthDate');
+
+export const guardian = {
+	guardianName: optional(name),
+	guardianPhone: optional(phone),
+	guardianEmail: optional(email)
+};
+
+type GuardianData = { birthDate?: unknown } & Partial<
+	Record<(typeof guardianFields)[number], unknown>
+>;
+
+/** docs/03 sections 1 and 13: parent data is required under 18. Runs even if other fields fail. */
+export const requireGuardianIfMinor = (today: Date) =>
+	[
+		(data: GuardianData, ctx: z.RefinementCtx) => {
+			if (typeof data.birthDate !== 'string' || !isMinor(data.birthDate, today)) return;
+			for (const field of guardianFields) {
+				if (data[field] === undefined) {
+					ctx.addIssue({ code: 'custom', path: [field], message: 'auth.error.required' });
+				}
+			}
+		},
+		{ when: () => true }
+	] as const;
+
+/** docs/06 section 4.11. */
 export function registerSchema(today: Date = new Date()) {
 	return z
 		.object({
@@ -62,26 +93,11 @@ export function registerSchema(today: Date = new Date()) {
 			password,
 			firstName: name,
 			lastName: name,
-			birthDate: z.string({ error: 'auth.error.birthDate' }).refine((v) => {
-				const age = ageOn(v, today);
-				return age !== null && age >= 0 && age <= MAX_AGE;
-			}, 'auth.error.birthDate'),
+			birthDate: birthDate(today),
 			terms: z.literal('on', { error: 'auth.error.terms' }).transform(() => true),
-			guardianName: optional(name),
-			guardianPhone: optional(phone),
-			guardianEmail: optional(email)
+			...guardian
 		})
-		.superRefine(
-			(data, ctx) => {
-				if (typeof data.birthDate !== 'string' || !isMinor(data.birthDate, today)) return;
-				for (const field of guardianFields) {
-					if (data[field] === undefined) {
-						ctx.addIssue({ code: 'custom', path: [field], message: 'auth.error.required' });
-					}
-				}
-			},
-			{ when: () => true }
-		);
+		.superRefine(...requireGuardianIfMinor(today));
 }
 
 export type Registration = z.output<ReturnType<typeof registerSchema>>;

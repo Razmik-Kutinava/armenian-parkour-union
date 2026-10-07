@@ -40,9 +40,9 @@ describe('admin user forms', () => {
 		expect(roleSchema.safeParse({ role: 'root' }).success).toBe(false);
 	});
 
-	it('block: a reason is required, at most 500 characters', () => {
+	it('block: a reason is required, at most 1000 characters (as in ConfirmDialog)', () => {
 		expect(blockSchema.safeParse({ reason: '  ' }).success).toBe(false);
-		expect(blockSchema.safeParse({ reason: 'x'.repeat(501) }).success).toBe(false);
+		expect(blockSchema.safeParse({ reason: 'x'.repeat(1001) }).success).toBe(false);
 		expect(blockSchema.safeParse({ reason: ' Spam ' }).data).toEqual({ reason: 'Spam' });
 	});
 });
