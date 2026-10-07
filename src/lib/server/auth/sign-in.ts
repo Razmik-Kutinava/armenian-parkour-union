@@ -24,7 +24,7 @@ export async function signIn(
 	if (staffKey && (await isLimited(db, staffKey, limits.staffSignInFailures))) return 'limited';
 
 	try {
-		await auth.api.signInEmail({ body: input, headers });
+		await auth().api.signInEmail({ body: input, headers });
 		return 'ok';
 	} catch (error) {
 		if (!(error instanceof APIError)) throw error;
@@ -35,5 +35,5 @@ export async function signIn(
 }
 
 export async function signOut(headers: Headers): Promise<void> {
-	await auth.api.signOut({ headers });
+	await auth().api.signOut({ headers });
 }

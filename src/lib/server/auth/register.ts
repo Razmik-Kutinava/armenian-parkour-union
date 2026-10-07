@@ -25,7 +25,7 @@ export async function register(
 		: {};
 
 	try {
-		await auth.api.signUpEmail({
+		await auth().api.signUpEmail({
 			body: {
 				email: data.email,
 				password: data.password,
