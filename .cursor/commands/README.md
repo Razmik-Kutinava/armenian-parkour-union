@@ -8,7 +8,7 @@
 | `/spec` | задача с логикой: todo, файлы, «Не ломать», «Проверка» | `/sbr` |
 | `/sbr` | RED → GREEN по todo | `/regress` |
 | `/regress` | тесты зоны до REVIEW | `/review` (FAIL → `/sbr`) |
-| `/review` | local → `bugbot` + `security-review` + `/crit-audit` → PROGRESS → push → CI | `/deploy` по апруву |
+| `/review` | local → субагенты по риску (`high`: `bugbot` + `security-review`, `normal`: `bugbot`, `low`: нет) + `/crit-audit` → PROGRESS → push → CI | `/deploy` по апруву |
 | `/crit-audit` | только K1–K5, каждая находка с падающим тестом, журнал `docs/critical-ledger.md` | `CLEAN` → дальше; `BLOCKED` → `/sbr` |
 | `/trace-bug` | баг в оплате, правах, баллах — разбор цепочки до правок | `/spec` или `/sbr` |
 | `/deploy` | только по явному апруву владельца | `/spec` |

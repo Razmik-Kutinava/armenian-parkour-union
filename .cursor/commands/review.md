@@ -3,7 +3,7 @@
 Канон: `.cursor/rules/sbr.mdc` § PHASE 3. Порядок не менять.
 
 1. Local: `npm run check`, `npm run lint`, `npm run test` (+ «Проверка» из todo). FAIL → `/sbr`.
-2. Два субагента **параллельно и всегда оба**: `bugbot` и `security-review`, **только на отфильтрованном диффе** (ниже), `Diff: uncommitted changes`. Их находки + свой проход по диффу → `/crit-audit` (`.cursor/commands/crit-audit.md`): K1–K5, падающий тест, журнал. `BLOCKED` → фикс → шаг 1.
+2. Субагенты **по уровню риска** (таблица в `sbr.mdc` § PHASE 3; «Риск» из todo, сверить с диффом, высший уровень побеждает): `high` — `bugbot` + `security-review` параллельно; `normal` — только `bugbot`; `low` — без субагентов. Субагенты — **только на отфильтрованном диффе** (ниже), `Diff: uncommitted changes`. Их находки + свой проход по диффу → `/crit-audit` (`.cursor/commands/crit-audit.md`): K1–K5, падающий тест, журнал. `BLOCKED` → фикс → шаг 1.
 3. Сверка со SPEC (todo) и «Готово, когда» задачи в `09-ROADMAP.md`.
 4. `PROGRESS.md`: «Сделано», убрать из «В работе»; todo очистить до шаблона. Сработал триггер `/trim` — выполнить его. Коммит.
 5. `git push` без вопроса. Смотреть все job (`gh run watch`).
@@ -21,14 +21,14 @@ git add -A -- . ':(exclude)src' ':(exclude)tests' ':(exclude)scripts' ':(exclude
 git add -A -- src/lib/i18n
 git diff --cached --quiet; if ($LASTEXITCODE) { git commit -q --no-verify -m "tmp: review base" }
 git add -A
-# → bugbot + security-review с Diff: uncommitted changes
+# → субагенты по уровню риска с Diff: uncommitted changes
 git reset -q $S                              # сразу после ответа субагентов
 ```
 
 После возврата: `git rev-parse HEAD` = `$S`, `git status` пуст. Иначе — стоп и вернуть `git reset -q $S`. Фиксы по находкам — только после возврата.
 
 ## Отчёт
-Сделано · Не сделано · Local PASS/FAIL · `Субагенты: bugbot (критичных N) | security-review (критичных N)` · `crit-audit: CLEAN | BLOCKED: N` · CI green + ссылка · `Коммит: <хеш>`
+Сделано · Не сделано · Local PASS/FAIL · `Риск: high | normal | low` · `Субагенты: bugbot (критичных N) | security-review (критичных N) | нет — low` · `crit-audit: CLEAN | BLOCKED: N` · CI green + ссылка · `Коммит: <хеш>`
 
 ## Обязательно в конце
 
