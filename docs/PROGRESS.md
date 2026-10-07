@@ -15,7 +15,7 @@
 | Параметр | Значение |
 |---|---|
 | Текущий этап | 0. Подготовка (закрыт), следующий — 1. Каркас |
-| Последнее обновление | 2026-10-07, агент — направление дизайна записано |
+| Последнее обновление | 2026-10-07, агент — Fly: `PUBLIC_SITE_URL`, `ORIGIN`, сертификат `www` |
 | Ветка | `master` (единственная, другие ветки не создаём) |
 | Адрес сайта | https://parkour.am (заглушка; запасной — https://armenian-parkour-union.fly.dev) |
 | Последний `/trim` | 2026-10-06 |
@@ -52,17 +52,15 @@
 
 Формат: `дата | задача | итог | коммит`. Полные записи — `docs/archive/done-stage-N.md`.
 
+- 2026-10-07 | хвосты | Fly secrets `PUBLIC_SITE_URL`, `ORIGIN` = `https://parkour.am`; сертификат `www.parkour.am` `Issued`, https → 200 | `docs: …`
 - 2026-10-06 | 0.8 | `backup.yml`: ежедневный `pg_dump` под `backup_reader`, восстановление во временный Postgres, gpg, артефакт 30 дней; ручная расшифровка проверена | `chore: …`
-- 2026-10-06 | процесс | `/crit-audit` + журнал `critical-ledger.md` (встроен в `/review`), `/trace-bug`, README команд, `Next:` в `/trim` | `docs: …`
-- 2026-10-06 | 0.7 | домен `parkour.am`: сертификат Fly `Issued`, https → 200 | `docs: …`
-- 2026-10-06 | процесс | `/trim`: PROGRESS порезан, архив этапа 0, `questions.md`, `decisions.md`, оглавления в больших документах | `docs: trim …`
+- 2026-10-06 | процесс | `/crit-audit` + журнал `critical-ledger.md` (встроен в `/review`), `/trace-bug`, README команд, `Next:` в `/trim` | `docs: …`- 2026-10-06 | процесс | `/trim`: PROGRESS порезан, архив этапа 0, `questions.md`, `decisions.md`, оглавления в больших документах | `docs: trim …`
 - 2026-10-06 | 0.7 | Deploy из GitHub → Fly → Neon, миграция на `parkour_prod` | `ced3b2e`
 ## Известные проблемы и долги
 
 - Локально: Node 24 arm64 (`C:\Program Files\nodejs`) и nvm (Node 20 x64 первым в PATH). Под Node 20 x64 drizzle-kit падает (esbuild не той архитектуры) — запускать под Node 24.
 - Обе базы Neon под одной ролью `neondb_owner`: отдельная роль для прода — в чек-лист перед запуском (этап 8), решение владельца.
-- `www.parkour.am` не открывается (нет сертификата на Fly, TLS падает): `fly certs add www.parkour.am` + DNS, или редирект у регистратора.
-- На Fly нет `PUBLIC_SITE_URL` и `ORIGIN` (есть только `DATABASE_URL`): задать `https://parkour.am` до первых форм и входа (этап 1), иначе SvelteKit отклонит POST-формы.
+- `www.parkour.am` отдаёт тот же сайт без редиректа: добавить 301 `www` → `parkour.am` в `hooks.server.ts` (задача 1.6), иначе дубли в поиске.
 - Версии из `sv create`: SvelteKit 3, Vite 8, TypeScript 6, Tailwind 4, ESLint 10 — актуальные на дату установки.
 - `npm audit`: 4 moderate в esbuild внутри drizzle-kit (только dev, на сайт не попадает; CI проверяет prod-зависимости уровня high). Следить за обновлением drizzle-kit.
 - Пароль шифрования бэкапов лежит у владельца в `C:\Users\darks\parkour-backup-passphrase.txt`: перенести в менеджер паролей и удалить файл. Без него бэкапы не расшифровать.
