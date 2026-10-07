@@ -37,6 +37,7 @@
 - 1.6 закрыта: `hooks.server.ts` читает сессию на каждом запросе с cookie (без cookie — гость без запроса к БД), `locals.user` (`src/lib/server/auth/session.ts`, без контактов и даты рождения); `blocked` / `deleted_at` → гость сразу; 301 `www.` → голый домен; `/login`, `/register`, `/forgot-password` уводят вошедшего на главную.
 - 1.7 закрыта: `src/lib/server/auth/permissions.ts` (= `04` 5.1), `guard.ts` (`requireStaff`, `requirePermission` — **вызывать в каждом load и action админки**, layout на POST не срабатывает), `role-rules.ts` (считать активных админов в той же транзакции — 1.10). `/admin` — заглушка до 1.9.
 - 1.8 закрыта: layout `(site)` — шапка (`src/lib/components/site/`), подвал из `site_settings` (`services/site-settings.ts`, схемы `validation/site-settings.ts` — их же брать в админке 1.10), переключатель языка, 404 внутри сайта (`[...rest]`), `+error.svelte` (5xx без деталей). Меню ведёт на ещё не созданные страницы (404).
+- 1.9 оболочка админки — в работе (SBR, `docs/todo.md`).
 - Google-вход — отдельный шаг, ждёт ключи владельца (`GOOGLE_CLIENT_ID/SECRET`).
 - 0.9 хранилище R2 — отложено владельцем до этапа 2 (до этого фото — заглушки).
 
