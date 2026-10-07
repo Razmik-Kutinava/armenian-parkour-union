@@ -32,7 +32,7 @@
 
 ## В работе
 
-- 1.10a закрыта: `/admin/users` (+ `new`, `[id]`), `/admin/roles`, сервисы `services/users/`, `services/audit.ts` (`writeAudit` — в транзакции действия). **Следующая — 1.10b**: «Журнал действий» + «Настройки сайта» (объём — `decisions.md` 2026-10-07).
+- 1.10a закрыта: `/admin/users` (+ `new`, `[id]`), `/admin/roles`, сервисы `services/users/`, `services/audit.ts` (`writeAudit` — в транзакции действия). **1.10b в работе**: «Журнал действий» + «Настройки сайта» (`docs/todo.md`).
 - Заметки закрытых 1.1–1.9 — `archive/done-stage-1.md`. Важное: миграция `0001` на `parkour_prod` — с ближайшим Deploy (откат `scripts/rollback/0001_down.sql`, только по «go»); **перед Deploy** владелец задаёт Fly secret `BETTER_AUTH_SECRET`; `requirePermission` — в каждом load и action админки; схемы подвала — `validation/site-settings.ts`.
 - Google-вход — отдельный шаг, ждёт ключи владельца (`GOOGLE_CLIENT_ID/SECRET`).
 - 0.9 хранилище R2 — отложено владельцем до этапа 2 (до этого фото — заглушки).
