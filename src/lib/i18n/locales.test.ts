@@ -29,6 +29,15 @@ describe('localizePath', () => {
 	] as const)('%s in %s -> %s', (path, locale, expected) => {
 		expect(localizePath(path, locale)).toBe(expected);
 	});
+
+	it.each([
+		['//evil.example/x', 'en', '/evil.example/x'],
+		['//evil.example/x', 'ru', '/ru/evil.example/x'],
+		['/ru//evil.example', 'en', '/evil.example'],
+		['/\\evil.example', 'en', '/evil.example']
+	] as const)('never builds an off-site link from %s (%s)', (path, locale, expected) => {
+		expect(localizePath(path, locale)).toBe(expected);
+	});
 });
 
 describe('defaultLocaleRedirect', () => {

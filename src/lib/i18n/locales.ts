@@ -23,7 +23,8 @@ function stripLocale(pathname: string): string {
 
 /** Same page in another language: localizePath('/hy/events', 'ru') === '/ru/events'. */
 export function localizePath(pathname: string, locale: Locale): string {
-	const bare = stripLocale(pathname);
+	/* '//host' or '/\host' in an href leaves the site: keep exactly one leading slash. */
+	const bare = '/' + stripLocale(pathname).replace(/^[/\\]+/, '');
 	if (locale === defaultLocale) return bare;
 	return bare === '/' ? `/${locale}` : `/${locale}${bare}`;
 }
