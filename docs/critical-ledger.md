@@ -5,7 +5,7 @@
 
 | Параметр | Значение |
 |---|---|
-| `last_audited_sha` | `527a26d` |
+| `last_audited_sha` | `8380bd8` |
 | Дата | 2026-10-07 |
 | Вердикт | CLEAN |
 
@@ -33,3 +33,4 @@
 | 2026-10-07 | 1.9 оболочка админки: `server/admin/nav.ts`, `components/admin`, `routes/admin`, `admin/locale/+server.ts`, `hooks.server.ts` | CLEAN | 0 | `1b857a1` |
 | 2026-10-07 | 1.10a пользователи и роли: `services/users/*`, `services/audit.ts`, `auth/credential.ts`, `validation/admin-users.ts`, `routes/admin/users`, `routes/admin/roles` | CLEAN | 0 (bugbot: 2 отклонены валидатором; security: 0) | `7d1f517` |
 | 2026-10-07 | 1.10b журнал и настройки: `services/audit-list.ts`, `audit-csv.ts`, `site-settings.ts`, `validation/site-settings*.ts`, `routes/admin/audit`, `routes/admin/settings`, `FilterBar`, `LocalizedInput` | CLEAN | 0 (bugbot: 1 отклонена валидатором; security: 0) | `527a26d` |
+| 2026-10-07 | 1.11 аудит действий админки: только тесты (`routes/admin/audit-coverage.test.ts`, `tests/e2e/admin-audit*`) | CLEAN | 0 (bugbot: 0) | `8380bd8` |
