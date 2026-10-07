@@ -2,6 +2,7 @@
 
 Формат: `дата | задача | итог | коммит`. Переносится из `PROGRESS.md` («Сделано»), когда там больше 5 записей.
 
+- 2026-10-07 | 1.5 | авторизация на form actions + Better Auth, свои лимиты попыток, защита адреса возврата; unit 67 + e2e 13; REVIEW: bugbot 1 (исправлено), security 5 (C1 исправлено, остальные не K / приняты) | `feat: …`
 - 2026-10-07 | trim | заметки «В работе» по закрытым 1.1–1.9 (перенесены из `PROGRESS.md`):
   - 1.1–1.4: дизайн, компоненты `src/lib/components/ui/`, i18n `src/lib/i18n/`, схема `src/lib/server/db/schema/`.
   - 1.5: `/register` (родитель до 18), `/login`, `/logout`, `/verify-email`, `/forgot-password`, `/reset-password`; сервисы `src/lib/server/auth/`, Zod `src/lib/validation/`. Письма — в лог.
