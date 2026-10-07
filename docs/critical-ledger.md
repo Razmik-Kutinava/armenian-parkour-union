@@ -5,7 +5,7 @@
 
 | Параметр | Значение |
 |---|---|
-| `last_audited_sha` | `642ee3e` |
+| `last_audited_sha` | `2d44b3f` |
 | Дата | 2026-10-07 |
 | Вердикт | CLEAN |
 
@@ -26,3 +26,4 @@
 | Дата | Scope | Вердикт | Новых | Коммит |
 |---|---|---|---|---|
 | 2026-10-07 | 1.5 авторизация: `src/lib/server/auth`, `validation`, `(auth)` | CLEAN | 0 критичных (C1–C5 не K или приняты) | 1.5 REVIEW |
+| 2026-10-07 | 1.6 сессия: `hooks.server.ts`, `auth/session.ts`, `canonical-host.ts` | CLEAN | 0 | `2d44b3f` |
