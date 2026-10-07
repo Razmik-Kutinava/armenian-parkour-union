@@ -5,6 +5,8 @@
 	import TypeSamples from './TypeSamples.svelte';
 	import Ornaments from './Ornaments.svelte';
 	import Scales from './Scales.svelte';
+	import DemoControls from './DemoControls.svelte';
+	import DemoFeedback from './DemoFeedback.svelte';
 
 	let heroLang = $state(0);
 </script>
@@ -36,6 +38,11 @@
 		<section>
 			<h2 class="mb-6 text-3xl font-bold">Typography — APU Sans (Arian AMU)</h2>
 			<TypeSamples {samples} />
+		</section>
+		<section class="flex flex-col gap-8">
+			<h2 class="text-3xl font-bold">Components</h2>
+			<DemoControls />
+			<DemoFeedback />
 		</section>
 		<section>
 			<h2 class="mb-6 text-3xl font-bold">Ornament</h2>
