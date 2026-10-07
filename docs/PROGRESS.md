@@ -32,7 +32,8 @@
 
 ## В работе
 
-- 1.11 закрыта. Новое действие админки — сразу в карту `tests/e2e/admin-audit-map.ts` (коды журнала или причина «не пишется») и исполнитель в `admin-audit.spec.ts`. Следующая — 1.12 seed (ждёт «дальше»).
+- 1.12 seed — SPEC в `docs/todo.md`; страницы-заглушки перенесены в 2.3 (решение владельца).
+- 1.11 закрыта. Новое действие админки — сразу в карту `tests/e2e/admin-audit-map.ts` (коды журнала или причина «не пишется») и исполнитель в `admin-audit.spec.ts`.
 - 1.10: `/admin/users`, `/admin/roles`, `/admin/audit` (+ `[id]`, `export`), `/admin/settings`; сервисы `services/users/`, `services/audit.ts` (`writeAudit` — в транзакции действия), `audit-list.ts`, `site-settings.ts` (`saveSettings`).
 - Заметки закрытых 1.1–1.9 — `archive/done-stage-1.md`. Важное: миграция `0001` на `parkour_prod` — с ближайшим Deploy (откат `scripts/rollback/0001_down.sql`, только по «go»); **перед Deploy** владелец задаёт Fly secret `BETTER_AUTH_SECRET`; `requirePermission` — в каждом load и action админки; схемы подвала — `validation/site-settings.ts`.
 - Google-вход — отдельный шаг, ждёт ключи владельца (`GOOGLE_CLIENT_ID/SECRET`).
