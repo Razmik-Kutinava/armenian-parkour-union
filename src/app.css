@@ -1,0 +1,149 @@
+@import 'tailwindcss';
+
+/* Tokens: docs/08-DESIGN.md, sections 3–5 and 7. Components use tokens only. */
+:root {
+	--navy-950: #0a1a2b;
+	--navy-900: #0f2a44;
+	--navy-800: #163a5c;
+	--navy-700: #1f4e78;
+	--navy-600: #2b6499;
+	--navy-500: #3f7db8;
+	--navy-300: #7db3e3;
+	--navy-100: #e3edf6;
+	--navy-50: #f2f7fb;
+
+	--accent-500: #ff8a1f;
+	--accent-600: #e5740a;
+	--accent-700: #b45309;
+	--accent-100: #ffebd6;
+
+	--ink-900: #0f172a;
+	--ink-700: #475569;
+	--ink-500: #64748b;
+	--line: #e2e8f0;
+	--surface: #ffffff;
+	--bg: #f2f7fb;
+
+	--success-bg: #dcfce7;
+	--success-fg: #15803d;
+	--warning-bg: #fef3c7;
+	--warning-fg: #92400e;
+	--error-bg: #fee2e2;
+	--error-fg: #b91c1c;
+	--error-strong: #dc2626;
+	--info-bg: var(--navy-100);
+	--info-fg: var(--navy-700);
+
+	--space-1: 0.25rem;
+	--space-2: 0.5rem;
+	--space-3: 0.75rem;
+	--space-4: 1rem;
+	--space-6: 1.5rem;
+	--space-8: 2rem;
+	--space-12: 3rem;
+	--space-16: 4rem;
+	--space-24: 6rem;
+
+	--dur-fast: 120ms;
+	--dur-base: 200ms;
+	--dur-slow: 400ms;
+	--ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+@theme inline {
+	--color-*: initial;
+	--color-navy-950: var(--navy-950);
+	--color-navy-900: var(--navy-900);
+	--color-navy-800: var(--navy-800);
+	--color-navy-700: var(--navy-700);
+	--color-navy-600: var(--navy-600);
+	--color-navy-500: var(--navy-500);
+	--color-navy-300: var(--navy-300);
+	--color-navy-100: var(--navy-100);
+	--color-navy-50: var(--navy-50);
+	--color-accent-500: var(--accent-500);
+	--color-accent-600: var(--accent-600);
+	--color-accent-700: var(--accent-700);
+	--color-accent-100: var(--accent-100);
+	--color-ink-900: var(--ink-900);
+	--color-ink-700: var(--ink-700);
+	--color-ink-500: var(--ink-500);
+	--color-line: var(--line);
+	--color-surface: var(--surface);
+	--color-bg: var(--bg);
+	--color-success-bg: var(--success-bg);
+	--color-success-fg: var(--success-fg);
+	--color-warning-bg: var(--warning-bg);
+	--color-warning-fg: var(--warning-fg);
+	--color-error-bg: var(--error-bg);
+	--color-error-fg: var(--error-fg);
+	--color-error-strong: var(--error-strong);
+	--color-info-bg: var(--info-bg);
+	--color-info-fg: var(--info-fg);
+
+	--ease-brand: var(--ease);
+}
+
+@theme static {
+	--font-*: initial;
+	--font-display: 'Unbounded', 'Noto Sans Armenian', system-ui, sans-serif;
+	--font-body: 'Inter', 'Noto Sans Armenian', system-ui, sans-serif;
+
+	--spacing: 0.25rem;
+
+	--text-*: initial;
+	--text-xs: 0.75rem;
+	--text-xs--line-height: 1rem;
+	--text-sm: 0.875rem;
+	--text-sm--line-height: 1.25rem;
+	--text-base: 1rem;
+	--text-base--line-height: 1.5rem;
+	--text-lg: 1.125rem;
+	--text-lg--line-height: 1.75rem;
+	--text-xl: 1.25rem;
+	--text-xl--line-height: 1.75rem;
+	--text-2xl: 1.5rem;
+	--text-2xl--line-height: 2rem;
+	--text-3xl: 1.875rem;
+	--text-3xl--line-height: 2.25rem;
+	--text-4xl: 2.5rem;
+	--text-4xl--line-height: 2.75rem;
+	--text-5xl: 3.5rem;
+	--text-5xl--line-height: 3.75rem;
+
+	--radius-*: initial;
+	--radius-sm: 6px;
+	--radius-md: 12px;
+	--radius-lg: 20px;
+	--radius-full: 9999px;
+
+	--shadow-*: initial;
+	--shadow-sm: 0 1px 2px rgb(15 42 68 / 0.08), 0 1px 3px rgb(15 42 68 / 0.06);
+	--shadow-md: 0 4px 12px rgb(15 42 68 / 0.12);
+	--shadow-lg: 0 16px 40px rgb(15 42 68 / 0.2);
+
+	--container-page: 1200px;
+}
+
+@layer base {
+	html {
+		background: var(--bg);
+		color: var(--ink-900);
+		font-family: var(--font-body);
+	}
+
+	h1,
+	h2,
+	h3 {
+		font-family: var(--font-display);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		*,
+		*::before,
+		*::after {
+			animation-duration: 0.01ms !important;
+			transition-duration: 0.01ms !important;
+		}
+	}
+}

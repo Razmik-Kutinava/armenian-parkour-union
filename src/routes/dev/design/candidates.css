@@ -1,0 +1,35 @@
+/* Font candidates, loaded only on /dev/design. Licenses: static/fonts/<family>/LICENSE.txt */
+@font-face {
+	font-family: 'Arian AMU';
+	font-weight: 400;
+	font-display: swap;
+	src: url('/fonts/arian-amu/arian-amu-400.ttf') format('truetype');
+}
+
+@font-face {
+	font-family: 'Arian AMU';
+	font-weight: 700;
+	font-display: swap;
+	src: url('/fonts/arian-amu/arian-amu-700.ttf') format('truetype');
+}
+
+@font-face {
+	font-family: 'Mardoto';
+	font-weight: 400;
+	font-display: swap;
+	src: url('/fonts/mardoto/Mardoto-Regular.woff2') format('woff2');
+}
+
+@font-face {
+	font-family: 'Mardoto';
+	font-weight: 500 600;
+	font-display: swap;
+	src: url('/fonts/mardoto/Mardoto-Medium.woff2') format('woff2');
+}
+
+@font-face {
+	font-family: 'Mardoto';
+	font-weight: 700;
+	font-display: swap;
+	src: url('/fonts/mardoto/Mardoto-Bold.woff2') format('woff2');
+}
