@@ -60,9 +60,9 @@
 ## Фазы
 
 - [x] SPEC
-- [ ] Migration Gate «go»
-- [ ] RED (`test: … [RED]`)
-- [ ] GREEN (`feat: … [GREEN]`)
+- [x] Migration Gate «go» (0002 применена на `parkour_dev`)
+- [x] RED (`test: … [RED]`) — `d069c29`
+- [x] GREEN (`feat: … [GREEN]`) — `5e35445`; unit 213, e2e медиа / прав / журнала 7/7
 - [ ] REGRESS
 - [ ] REVIEW: local · bugbot · security-review · сверка со SPEC · PROGRESS · push · CI green
 - [ ] DEPLOY (только по апруву владельца)

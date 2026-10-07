@@ -60,7 +60,11 @@ test('admin changes a role; the card history shows it', async ({ page, browser }
 	await registerAs(page, 'admin');
 	const member = await memberInOwnContext(browser, `role-${crypto.randomUUID().slice(0, 8)}`);
 	await page.goto(`/admin/users/${member.id}`);
-	await page.getByLabel('Role', { exact: true }).selectOption('editor');
+	/* A choice made before hydration is lost and the button stays disabled: choose until it counts. */
+	await expect(async () => {
+		await page.getByLabel('Role', { exact: true }).selectOption('editor');
+		await expect(page.getByRole('button', { name: 'Change role' })).toBeEnabled({ timeout: 1000 });
+	}).toPass();
 	await page.getByRole('button', { name: 'Change role' }).click();
 	await page.getByRole('dialog').getByRole('button', { name: 'Change role' }).click();
 	await expect(page.getByText('Saved.')).toBeVisible();
