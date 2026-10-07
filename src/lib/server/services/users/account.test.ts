@@ -67,6 +67,20 @@ describe.skipIf(!testDbUrl)('account actions (docs/04 section 6)', () => {
 		});
 	});
 
+	it('a blocked or deleted admin is not a second one; taking the role is refused too', async () => {
+		await inRollback(async (tx) => {
+			const actor = await admin(tx);
+			const last = await insertUser(tx, { role: 'admin' });
+			await onlyAdmin(tx, last.id);
+			await insertUser(tx, { role: 'admin', status: 'blocked' });
+			await insertUser(tx, { role: 'admin', deletedAt: new Date() });
+			expect(await changeRole(tx, actor, last.id, 'member', IP)).toBe('last_admin');
+			expect(await setBlocked(tx, actor, last.id, true, 'reason', IP)).toBe('last_admin');
+			expect(await userRow(tx, last.id)).toMatchObject({ role: 'admin', status: 'active' });
+			expect(await auditOf(tx, last.id, 'user.role_change')).toHaveLength(0);
+		});
+	});
+
 	it('a second admin can be demoted', async () => {
 		await inRollback(async (tx) => {
 			const actor = await admin(tx);

@@ -1,0 +1,35 @@
+import type { Permission } from '../../src/lib/server/auth/permissions';
+import type { AdminAction } from './admin-audit-map';
+
+/*
+ * What each admin route asks for (docs/04 section 5): a permission code, or 'staff' for any of
+ * editor, moderator, admin. A new admin page, endpoint or action must be added here, or the
+ * coverage test fails.
+ */
+export type Access = Permission | 'staff';
+
+export const ADMIN_READS = {
+	'/admin': 'staff',
+	'/admin/users': 'users.read_limited',
+	'/admin/users/[id]': 'users.read_limited',
+	'/admin/users/new': 'users.write',
+	'/admin/roles': 'users.set_role',
+	'/admin/audit': 'audit.read',
+	'/admin/audit/[id]': 'audit.read',
+	'GET /admin/audit/export': 'audit.read',
+	'/admin/settings': 'settings.write'
+} as const satisfies Record<string, Access>;
+
+export const ADMIN_WRITES = {
+	'/admin/users/[id]?/update': 'users.write',
+	'/admin/users/[id]?/role': 'users.set_role',
+	'/admin/users/[id]?/block': 'users.block',
+	'/admin/users/[id]?/unblock': 'users.block',
+	'/admin/users/[id]?/confirmEmail': 'users.write',
+	'/admin/users/[id]?/passwordLink': 'users.write',
+	'/admin/users/new?/default': 'users.write',
+	'/admin/roles?/grant': 'users.set_role',
+	'/admin/roles?/revoke': 'users.set_role',
+	'/admin/settings?/default': 'settings.write',
+	'POST /admin/locale': 'staff'
+} as const satisfies Record<AdminAction | 'POST /admin/locale', Access>;

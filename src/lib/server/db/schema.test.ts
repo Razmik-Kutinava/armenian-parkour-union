@@ -78,6 +78,16 @@ describe.skipIf(!url)('database schema (migration 0001)', () => {
 		});
 	});
 
+	it('a user with audit entries cannot be hard-deleted: the entries keep their author', async () => {
+		await inRollback(async (tx) => {
+			const user = await newUser(tx);
+			await tx`insert into audit_log (actor_id, action) values (${user.id}, 'test.insert')`;
+			await expectError(tx, () => tx`delete from users where id = ${user.id}`);
+			const rows = await tx`select actor_id from audit_log where actor_id = ${user.id}`;
+			expect(rows).toHaveLength(1);
+		});
+	});
+
 	it('deleting a user removes their sessions', async () => {
 		await inRollback(async (tx) => {
 			const user = await newUser(tx);
