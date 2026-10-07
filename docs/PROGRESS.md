@@ -38,7 +38,7 @@
 - 1.12: `npm run db:seed` (логика — `src/lib/server/seed/`). На прод — с машины владельца, все переменные в shell (`DATABASE_URL` прода, `SEED_ADMIN_EMAIL`, `SEED_ADMIN_PASSWORD`), **до** открытия регистрации на проде.
 - Новое действие или страница админки — сразу в две карты: `tests/e2e/admin-audit-map.ts` (коды журнала или причина «не пишется», исполнитель в `admin-audit.spec.ts`) и `tests/e2e/admin-access-map.ts` (право из `04` 5.1); иначе падают `audit-coverage` / `access-coverage`.
 - Заметки закрытых 1.1–1.9 — `archive/done-stage-1.md`. Миграция `0001` на `parkour_prod` применена Deploy 2026-10-07 (откат `scripts/rollback/0001_down.sql`, только по «go»); `requirePermission` — в каждом load и action админки; схемы подвала — `validation/site-settings.ts`.
-- **Seed на проде не запущен**: владелец со своей машины (`DATABASE_URL` прода + `SEED_ADMIN_*` в shell) → `npm run db:seed`; без него на проде нет админа и ключей `site_settings`.
+- Seed на проде выполнен 2026-10-07 по просьбе владельца: ключи `site_settings` добавлены, первый админ — email владельца (пароль передан владельцу в чате, сменить через «Забыли пароль» после подключения почты). На dev seed админа не создаёт: в `parkour_dev` много активных `e2e-*-admin` — админ владельца там создан отдельным одноразовым скриптом.
 - Google-вход — отдельный шаг (SBR); ключи `GOOGLE_CLIENT_ID/SECRET` уже в Fly secrets, код их пока не читает.
 - 0.9 хранилище R2 — отложено владельцем до этапа 2 (до этого фото — заглушки).
 
