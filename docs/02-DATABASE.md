@@ -20,7 +20,7 @@
 - **Время:** `timestamptz`. В каждой таблице `created_at` (default now), в изменяемых ещё `updated_at`.
 - **Деньги:** `amount_minor integer` (целое, в минимальных единицах, например центы или драмы без дробной части) + `currency char(3)` (`AMD`, `USD`, `EUR`). Никаких float.
 - **Мягкое удаление:** `deleted_at timestamptz null` там, где на запись есть ссылки. Все выборки для сайта фильтруют `deleted_at is null`.
-- **Многоязычные тексты:** `jsonb` вида `{"ru": "...", "hy": "...", "en": "..."}`. Язык `ru` обязателен, при отсутствии перевода сайт показывает `ru`.
+- **Многоязычные тексты:** `jsonb` вида `{"en": "...", "hy": "...", "ru": "..."}`. Язык `en` обязателен, при отсутствии перевода сайт показывает `en` (решение 2026-10-07).
 - **Имена:** таблицы и поля `snake_case`, английский. Таблицы во множественном числе.
 - **Файлы:** в БД хранится только ключ в хранилище (`*_key`), не полный URL.
 - **Append-only таблицы:** `points_ledger`, `audit_log`, `payment_webhook_events`. Записи не обновляются и не удаляются. Запретить `UPDATE` и `DELETE` триггером.
@@ -60,7 +60,7 @@
 ## 1. Пользователи и авторизация
 
 ### Таблицы Better Auth
-`session`, `account`, `verification` создаются библиотекой Better Auth, структуру не менять вручную. Таблица `users` ниже расширяет её пользовательскую таблицу (`additionalFields`).
+`session`, `account`, `verification`, `rate_limit` — таблицы Better Auth 1.7 (поля из `@better-auth/core`, колонки `snake_case`, `id uuid`), структуру не менять вручную. `rate_limit` — счётчики попыток входа (`rateLimit.storage = 'database'`, решение 2026-10-07). Таблица `users` ниже — пользовательская модель Better Auth (`additionalFields`); поле Better Auth `image` отображается на `avatar_key`, URL фото из Google не сохраняется. Схема — `src/lib/server/db/schema/`.
 
 ### `users`
 | Поле | Тип | Описание |
@@ -82,10 +82,11 @@
 | level | membership_level null | текущая степень, `null` до оплаты первого взноса |
 | points_balance | integer default 0, check >= 0 | кэш баланса, пересчитывается в той же транзакции, что и запись в журнал |
 | guardian_name, guardian_phone, guardian_email | text | для несовершеннолетних |
+| terms_accepted_at | timestamptz null | согласие с политикой и правилами при регистрации (решение 2026-10-07) |
 | deleted_at | timestamptz | |
 | created_at, updated_at | timestamptz | |
 
-Индексы: unique(`email`), `role`, `level`, `status`, (`last_name`, `first_name`).
+Индексы: unique(`email`), `role`, `level`, `status`, (`last_name`, `first_name`). Проверки: `email = lower(email)`, `locale in ('en','hy','ru')`, `points_balance >= 0`.
 Правило: источник правды по баллам `points_ledger`, `points_balance` только кэш.
 
 ### `staff_profiles`

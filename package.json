@@ -52,7 +52,13 @@
 	},
 	"dependencies": {
 		"@lucide/svelte": "^1.52.0",
+		"better-auth": "^1.7.7",
 		"drizzle-orm": "^0.45.3",
 		"postgres": "^3.4.9"
+	},
+	"overrides": {
+		"better-auth": {
+			"@sveltejs/kit": "$@sveltejs/kit"
+		}
 	}
 }
