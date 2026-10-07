@@ -5,7 +5,7 @@
 
 | Параметр | Значение |
 |---|---|
-| `last_audited_sha` | `c9555ff` |
+| `last_audited_sha` | `473d27f` |
 | Дата | 2026-10-07 |
 | Вердикт | CLEAN |
 
@@ -20,6 +20,7 @@
 | C3 | — | `src/lib/server/auth/sign-in.ts:31` | «аккаунт заблокирован» видно только при верном пароле | — | rejected: not-K | — |
 | C4 | K4 | `src/lib/server/mail/index.ts:5` | ссылки с токенами сброса и подтверждения пишутся в лог Fly | — | accepted-risk (решение владельца 2026-10-07: письма в лог до 0.10) | — |
 | C5 | — | `verify-email/+page.server.ts:8` | почтовый сканер откроет ссылку раньше пользователя | — | rejected: no-repro (токен — JWT, повторное открытие даёт «подтверждён») | — |
+| C6 | — | `src/lib/i18n/locales.ts:27` | `https://parkour.am//evil.com` → ссылки переключателя языка `//evil.com` (уход на чужой сайт) | `locales.test.ts` | rejected: not-K (исправлено) | `473d27f` |
 
 ## История аудитов
 
@@ -28,3 +29,4 @@
 | 2026-10-07 | 1.5 авторизация: `src/lib/server/auth`, `validation`, `(auth)` | CLEAN | 0 критичных (C1–C5 не K или приняты) | 1.5 REVIEW |
 | 2026-10-07 | 1.6 сессия: `hooks.server.ts`, `auth/session.ts`, `canonical-host.ts` | CLEAN | 0 | `2d44b3f` |
 | 2026-10-07 | 1.7 права: `permissions.ts`, `guard.ts`, `role-rules.ts`, `routes/admin` | CLEAN | 0 | `c9555ff` |
+| 2026-10-07 | 1.8 каркас: `(site)/+layout*`, `components/site`, `services/site-settings.ts`, `validation/site-settings.ts`, `+error` | CLEAN | 0 критичных (C6 не K, исправлено) | `473d27f` |
