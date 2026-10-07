@@ -4,6 +4,8 @@ import type { LimitDb } from '../auth/rate-limit';
 import { auditLog } from '../db/schema/service';
 import { users } from '../db/schema/users';
 
+export * from './audit-list';
+
 export type AuditEntry = {
 	actorId: string | null;
 	action: string;

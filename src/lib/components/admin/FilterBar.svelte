@@ -1,5 +1,7 @@
 <script lang="ts" module>
-	export type Filter = { key: string; label: string; options: { value: string; label: string }[] };
+	export type Filter =
+		| { key: string; label: string; type?: 'select'; options: { value: string; label: string }[] }
+		| { key: string; label: string; type: 'date' };
 </script>
 
 <script lang="ts">
@@ -19,7 +21,7 @@
 	}: { filters: Filter[]; state: ListState; searchLabel: string } = $props();
 
 	const labelOf = (f: Filter, value: string) =>
-		f.options.find((o) => o.value === value)?.label ?? value;
+		(f.type !== 'date' && f.options.find((o) => o.value === value)?.label) || value;
 	const chips = $derived([
 		...(state.q ? [{ key: 'q', text: `${searchLabel}: ${state.q}` }] : []),
 		...filters
@@ -53,12 +55,21 @@
 		{#each filters as f (f.key)}
 			<label class="flex flex-col gap-1 text-sm font-bold text-ink-900">
 				{f.label}
-				<select name={f.key} class="{controlClass} min-w-36 px-3 font-normal">
-					<option value="">{t('filter.any')}</option>
-					{#each f.options as o (o.value)}
-						<option value={o.value} selected={state.filters[f.key] === o.value}>{o.label}</option>
-					{/each}
-				</select>
+				{#if f.type === 'date'}
+					<input
+						type="date"
+						name={f.key}
+						value={state.filters[f.key] ?? ''}
+						class="{controlClass} px-3 font-normal"
+					/>
+				{:else}
+					<select name={f.key} class="{controlClass} min-w-36 px-3 font-normal">
+						<option value="">{t('filter.any')}</option>
+						{#each f.options as o (o.value)}
+							<option value={o.value} selected={state.filters[f.key] === o.value}>{o.label}</option>
+						{/each}
+					</select>
+				{/if}
 			</label>
 		{/each}
 		<Button type="submit" variant="secondary">{t('filter.apply')}</Button>

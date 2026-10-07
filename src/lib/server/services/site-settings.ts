@@ -1,3 +1,4 @@
+import { isDeepStrictEqual } from 'node:util';
 import { inArray } from 'drizzle-orm';
 import type { z } from 'zod';
 import { pickLocalized } from '#lib/i18n/localized.ts';
@@ -10,8 +11,15 @@ import {
 	socialsSchema,
 	type SocialNetwork
 } from '#lib/validation/site-settings.ts';
+import {
+	settingKeys,
+	settingsFormSchema,
+	type SettingsValues
+} from '#lib/validation/site-settings-form.ts';
 import type { LimitDb } from '../auth/rate-limit';
 import { siteSettings } from '../db/schema/service';
+import { writeAudit } from './audit';
+import type { Actor } from './users/target';
 
 export type FooterSettings = {
 	contacts: { email?: string; phone?: string; address?: string; mapUrl?: string } | null;
@@ -26,6 +34,56 @@ const keys = ['contacts', 'socials', 'footer', 'requisites'];
 function parse<T extends z.ZodType>(schema: T, value: unknown): z.infer<T> | null {
 	const result = schema.safeParse(value);
 	return result.success ? result.data : null;
+}
+
+/** Stored values for the admin form; a broken value is left out (the form shows it empty). */
+export async function getAdminSettings(db: LimitDb): Promise<Partial<SettingsValues>> {
+	const rows = await db.select().from(siteSettings).where(inArray(siteSettings.key, settingKeys));
+	const result: Partial<Record<keyof SettingsValues, unknown>> = {};
+	for (const key of settingKeys) {
+		const row = rows.find((r) => r.key === key);
+		const parsed = row && settingsFormSchema.shape[key].safeParse(row.value);
+		if (parsed?.success) result[key] = parsed.data;
+	}
+	return result as Partial<SettingsValues>;
+}
+
+/** docs/05 section 21: every changed key goes to audit_log with the old and new value, atomically. */
+export async function saveSettings(
+	db: LimitDb,
+	actor: Actor,
+	values: SettingsValues,
+	ip: string | null
+): Promise<'ok' | 'not_admin'> {
+	if (actor.role !== 'admin') return 'not_admin';
+	return db.transaction(async (tx) => {
+		const rows = await tx
+			.select()
+			.from(siteSettings)
+			.where(inArray(siteSettings.key, settingKeys))
+			.for('update');
+		for (const key of settingKeys) {
+			const before = rows.find((r) => r.key === key)?.value ?? null;
+			const after = values[key];
+			if (isDeepStrictEqual(before, after)) continue;
+			await tx
+				.insert(siteSettings)
+				.values({ key, value: after, updatedBy: actor.id })
+				.onConflictDoUpdate({
+					target: siteSettings.key,
+					set: { value: after, updatedBy: actor.id }
+				});
+			await writeAudit(tx, {
+				actorId: actor.id,
+				action: 'settings.update',
+				entityType: 'site_settings',
+				before: before === null ? null : { [key]: before },
+				after: { [key]: after },
+				ip
+			});
+		}
+		return 'ok' as const;
+	});
 }
 
 export async function getFooterSettings(db: LimitDb, locale: Locale): Promise<FooterSettings> {

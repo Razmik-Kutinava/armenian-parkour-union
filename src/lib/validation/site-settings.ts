@@ -2,14 +2,27 @@ import { z } from 'zod';
 
 /* Footer keys of site_settings (docs/05 section 21; format — docs/decisions.md, 1.8). */
 
-const text = z.string().trim().min(1).max(2000);
-const localized = z.object({ en: text, hy: text.optional(), ru: text.optional() });
+/* Messages are i18n keys: the admin form shows them at the field (1.10b). */
+const textMax = (max: number) =>
+	z
+		.string({ error: 'auth.error.required' })
+		.trim()
+		.min(1, { error: 'auth.error.required' })
+		.max(max, { error: 'auth.error.tooLong' });
+export const localizedText = (max = 2000) =>
+	z.object({ en: textMax(max), hy: textMax(max).optional(), ru: textMax(max).optional() });
+const localized = localizedText();
 /** Links end up in href: only https, so no javascript: or data: URLs. */
-const httpsUrl = z.url({ protocol: /^https$/ }).max(500);
+const httpsUrl = z
+	.url({ protocol: /^https$/, error: 'settings.error.url' })
+	.max(500, { error: 'auth.error.tooLong' });
 
 export const contactsSchema = z.object({
-	email: z.email().max(254).optional(),
-	phone: z.string().trim().min(1).max(40).optional(),
+	email: z
+		.email({ error: 'auth.error.email' })
+		.max(254, { error: 'auth.error.tooLong' })
+		.optional(),
+	phone: textMax(40).optional(),
 	address: localized.optional(),
 	mapUrl: httpsUrl.optional()
 });
