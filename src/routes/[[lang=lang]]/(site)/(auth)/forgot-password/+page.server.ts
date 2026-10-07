@@ -2,7 +2,10 @@ import { fail } from '@sveltejs/kit';
 import { requestPasswordReset } from '#lib/server/auth/password.ts';
 import { forgotPasswordSchema } from '#lib/validation/auth.ts';
 import { fieldErrors, keepValues } from '#lib/validation/form.ts';
-import type { Actions } from './$types';
+import { redirectIfSignedIn } from '../guest';
+import type { Actions, PageServerLoad } from './$types';
+
+export const load: PageServerLoad = ({ locals }) => redirectIfSignedIn(locals);
 
 export const actions: Actions = {
 	default: async (event) => {

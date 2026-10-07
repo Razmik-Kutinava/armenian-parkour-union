@@ -24,6 +24,8 @@ async function mailLink(to: string, path: string, token: string, kind: 'verify' 
 }
 
 const optionalText = { type: 'string', required: false, input: true } as const;
+/** Returned with the session user for hooks.server.ts; never accepted from sign-up input. */
+const readOnly = { required: false, input: false } as const;
 
 /*
  * The HTTP handler (/api/auth/*) is not mounted: every call goes through form actions with Zod
@@ -49,7 +51,11 @@ const createAuth = () =>
 				guardianPhone: optionalText,
 				guardianEmail: optionalText,
 				locale: optionalText,
-				termsAcceptedAt: { type: 'date', required: false, input: true }
+				termsAcceptedAt: { type: 'date', required: false, input: true },
+				role: { type: 'string', ...readOnly },
+				status: { type: 'string', ...readOnly },
+				level: { type: 'string', ...readOnly },
+				deletedAt: { type: 'date', ...readOnly }
 			}
 		},
 		emailAndPassword: {

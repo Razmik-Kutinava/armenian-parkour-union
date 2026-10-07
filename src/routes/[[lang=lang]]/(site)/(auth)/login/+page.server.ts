@@ -5,6 +5,7 @@ import { safeReturnTo } from '#lib/server/auth/return-to.ts';
 import { signIn } from '#lib/server/auth/sign-in.ts';
 import { signInSchema } from '#lib/validation/auth.ts';
 import { fieldErrors, keepValues } from '#lib/validation/form.ts';
+import { redirectIfSignedIn } from '../guest';
 import type { Actions, PageServerLoad } from './$types';
 
 const failures: Record<string, { status: number; message: MessageKey }> = {
@@ -13,9 +14,10 @@ const failures: Record<string, { status: number; message: MessageKey }> = {
 	limited: { status: 429, message: 'auth.error.limited' }
 };
 
-export const load: PageServerLoad = ({ url }) => ({
-	returnTo: safeReturnTo(url.searchParams.get('returnTo'), '')
-});
+export const load: PageServerLoad = ({ url, locals }) => {
+	redirectIfSignedIn(locals);
+	return { returnTo: safeReturnTo(url.searchParams.get('returnTo'), '') };
+};
 
 export const actions: Actions = {
 	default: async (event) => {
