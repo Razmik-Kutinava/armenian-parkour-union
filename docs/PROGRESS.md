@@ -36,6 +36,7 @@
 - 1.5 закрыта: `/register` (родитель до 18), `/login`, `/logout`, `/verify-email`, `/forgot-password`, `/reset-password`; сервисы `src/lib/server/auth/`, Zod `src/lib/validation/`. Письма — в лог. **Перед Deploy:** владелец задаёт Fly secret `BETTER_AUTH_SECRET` (его там нет — страницы входа дадут 500).
 - 1.6 закрыта: `hooks.server.ts` читает сессию на каждом запросе с cookie (без cookie — гость без запроса к БД), `locals.user` (`src/lib/server/auth/session.ts`, без контактов и даты рождения); `blocked` / `deleted_at` → гость сразу; 301 `www.` → голый домен; `/login`, `/register`, `/forgot-password` уводят вошедшего на главную.
 - 1.7 закрыта: `src/lib/server/auth/permissions.ts` (= `04` 5.1), `guard.ts` (`requireStaff`, `requirePermission` — **вызывать в каждом load и action админки**, layout на POST не срабатывает), `role-rules.ts` (считать активных админов в той же транзакции — 1.10). `/admin` — заглушка до 1.9.
+- 1.8 каркас сайта — в работе (SBR, `docs/todo.md`).
 - Google-вход — отдельный шаг, ждёт ключи владельца (`GOOGLE_CLIENT_ID/SECRET`).
 - 0.9 хранилище R2 — отложено владельцем до этапа 2 (до этого фото — заглушки).
 
