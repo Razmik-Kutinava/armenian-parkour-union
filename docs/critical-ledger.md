@@ -5,7 +5,7 @@
 
 | Параметр | Значение |
 |---|---|
-| `last_audited_sha` | `d533ede` |
+| `last_audited_sha` | `a30b0bf` |
 | Дата | 2026-10-07 |
 | Вердикт | CLEAN |
 
@@ -22,6 +22,7 @@
 | C5 | — | `verify-email/+page.server.ts:8` | почтовый сканер откроет ссылку раньше пользователя | — | rejected: no-repro (токен — JWT, повторное открытие даёт «подтверждён») | — |
 | C6 | — | `src/lib/i18n/locales.ts:27` | `https://parkour.am//evil.com` → ссылки переключателя языка `//evil.com` (уход на чужой сайт) | `locales.test.ts` | rejected: not-K (исправлено) | `473d27f` |
 | C7 | K1 | `src/lib/server/seed/admin.ts:37` | пока на сайте нет админа, кто-то регистрируется на email будущего админа → `db:seed` с `SEED_ADMIN_EMAIL` повышает этот аккаунт, пароль `SEED_ADMIN_PASSWORD` не сверяется → чужой человек — admin | `seed/admin.test.ts` «refuses to promote…» | fixed (повышение только при совпадении пароля аккаунта) | `2d60f2e` |
+| C8 | — | `src/lib/server/services/media/upload.ts:61` | editor загружает PDF со встроенным JavaScript (`%PDF-` в начале проходит проверку) → публичная ссылка открывается во встроенном просмотрщике | — | rejected: not-K (загружают только editor/admin; в «Известные проблемы»: отдавать PDF с `Content-Disposition: attachment` при подключении R2) | — |
 
 ## История аудитов
 
@@ -37,3 +38,4 @@
 | 2026-10-07 | 1.11 аудит действий админки: только тесты (`routes/admin/audit-coverage.test.ts`, `tests/e2e/admin-audit*`) | CLEAN | 0 (bugbot: 0) | `8380bd8` |
 | 2026-10-07 | 1.12 seed: `server/seed/*`, `scripts/seed.ts`, `package.json` | CLEAN | 1 (C7 K1, fixed; bugbot: 1 не K — `.env` не читается при заданном `DATABASE_URL`, намеренно) | `2d60f2e` |
 | 2026-10-07 | 1.13 тесты этапа: только тесты (`access-coverage.test.ts`, `tests/e2e/admin-access-map.ts`, `admin-permissions.spec.ts`, `admin-block.spec.ts`, `account.test.ts`, `schema.test.ts`); кода приложения нет | CLEAN | 0 (bugbot: 0; мутации прав ловятся матрицей) | `d533ede` |
+| 2026-10-07 | 2.1 медиабиблиотека: `services/media/*`, `storage/*`, `validation/media.ts`, `routes/admin/media`, `env.ts`, `drizzle/0002`, `package.json` (AWS SDK v3) | CLEAN | 0 (bugbot: 2 отклонены валидатором; security: 1 средняя — C8 не K) | `a30b0bf` |
