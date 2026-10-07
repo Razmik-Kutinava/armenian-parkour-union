@@ -93,6 +93,26 @@ test('blocked user cannot log in even with the right password', async ({ page })
 	expect(await hasSession(page)).toBe(false);
 });
 
+test('logged-in user is sent home from guest-only pages', async ({ page }) => {
+	await register(page, newEmail());
+	for (const path of ['/login', '/register', '/forgot-password', '/ru/login']) {
+		await page.goto(path);
+		await expect(page).toHaveURL(path.startsWith('/ru') ? '/ru' : '/');
+	}
+});
+
+test('blocking takes effect on the next request, not when the session ends', async ({ page }) => {
+	const email = newEmail();
+	await register(page, email);
+	await page.goto('/login');
+	await expect(page).toHaveURL('/');
+
+	await sql`update users set status = 'blocked' where email = ${email}`;
+	await page.goto('/login');
+	await expect(page).toHaveURL('/login');
+	await expect(page.getByRole('button', { name: 'Log in' })).toBeVisible();
+});
+
 test('sixth login attempt in a minute is refused', async ({ page }) => {
 	const email = newEmail();
 	for (let i = 0; i < 5; i++) {
