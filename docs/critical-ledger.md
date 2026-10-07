@@ -5,7 +5,7 @@
 
 | Параметр | Значение |
 |---|---|
-| `last_audited_sha` | `2d60f2e` |
+| `last_audited_sha` | `d533ede` |
 | Дата | 2026-10-07 |
 | Вердикт | CLEAN |
 
@@ -36,3 +36,4 @@
 | 2026-10-07 | 1.10b журнал и настройки: `services/audit-list.ts`, `audit-csv.ts`, `site-settings.ts`, `validation/site-settings*.ts`, `routes/admin/audit`, `routes/admin/settings`, `FilterBar`, `LocalizedInput` | CLEAN | 0 (bugbot: 1 отклонена валидатором; security: 0) | `527a26d` |
 | 2026-10-07 | 1.11 аудит действий админки: только тесты (`routes/admin/audit-coverage.test.ts`, `tests/e2e/admin-audit*`) | CLEAN | 0 (bugbot: 0) | `8380bd8` |
 | 2026-10-07 | 1.12 seed: `server/seed/*`, `scripts/seed.ts`, `package.json` | CLEAN | 1 (C7 K1, fixed; bugbot: 1 не K — `.env` не читается при заданном `DATABASE_URL`, намеренно) | `2d60f2e` |
+| 2026-10-07 | 1.13 тесты этапа: только тесты (`access-coverage.test.ts`, `tests/e2e/admin-access-map.ts`, `admin-permissions.spec.ts`, `admin-block.spec.ts`, `account.test.ts`, `schema.test.ts`); кода приложения нет | CLEAN | 0 (bugbot: 0; мутации прав ловятся матрицей) | `d533ede` |
