@@ -77,11 +77,11 @@
 	</div>
 </div>
 
-<Modal bind:open={modalOpen} title="Cancel registration?" closeLabel="Close">
+<Modal bind:open={modalOpen} title="Cancel registration?">
 	<p class="text-ink-700">Your place will be released. Points for registration will be reversed.</p>
 	{#snippet footer()}
 		<Button variant="ghost" onclick={() => (modalOpen = false)}>Keep</Button>
 		<Button variant="danger" onclick={() => (modalOpen = false)}>Cancel registration</Button>
 	{/snippet}
 </Modal>
-<Toaster closeLabel="Close" />
+<Toaster />

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import X from '@lucide/svelte/icons/x';
 	import type { Snippet } from 'svelte';
+	import { t } from '#lib/i18n/index.svelte.ts';
 
 	let {
 		open = $bindable(false),
@@ -11,8 +12,7 @@
 	}: {
 		open?: boolean;
 		title: string;
-		/** Accessible name of the close button, from translations. */
-		closeLabel: string;
+		closeLabel?: string;
 		children: Snippet;
 		footer?: Snippet;
 	} = $props();
@@ -20,6 +20,7 @@
 	let dialog: HTMLDialogElement | undefined = $state();
 	const id = $props.id();
 	const titleId = `${id}-title`;
+	const close = $derived(closeLabel ?? t('common.close'));
 
 	$effect(() => {
 		if (!dialog) return;
@@ -41,7 +42,7 @@
 		<button
 			type="button"
 			class="-m-2 rounded-sm p-2 text-ink-500 hover:text-ink-900 focus-visible:outline-2 focus-visible:outline-navy-600"
-			aria-label={closeLabel}
+			aria-label={close}
 			onclick={() => dialog?.close()}
 		>
 			<X class="size-5" aria-hidden="true" />

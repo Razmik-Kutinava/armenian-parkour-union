@@ -22,6 +22,7 @@
 - 2026-10-06 | процесс | `/trim`: PROGRESS порезан, архив этапа 0, `questions.md`, `decisions.md`, оглавления в больших документах | `docs/*`, `.cursor/commands/trim.md` | `PROGRESS.md` ≤ 80 строк
 - 2026-10-06 | 0.7 (домен) | `parkour.am` подключён владельцем: сертификат Fly `Issued`, `https://parkour.am` → 200. `www.parkour.am` без сертификата; `PUBLIC_SITE_URL`/`ORIGIN` на Fly не заданы — в «Известные проблемы» | — | `fly certs list -a armenian-parkour-union`; открыть https://parkour.am
 - 2026-10-06 | процесс | из CoffeeOS: `/crit-audit` (K1–K5 из `sbr.mdc`, падающий тест обязателен, вердикт CLEAN/BLOCKED, журнал `docs/critical-ledger.md`), встроен в шаг 2 `/review`; `/trace-bug` для оплаты, прав, баллов; `.cursor/commands/README.md`; `Next:` в `/trim` | `.cursor/commands/*`, `.cursor/rules/sbr.mdc`, `main.mdc`, `docs/critical-ledger.md` | набрать `/` в чате — видны `crit-audit`, `trace-bug`
+- 2026-10-06 | 0.8 | `backup.yml`: ежедневный `pg_dump` `parkour_prod` под `backup_reader`, восстановление во временный Postgres, шифрование gpg, артефакт 30 дней; ручная расшифровка проверена | `.github/workflows/backup.yml` | запуск Backup в Actions → зелёный, артефакт есть
 
 ## Статус документации на конец этапа 0
 

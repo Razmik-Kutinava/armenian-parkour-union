@@ -3,10 +3,11 @@
 	import CircleCheck from '@lucide/svelte/icons/circle-check';
 	import Info from '@lucide/svelte/icons/info';
 	import X from '@lucide/svelte/icons/x';
+	import { t } from '#lib/i18n/index.svelte.ts';
 	import { dismissToast, toasts, type ToastTone } from './toast.svelte';
 
-	/** Accessible name of the close button, from translations. */
-	let { closeLabel }: { closeLabel: string } = $props();
+	let { closeLabel }: { closeLabel?: string } = $props();
+	const close = $derived(closeLabel ?? t('common.close'));
 
 	const tones: Record<ToastTone, { icon: typeof Info; class: string }> = {
 		success: { icon: CircleCheck, class: 'text-success-fg' },
@@ -31,7 +32,7 @@
 			<button
 				type="button"
 				class="-m-1 rounded-sm p-1 text-ink-500 hover:text-ink-900 focus-visible:outline-2 focus-visible:outline-navy-600"
-				aria-label={closeLabel}
+				aria-label={close}
 				onclick={() => dismissToast(toast.id)}
 			>
 				<X class="size-4" aria-hidden="true" />
