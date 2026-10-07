@@ -11,7 +11,10 @@ declare global {
 			/** null for guests and for blocked or deleted users (hooks.server.ts). */
 			user: LocalsUser | null;
 		}
-		// interface PageData {}
+		interface PageData {
+			/** Overrides the URL locale where the address has no prefix (admin: profile language). */
+			locale?: Locale;
+		}
 		// interface PageState {}
 		// interface Platform {}
 	}

@@ -7,7 +7,5 @@
 
 <svelte:head><title>{t('admin.title')} — {t('site.name')}</title></svelte:head>
 
-<main class="mx-auto max-w-(--container-page) p-6">
-	<h1 class="text-2xl font-bold">{t('admin.title')}</h1>
-	<p class="mt-2 text-ink-700">{data.staff.name} · {t(`role.${data.staff.role}`)}</p>
-</main>
+<h1 class="text-2xl font-bold">{t('admin.title')}</h1>
+<p class="mt-2 text-ink-700">{data.staff.name} · {t(`role.${data.staff.role}`)}</p>

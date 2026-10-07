@@ -2,7 +2,10 @@ import { describe, expect, it } from 'vitest';
 import { breadcrumbs } from './breadcrumbs';
 
 const nav = [
-	{ key: 'admin.group.overview', items: [{ key: 'admin.nav.dashboard', href: '/admin', icon: 'dashboard' }] },
+	{
+		key: 'admin.group.overview',
+		items: [{ key: 'admin.nav.dashboard', href: '/admin', icon: 'dashboard' }]
+	},
 	{
 		key: 'admin.group.content',
 		items: [

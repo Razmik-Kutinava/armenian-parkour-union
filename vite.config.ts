@@ -24,6 +24,8 @@ export default defineConfig({
 				test: {
 					name: 'server',
 					environment: 'node',
+					// Database tests go to the remote Neon dev database; 5 s is too tight in parallel.
+					testTimeout: 20_000,
 					include: ['src/**/*.{test,spec}.{js,ts}'],
 					exclude: ['src/**/*.svelte.{test,spec}.{js,ts}']
 				}

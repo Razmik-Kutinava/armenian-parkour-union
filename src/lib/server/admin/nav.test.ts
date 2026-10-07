@@ -27,7 +27,11 @@ describe('adminNav', () => {
 			'/admin/media',
 			'/admin/products'
 		]);
-		expect(groups('editor')).toEqual(['admin.group.overview', 'admin.group.content', 'admin.group.shop']);
+		expect(groups('editor')).toEqual([
+			'admin.group.overview',
+			'admin.group.content',
+			'admin.group.shop'
+		]);
 	});
 
 	it('moderator: dashboard, members, moderation, points and orders', () => {

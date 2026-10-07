@@ -20,7 +20,9 @@ describe('readListState', () => {
 	});
 
 	it('reads page, sort, direction, search and known filters', () => {
-		expect(readListState(params('page=3&sort=name&dir=asc&q=+anna+&role=editor&status='), opts)).toEqual({
+		expect(
+			readListState(params('page=3&sort=name&dir=asc&q=+anna+&role=editor&status='), opts)
+		).toEqual({
 			page: 3,
 			sort: 'name',
 			dir: 'asc',

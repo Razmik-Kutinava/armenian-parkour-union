@@ -33,7 +33,10 @@ test('editor sees content sections only', async ({ page }) => {
 	await registerAs(page, 'editor');
 	await page.goto('/admin');
 	const nav = sidebar(page);
-	await expect(nav.getByRole('link', { name: 'Dashboard' })).toHaveAttribute('aria-current', 'page');
+	await expect(nav.getByRole('link', { name: 'Dashboard' })).toHaveAttribute(
+		'aria-current',
+		'page'
+	);
 	await expect(nav.getByRole('link', { name: 'News' })).toHaveAttribute('href', '/admin/news');
 	await expect(nav.getByRole('link', { name: 'Users' })).toHaveCount(0);
 	await expect(nav.getByRole('link', { name: 'Site settings' })).toHaveCount(0);

@@ -31,7 +31,14 @@ describe.skipIf(!url)('setLocale', () => {
 	const insertUser = async (tx: LimitDb, email: string) => {
 		const [row] = await tx
 			.insert(users)
-			.values({ email, name: 'T', firstName: 'T', lastName: 'T', birthDate: '1990-01-01', locale: 'en' })
+			.values({
+				email,
+				name: 'T',
+				firstName: 'T',
+				lastName: 'T',
+				birthDate: '1990-01-01',
+				locale: 'en'
+			})
 			.returning({ id: users.id });
 		return row.id;
 	};
@@ -41,7 +48,10 @@ describe.skipIf(!url)('setLocale', () => {
 			const a = await insertUser(tx, `t-${crypto.randomUUID()}@example.com`);
 			const b = await insertUser(tx, `t-${crypto.randomUUID()}@example.com`);
 			await setLocale(tx, a, 'ru');
-			const rows = await tx.select({ id: users.id, locale: users.locale }).from(users).where(eq(users.id, a));
+			const rows = await tx
+				.select({ id: users.id, locale: users.locale })
+				.from(users)
+				.where(eq(users.id, a));
 			expect(rows[0].locale).toBe('ru');
 			const other = await tx.select({ locale: users.locale }).from(users).where(eq(users.id, b));
 			expect(other[0].locale).toBe('en');

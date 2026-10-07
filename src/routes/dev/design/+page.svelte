@@ -7,6 +7,7 @@
 	import Scales from './Scales.svelte';
 	import DemoControls from './DemoControls.svelte';
 	import DemoFeedback from './DemoFeedback.svelte';
+	import AdminDemo from './AdminDemo.svelte';
 
 	let heroLang = $state(0);
 </script>
@@ -43,6 +44,7 @@
 			<h2 class="text-3xl font-bold">Components</h2>
 			<DemoControls />
 			<DemoFeedback />
+			<AdminDemo />
 		</section>
 		<section>
 			<h2 class="mb-6 text-3xl font-bold">Ornament</h2>
