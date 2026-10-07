@@ -20,6 +20,7 @@
 | C3 | — | `src/lib/server/auth/sign-in.ts:31` | «аккаунт заблокирован» видно только при верном пароле | — | rejected: not-K | — |
 | C4 | K4 | `src/lib/server/mail/index.ts:5` | ссылки с токенами сброса и подтверждения пишутся в лог Fly | — | accepted-risk (решение владельца 2026-10-07: письма в лог до 0.10) | — |
 | C5 | — | `verify-email/+page.server.ts:8` | почтовый сканер откроет ссылку раньше пользователя | — | rejected: no-repro (токен — JWT, повторное открытие даёт «подтверждён») | — |
+| C7 | K1 | `src/lib/server/seed/admin.ts:37` | пока на сайте нет админа, кто-то регистрируется на email будущего админа → `db:seed` с `SEED_ADMIN_EMAIL` повышает этот аккаунт, пароль `SEED_ADMIN_PASSWORD` не сверяется → чужой человек — admin | `seed/admin.test.ts` «refuses to promote…» | open | — |
 | C6 | — | `src/lib/i18n/locales.ts:27` | `https://parkour.am//evil.com` → ссылки переключателя языка `//evil.com` (уход на чужой сайт) | `locales.test.ts` | rejected: not-K (исправлено) | `473d27f` |
 
 ## История аудитов

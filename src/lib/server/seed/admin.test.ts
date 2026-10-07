@@ -1,5 +1,5 @@
 import { and, eq } from 'drizzle-orm';
-import { verifyPassword } from 'better-auth/crypto';
+import { hashPassword, verifyPassword } from 'better-auth/crypto';
 import { afterAll, describe, expect, it } from 'vitest';
 import type { LimitDb } from '../auth/rate-limit';
 import { account } from '../db/schema/auth';
@@ -79,14 +79,23 @@ describe.skipIf(!testDbUrl)('seed: first admin', () => {
 		});
 	});
 
-	it('promotes an existing active account without touching its password', async () => {
+	async function memberWithPassword(tx: LimitDb, password: string) {
+		const member = await insertUser(tx);
+		await tx.insert(account).values({
+			userId: member.id,
+			accountId: member.id,
+			providerId: 'credential',
+			password: await hashPassword(password)
+		});
+		return member;
+	}
+
+	it('promotes an existing active account only with its own password', async () => {
 		await inRollback(async (tx) => {
 			await noAdmins(tx);
-			const member = await insertUser(tx);
+			const member = await memberWithPassword(tx, PASSWORD);
 			expect(await seedAdmin(tx, { email: member.email, password: PASSWORD })).toBe('promoted');
 			expect((await userByEmail(tx, member.email)).role).toBe('admin');
-			const creds = await tx.select().from(account).where(eq(account.userId, member.id));
-			expect(creds).toHaveLength(0);
 			const [entry] = await auditOf(tx, member.id);
 			expect(entry).toMatchObject({
 				actorId: null,
@@ -94,6 +103,21 @@ describe.skipIf(!testDbUrl)('seed: first admin', () => {
 				before: { role: 'member' },
 				after: { role: 'admin' }
 			});
+		});
+	});
+
+	/* C7: someone registers the future admin email first; the seed must not hand them admin. */
+	it('refuses to promote an account whose password is not SEED_ADMIN_PASSWORD', async () => {
+		await inRollback(async (tx) => {
+			await noAdmins(tx);
+			const squatter = await memberWithPassword(tx, 'squatter-pass-1');
+			await expect(seedAdmin(tx, { email: squatter.email, password: PASSWORD })).rejects.toThrow();
+			const noPassword = await insertUser(tx);
+			await expect(
+				seedAdmin(tx, { email: noPassword.email, password: PASSWORD })
+			).rejects.toThrow();
+			expect((await userByEmail(tx, squatter.email)).role).toBe('member');
+			expect((await userByEmail(tx, noPassword.email)).role).toBe('member');
 		});
 	});
 
