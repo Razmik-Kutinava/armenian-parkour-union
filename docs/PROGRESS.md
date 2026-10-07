@@ -36,8 +36,9 @@
 - 1.12: `npm run db:seed` (логика — `src/lib/server/seed/`). На прод — с машины владельца, все переменные в shell (`DATABASE_URL` прода, `SEED_ADMIN_EMAIL`, `SEED_ADMIN_PASSWORD`), **до** открытия регистрации на проде.
 - Новое действие или страница админки — сразу в две карты: `tests/e2e/admin-audit-map.ts` (коды журнала или причина «не пишется», исполнитель в `admin-audit.spec.ts`) и `tests/e2e/admin-access-map.ts` (право из `04` 5.1); иначе падают `audit-coverage` / `access-coverage`.
 - 1.10: `/admin/users`, `/admin/roles`, `/admin/audit` (+ `[id]`, `export`), `/admin/settings`; сервисы `services/users/`, `services/audit.ts` (`writeAudit` — в транзакции действия), `audit-list.ts`, `site-settings.ts` (`saveSettings`).
-- Заметки закрытых 1.1–1.9 — `archive/done-stage-1.md`. Важное: миграция `0001` на `parkour_prod` — с ближайшим Deploy (откат `scripts/rollback/0001_down.sql`, только по «go»); **перед Deploy** владелец задаёт Fly secret `BETTER_AUTH_SECRET`; `requirePermission` — в каждом load и action админки; схемы подвала — `validation/site-settings.ts`.
-- Google-вход — отдельный шаг, ждёт ключи владельца (`GOOGLE_CLIENT_ID/SECRET`).
+- Заметки закрытых 1.1–1.9 — `archive/done-stage-1.md`. Миграция `0001` на `parkour_prod` применена Deploy 2026-10-07 (откат `scripts/rollback/0001_down.sql`, только по «go»); `requirePermission` — в каждом load и action админки; схемы подвала — `validation/site-settings.ts`.
+- **Seed на проде не запущен**: владелец со своей машины (`DATABASE_URL` прода + `SEED_ADMIN_*` в shell) → `npm run db:seed`; без него на проде нет админа и ключей `site_settings`.
+- Google-вход — отдельный шаг (SBR); ключи `GOOGLE_CLIENT_ID/SECRET` уже в Fly secrets, код их пока не читает.
 - 0.9 хранилище R2 — отложено владельцем до этапа 2 (до этого фото — заглушки).
 
 ## Открытые вопросы (этапы 0–1)
@@ -54,6 +55,7 @@
 
 Формат: `дата | задача | итог | коммит`. Полные записи — `docs/archive/done-stage-N.md`.
 
+- 2026-10-07 | Deploy этапа 1 | run 37628939831 на `78effb0` (CI зелёный): `release_command` применил `0001` на `parkour_prod`; `/`, `/ru`, `/ru/login` → 200, `/admin` → 303 на вход; логи без 5xx | см. коммит docs
 - 2026-10-07 | 1.13 | тесты этапа, кода приложения нет (дыр не найдено): матрица «роль × каждая страница, эндпоинт и action `/admin`» по HTTP по карте `tests/e2e/admin-access-map.ts` (инвентарь `access-coverage.test.ts` падает на новом маршруте без права), запрещённые action с «враждебной» формой не меняют данные; страницы журнала отвечают 405 на любую запись, запись не меняется; пользователя с записями журнала нельзя удалить; заблокированный сотрудник теряет `/admin` и action на следующем запросе; заблокированный или удалённый админ не считается вторым; проверено мутацией прав; unit 194 + e2e 54; REVIEW: bugbot 0 | `d533ede`
 - 2026-10-07 | 1.12 | seed `npm run db:seed` (`tsx`, devDependency по согласию владельца): ключи `site_settings` только недостающие (`site_name`, `contacts`, `socials`, `footer`, `requisites`, `feature_flags`, `membership_fee` с суммой 0), первый админ из `SEED_ADMIN_*` только пока нет активного админа (создание с паролем Better Auth или повышение своего аккаунта при совпадении пароля), запись в журнал от системы; страницы-заглушки → 2.3; unit 190 + e2e 48; REVIEW: bugbot 1 (не K), security 1 (C7 K1, исправлено) | `2d60f2e`
 - 2026-10-07 | 1.11 | аудит всех действий админки: код 1.10 уже писал журнал во всех 10 действиях (с IP), изменений кода нет; закреплено тестами — инвентарь `audit-coverage.test.ts` (каждое action и не-GET endpoint `/admin` есть в карте `tests/e2e/admin-audit-map.ts`, иначе падает) и e2e `admin-audit.spec.ts` (каждое действие по HTTP → запись с автором и IP; новое действие без исполнителя не проходит `check`); unit 178 + e2e 48; REVIEW: bugbot 0 | `8380bd8`
