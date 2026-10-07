@@ -55,12 +55,16 @@ test('every admin action leaves an audit entry with author and IP', async ({ pag
 				...PROFILE,
 				email: `e2e-audit-new-${crypto.randomUUID()}@example.com`
 			}),
+		/* The stored form as rendered, phone changed: no typing before hydration. */
 		'/admin/settings?/default': async () => {
 			await page.goto('/admin/settings');
+			const field = page.getByLabel('Phone', { exact: true });
+			const form = await field.evaluate((el: HTMLInputElement) =>
+				Object.fromEntries([...new FormData(el.form!)].map(([k, v]) => [k, String(v)]))
+			);
+			const name = (await field.getAttribute('name'))!;
 			const phone = `+374 10 ${String(Math.floor(Math.random() * 1e6)).padStart(6, '0')}`;
-			await page.getByLabel('Phone', { exact: true }).fill(phone);
-			await page.getByRole('button', { name: 'Save' }).click();
-			await expect(page.getByText('Saved.')).toBeVisible();
+			await post('/admin/settings', { ...form, [name]: phone });
 		}
 	};
 
