@@ -1,15 +1,17 @@
 <script lang="ts" module>
 	/* Armenian geometric ornament, no crosses (docs/08-DESIGN.md, section 16). Colour = currentColor. */
-	export type OrnamentVariant = 'rhombus' | 'interlace' | 'pomegranate';
+	export type OrnamentVariant = 'rhombus' | 'pomegranate';
 </script>
 
 <script lang="ts">
-	let { variant, class: className = '' }: { variant: OrnamentVariant; class?: string } = $props();
+	let {
+		variant = 'rhombus',
+		class: className = ''
+	}: { variant?: OrnamentVariant; class?: string } = $props();
 
 	const id = $props.id();
 	const tiles: Record<OrnamentVariant, { w: number; h: number }> = {
 		rhombus: { w: 48, h: 48 },
-		interlace: { w: 32, h: 16 },
 		pomegranate: { w: 48, h: 56 }
 	};
 	const tile = $derived(tiles[variant]);
@@ -26,11 +28,6 @@
 					{#each [[0, 0], [48, 0], [0, 48], [48, 48]] as [cx, cy], i (i)}
 						<circle {cx} {cy} r="1.5" fill="currentColor" />
 					{/each}
-				{:else if variant === 'interlace'}
-					<path d="M0 8C5 1 11 1 16 8S27 15 32 8" />
-					<path d="M0 8C5 15 11 15 16 8S27 1 32 8" />
-					<circle cx="8" cy="8" r="1" fill="currentColor" />
-					<circle cx="24" cy="8" r="1" fill="currentColor" />
 				{:else}
 					<circle cx="24" cy="32" r="11" />
 					<path d="M19 22 20 15 24 19 28 15 29 22" />

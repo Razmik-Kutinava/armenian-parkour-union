@@ -27,7 +27,7 @@
 | Почта | Resend (или аналог, см. открытые решения) | Письма: регистрация, оплата, сертификаты |
 | Платежи | Армянский эквайринг (банк) и/или Idram, детали в `07-PAYMENTS.md` | Взнос, донаты, оплата участия |
 | Иконки | Lucide (`lucide-svelte`) | Линейные иконки (`08-DESIGN.md`, раздел 6) |
-| Шрифты | `@fontsource`: Inter, Unbounded, Noto Sans Armenian | Свой хостинг шрифтов (`08-DESIGN.md`, раздел 4) |
+| Шрифты | APU Sans (подмножество Arian AMU, woff2) в `static/fonts/apu-sans/`, без npm-пакетов | Свой хостинг шрифтов (`08-DESIGN.md`, раздел 4) |
 | Тесты | Vitest (логика), Playwright (ключевые сценарии) | Минимум для критичных мест: баллы, платежи, права |
 | Линтинг | ESLint + Prettier | Единый стиль |
 
@@ -61,7 +61,7 @@
 ├─ scripts/                      seed, утилиты
 ├─ static/                       статические файлы
 │  ├─ brand/                     логотип, favicon, og-картинка, подпись и печать (`08`, раздел 2)
-│  └─ fonts/                     шрифты, если не через @fontsource
+│  └─ fonts/                     шрифты (APU Sans)
 ├─ tests/e2e/                    сценарии Playwright
 ├─ src/
 │  ├─ app.html, app.css

@@ -1,7 +1,0 @@
-Arian AMU fonts — Copyright (c) 1998–2011 Ruben Hakobyan (Tarumian), post@tarumian.am
-Source: https://arian.am/ (arnamu.zip), license: https://arian.tarumian.am/en/license/
-
-Summary of the license: anyone may obtain, use, copy and disseminate the fonts free of charge.
-Modified fonts must not use the words "Arian", "AMU" or "Tarumian" in their name and must state
-that they derive from the Arian AMU fonts. The fonts are provided "as is", without warranty.
-Files here are unmodified (arnamu.ttf, arnamu_bold.ttf), renamed only.

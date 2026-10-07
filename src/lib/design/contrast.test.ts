@@ -1,37 +1,49 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { contrastRatio } from './contrast';
-import { accentPalettes } from './palettes';
 
-const NAVY_950 = '#0A1A2B';
-const WHITE = '#FFFFFF';
+const css = readFileSync(new URL('../../app.css', import.meta.url), 'utf8');
+
+function token(name: string): string {
+	const match = new RegExp(`--${name}:\\s*(#[0-9a-fA-F]{6});`).exec(css);
+	if (!match) throw new Error(`Token --${name} not found in app.css`);
+	return match[1];
+}
+
 const AA_TEXT = 4.5;
 
 describe('contrastRatio', () => {
 	it('matches known WCAG values', () => {
-		expect(contrastRatio('#000000', WHITE)).toBeCloseTo(21, 5);
-		expect(contrastRatio(WHITE, WHITE)).toBeCloseTo(1, 5);
-		expect(contrastRatio('#1F4E78', WHITE)).toBeGreaterThan(8.5);
+		expect(contrastRatio('#000000', '#FFFFFF')).toBeCloseTo(21, 5);
+		expect(contrastRatio('#FFFFFF', '#FFFFFF')).toBeCloseTo(1, 5);
 	});
 
 	it('is symmetric', () => {
-		expect(contrastRatio('#FF8A1F', NAVY_950)).toBe(contrastRatio(NAVY_950, '#FF8A1F'));
+		expect(contrastRatio('#FF8A1F', '#0A1A2B')).toBe(contrastRatio('#0A1A2B', '#FF8A1F'));
 	});
 
 	it('rejects non-hex input', () => {
-		expect(() => contrastRatio('red', WHITE)).toThrow();
+		expect(() => contrastRatio('red', '#FFFFFF')).toThrow();
 	});
 });
 
-describe.each(accentPalettes)('accent palette $id passes section 3.5 pairs', (p) => {
-	it('accent-500 on navy-950 (button on dark)', () => {
-		expect(contrastRatio(p.accent500, NAVY_950)).toBeGreaterThanOrEqual(AA_TEXT);
-	});
+describe('app.css text pairs (08-DESIGN, section 3.5)', () => {
+	const pairs: [fg: string, bg: string, min: number][] = [
+		['surface', 'navy-700', AA_TEXT],
+		['surface', 'navy-900', AA_TEXT],
+		['accent-500', 'navy-950', AA_TEXT],
+		['navy-950', 'accent-100', AA_TEXT],
+		['ink-900', 'surface', AA_TEXT],
+		['ink-700', 'surface', AA_TEXT],
+		['ink-500', 'surface', AA_TEXT],
+		['accent-700', 'surface', AA_TEXT],
+		['success-fg', 'success-bg', AA_TEXT],
+		['warning-fg', 'warning-bg', AA_TEXT],
+		['error-fg', 'error-bg', AA_TEXT],
+		['surface', 'error-strong', AA_TEXT]
+	];
 
-	it('accent-700 on white (accent text on light)', () => {
-		expect(contrastRatio(p.accent700, WHITE)).toBeGreaterThanOrEqual(AA_TEXT);
-	});
-
-	it('navy-950 text on accent-100 badge', () => {
-		expect(contrastRatio(NAVY_950, p.accent100)).toBeGreaterThanOrEqual(AA_TEXT);
+	it.each(pairs)('%s on %s', (fg, bg, min) => {
+		expect(contrastRatio(token(fg), token(bg))).toBeGreaterThanOrEqual(min);
 	});
 });

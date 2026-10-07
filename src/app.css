@@ -1,5 +1,20 @@
 @import 'tailwindcss';
 
+/* APU Sans = Arian AMU subset (static/fonts/apu-sans/LICENSE.txt). Only 400 and 700 exist. */
+@font-face {
+	font-family: 'APU Sans';
+	font-weight: 400;
+	font-display: swap;
+	src: url('/fonts/apu-sans/apu-sans-400.woff2') format('woff2');
+}
+
+@font-face {
+	font-family: 'APU Sans';
+	font-weight: 700;
+	font-display: swap;
+	src: url('/fonts/apu-sans/apu-sans-700.woff2') format('woff2');
+}
+
 /* Tokens: docs/08-DESIGN.md, sections 3–5 and 7. Components use tokens only. */
 :root {
 	--navy-950: #0a1a2b;
@@ -86,8 +101,8 @@
 
 @theme static {
 	--font-*: initial;
-	--font-display: 'Unbounded', 'Noto Sans Armenian', system-ui, sans-serif;
-	--font-body: 'Inter', 'Noto Sans Armenian', system-ui, sans-serif;
+	--font-display: 'APU Sans', system-ui, sans-serif;
+	--font-body: 'APU Sans', system-ui, sans-serif;
 
 	--spacing: 0.25rem;
 

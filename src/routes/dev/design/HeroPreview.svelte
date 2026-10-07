@@ -1,8 +1,8 @@
 <script lang="ts">
-	import Ornament, { type OrnamentVariant } from '#lib/components/Ornament.svelte';
+	import Ornament from '#lib/components/Ornament.svelte';
 	import type { Sample } from './data';
 
-	let { sample, ornament }: { sample: Sample; ornament: OrnamentVariant } = $props();
+	let { sample }: { sample: Sample } = $props();
 </script>
 
 <section
@@ -10,7 +10,7 @@
 	class="relative overflow-hidden bg-navy-950 px-6 pt-16 pb-24 text-surface md:px-12"
 	style="clip-path: polygon(0 0, 100% 0, 100% 88%, 0 100%)"
 >
-	<Ornament variant={ornament} class="absolute inset-0 text-navy-300 opacity-10" />
+	<Ornament class="absolute inset-0 text-navy-300 opacity-10" />
 	<div class="relative mx-auto flex max-w-page flex-col gap-6">
 		<p class="text-sm font-semibold text-accent-500">parkour.am</p>
 		<h1 class="max-w-3xl text-4xl font-bold md:text-5xl">{sample.title}</h1>

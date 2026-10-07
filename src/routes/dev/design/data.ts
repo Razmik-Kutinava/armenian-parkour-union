@@ -1,43 +1,4 @@
 /* Dev-only showcase data; not user-facing UI text. */
-export interface FontSet {
-	id: string;
-	name: string;
-	note: string;
-	display: string;
-	body: string;
-}
-
-export const fontSets: FontSet[] = [
-	{
-		id: 'arian',
-		name: 'Arian AMU',
-		note: 'Armenian designer (R. Tarumian); Armenian + Latin + Cyrillic in one family; free license; 400/700',
-		display: "'Arian AMU', system-ui, sans-serif",
-		body: "'Arian AMU', system-ui, sans-serif"
-	},
-	{
-		id: 'mardoto',
-		name: 'Mardoto',
-		note: 'Armenian in Roboto style; OFL; Cyrillic falls back to Inter if missing',
-		display: "'Mardoto', 'Inter', system-ui, sans-serif",
-		body: "'Mardoto', 'Inter', system-ui, sans-serif"
-	},
-	{
-		id: 'proposal',
-		name: 'Unbounded + Inter + Noto',
-		note: 'Current proposal in 08-DESIGN: wide sporty headings; Armenian from Noto Sans Armenian',
-		display: "'Unbounded', 'Noto Sans Armenian', system-ui, sans-serif",
-		body: "'Inter', 'Noto Sans Armenian', system-ui, sans-serif"
-	},
-	{
-		id: 'calm',
-		name: 'Inter + Noto',
-		note: 'Calm variant: Inter everywhere, Armenian from Noto Sans Armenian',
-		display: "'Inter', 'Noto Sans Armenian', system-ui, sans-serif",
-		body: "'Inter', 'Noto Sans Armenian', system-ui, sans-serif"
-	}
-];
-
 export interface Sample {
 	lang: 'hy' | 'ru' | 'en';
 	title: string;
