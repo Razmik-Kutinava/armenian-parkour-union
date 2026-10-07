@@ -11,6 +11,8 @@ describe('safeReturnTo', () => {
 		for (const bad of [
 			'https://evil.com',
 			'//evil.com',
+			'/.//evil.com',
+			'/a/..//evil.com',
 			'/\\evil.com',
 			'\\\\evil.com',
 			'javascript:alert(1)',

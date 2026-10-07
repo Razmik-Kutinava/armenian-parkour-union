@@ -9,7 +9,8 @@ export function safeReturnTo(value: string | null, fallback: string): string {
 		const url = new URL(value, BASE);
 		if (url.origin !== BASE) return fallback;
 		const path = url.pathname + url.search + url.hash;
-		return /%0[ad]/i.test(path) ? fallback : path;
+		// Dot segments normalise '/.//evil.com' into the protocol-relative '//evil.com'.
+		return path.startsWith('//') || /%0[ad]/i.test(path) ? fallback : path;
 	} catch {
 		return fallback;
 	}

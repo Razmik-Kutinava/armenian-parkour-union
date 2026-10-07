@@ -28,6 +28,12 @@ describe('isMinor', () => {
 		expect(isMinor('2008-10-07', today)).toBe(false);
 		expect(isMinor('1990-05-01', today)).toBe(false);
 	});
+
+	it('is false for a future or broken date: that is a birth date error, not a minor', () => {
+		expect(isMinor('2027-01-01', today)).toBe(false);
+		expect(isMinor('2000-02-30', today)).toBe(false);
+		expect(errorPaths({ ...adult, birthDate: '2027-01-01' })).not.toContain('guardianName');
+	});
 });
 
 describe('registerSchema', () => {

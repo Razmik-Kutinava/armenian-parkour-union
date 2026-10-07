@@ -49,7 +49,7 @@ function ageOn(birthDate: string, today: Date): number | null {
 /** Under 18 on `today` (UTC calendar date). `birthDate` is `YYYY-MM-DD`. */
 export function isMinor(birthDate: string, today: Date): boolean {
 	const age = ageOn(birthDate, today);
-	return age !== null && age < ADULT_AGE;
+	return age !== null && age >= 0 && age < ADULT_AGE;
 }
 
 const guardianFields = ['guardianName', 'guardianPhone', 'guardianEmail'] as const;
