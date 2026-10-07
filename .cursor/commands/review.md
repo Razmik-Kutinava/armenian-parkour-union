@@ -6,7 +6,7 @@
 2. Субагенты **по уровню риска** (таблица в `sbr.mdc` § PHASE 3; «Риск» из todo, сверить с диффом, высший уровень побеждает): `high` — `bugbot` + `security-review` параллельно; `normal` — только `bugbot`; `low` — без субагентов. Субагенты — **только на отфильтрованном диффе** (ниже), `Diff: uncommitted changes`. Их находки + свой проход по диффу → `/crit-audit` (`.cursor/commands/crit-audit.md`): K1–K5, падающий тест, журнал. `BLOCKED` → фикс → шаг 1.
 3. Сверка со SPEC (todo) и «Готово, когда» задачи в `09-ROADMAP.md`.
 4. `PROGRESS.md`: «Сделано», убрать из «В работе»; todo очистить до шаблона. Сработал триггер `/trim` — выполнить его. Коммит.
-5. `git push` без вопроса. Смотреть все job (`gh run watch`).
+5. `git push` без вопроса. Ждать CI одной командой, без `Start-Sleep` и опроса `gh run list`: `gh run list -L 1 -w CI --json databaseId -q '.[0].databaseId'` → `gh run watch <id> --exit-status`. Run ещё не появился — один повтор через `gh run watch` без id (интерактивный выбор не использовать).
 6. CI красный → субагент `ci-investigator` → фикс → local → коммит → push. Пока не зелёный.
 7. CI зелёный → **стоп**.
 
