@@ -1,5 +1,5 @@
-import { hashPassword } from 'better-auth/crypto';
-import { eq } from 'drizzle-orm';
+import { hashPassword, verifyPassword } from 'better-auth/crypto';
+import { and, eq } from 'drizzle-orm';
 import { email as emailSchema, PASSWORD_MAX, PASSWORD_MIN } from '#lib/validation/auth.ts';
 import type { LimitDb } from '../auth/rate-limit';
 import { account } from '../db/schema/auth';
@@ -37,6 +37,14 @@ export async function seedAdmin(
 		if (existing) {
 			if (existing.status !== 'active' || existing.deletedAt) {
 				throw new Error('SEED_ADMIN_EMAIL belongs to a blocked or deleted account');
+			}
+			/* Anyone can register first with the future admin email: only its owner gets promoted. */
+			const [cred] = await tx
+				.select({ hash: account.password })
+				.from(account)
+				.where(and(eq(account.userId, existing.id), eq(account.providerId, 'credential')));
+			if (!cred?.hash || !(await verifyPassword({ hash: cred.hash, password }))) {
+				throw new Error('SEED_ADMIN_EMAIL is taken by an account with another password');
 			}
 			await tx.update(users).set({ role: 'admin' }).where(eq(users.id, existing.id));
 			await writeAudit(tx, {
