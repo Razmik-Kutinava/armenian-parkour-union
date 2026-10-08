@@ -64,7 +64,7 @@ test('editor writes a draft, previews, publishes; guest reads it with Open Graph
 	).toBe(303);
 
 	await page.getByRole('button', { name: 'Publish' }).click();
-	await expect(page.getByText('Published', { exact: true }).first()).toBeVisible();
+	await expect(page.getByRole('button', { name: 'Unpublish' })).toBeVisible();
 	expect((await sql`select status from posts where id = ${row.id}`)[0].status).toBe('published');
 
 	expect((await guest.goto(`/news?tag=${tag}`))?.status()).toBe(200);

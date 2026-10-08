@@ -19,7 +19,7 @@ export const pageStatuses = ['draft', 'published', 'archived'] as const;
 export type PageStatus = (typeof pageStatuses)[number];
 
 export const SLUG_MAX = 80;
-const slugSchema = z
+export const slugSchema = z
 	.string({ error: 'auth.error.required' })
 	.max(SLUG_MAX, { error: 'auth.error.tooLong' })
 	.regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, { error: 'pages.error.slug' });

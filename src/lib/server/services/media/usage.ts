@@ -1,14 +1,14 @@
-import { and, eq, isNull, sql } from 'drizzle-orm';
+import { and, eq, isNull, or, sql } from 'drizzle-orm';
 import type { LimitDb } from '../../auth/rate-limit';
-import { pages } from '../../db/schema/content';
+import { pages, posts } from '../../db/schema/content';
 import { users } from '../../db/schema/users';
 
 /*
  * docs/05 section 20: "where a file is used". Every table that stores a media key adds its finder
- * here (posts, events, hero blocks, products — with their tasks), and the code that starts
+ * here (events, hero blocks, products — with their tasks), and the code that starts
  * using a file locks its media row FOR SHARE in the same transaction, so a delete cannot slip in.
  */
-export type MediaUsage = { kind: 'user_avatar' | 'page'; id: string };
+export type MediaUsage = { kind: 'user_avatar' | 'page' | 'post'; id: string };
 
 type Finder = (db: LimitDb, key: string) => Promise<MediaUsage[]>;
 
@@ -20,17 +20,31 @@ const avatars: Finder = async (db, key) => {
 	return rows.map((r) => ({ kind: 'user_avatar' as const, id: r.id }));
 };
 
-/** Images in page text are `src="{R2_PUBLIC_URL}/{key}"`; in jsonb text the quote is `\"`. */
+/** Images in rich text are `src="{R2_PUBLIC_URL}/{key}"`; in jsonb text the quote is `\"`. */
+const inText = (key: string) => `/${key}\\"`;
+
 const pageBodies: Finder = async (db, key) => {
-	const needle = `/${key}\\"`;
 	const rows = await db
 		.select({ id: pages.id })
 		.from(pages)
-		.where(and(sql`strpos(${pages.body}::text, ${needle}) > 0`, isNull(pages.deletedAt)));
+		.where(and(sql`strpos(${pages.body}::text, ${inText(key)}) > 0`, isNull(pages.deletedAt)));
 	return rows.map((r) => ({ kind: 'page' as const, id: r.id }));
 };
 
-const finders: Finder[] = [avatars, pageBodies];
+const postCoversAndBodies: Finder = async (db, key) => {
+	const rows = await db
+		.select({ id: posts.id })
+		.from(posts)
+		.where(
+			and(
+				or(eq(posts.coverKey, key), sql`strpos(${posts.body}::text, ${inText(key)}) > 0`),
+				isNull(posts.deletedAt)
+			)
+		);
+	return rows.map((r) => ({ kind: 'post' as const, id: r.id }));
+};
+
+const finders: Finder[] = [avatars, pageBodies, postCoversAndBodies];
 
 export async function findUsages(db: LimitDb, key: string): Promise<MediaUsage[]> {
 	const found: MediaUsage[] = [];

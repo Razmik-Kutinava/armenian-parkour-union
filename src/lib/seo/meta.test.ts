@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { buildSeo } from './meta';
+import { buildSeo, textFromHtml } from './meta';
 
 const base = {
 	siteUrl: 'https://parkour.am/',
@@ -83,6 +83,12 @@ describe('seo: page meta (docs/06 section 7)', () => {
 		});
 		expect(meta.jsonLd).not.toContain('<');
 		expect(JSON.parse(meta.jsonLd!).headline).toBe('</script><script>alert(1)</script>');
+	});
+
+	it('text of editor HTML stands in for a missing excerpt', () => {
+		expect(textFromHtml('<h2>Jam</h2><p>Bring&nbsp;water &amp; shoes</p><ul><li>a</li></ul>')).toBe(
+			'Jam Bring water & shoes a'
+		);
 	});
 
 	it('a long description is cut on a word to 200 characters', () => {

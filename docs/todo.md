@@ -29,8 +29,8 @@
 - Гость видит новость, если `status = published`, `published_at <= now()`, не удалена. «Опубликовать» без даты ставит `published_at = now()`; дата в будущем — «запланирована» (в списке админки отдельной меткой). «Снять» → `draft`.
 - Автор — выбор из активных editor / admin, по умолчанию текущий.
 - Теги — одним языком, без перевода: обрезка пробелов, нижний регистр, без повторов, до 10 штук по 32 символа. Фильтр `/news?tag=…`.
-- Краткое описание — простой текст до 300 символов на язык; оно же description и og:description (нет — `seo_description` сайта).
-- Предпросмотр — сохранённая версия на `/admin/posts/{id}/preview`, вид как на сайте, плашка «Предпросмотр», `noindex`, только `posts.write`.
+- Краткое описание — простой текст до 300 символов на язык; оно же description и og:description (нет — начало текста новости, нет и его — общее описание раздела «Новости»).
+- Предпросмотр — сохранённая версия на `/admin/news/{id}/preview`, вид как на сайте, плашка «Предпросмотр», `noindex`, только `posts.write`.
 - Дублировать — копия в `draft`, адрес `{slug}-copy` (`-copy-2`, …), без даты публикации.
 - Удаление мягкое, кроме архива (как у страниц).
 - Обложка — выбор из медиатеки (только изображения); og:image — адрес обложки в R2 как есть, без нарезки; без обложки og:image нет (логотипа пока нет).
@@ -45,14 +45,14 @@
 - `src/lib/server/services/media/usage.ts` — обложка и картинки текста новостей
 - `src/lib/components/site/SeoHead.svelte` — title, description, canonical, og:*, twitter:card, JSON-LD (2.8 переиспользует)
 - `src/lib/components/admin/MediaPicker.svelte` — выбор обложки из медиатеки
-- `src/routes/admin/posts/` (`+page`, `new`, `[id]`, `[id]/preview`) — список, форма, действия
+- `src/routes/admin/news/` (`+page`, `new`, `[id]`, `[id]/preview`) — список, форма, действия (адрес раздела уже был в меню админки)
 - `src/routes/[[lang=lang]]/(site)/news/`, `news/[slug]/` — публичный вывод; пункт «Новости» в меню
 - `tests/e2e/admin-audit-map.ts`, `admin-access-map.ts`, `tests/e2e/news.spec.ts`; переводы `en/hy/ru`
 
 ## Не ломать
 
 - Гость не видит черновик, архив, удалённую и запланированную (дата в будущем) новость — ни в списке, ни по адресу (404), ни в «Читайте также»
-- editor и admin правят и смотрят предпросмотр; moderator и member получают 404 на `/admin/posts*`, гость — вход (`access-coverage`)
+- editor и admin правят и смотрят предпросмотр; moderator и member получают 404 на `/admin/news*`, гость — вход (`access-coverage`)
 - Сырой HTML из формы не сохраняется — только результат `richTextSchema`
 - Файл — обложка или картинка в тексте новости — нельзя удалить из медиатеки
 
@@ -68,9 +68,9 @@
 ## Фазы
 
 - [x] SPEC
-- [ ] Подтверждение правил + «go» на миграцию 0004
-- [ ] RED (`test: … [RED]`)
-- [ ] GREEN (`feat: … [GREEN]`)
+- [x] Подтверждение правил + «go» на миграцию 0004 (применена на dev)
+- [x] RED (`test: … [RED]`)
+- [x] GREEN (`feat: … [GREEN]`)
 - [ ] REGRESS
 - [ ] REVIEW: local · bugbot · security-review · сверка со SPEC · PROGRESS · push · CI green
 - [ ] DEPLOY (только по апруву владельца)
