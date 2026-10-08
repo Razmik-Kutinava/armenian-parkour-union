@@ -43,6 +43,10 @@ test('every admin action leaves an audit entry with author and IP', async ({ pag
 		insert into media (key, original_name, mime, size_bytes, uploaded_by)
 		values (${`media/2026/10/${crypto.randomUUID()}.png`}, 'audit.png', 'image/png', 10, ${adminId})
 		returning id`;
+	const pageSlug = `e2e-audit-${crypto.randomUUID().slice(0, 8)}`;
+	const pageForm = { slug: pageSlug, 'title.en': 'Audit page', status: 'draft' };
+	const pageId = async () =>
+		(await sql`select id from pages where slug = ${pageSlug}`)[0].id as string;
 
 	/* Typed by the map: a new admin action does not compile until it is exercised here. */
 	const perform: Record<AdminAction, () => Promise<void>> = {
@@ -86,6 +90,24 @@ test('every admin action leaves an audit entry with author and IP', async ({ pag
 		'/admin/media/[id]?/alt': () => post(`/admin/media/${file.id}?/alt`, { 'alt.en': 'Audit' }),
 		'/admin/media/[id]?/delete': async () => {
 			const res = await page.request.post(`/admin/media/${file.id}?/delete`, {
+				form: {},
+				headers: ORIGIN,
+				maxRedirects: 0
+			});
+			expect(res.status()).toBeLessThan(400);
+		},
+		'/admin/pages/new?/default': async () => {
+			const res = await page.request.post('/admin/pages/new', {
+				form: pageForm,
+				headers: ORIGIN,
+				maxRedirects: 0
+			});
+			expect(res.status()).toBeLessThan(400);
+		},
+		'/admin/pages/[id]?/update': async () =>
+			post(`/admin/pages/${await pageId()}?/update`, { ...pageForm, status: 'published' }),
+		'/admin/pages/[id]?/delete': async () => {
+			const res = await page.request.post(`/admin/pages/${await pageId()}?/delete`, {
 				form: {},
 				headers: ORIGIN,
 				maxRedirects: 0

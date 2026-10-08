@@ -28,7 +28,11 @@ const HOSTILE_FORM = (userId: string) => ({
 	key: `media/2026/10/${crypto.randomUUID()}.png`,
 	name: 'hacked.png',
 	mime: 'image/png',
-	size: '10'
+	size: '10',
+	slug: `e2e-hostile-${crypto.randomUUID().slice(0, 8)}`,
+	'title.en': 'Hacked',
+	'body.en': '<p>Hacked</p>',
+	status: 'published'
 });
 
 async function registerAs(page: Page, role: Role) {
@@ -61,23 +65,34 @@ async function insertMedia(uploadedBy: string) {
 	return row.id as string;
 }
 
+async function insertPage() {
+	const [row] = await sql`
+		insert into pages (slug, title, status)
+		values (${`e2e-perm-${crypto.randomUUID().slice(0, 8)}`}, ${sql.json({ en: 'Perm' })}, 'draft')
+		returning id`;
+	return row.id as string;
+}
+
 /* docs/04 section 5.4: member → 404 for all of /admin, staff without the permission → 403. */
 const expectedStatus = (role: Role, access: Access) =>
 	role === 'member' ? 404 : access === 'staff' || roleCan(role, access) ? 200 : 403;
 
-type Ids = { userId: string; auditId: string; mediaId: string };
+type Ids = { userId: string; auditId: string; mediaId: string; pageId: string };
 const toPath = (key: string, ids: Ids) =>
 	key
 		.replace(/^(GET|POST) /, '')
 		.replace('/users/[id]', `/users/${ids.userId}`)
 		.replace('/audit/[id]', `/audit/${ids.auditId}`)
 		.replace('/media/[id]', `/media/${ids.mediaId}`)
+		.replace('/pages/[id]', `/pages/${ids.pageId}`)
 		.replace('?/default', '');
 
 const targetRow = async (id: string) =>
 	(await sql`select role, status, email_verified, first_name from users where id = ${id}`)[0];
 const mediaRow = async (id: string) =>
 	(await sql`select alt, deleted_at from media where id = ${id}`)[0];
+const pageRow = async (id: string) =>
+	(await sql`select slug, title, body, status, deleted_at from pages where id = ${id}`)[0];
 
 for (const role of ['member', 'editor', 'moderator'] as const) {
 	test(`${role}: every admin page and action answers by docs/04, data stays`, async ({ page }) => {
@@ -87,9 +102,11 @@ for (const role of ['member', 'editor', 'moderator'] as const) {
 		const ids = {
 			userId: target,
 			auditId: crypto.randomUUID(),
-			mediaId: await insertMedia(target)
+			mediaId: await insertMedia(target),
+			pageId: await insertPage()
 		};
 		const mediaBefore = await mediaRow(ids.mediaId);
+		const pageBefore = await pageRow(ids.pageId);
 		await registerAs(page, role);
 
 		for (const [key, access] of Object.entries(ADMIN_READS)) {
@@ -109,9 +126,11 @@ for (const role of ['member', 'editor', 'moderator'] as const) {
 
 		expect(await targetRow(target)).toEqual(before);
 		expect(await mediaRow(ids.mediaId)).toEqual(mediaBefore);
+		expect(await pageRow(ids.pageId)).toEqual(pageBefore);
 		expect(
-			await sql`select 1 from audit_log where entity_id in (${target}, ${ids.mediaId})`
+			await sql`select 1 from audit_log where entity_id in (${target}, ${ids.mediaId}, ${ids.pageId})`
 		).toHaveLength(0);
+		expect(await sql`select 1 from pages where slug like 'e2e-hostile-%'`).toHaveLength(0);
 	});
 }
 
@@ -128,7 +147,12 @@ test('admin opens every admin page; audit pages take no writes and the entry sta
 	const [entry] = await sql`select * from audit_log where entity_id = ${target}`;
 	expect(entry.action).toBe('user.email_confirm');
 
-	const ids = { userId: target, auditId: entry.id, mediaId: await insertMedia(target) };
+	const ids = {
+		userId: target,
+		auditId: entry.id,
+		mediaId: await insertMedia(target),
+		pageId: await insertPage()
+	};
 	for (const key of Object.keys(ADMIN_READS)) {
 		const res = await page.request.get(toPath(key, ids), { maxRedirects: 0 });
 		expect(res.status(), `GET ${key}`).toBe(200);

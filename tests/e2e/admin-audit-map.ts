@@ -16,7 +16,10 @@ export const ADMIN_AUDIT = {
 	'/admin/settings?/default': ['settings.update'],
 	'/admin/media?/complete': ['media.upload'],
 	'/admin/media/[id]?/alt': ['media.update'],
-	'/admin/media/[id]?/delete': ['media.delete']
+	'/admin/media/[id]?/delete': ['media.delete'],
+	'/admin/pages/new?/default': ['page.create'],
+	'/admin/pages/[id]?/update': ['page.update'],
+	'/admin/pages/[id]?/delete': ['page.delete']
 } as const;
 
 export type AdminAction = keyof typeof ADMIN_AUDIT;
