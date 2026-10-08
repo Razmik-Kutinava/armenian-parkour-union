@@ -26,7 +26,11 @@ export const ADMIN_READS = {
 	'/admin/news': 'posts.write',
 	'/admin/news/new': 'posts.write',
 	'/admin/news/[id]': 'posts.write',
-	'/admin/news/[id]/preview': 'posts.write'
+	'/admin/news/[id]/preview': 'posts.write',
+	'/admin/events': 'events.write',
+	'/admin/events/new': 'events.write',
+	'/admin/events/[id]': 'events.write',
+	'/admin/events/[id]/preview': 'events.write'
 } as const satisfies Record<string, Access>;
 
 export const ADMIN_WRITES = {
@@ -52,5 +56,17 @@ export const ADMIN_WRITES = {
 	'/admin/news/[id]?/status': 'posts.write',
 	'/admin/news/[id]?/duplicate': 'posts.write',
 	'/admin/news/[id]?/delete': 'posts.write',
+	'/admin/events/new?/default': 'events.write',
+	'/admin/events/[id]?/update': 'events.write',
+	'/admin/events/[id]?/categoryCreate': 'events.write',
+	'/admin/events/[id]?/categoryUpdate': 'events.write',
+	'/admin/events/[id]?/categoryDelete': 'events.write',
+	'/admin/events/[id]?/status': 'events.write',
+	'/admin/events/[id]?/duplicate': 'events.write',
+	'/admin/events/[id]?/delete': 'events.write',
+	'/admin/events/[id]?/cancel': 'events.cancel',
+	'/admin/events/[id]?/finish': 'events.cancel',
+	'/admin/events/[id]?/archive': 'events.cancel',
+	'/admin/events/[id]?/restore': 'events.cancel',
 	'POST /admin/locale': 'staff'
 } as const satisfies Record<AdminAction | NotAuditedAction, Access>;

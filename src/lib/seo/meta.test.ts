@@ -75,6 +75,65 @@ describe('seo: page meta (docs/06 section 7)', () => {
 		});
 	});
 
+	it('an event adds Event markup: dates, status, place, price (docs/06 section 4.3)', () => {
+		const event = {
+			startsAt: new Date('2026-11-14T07:00:00Z'),
+			endsAt: new Date('2026-11-14T14:00:00Z'),
+			cancelled: false,
+			place: { name: 'Parkour park', address: 'Abovyan 1', city: 'Yerevan' },
+			price: { amountMinor: 5000, currency: 'AMD' }
+		};
+		const meta = buildSeo({
+			...base,
+			path: '/ru/events/jam',
+			image: { url: 'https://media.parkour.am/media/a.webp', alt: '' },
+			event
+		});
+		expect(og(meta, 'og:type')).toBe('website');
+		expect(JSON.parse(meta.jsonLd!)).toEqual({
+			'@context': 'https://schema.org',
+			'@type': 'Event',
+			name: 'Джем',
+			description: 'Коротко о джеме',
+			image: ['https://media.parkour.am/media/a.webp'],
+			startDate: '2026-11-14T07:00:00.000Z',
+			endDate: '2026-11-14T14:00:00.000Z',
+			eventStatus: 'https://schema.org/EventScheduled',
+			eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+			inLanguage: 'ru',
+			location: {
+				'@type': 'Place',
+				name: 'Parkour park',
+				address: {
+					'@type': 'PostalAddress',
+					streetAddress: 'Abovyan 1',
+					addressLocality: 'Yerevan',
+					addressCountry: 'AM'
+				}
+			},
+			offers: {
+				'@type': 'Offer',
+				price: '5000',
+				priceCurrency: 'AMD',
+				url: 'https://parkour.am/ru/events/jam'
+			},
+			organizer: { '@type': 'Organization', name: 'Armenian Parkour Union' }
+		});
+		const cancelled = buildSeo({
+			...base,
+			event: {
+				...event,
+				cancelled: true,
+				place: null,
+				price: { amountMinor: 1050, currency: 'USD' }
+			}
+		});
+		const ld = JSON.parse(cancelled.jsonLd!);
+		expect(ld.eventStatus).toBe('https://schema.org/EventCancelled');
+		expect(ld).not.toHaveProperty('location');
+		expect(ld.offers.price).toBe('10.50');
+	});
+
 	it('markup cannot close its script tag', () => {
 		const meta = buildSeo({
 			...base,

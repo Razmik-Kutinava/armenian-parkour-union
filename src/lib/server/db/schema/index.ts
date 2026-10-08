@@ -4,3 +4,4 @@ export * from './users';
 export * from './auth';
 export * from './service';
 export * from './content';
+export * from './events';

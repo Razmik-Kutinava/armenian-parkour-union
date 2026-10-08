@@ -30,7 +30,7 @@ async function register(page: Page, prefix: string) {
 }
 
 test('every admin action leaves an audit entry with author and IP', async ({ page, browser }) => {
-	test.setTimeout(90_000);
+	test.setTimeout(150_000);
 	const adminId = await register(page, 'admin');
 	await sql`update users set role = 'admin' where id = ${adminId}`;
 	const target = await register(await (await browser.newContext()).newPage(), 'target');
@@ -51,8 +51,29 @@ test('every admin action leaves an audit entry with author and IP', async ({ pag
 	const postForm = { slug: postSlug, 'title.en': 'Audit post', status: 'draft' };
 	const postId = async () =>
 		(await sql`select id from posts where slug = ${postSlug}`)[0].id as string;
-	const postRedirect = async (path: string) => {
-		const res = await page.request.post(path, { form: {}, headers: ORIGIN, maxRedirects: 0 });
+	const eventSlug = `e2e-audit-${crypto.randomUUID().slice(0, 8)}`;
+	const eventForm = {
+		slug: eventSlug,
+		'title.en': 'Audit event',
+		startsAt: '2099-05-01T10:00',
+		endsAt: '2099-05-01T18:00',
+		price: '0',
+		priceCurrency: 'AMD',
+		status: 'draft'
+	};
+	const eventId = async () =>
+		(await sql`select id from events where slug = ${eventSlug}`)[0].id as string;
+	const categoryId = async () =>
+		(await sql`select id from event_categories where event_id = ${await eventId()}`)[0]
+			.id as string;
+	const categoryForm = { 'name.en': 'Audit category', discipline: 'speed' };
+	const [startedEvent] = await sql`
+		insert into events (slug, title, status, published_at, starts_at, ends_at)
+		values (${`e2e-audit-${crypto.randomUUID().slice(0, 8)}`}, ${sql.json({ en: 'Started' })},
+			'published', now() - interval '2 days', now() - interval '1 day', now() - interval '20 hours')
+		returning id`;
+	const postRedirect = async (path: string, form: Record<string, string> = {}) => {
+		const res = await page.request.post(path, { form, headers: ORIGIN, maxRedirects: 0 });
 		expect(res.status(), path).toBeLessThan(400);
 	};
 
@@ -136,7 +157,31 @@ test('every admin action leaves an audit entry with author and IP', async ({ pag
 			post(`/admin/news/${await postId()}?/status`, { status: 'published' }),
 		'/admin/news/[id]?/duplicate': async () =>
 			postRedirect(`/admin/news/${await postId()}?/duplicate`),
-		'/admin/news/[id]?/delete': async () => postRedirect(`/admin/news/${await postId()}?/delete`)
+		'/admin/news/[id]?/delete': async () => postRedirect(`/admin/news/${await postId()}?/delete`),
+		'/admin/events/new?/default': () => postRedirect('/admin/events/new', eventForm),
+		'/admin/events/[id]?/update': async () =>
+			post(`/admin/events/${await eventId()}?/update`, { ...eventForm, city: 'Gyumri' }),
+		'/admin/events/[id]?/categoryCreate': async () =>
+			post(`/admin/events/${await eventId()}?/categoryCreate`, categoryForm),
+		'/admin/events/[id]?/categoryUpdate': async () =>
+			post(`/admin/events/${await eventId()}?/categoryUpdate`, {
+				...categoryForm,
+				categoryId: await categoryId(),
+				ageMin: '10'
+			}),
+		'/admin/events/[id]?/categoryDelete': async () =>
+			post(`/admin/events/${await eventId()}?/categoryDelete`, { categoryId: await categoryId() }),
+		'/admin/events/[id]?/status': async () =>
+			post(`/admin/events/${await eventId()}?/status`, { action: 'publish' }),
+		'/admin/events/[id]?/duplicate': async () =>
+			postRedirect(`/admin/events/${await eventId()}?/duplicate`),
+		'/admin/events/[id]?/cancel': async () =>
+			post(`/admin/events/${await eventId()}?/cancel`, { comment: 'Audit check' }),
+		'/admin/events/[id]?/finish': () => post(`/admin/events/${startedEvent.id}?/finish`),
+		'/admin/events/[id]?/archive': async () => post(`/admin/events/${await eventId()}?/archive`),
+		'/admin/events/[id]?/restore': async () => post(`/admin/events/${await eventId()}?/restore`),
+		'/admin/events/[id]?/delete': async () =>
+			postRedirect(`/admin/events/${await eventId()}?/delete`)
 	};
 
 	for (const [action, run] of Object.entries(perform)) await test.step(action, run);

@@ -32,7 +32,14 @@ const HOSTILE_FORM = (userId: string) => ({
 	slug: `e2e-hostile-${crypto.randomUUID().slice(0, 8)}`,
 	'title.en': 'Hacked',
 	'body.en': '<p>Hacked</p>',
-	status: 'published'
+	status: 'published',
+	action: 'publish',
+	startsAt: '2099-01-01T10:00',
+	endsAt: '2099-01-01T12:00',
+	price: '0',
+	priceCurrency: 'AMD',
+	'name.en': 'Hacked',
+	discipline: 'speed'
 });
 
 async function registerAs(page: Page, role: Role) {
@@ -81,11 +88,29 @@ async function insertPost() {
 	return row.id as string;
 }
 
+/* Published and started: every status action (publish aside) could really run on it. */
+async function insertEvent() {
+	const [row] = await sql`
+		insert into events (slug, title, status, published_at, starts_at, ends_at)
+		values (${`e2e-perm-${crypto.randomUUID().slice(0, 8)}`}, ${sql.json({ en: 'Perm' })},
+			'published', now() - interval '2 days', now() - interval '1 day', now() - interval '20 hours')
+		returning id`;
+	await sql`insert into event_categories (event_id, name) values (${row.id}, ${sql.json({ en: 'Perm' })})`;
+	return row.id as string;
+}
+
 /* docs/04 section 5.4: member → 404 for all of /admin, staff without the permission → 403. */
 const expectedStatus = (role: Role, access: Access) =>
 	role === 'member' ? 404 : access === 'staff' || roleCan(role, access) ? 200 : 403;
 
-type Ids = { userId: string; auditId: string; mediaId: string; pageId: string; postId: string };
+type Ids = {
+	userId: string;
+	auditId: string;
+	mediaId: string;
+	pageId: string;
+	postId: string;
+	eventId: string;
+};
 const toPath = (key: string, ids: Ids) =>
 	key
 		.replace(/^(GET|POST) /, '')
@@ -94,6 +119,7 @@ const toPath = (key: string, ids: Ids) =>
 		.replace('/media/[id]', `/media/${ids.mediaId}`)
 		.replace('/pages/[id]', `/pages/${ids.pageId}`)
 		.replace('/news/[id]', `/news/${ids.postId}`)
+		.replace('/events/[id]', `/events/${ids.eventId}`)
 		.replace('?/default', '');
 
 const targetRow = async (id: string) =>
@@ -103,6 +129,10 @@ const mediaRow = async (id: string) =>
 const pageRow = async (id: string) =>
 	(await sql`select slug, title, body, status, deleted_at from pages where id = ${id}`)[0];
 const postRow = async (id: string) => (await sql`select * from posts where id = ${id}`)[0];
+const eventRows = async (id: string) => ({
+	event: (await sql`select * from events where id = ${id}`)[0],
+	categories: await sql`select * from event_categories where event_id = ${id} order by id`
+});
 
 for (const role of ['member', 'editor', 'moderator'] as const) {
 	test(`${role}: every admin page and action answers by docs/04, data stays`, async ({ page }) => {
@@ -114,11 +144,13 @@ for (const role of ['member', 'editor', 'moderator'] as const) {
 			auditId: crypto.randomUUID(),
 			mediaId: await insertMedia(target),
 			pageId: await insertPage(),
-			postId: await insertPost()
+			postId: await insertPost(),
+			eventId: await insertEvent()
 		};
 		const mediaBefore = await mediaRow(ids.mediaId);
 		const pageBefore = await pageRow(ids.pageId);
 		const postBefore = await postRow(ids.postId);
+		const eventBefore = await eventRows(ids.eventId);
 		await registerAs(page, role);
 
 		for (const [key, access] of Object.entries(ADMIN_READS)) {
@@ -140,11 +172,13 @@ for (const role of ['member', 'editor', 'moderator'] as const) {
 		expect(await mediaRow(ids.mediaId)).toEqual(mediaBefore);
 		expect(await pageRow(ids.pageId)).toEqual(pageBefore);
 		expect(await postRow(ids.postId)).toEqual(postBefore);
+		expect(await eventRows(ids.eventId)).toEqual(eventBefore);
 		expect(
-			await sql`select 1 from audit_log where entity_id in (${target}, ${ids.mediaId}, ${ids.pageId}, ${ids.postId})`
+			await sql`select 1 from audit_log where entity_id in (${target}, ${ids.mediaId}, ${ids.pageId}, ${ids.postId}, ${ids.eventId})`
 		).toHaveLength(0);
 		expect(await sql`select 1 from pages where slug like 'e2e-hostile-%'`).toHaveLength(0);
 		expect(await sql`select 1 from posts where slug like 'e2e-hostile-%'`).toHaveLength(0);
+		expect(await sql`select 1 from events where slug like 'e2e-hostile-%'`).toHaveLength(0);
 	});
 }
 
@@ -166,7 +200,8 @@ test('admin opens every admin page; audit pages take no writes and the entry sta
 		auditId: entry.id,
 		mediaId: await insertMedia(target),
 		pageId: await insertPage(),
-		postId: await insertPost()
+		postId: await insertPost(),
+		eventId: await insertEvent()
 	};
 	for (const key of Object.keys(ADMIN_READS)) {
 		const res = await page.request.get(toPath(key, ids), { maxRedirects: 0 });
