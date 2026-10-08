@@ -111,7 +111,9 @@ test('settings: footer links and the site name in the header come from the datab
 	await expect(page.getByText('Saved.')).toBeVisible();
 
 	await page.goto('/ru');
-	await expect(page.getByRole('banner').getByRole('link', { name: 'Союз паркура Армении' })).toBeVisible();
+	await expect(
+		page.getByRole('banner').getByRole('link', { name: 'Союз паркура Армении' })
+	).toBeVisible();
 	await expect(
 		page.getByRole('contentinfo').getByRole('link', { name: `Link ${tag}` })
 	).toHaveAttribute('href', `/ru/pages/e2e-${tag}`);
@@ -123,7 +125,9 @@ test('settings: a footer link to another host is refused', async ({ page }) => {
 	await page.locator('input[name="footer.links.0.label.en"]').fill('Evil');
 	await page.locator('input[name="footer.links.0.url"]').fill('//evil.example');
 	await page.getByRole('button', { name: 'Save' }).click();
-	await expect(page.getByText('Enter a link starting with https:// or a site path /…')).toBeVisible();
+	await expect(
+		page.getByText('Enter a link starting with https:// or a site path /…')
+	).toBeVisible();
 });
 
 test('settings: an http link is refused with a message at the field', async ({ page }) => {

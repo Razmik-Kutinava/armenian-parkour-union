@@ -5,7 +5,8 @@
 	import Disclosure from './Disclosure.svelte';
 	import LanguageSwitcher from './LanguageSwitcher.svelte';
 
-	let { viewer }: { viewer: Viewer | null } = $props();
+	/* siteName — site_settings; the logo SVG from static/brand/ replaces it when it arrives (docs/08 section 2). */
+	let { viewer, siteName }: { viewer: Viewer | null; siteName: string | null } = $props();
 
 	/* docs/06 section 2. Pages appear in stages 2–7; until then the links lead to 404 (decisions, 1.8). */
 	const menu: [MessageKey, string][] = [
@@ -51,7 +52,7 @@
 			href={href('/')}
 			class="mr-auto rounded-sm py-2 text-lg font-bold whitespace-nowrap focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-500 lg:mr-4"
 		>
-			{t('site.name')}
+			{siteName ?? t('site.name')}
 		</a>
 
 		<nav aria-label={t('nav.main')} class="hidden lg:mr-auto lg:block">

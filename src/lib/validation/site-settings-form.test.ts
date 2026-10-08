@@ -151,9 +151,10 @@ describe('site settings form (docs/05 section 21)', () => {
 	});
 
 	it('stored footer links flatten back into numbered form fields', () => {
-		expect(
-			flattenValues({ footer: { links: [{ label: { en: 'A' }, url: '/a' }] } })
-		).toEqual({ 'footer.links.0.label.en': 'A', 'footer.links.0.url': '/a' });
+		expect(flattenValues({ footer: { links: [{ label: { en: 'A' }, url: '/a' }] } })).toEqual({
+			'footer.links.0.label.en': 'A',
+			'footer.links.0.url': '/a'
+		});
 	});
 
 	it('stored values flatten back into form field values', () => {

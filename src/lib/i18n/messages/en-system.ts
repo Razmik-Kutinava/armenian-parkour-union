@@ -19,6 +19,15 @@ export const enSystem = {
 	'settings.httpsHint': 'Full links starting with https://. Leave empty to hide.',
 	'settings.footer': 'Footer',
 	'settings.footerText': 'Footer text',
+	'settings.links': 'Footer links',
+	'settings.linksHint':
+		'Shown after the federation pages. A full link starting with https:// or a site path like /pages/coaches. Up to 10.',
+	'settings.linkLabel': 'Link text',
+	'settings.linkUrl': 'Address',
+	'settings.addLink': 'Add link',
+	'settings.removeLink': 'Remove link',
 	'settings.fixErrors': 'Nothing was saved. Fix the marked fields.',
-	'settings.error.url': 'Enter a link starting with https://'
+	'settings.error.url': 'Enter a link starting with https://',
+	'settings.error.link': 'Enter a link starting with https:// or a site path /…',
+	'settings.error.tooManyLinks': 'No more than 10 links.'
 } as const;

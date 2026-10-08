@@ -15,7 +15,7 @@
 </a>
 
 <div class="flex min-h-screen flex-col bg-bg">
-	<SiteHeader viewer={data.viewer} />
+	<SiteHeader viewer={data.viewer} siteName={data.footer.siteName} />
 	<main id="content" class="flex-1" tabindex="-1">
 		{@render children()}
 	</main>

@@ -4,6 +4,7 @@
 	import LocalizedInput from '#lib/components/admin/LocalizedInput.svelte';
 	import Input from '#lib/components/ui/Input.svelte';
 	import { t } from '#lib/i18n/index.svelte.ts';
+	import FooterLinks from './FooterLinks.svelte';
 	import type { PageProps } from './$types';
 
 	/* docs/05 section 21; groups of stage 1 — decisions.md 2026-10-07. */
@@ -67,6 +68,9 @@
 	</FormSection>
 	<FormSection title={t('settings.footer')}>
 		<LocalizedInput name="footer.text" label={t('settings.footerText')} {values} {errors} />
+	</FormSection>
+	<FormSection title={t('settings.links')} text={t('settings.linksHint')}>
+		<FooterLinks {values} {errors} />
 	</FormSection>
 	<FormSection title={t('footer.requisites')}>
 		<LocalizedInput name="requisites.text" label={t('footer.requisites')} {values} {errors} />

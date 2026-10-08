@@ -37,5 +37,22 @@ export const socialsSchema = z.object(
 	>
 );
 
-export const footerSchema = z.object({ text: localized.optional() });
+/** A footer link: https, or a path on this site ('//host' and '/\host' leave the site). */
+const siteLink = z
+	.string({ error: 'auth.error.required' })
+	.trim()
+	.min(1, { error: 'auth.error.required' })
+	.max(500, { error: 'auth.error.tooLong' })
+	.refine((v) => /^\/(?![/\\])\S*$/.test(v) || httpsUrl.safeParse(v).success, {
+		error: 'settings.error.link'
+	});
+/* prefault: a row with only an address still reports "required" at the English label. */
+export const footerLinksSchema = z
+	.array(z.object({ label: localizedText(100).prefault({ en: '' }), url: siteLink }))
+	.max(10, { error: 'settings.error.tooManyLinks' });
+
+export const footerSchema = z.object({
+	text: localized.optional(),
+	links: footerLinksSchema.optional()
+});
 export const requisitesSchema = z.object({ text: localized.optional() });

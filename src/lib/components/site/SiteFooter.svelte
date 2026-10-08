@@ -27,6 +27,15 @@
 				{#each pages as [key, path] (path)}
 					<li><a class={link} href={localizePath(path, currentLocale())}>{t(key)}</a></li>
 				{/each}
+				{#each footer.links as l, i (i)}
+					<li>
+						{#if l.external}
+							<a class={link} href={l.href} rel="noopener noreferrer" target="_blank">{l.label}</a>
+						{:else}
+							<a class={link} href={l.href}>{l.label}</a>
+						{/if}
+					</li>
+				{/each}
 			</ul>
 		</section>
 
@@ -77,7 +86,7 @@
 	<div
 		class="mx-auto flex max-w-6xl flex-col gap-4 border-t border-navy-800 px-4 py-6 sm:flex-row sm:items-center sm:justify-between"
 	>
-		<p class="text-sm whitespace-pre-line">{footer.text ?? t('site.name')}</p>
+		<p class="text-sm whitespace-pre-line">{footer.text ?? footer.siteName ?? t('site.name')}</p>
 		<LanguageSwitcher />
 	</div>
 </footer>

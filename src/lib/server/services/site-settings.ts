@@ -2,7 +2,7 @@ import { isDeepStrictEqual } from 'node:util';
 import { inArray } from 'drizzle-orm';
 import type { z } from 'zod';
 import { pickLocalized } from '#lib/i18n/localized.ts';
-import type { Locale } from '#lib/i18n/locales.ts';
+import { localizePath, type Locale } from '#lib/i18n/locales.ts';
 import {
 	contactsSchema,
 	footerSchema,
@@ -22,13 +22,17 @@ import { writeAudit } from './audit';
 import type { Actor } from './users/target';
 
 export type FooterSettings = {
+	/** null: the key is missing or broken, the page shows the name from translations. */
+	siteName: string | null;
 	contacts: { email?: string; phone?: string; address?: string; mapUrl?: string } | null;
 	socials: { name: SocialNetwork; url: string }[];
 	text: string | null;
+	links: { label: string; href: string; external: boolean }[];
 	requisites: string | null;
 };
 
-const keys = ['contacts', 'socials', 'footer', 'requisites'];
+const keys = ['site_name', 'contacts', 'socials', 'footer', 'requisites'];
+const siteNameSchema = settingsFormSchema.shape.site_name;
 
 /** A missing or invalid key is simply not shown: the footer never breaks the page. */
 function parse<T extends z.ZodType>(schema: T, value: unknown): z.infer<T> | null {
@@ -98,13 +102,26 @@ export async function getFooterSettings(db: LimitDb, locale: Locale): Promise<Fo
 		...(c.mapUrl && { mapUrl: c.mapUrl })
 	};
 	const s = parse(socialsSchema, value('socials'));
-	const footer = parse(footerSchema, value('footer'));
+	/* Text and links separately: a broken link must not hide the footer text. */
+	const f = Object(value('footer') ?? {}) as Record<string, unknown>;
+	const text = parse(footerSchema.shape.text, f.text);
+	const links = parse(footerSchema.shape.links, f.links) ?? [];
 	const requisites = parse(requisitesSchema, value('requisites'));
+	const name = parse(siteNameSchema, value('site_name'));
 
 	return {
+		siteName: name ? pickLocalized(name, locale) : null,
 		contacts: contacts && Object.keys(contacts).length > 0 ? contacts : null,
 		socials: socialNetworks.flatMap((name) => (s?.[name] ? [{ name, url: s[name] }] : [])),
-		text: footer?.text ? pickLocalized(footer.text, locale) : null,
+		text: text ? pickLocalized(text, locale) : null,
+		links: links.map(({ label, url }) => {
+			const external = url.startsWith('https://');
+			return {
+				label: pickLocalized(label, locale),
+				href: external ? url : localizePath(url, locale),
+				external
+			};
+		}),
 		requisites: requisites?.text ? pickLocalized(requisites.text, locale) : null
 	};
 }
