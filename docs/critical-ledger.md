@@ -5,8 +5,8 @@
 
 | Параметр | Значение |
 |---|---|
-| `last_audited_sha` | `a30b0bf` |
-| Дата | 2026-10-07 |
+| `last_audited_sha` | `19a0204` |
+| Дата | 2026-10-08 |
 | Вердикт | CLEAN |
 
 ## Находки
@@ -39,3 +39,4 @@
 | 2026-10-07 | 1.12 seed: `server/seed/*`, `scripts/seed.ts`, `package.json` | CLEAN | 1 (C7 K1, fixed; bugbot: 1 не K — `.env` не читается при заданном `DATABASE_URL`, намеренно) | `2d60f2e` |
 | 2026-10-07 | 1.13 тесты этапа: только тесты (`access-coverage.test.ts`, `tests/e2e/admin-access-map.ts`, `admin-permissions.spec.ts`, `admin-block.spec.ts`, `account.test.ts`, `schema.test.ts`); кода приложения нет | CLEAN | 0 (bugbot: 0; мутации прав ловятся матрицей) | `d533ede` |
 | 2026-10-07 | 2.1 медиабиблиотека: `services/media/*`, `storage/*`, `validation/media.ts`, `routes/admin/media`, `env.ts`, `drizzle/0002`, `package.json` (AWS SDK v3) | CLEAN | 0 (bugbot: 2 отклонены валидатором; security: 1 средняя — C8 не K) | `a30b0bf` |
+| 2026-10-08 | 2.2 редактор: `server/rich-text/*`, `components/admin/RichText*`, `rich-text-extensions.ts`, `app.css`, `package.json` (TipTap, sanitize-html) | CLEAN | 0 (bugbot: 2 не K — грязная форма и `aria-invalid`, исправлены `19a0204`; security: 0) | `19a0204` |
