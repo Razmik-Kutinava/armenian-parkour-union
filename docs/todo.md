@@ -54,9 +54,9 @@
 ## Фазы
 
 - [x] SPEC
-- [ ] Ответы владельца + «go» на миграцию 0003
-- [ ] RED (`test: … [RED]`)
-- [ ] GREEN (`feat: … [GREEN]`)
-- [ ] REGRESS
+- [x] Ответы владельца + «go» на миграцию 0003 (decisions.md 2026-10-08); 0003 применена на dev, seed на dev выполнен
+- [x] RED (`test: … [RED]`)
+- [x] GREEN (`feat: … [GREEN]`)
+- [x] REGRESS: check, lint, vitest 301, e2e зоны 17 (1 флак регистрации — повтор зелёный)
 - [ ] REVIEW: local · bugbot · security-review · сверка со SPEC · PROGRESS · push · CI green
 - [ ] DEPLOY (только по апруву владельца)

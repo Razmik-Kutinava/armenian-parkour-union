@@ -1,0 +1,30 @@
+/** Admin "Pages" and the public page view (docs/05 section 19, docs/06 section 4.5). Part of `en`. */
+export const enPages = {
+	'pages.create': 'New page',
+	'pages.empty': 'No pages yet',
+	'pages.back': 'All pages',
+	'pages.col.title': 'Title',
+	'pages.col.slug': 'Address',
+	'pages.col.status': 'Status',
+	'pages.col.updated': 'Changed',
+	'pages.system': 'System',
+	'pages.slug': 'Address',
+	'pages.slugHint':
+		'Latin letters, digits and hyphens, e.g. summer-camp. The page opens at /pages/…',
+	'pages.slugSystem': 'The address of a system page cannot be changed.',
+	'pages.title': 'Title',
+	'pages.body': 'Text',
+	'pages.status': 'Status',
+	'pages.status.draft': 'Draft',
+	'pages.status.published': 'Published',
+	'pages.status.archived': 'Archived',
+	'pages.open': 'Open on the site',
+	'pages.delete': 'Delete',
+	'pages.deleteTitle': 'Delete the page?',
+	'pages.deleteText': 'The page disappears from the site and from this list.',
+	'pages.systemNoDelete': 'System pages cannot be deleted, only edited.',
+	'pages.error.slug': 'Use lowercase Latin letters, digits and single hyphens',
+	'pages.error.slugTaken': 'This address is already taken',
+	'pages.error.status': 'Choose a status',
+	'media.usage.page': 'Page'
+} as const;

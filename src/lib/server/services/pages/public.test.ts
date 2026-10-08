@@ -4,6 +4,7 @@ import type { LimitDb } from '../../auth/rate-limit';
 import { pages } from '../../db/schema/content';
 import { media } from '../../db/schema/service';
 import { insertUser, testDb, testDbUrl } from '../../db/test-db';
+import { richTextSchema } from '../../rich-text/schema';
 import { deleteMedia } from '../media/edit';
 import { findUsages } from '../media/usage';
 import { getPublishedPage } from './public';
@@ -87,7 +88,7 @@ describe.skipIf(!testDbUrl)('pages: media used in the text (docs/05 section 20)'
 				.values({
 					slug: `t-${crypto.randomUUID().slice(0, 8)}`,
 					title: { en: 'Gallery' },
-					body: { hy: `<p><img src="${BASE}/${key}" alt=""></p>` }
+					body: { hy: richTextSchema(BASE).parse(`<p><img src="${BASE}/${key}" alt=""></p>`) }
 				})
 				.returning();
 

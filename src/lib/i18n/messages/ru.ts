@@ -1,6 +1,7 @@
 import type { Messages } from '../translate';
 import { ruEditor } from './ru-editor';
 import { ruMedia } from './ru-media';
+import { ruPages } from './ru-pages';
 import { ruSystem } from './ru-system';
 import { ruUsers } from './ru-users';
 
@@ -9,6 +10,7 @@ export const ru: Partial<Messages> = {
 	...ruSystem,
 	...ruMedia,
 	...ruEditor,
+	...ruPages,
 	'site.underConstruction': 'Сайт в разработке.',
 	'common.close': 'Закрыть',
 
@@ -36,6 +38,9 @@ export const ru: Partial<Messages> = {
 	'footer.about': 'О федерации',
 	'footer.rules': 'Правила',
 	'footer.privacy': 'Политика конфиденциальности',
+	'footer.contactsPage': 'Контакты',
+	'footer.offer': 'Публичная оферта',
+	'footer.refund': 'Политика возврата',
 
 	'error.notFound.title': 'Страница не найдена',
 	'error.notFound.text': 'Такой страницы нет или она переехала.',

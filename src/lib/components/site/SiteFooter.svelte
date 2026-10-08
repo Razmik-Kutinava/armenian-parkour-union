@@ -1,23 +1,19 @@
 <script lang="ts">
 	import { currentLocale, localizePath, t, type MessageKey } from '#lib/i18n/index.svelte.ts';
 	import type { FooterSettings } from '#lib/server/services/site-settings.ts';
-	import type { SocialNetwork } from '#lib/validation/site-settings.ts';
 	import LanguageSwitcher from './LanguageSwitcher.svelte';
+	import { networkNames } from './social-names';
 
 	let { footer }: { footer: FooterSettings } = $props();
 
 	const pages: [MessageKey, string][] = [
 		['footer.about', '/federation'],
 		['footer.rules', '/pages/rules'],
-		['footer.privacy', '/pages/privacy']
+		['footer.contactsPage', '/pages/contacts'],
+		['footer.privacy', '/pages/privacy'],
+		['footer.offer', '/pages/offer'],
+		['footer.refund', '/pages/refund-policy']
 	];
-	const networkNames: Record<SocialNetwork, string> = {
-		instagram: 'Instagram',
-		youtube: 'YouTube',
-		telegram: 'Telegram',
-		facebook: 'Facebook',
-		tiktok: 'TikTok'
-	};
 	const link =
 		'rounded-sm text-navy-100 underline-offset-4 hover:text-surface hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-500';
 	const heading = 'mb-3 text-sm font-bold tracking-wide text-navy-300 uppercase';

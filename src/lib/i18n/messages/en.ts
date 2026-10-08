@@ -1,5 +1,6 @@
 import { enEditor } from './en-editor';
 import { enMedia } from './en-media';
+import { enPages } from './en-pages';
 import { enSystem } from './en-system';
 import { enUsers } from './en-users';
 
@@ -9,6 +10,7 @@ export const en = {
 	...enSystem,
 	...enMedia,
 	...enEditor,
+	...enPages,
 	'site.name': 'Armenian Parkour Union',
 	'site.underConstruction': 'Site under construction.',
 	'common.close': 'Close',
@@ -37,6 +39,9 @@ export const en = {
 	'footer.about': 'About the federation',
 	'footer.rules': 'Rules',
 	'footer.privacy': 'Privacy policy',
+	'footer.contactsPage': 'Contacts',
+	'footer.offer': 'Public offer',
+	'footer.refund': 'Refund policy',
 
 	'error.notFound.title': 'Page not found',
 	'error.notFound.text': 'This page does not exist or has been moved.',

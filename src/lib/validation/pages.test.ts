@@ -61,7 +61,7 @@ describe('pages: admin form (docs/05 section 19)', () => {
 	});
 
 	it('images only from the media library survive', () => {
-		const img = `${BASE}/media/2026/10/a.png`;
+		const img = `${BASE}/media/2026/10/${crypto.randomUUID()}.png`;
 		const result = schema.parse({
 			...valid,
 			body: { en: `<p>a<img src="${img}"><img src="https://evil.example/x.png"></p>` }

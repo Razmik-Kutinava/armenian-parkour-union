@@ -95,7 +95,11 @@
 				<ul class="flex flex-col gap-1 text-sm">
 					{#each data.usages as usage (usage.kind + usage.id)}
 						<li>
-							{#if data.canOpenUsers}
+							{#if usage.kind === 'page'}
+								<a class="text-navy-700 underline" href="/admin/pages/{usage.id}"
+									>{t('media.usage.page')}</a
+								>
+							{:else if data.canOpenUsers}
 								<a class="text-navy-700 underline" href="/admin/users/{usage.id}"
 									>{t(`media.usage.${usage.kind}`)}</a
 								>
