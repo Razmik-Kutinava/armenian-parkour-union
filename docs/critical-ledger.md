@@ -5,7 +5,7 @@
 
 | Параметр | Значение |
 |---|---|
-| `last_audited_sha` | `b59755b` |
+| `last_audited_sha` | `4119ae4` |
 | Дата | 2026-10-08 |
 | Вердикт | CLEAN |
 
@@ -41,3 +41,4 @@
 | 2026-10-07 | 2.1 медиабиблиотека: `services/media/*`, `storage/*`, `validation/media.ts`, `routes/admin/media`, `env.ts`, `drizzle/0002`, `package.json` (AWS SDK v3) | CLEAN | 0 (bugbot: 2 отклонены валидатором; security: 1 средняя — C8 не K) | `a30b0bf` |
 | 2026-10-08 | 2.2 редактор: `server/rich-text/*`, `components/admin/RichText*`, `rich-text-extensions.ts`, `app.css`, `package.json` (TipTap, sanitize-html) | CLEAN | 0 (bugbot: 2 не K — грязная форма и `aria-invalid`, исправлены `19a0204`; security: 0) | `19a0204` |
 | 2026-10-08 | 2.3 страницы: `services/pages/*`, `services/media/usage.ts`, `validation/pages.ts`, `seed/pages.ts`, `routes/admin/pages`, `(site)/pages`, `(site)/federation`, `components/site`, `drizzle/0003` | CLEAN | 0 (bugbot: 0; security: 0; свой проход: гонка двух одновременных созданий с одним адресом → 500, без теста — не K) | `b59755b` |
+| 2026-10-08 | 2.4 новости: `services/posts/*`, `services/media/usage.ts`, `media/list.ts`, `validation/posts.ts`, `lib/seo/*`, `components/site/News*`, `SeoHead`, `ShareButton`, `routes/admin/news`, `(site)/news`, `drizzle/0004` | CLEAN | 0 (bugbot: 1 не K — выбор обложки только из 25 картинок, исправлено `4119ae4`; security: 0; свой проход: невозможная дата в фильтре периода админки → 500, только для staff — не K, исправлено `4119ae4`) | `4119ae4` |
