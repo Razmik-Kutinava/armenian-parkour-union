@@ -4,54 +4,7 @@
 
 ## Задача
 
-2.7 Настройки сайта (`09`): довести форму `/admin/settings` (1.10b) до `05` § 21 в объёме этапа 2 — добавить ссылки подвала; шапка и подвал берут название из `site_settings.site_name`. Решения владельца — `decisions.md` 2026-10-08 (2.7).
-
-## Читать (выписано)
-
-- `05` § 21: группы Основное (название ×3, логотип, favicon, SEO), Контакты, Соцсети, Футер (текст, **ссылки**), Реквизиты — этап 2; Членство — этап 3; Параметры правил — 5–7; Функции — когда будет список. Каждое изменение — в `audit_log` с прежним и новым значением (уже есть, `settings.update`).
-- `06` § 2: шапка — логотип, меню…; подвал — контакты, соцсети, реквизиты, ссылки на страницы, язык; источник `site_settings`.
-- `08` § 2: логотип / favicon — SVG в `static/brand/`; растровый запрещён; до файлов — заглушка (решение: текст `site_name`).
-- Решения: `footer.links` — до 10 `{label: {en,hy,ru}, url}`, EN обязателен, url — `https://…` или путь сайта `/…` (не `//`), после 6 системных страниц; логотип / favicon не в форме.
-
-## Файлы (ожидаемо)
-
-- `src/lib/validation/site-settings.ts` — `footerSchema.links`, `siteLinkUrl`
-- `src/lib/validation/site-settings-form.ts` — `formToObject`: индексы → массив, глубина до 5
-- `src/lib/server/services/site-settings.ts` — `getFooterSettings`: `siteName`, `links`
-- `src/routes/admin/settings/+page.svelte` (+ `FooterLinks.svelte`) — строки ссылок, «Добавить ссылку»
-- `src/lib/components/site/SiteHeader.svelte`, `SiteFooter.svelte`, `(site)/+layout.server.ts`, `+layout.svelte`
-- i18n `en.ts`, `ru.ts`; тесты `site-settings*.test.ts`, `tests/e2e/admin-system.spec.ts`
-
-## Не ломать
-
-- Сохранение настроек: журнал `settings.update` с before / after только по изменённым ключам; неадмин → 403.
-- Битый ключ в базе — блок скрыт, страница не падает (подвал, «Контакты»).
-- Ссылки в `href` — без `javascript:`, `data:`, `//host`.
-- Старое значение `footer` (`{text}` без `links`) читается и сохраняется как раньше.
-
-## Проверка
-
-- `npx vitest run src/lib/validation/site-settings src/lib/server/services/site-settings`
-- `npx playwright test tests/e2e/admin-system.spec.ts tests/e2e/admin-audit.spec.ts`
-
-## Риск
-
-`normal` — валидация формы и сервис, без миграции и прав.
-
-## Фазы
-
-- [x] SPEC
-- [ ] RED (`test: … [RED]`)
-- [ ] GREEN (`feat: … [GREEN]`)
-- [ ] REGRESS
-- [ ] REVIEW: local · bugbot · сверка со SPEC · PROGRESS · push · CI green
-- [ ] DEPLOY (только по апруву владельца)
-
----
-
-# Отложено: 2.6 Hero-блоки и главная (ждёт «go» на миграцию 0006)
-
-Таблица `hero_blocks`, админка `/admin/hero` (перетаскивание + ↑ / ↓, предпросмотр, «Что сейчас на главной»), компонент `HeroBlock` всех типов, запасной блок, главная `/` целиком (`06` § 4.1). Решения владельца — `decisions.md` 2026-10-08 (2.6).
+2.6 Hero-блоки и главная (`09`, ждёт «go» на миграцию 0006): таблица `hero_blocks`, админка `/admin/hero` (перетаскивание + ↑ / ↓, предпросмотр, «Что сейчас на главной»), компонент `HeroBlock` всех типов, запасной блок, главная `/` целиком (`06` § 4.1). Решения владельца — `decisions.md` 2026-10-08 (2.6).
 
 ## Читать (выписано)
 
@@ -109,7 +62,7 @@
 - Медиа фона: строка `media` `FOR SHARE` (как обложка), поиск в `usage.ts`.
 - Запасной: ближайшее опубликованное предстоящее событие, иначе общий баннер (тексты из переводов + «Вступить»).
 
-## Фазы 2.6
+## Фазы
 
 - [x] SPEC
 - [ ] Migration Gate «go»
