@@ -1,9 +1,8 @@
 import { error, fail } from '@sveltejs/kit';
 import { R2_PUBLIC_URL } from '$app/env/private';
 import type { MessageKey } from '#lib/i18n/translate.ts';
-import { readListState } from '#lib/components/admin/list-state.ts';
 import { db } from '#lib/server/db/index.ts';
-import { listMedia, mediaListOptions } from '#lib/server/services/media/list.ts';
+import { listImageChoices } from '#lib/server/services/media/list.ts';
 import { listAuthors } from '#lib/server/services/posts/list.ts';
 import { publicUrl } from '#lib/server/storage/r2.ts';
 import { postFormSchema, type PostValues } from '#lib/validation/posts.ts';
@@ -35,14 +34,6 @@ export function refused(result: string, raw: Record<string, unknown>) {
 
 /** Choices for the form: authors and the latest library images for the cover. */
 export async function formChoices() {
-	const state = readListState(new URLSearchParams('kind=image'), mediaListOptions);
-	const [authors, images] = await Promise.all([listAuthors(db), listMedia(db, state)]);
-	return {
-		authors,
-		images: images.rows.map((m) => ({
-			key: m.key,
-			name: m.originalName,
-			url: publicUrl(m.key)
-		}))
-	};
+	const [authors, images] = await Promise.all([listAuthors(db), listImageChoices(db)]);
+	return { authors, images: images.map((m) => ({ ...m, url: publicUrl(m.key) })) };
 }

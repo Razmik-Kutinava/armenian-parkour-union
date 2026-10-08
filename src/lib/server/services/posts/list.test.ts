@@ -51,6 +51,7 @@ describe.skipIf(!testDbUrl)('posts: admin list (docs/05 section 18)', () => {
 			expect(await slugs('from=2026-03-11')).toEqual([scheduled.slug]);
 			expect(await slugs('q=весенний')).toEqual([live.slug]);
 			expect(await slugs('q=%25')).toEqual([]);
+			expect(await slugs('from=2026-13-45&to=2026-02-30')).toHaveLength(4);
 
 			const { rows, total } = await listPosts(tx, state(`tag=${t}&status=draft`));
 			expect(total).toBe(1);

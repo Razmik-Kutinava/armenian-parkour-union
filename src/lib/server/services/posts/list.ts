@@ -79,7 +79,11 @@ export async function listPostTags(db: LimitDb): Promise<string[]> {
 }
 
 const escapeLike = (s: string) => s.replace(/[\\%_]/g, (c) => `\\${c}`);
-const DAY = /^\d{4}-\d{2}-\d{2}$/;
+function isDay(v: string | undefined): v is string {
+	if (!v || !/^\d{4}-\d{2}-\d{2}$/.test(v)) return false;
+	const date = new Date(`${v}T00:00:00Z`);
+	return !Number.isNaN(date.getTime()) && date.toISOString().startsWith(v);
+}
 const yerevanDay = (day: string) => sql`(${day}::date)::timestamp AT TIME ZONE 'Asia/Yerevan'`;
 
 function conditions({ q, filters }: ListState): SQL[] {
@@ -94,10 +98,8 @@ function conditions({ q, filters }: ListState): SQL[] {
 		where.push(eq(posts.status, status));
 	}
 	if (filters.tag) where.push(sql`${filters.tag} = any(${posts.tags})`);
-	if (filters.from && DAY.test(filters.from)) {
-		where.push(gte(posts.publishedAt, yerevanDay(filters.from)));
-	}
-	if (filters.to && DAY.test(filters.to)) {
+	if (isDay(filters.from)) where.push(gte(posts.publishedAt, yerevanDay(filters.from)));
+	if (isDay(filters.to)) {
 		where.push(lt(posts.publishedAt, sql`${yerevanDay(filters.to)} + interval '1 day'`));
 	}
 	return where;

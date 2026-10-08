@@ -64,6 +64,16 @@ export async function listMedia(
 	return { rows: rows as MediaRow[], total };
 }
 
+/** Images to pick from (a post cover): the latest ones, not deleted. */
+export async function listImageChoices(db: LimitDb, limit = 200) {
+	return db
+		.select({ key: media.key, name: media.originalName })
+		.from(media)
+		.where(and(isNull(media.deletedAt), like(media.mime, 'image/%')))
+		.orderBy(desc(media.createdAt), desc(media.id))
+		.limit(limit);
+}
+
 export async function getMedia(db: LimitDb, id: string): Promise<MediaRow | null> {
 	if (!isUuid(id)) return null;
 	const [row] = await db
