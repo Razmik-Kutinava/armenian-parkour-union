@@ -103,6 +103,10 @@
 								<a class="text-navy-700 underline" href="/admin/news/{usage.id}"
 									>{t('media.usage.post')}</a
 								>
+							{:else if usage.kind === 'event'}
+								<a class="text-navy-700 underline" href="/admin/events/{usage.id}"
+									>{t('media.usage.event')}</a
+								>
 							{:else if data.canOpenUsers}
 								<a class="text-navy-700 underline" href="/admin/users/{usage.id}"
 									>{t(`media.usage.${usage.kind}`)}</a

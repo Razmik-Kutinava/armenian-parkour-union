@@ -1,6 +1,7 @@
 import { and, eq, isNull, or, sql } from 'drizzle-orm';
 import type { LimitDb } from '../../auth/rate-limit';
 import { pages, posts } from '../../db/schema/content';
+import { events } from '../../db/schema/events';
 import { users } from '../../db/schema/users';
 
 /*
@@ -8,7 +9,7 @@ import { users } from '../../db/schema/users';
  * here (events, hero blocks, products — with their tasks), and the code that starts
  * using a file locks its media row FOR SHARE in the same transaction, so a delete cannot slip in.
  */
-export type MediaUsage = { kind: 'user_avatar' | 'page' | 'post'; id: string };
+export type MediaUsage = { kind: 'user_avatar' | 'page' | 'post' | 'event'; id: string };
 
 type Finder = (db: LimitDb, key: string) => Promise<MediaUsage[]>;
 
@@ -44,7 +45,20 @@ const postCoversAndBodies: Finder = async (db, key) => {
 	return rows.map((r) => ({ kind: 'post' as const, id: r.id }));
 };
 
-const finders: Finder[] = [avatars, pageBodies, postCoversAndBodies];
+const eventCoversAndDescriptions: Finder = async (db, key) => {
+	const rows = await db
+		.select({ id: events.id })
+		.from(events)
+		.where(
+			and(
+				or(eq(events.coverKey, key), sql`strpos(${events.description}::text, ${inText(key)}) > 0`),
+				isNull(events.deletedAt)
+			)
+		);
+	return rows.map((r) => ({ kind: 'event' as const, id: r.id }));
+};
+
+const finders: Finder[] = [avatars, pageBodies, postCoversAndBodies, eventCoversAndDescriptions];
 
 export async function findUsages(db: LimitDb, key: string): Promise<MediaUsage[]> {
 	const found: MediaUsage[] = [];

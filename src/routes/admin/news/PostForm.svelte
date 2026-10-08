@@ -7,7 +7,7 @@
 	import Select from '#lib/components/ui/Select.svelte';
 	import { t, type MessageKey } from '#lib/i18n/index.svelte.ts';
 	import type { PostStatus } from '#lib/validation/posts.ts';
-	import CoverPicker from './CoverPicker.svelte';
+	import CoverPicker from '#lib/components/admin/CoverPicker.svelte';
 
 	/* docs/05 section 18: title, address, excerpt, text ×3; cover, tags, status, date, author. */
 	type Props = {

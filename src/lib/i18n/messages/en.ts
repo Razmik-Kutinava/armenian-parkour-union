@@ -1,4 +1,5 @@
 import { enEditor } from './en-editor';
+import { enEvents } from './en-events';
 import { enMedia } from './en-media';
 import { enNews } from './en-news';
 import { enPages } from './en-pages';
@@ -13,6 +14,7 @@ export const en = {
 	...enEditor,
 	...enPages,
 	...enNews,
+	...enEvents,
 	'site.name': 'Armenian Parkour Union',
 	'site.underConstruction': 'Site under construction.',
 	'common.close': 'Close',

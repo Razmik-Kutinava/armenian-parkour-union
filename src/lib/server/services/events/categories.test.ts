@@ -78,7 +78,12 @@ describe.skipIf(!testDbUrl)('events: categories tab (docs/05 section 5)', () => 
 				ip: IP
 			});
 
-			const next = category({ name: { en: 'Speed, 12–15' }, ageMax: 15, capacity: null });
+			const next = category({
+				name: { en: 'Speed, 12–15' },
+				ageMax: 15,
+				capacity: null,
+				sortOrder: 2
+			});
 			expect(await updateEventCategory(tx, actor, eventId, second, next, IP)).toBe('ok');
 			expect((await listEventCategories(tx, eventId))[1]).toMatchObject({ id: second, ...next });
 			const [update] = (await auditOf(tx, second)).filter(

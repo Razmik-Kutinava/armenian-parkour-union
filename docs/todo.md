@@ -64,7 +64,7 @@
 - [x] SPEC
 - [x] «go» на миграцию 0005 и подтверждение дефолтов 1–12 (2026-10-08)
 - [x] RED (`test: … [RED]`) — миграция 0005 на dev применена
-- [ ] GREEN (`feat: … [GREEN]`)
+- [x] GREEN (`feat: … [GREEN]`) — в RED-тесте категорий исправлен порядок (тест сам сбрасывал `sortOrder` на 0)
 - [ ] REGRESS
 - [ ] REVIEW: local · bugbot · security-review · сверка со SPEC · PROGRESS · push · CI green
 - [ ] DEPLOY (только по апруву владельца)

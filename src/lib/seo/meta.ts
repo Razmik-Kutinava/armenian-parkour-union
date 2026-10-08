@@ -1,4 +1,5 @@
 import type { Locale } from '#lib/i18n/locales.ts';
+import { eventMarkup } from './event';
 
 /* docs/06 section 7: title, description, Open Graph with an image, canonical address, markup. */
 
@@ -12,6 +13,14 @@ export type SeoInput = {
 	description: string;
 	image?: { url: string; alt: string } | null;
 	article?: { publishedAt: Date; modifiedAt: Date; tags: string[] };
+	event?: SeoEvent;
+};
+export type SeoEvent = {
+	startsAt: Date;
+	endsAt: Date;
+	cancelled: boolean;
+	place: { name: string | null; address: string | null; city: string | null } | null;
+	price: { amountMinor: number; currency: string };
 };
 export type MetaTag = { property?: string; name?: string; content: string };
 export type Seo = {
@@ -77,8 +86,8 @@ export function buildSeo(input: SeoInput): Seo {
 		);
 	}
 	const organization = { '@type': 'Organization', name: input.siteName };
-	const jsonLd = article
-		? JSON.stringify({
+	const markup = article
+		? {
 				'@context': 'https://schema.org',
 				'@type': 'Article',
 				headline: input.title,
@@ -91,8 +100,9 @@ export function buildSeo(input: SeoInput): Seo {
 				mainEntityOfPage: canonical,
 				author: organization,
 				publisher: organization
-			}).replace(/</g, '\\u003c')
-		: null;
+			}
+		: input.event && eventMarkup(input, input.event, description, canonical, organization);
+	const jsonLd = markup ? JSON.stringify(markup).replace(/</g, '\\u003c') : null;
 	return {
 		title: `${input.title} — ${input.siteName}`,
 		description,

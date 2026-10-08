@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { MessageKey } from '#lib/i18n/translate.ts';
 import { richTextSchema } from '#lib/server/rich-text/schema.ts';
 import { pageStatuses, slugSchema, type PageBody } from './pages';
 import { localizedText } from './site-settings';
@@ -26,17 +27,20 @@ const LOCAL_DATE_TIME = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])T([01]\d|2[
 export const toYerevanInput = (date: Date) =>
 	new Date(date.getTime() + YEREVAN_OFFSET_MS).toISOString().slice(0, 16);
 
-const publishedAtSchema = z
-	.string()
-	.regex(LOCAL_DATE_TIME, { error: 'news.error.date' })
-	.transform((value, ctx) => {
-		const date = new Date(`${value}:00+04:00`);
-		if (Number.isNaN(date.getTime()) || toYerevanInput(date) !== value) {
-			ctx.addIssue({ code: 'custom', message: 'news.error.date' });
-			return z.NEVER;
-		}
-		return date;
-	});
+/** `2026-11-14T11:00` typed as Yerevan time → the moment. */
+export const yerevanDateTime = (error: MessageKey) =>
+	z
+		.string({ error })
+		.regex(LOCAL_DATE_TIME, { error })
+		.transform((value, ctx) => {
+			const date = new Date(`${value}:00+04:00`);
+			if (Number.isNaN(date.getTime()) || toYerevanInput(date) !== value) {
+				ctx.addIssue({ code: 'custom', message: error });
+				return z.NEVER;
+			}
+			return date;
+		});
+const publishedAtSchema = yerevanDateTime('news.error.date');
 
 const excerptText = z.string().trim().max(EXCERPT_MAX, { error: 'auth.error.tooLong' }).optional();
 
@@ -48,9 +52,11 @@ const tagsSchema = z
 	});
 
 /** Keys as the library makes them (`media/2026/10/<uuid>.webp`): no `..`, no other prefix. */
-const coverKeySchema = z.string().regex(/^media\/(?:[A-Za-z0-9_-]+\/)*[A-Za-z0-9_-]+\.[a-z0-9]+$/, {
-	error: 'news.error.cover'
-});
+export const coverKeySchema = z
+	.string()
+	.regex(/^media\/(?:[A-Za-z0-9_-]+\/)*[A-Za-z0-9_-]+\.[a-z0-9]+$/, {
+		error: 'news.error.cover'
+	});
 
 const keepFilled = (text: Record<string, string | undefined>): PostText => {
 	const kept: PostText = {};

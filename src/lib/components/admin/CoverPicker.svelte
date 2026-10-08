@@ -4,9 +4,17 @@
 	import Modal from '#lib/components/ui/Modal.svelte';
 	import { t } from '#lib/i18n/index.svelte.ts';
 
-	/* docs/05 section 18: the cover is chosen from the media library (images only). */
+	/* docs/05 sections 4, 5, 18: the cover is chosen from the media library (images only). */
 	type Image = { key: string; name: string; url: string | null };
-	let { value = '', images, error }: { value?: string; images: Image[]; error?: string } = $props();
+	type Props = {
+		value?: string;
+		images: Image[];
+		error?: string;
+		name?: string;
+		label?: string;
+		hint?: string;
+	};
+	let { value = '', images, error, name = 'coverKey', label, hint }: Props = $props();
 
 	let picked: string | null = $state(null);
 	const key = $derived(picked ?? value);
@@ -16,8 +24,8 @@
 </script>
 
 <div class="flex flex-col gap-2" role="group" aria-labelledby="{id}-label">
-	<span id="{id}-label" class="text-sm font-bold text-ink-900">{t('news.cover')}</span>
-	<input type="hidden" name="coverKey" value={key} />
+	<span id="{id}-label" class="text-sm font-bold text-ink-900">{label ?? t('news.cover')}</span>
+	<input type="hidden" {name} value={key} />
 	<div class="flex flex-wrap items-center gap-3">
 		<div
 			class="flex h-24 w-40 items-center justify-center overflow-hidden rounded-md border border-line bg-navy-100"
@@ -41,7 +49,7 @@
 			{/if}
 		</div>
 	</div>
-	<p class="text-sm text-ink-500">{t('news.coverHint')}</p>
+	<p class="text-sm text-ink-500">{hint ?? t('news.coverHint')}</p>
 	{#if error}<p class="text-sm text-error-fg">{error}</p>{/if}
 </div>
 
