@@ -78,8 +78,12 @@ test('blocked user loses access at once, sessions are gone', async ({ page, brow
 	await registerAs(page, 'admin');
 	const member = await memberInOwnContext(browser, `block-${crypto.randomUUID().slice(0, 8)}`);
 	await page.goto(`/admin/users/${member.id}`);
-	await page.getByRole('button', { name: 'Block' }).click();
 	const dialog = page.getByRole('dialog');
+	/* A click before hydration does not open the dialog: click until it opens. */
+	await expect(async () => {
+		await page.getByRole('button', { name: 'Block' }).click();
+		await expect(dialog).toBeVisible({ timeout: 1000 });
+	}).toPass();
 	await dialog.getByLabel('Comment (required)').fill('Spam in comments');
 	await dialog.getByRole('button', { name: 'Block' }).click();
 	await expect(page.getByText('Saved.')).toBeVisible();

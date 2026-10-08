@@ -111,7 +111,10 @@ test('editor creates an event with a category, previews, publishes; guest finds 
 	expect(copy).toMatchObject({ status: 'draft', published_at: null });
 	expect(await sql`select 1 from event_categories where event_id = ${copy.id}`).toHaveLength(1);
 
-	await page.getByRole('button', { name: 'Delete' }).click();
+	await expect(async () => {
+		await page.getByRole('button', { name: 'Delete' }).click();
+		await expect(page.getByRole('dialog')).toBeVisible({ timeout: 1000 });
+	}).toPass();
 	await page.getByRole('dialog').getByRole('button', { name: 'Delete' }).click();
 	await expect(page).toHaveURL('/admin/events');
 	expect(
@@ -138,7 +141,11 @@ test('admin cancels with a reason and finishes a past event; guest sees the arch
 	const [past] = await insert(pastSlug, 'Summer cup', '1 hour', '1 minute');
 
 	await page.goto(`/admin/events/${toCancel.id}`);
-	await page.getByRole('button', { name: 'Cancel event' }).click();
+	/* A click before hydration does not open the dialog: click until it opens. */
+	await expect(async () => {
+		await page.getByRole('button', { name: 'Cancel event' }).click();
+		await expect(page.getByRole('dialog')).toBeVisible({ timeout: 1000 });
+	}).toPass();
 	await page.getByRole('dialog').getByLabel('Comment (required)').fill('Storm warning');
 	await page.getByRole('dialog').getByRole('button', { name: 'Cancel event' }).click();
 	await expect(page.getByText('Cancelled', { exact: true })).toBeVisible();
