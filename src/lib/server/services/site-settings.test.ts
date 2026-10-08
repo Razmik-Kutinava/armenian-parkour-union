@@ -34,9 +34,11 @@ describe.skipIf(!url)('footer settings from site_settings', () => {
 	it('returns nothing to show when the keys are absent', async () => {
 		await inRollback(async (tx) => {
 			expect(await getFooterSettings(tx, 'en')).toEqual({
+				siteName: null,
 				contacts: null,
 				socials: [],
 				text: null,
+				links: [],
 				requisites: null
 			});
 		});
@@ -53,10 +55,22 @@ describe.skipIf(!url)('footer settings from site_settings', () => {
 				telegram: 'https://t.me/apu',
 				instagram: 'https://instagram.com/apu'
 			});
-			await put(tx, 'footer', { text: { en: 'Since 2010', ru: 'С 2010 года' } });
+			await put(tx, 'site_name', { en: 'Armenian Parkour Union', ru: 'Союз паркура Армении' });
+			await put(tx, 'footer', {
+				text: { en: 'Since 2010', ru: 'С 2010 года' },
+				links: [
+					{ label: { en: 'Coaches', ru: 'Тренеры' }, url: '/pages/coaches' },
+					{ label: { en: 'Partners' }, url: 'https://partners.example' }
+				]
+			});
 			await put(tx, 'requisites', { text: { en: 'Tax ID 000' } });
 
 			expect(await getFooterSettings(tx, 'ru')).toEqual({
+				siteName: 'Союз паркура Армении',
+				links: [
+					{ label: 'Тренеры', href: '/ru/pages/coaches', external: false },
+					{ label: 'Partners', href: 'https://partners.example', external: true }
+				],
 				contacts: {
 					email: 'info@parkour.am',
 					address: 'Ереван',
@@ -80,6 +94,18 @@ describe.skipIf(!url)('footer settings from site_settings', () => {
 			const footer = await getFooterSettings(tx, 'en');
 			expect(footer.socials).toEqual([]);
 			expect(footer.contacts).toEqual({ phone: '+374 10 000000' });
+		});
+	});
+
+	it('hides footer links with an unsafe address and keeps the footer text', async () => {
+		await inRollback(async (tx) => {
+			await put(tx, 'footer', {
+				text: { en: 'Since 2010' },
+				links: [{ label: { en: 'X' }, url: '//evil.example' }]
+			});
+			const footer = await getFooterSettings(tx, 'en');
+			expect(footer.links).toEqual([]);
+			expect(footer.text).toBe('Since 2010');
 		});
 	});
 

@@ -90,6 +90,42 @@ test('settings: saved, logged with before and after, shown in the site footer', 
 	await expect(page.getByRole('contentinfo')).toContainText(phone);
 });
 
+test('settings: footer links and the site name in the header come from the database', async ({
+	page
+}) => {
+	await registerAs(page, 'admin');
+	const tag = crypto.randomUUID().slice(0, 8);
+	await page.goto('/admin/settings');
+	/* Replace links left by earlier runs: the list holds at most 10. */
+	await page
+		.locator('input[name^="footer.links."]')
+		.evaluateAll((els) => els.forEach((el) => ((el as HTMLInputElement).value = '')));
+	await page
+		.locator('input[name="site_name.ru"]')
+		.evaluate((el) => ((el as HTMLInputElement).value = 'Союз паркура Армении'));
+	await page.getByLabel('Federation name (English)').fill('Armenian Parkour Union');
+	await page.getByLabel('Description for search engines (English)').fill('Parkour in Armenia');
+	await page.locator('input[name="footer.links.0.label.en"]').fill(`Link ${tag}`);
+	await page.locator('input[name="footer.links.0.url"]').fill(`/pages/e2e-${tag}`);
+	await page.getByRole('button', { name: 'Save' }).click();
+	await expect(page.getByText('Saved.')).toBeVisible();
+
+	await page.goto('/ru');
+	await expect(page.getByRole('banner').getByRole('link', { name: 'Союз паркура Армении' })).toBeVisible();
+	await expect(
+		page.getByRole('contentinfo').getByRole('link', { name: `Link ${tag}` })
+	).toHaveAttribute('href', `/ru/pages/e2e-${tag}`);
+});
+
+test('settings: a footer link to another host is refused', async ({ page }) => {
+	await registerAs(page, 'admin');
+	await page.goto('/admin/settings');
+	await page.locator('input[name="footer.links.0.label.en"]').fill('Evil');
+	await page.locator('input[name="footer.links.0.url"]').fill('//evil.example');
+	await page.getByRole('button', { name: 'Save' }).click();
+	await expect(page.getByText('Enter a link starting with https:// or a site path /…')).toBeVisible();
+});
+
 test('settings: an http link is refused with a message at the field', async ({ page }) => {
 	await registerAs(page, 'admin');
 	await page.goto('/admin/settings');
