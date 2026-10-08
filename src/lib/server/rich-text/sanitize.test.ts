@@ -67,6 +67,12 @@ describe('sanitizeRichText: links', () => {
 		);
 	});
 
+	it('keeps a link to a site path', () => {
+		expect(clean('<p><a href="/ru/events?x=1">e</a></p>')).toBe(
+			'<p><a href="/ru/events?x=1" rel="noopener noreferrer">e</a></p>'
+		);
+	});
+
 	it('drops a target other than _blank', () => {
 		expect(clean('<p><a href="https://a.am" target="evil">x</a></p>')).toBe(
 			'<p><a href="https://a.am" rel="noopener noreferrer">x</a></p>'
@@ -101,7 +107,7 @@ describe('sanitizeRichText: images only from the media library', () => {
 
 describe('sanitizeRichText: YouTube video only', () => {
 	const embed = (id: string) =>
-		`<div data-youtube-video=""><iframe src="https://www.youtube-nocookie.com/embed/${id}" width="640" height="360" allowfullscreen="true" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe></div>`;
+		`<div data-youtube-video><iframe src="https://www.youtube-nocookie.com/embed/${id}" width="640" height="360" allowfullscreen="true" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe></div>`;
 
 	it.each([
 		'https://www.youtube.com/embed/dQw4w9WgXcQ',
@@ -113,6 +119,12 @@ describe('sanitizeRichText: YouTube video only', () => {
 				`<div data-youtube-video="" class="x"><iframe src="${src}" width="999" height="1" onload="x" srcdoc="<script>"></iframe></div>`
 			)
 		).toBe(embed('dQw4w9WgXcQ'));
+	});
+
+	it('accepts the exact markup the editor produces', () => {
+		const fromEditor =
+			'<div data-youtube-video=""><iframe width="640" height="360" allowfullscreen="true" autoplay="false" disablekbcontrols="false" enableiframeapi="false" endtime="0" ivloadpolicy="0" loop="false" modestbranding="false" origin="" playlist="" rel="1" src="https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?rel=1" start="0"></iframe></div>';
+		expect(clean(fromEditor)).toBe(embed('dQw4w9WgXcQ'));
 	});
 
 	it.each([

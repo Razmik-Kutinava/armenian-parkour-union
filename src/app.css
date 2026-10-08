@@ -163,3 +163,44 @@
 		}
 	}
 }
+
+/* Editor HTML (docs/05 section 18): the same look in the admin editor and on the site. */
+@layer components {
+	.rich-text > * + * {
+		margin-top: 0.75em;
+	}
+	.rich-text h2 {
+		font-size: 1.5em;
+		font-weight: 700;
+	}
+	.rich-text h3 {
+		font-size: 1.25em;
+		font-weight: 700;
+	}
+	.rich-text ul {
+		list-style: disc;
+		padding-left: 1.5em;
+	}
+	.rich-text ol {
+		list-style: decimal;
+		padding-left: 1.5em;
+	}
+	.rich-text blockquote {
+		border-left: 4px solid var(--line);
+		padding-left: 1em;
+		color: var(--ink-700);
+	}
+	.rich-text a {
+		color: var(--navy-700);
+		text-decoration: underline;
+	}
+	.rich-text img,
+	.rich-text iframe {
+		max-width: 100%;
+		height: auto;
+	}
+	.rich-text iframe {
+		aspect-ratio: 16 / 9;
+		width: 100%;
+	}
+}

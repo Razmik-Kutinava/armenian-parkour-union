@@ -7,6 +7,7 @@
 	import FormLayout from '#lib/components/admin/FormLayout.svelte';
 	import FormSection from '#lib/components/admin/FormSection.svelte';
 	import Pagination from '#lib/components/admin/Pagination.svelte';
+	import RichTextEditor from '#lib/components/admin/RichTextEditor.svelte';
 	import { readListState } from '#lib/components/admin/list-state.ts';
 	import Button from '#lib/components/ui/Button.svelte';
 	import EmptyState from '#lib/components/ui/EmptyState.svelte';
@@ -61,6 +62,11 @@
 	<FormLayout cancelHref="/dev/design" action="?/none" onsubmit={(e) => e.preventDefault()}>
 		<FormSection title="Main" text="Section with a heading, labels on top.">
 			<Input label="Title" name="title" />
+			<RichTextEditor
+				label="Text"
+				name="body"
+				value="<h2>Heading</h2><p>Some <strong>bold</strong> text.</p>"
+			/>
 		</FormSection>
 		<FormSection title="Contacts"><Input label="Email" name="email" type="email" /></FormSection>
 	</FormLayout>
