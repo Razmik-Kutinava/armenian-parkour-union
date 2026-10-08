@@ -150,6 +150,57 @@ describe('seo: page meta (docs/06 section 7)', () => {
 		);
 	});
 
+	it('hreflang: the same address in every language plus x-default (docs/06 section 7.4)', () => {
+		const meta = buildSeo({ ...base, path: '/ru/events?city=Gyumri' });
+		expect(meta.alternates).toEqual([
+			{ hreflang: 'en', href: 'https://parkour.am/events?city=Gyumri' },
+			{ hreflang: 'hy', href: 'https://parkour.am/hy/events?city=Gyumri' },
+			{ hreflang: 'ru', href: 'https://parkour.am/ru/events?city=Gyumri' },
+			{ hreflang: 'x-default', href: 'https://parkour.am/events?city=Gyumri' }
+		]);
+		const home = buildSeo({ ...base, path: '/hy', locale: 'hy' });
+		expect(home.alternates.map((a) => a.href)).toEqual([
+			'https://parkour.am/',
+			'https://parkour.am/hy',
+			'https://parkour.am/ru',
+			'https://parkour.am/'
+		]);
+		expect(home.tags.filter((t) => t.property === 'og:locale:alternate')).toEqual([
+			{ property: 'og:locale:alternate', content: 'en_US' },
+			{ property: 'og:locale:alternate', content: 'ru_RU' }
+		]);
+	});
+
+	it('home: the title is the site name alone, Organization markup with socials', () => {
+		const meta = buildSeo({
+			...base,
+			path: '/ru',
+			title: 'Armenian Parkour Union',
+			organization: {
+				sameAs: ['https://instagram.com/apu'],
+				email: 'info@parkour.am',
+				phone: '+374 10 000000'
+			}
+		});
+		expect(meta.title).toBe('Armenian Parkour Union');
+		expect(JSON.parse(meta.jsonLd!)).toEqual({
+			'@context': 'https://schema.org',
+			'@type': 'Organization',
+			name: 'Armenian Parkour Union',
+			url: 'https://parkour.am/',
+			description: 'Коротко о джеме',
+			sameAs: ['https://instagram.com/apu'],
+			email: 'info@parkour.am',
+			telephone: '+374 10 000000'
+		});
+		const bare = JSON.parse(
+			buildSeo({ ...base, path: '/', organization: { sameAs: [] } }).jsonLd!
+		);
+		expect(bare).not.toHaveProperty('sameAs');
+		expect(bare).not.toHaveProperty('email');
+		expect(bare).not.toHaveProperty('telephone');
+	});
+
 	it('a long description is cut on a word to 200 characters', () => {
 		const meta = buildSeo({ ...base, description: `${'слово '.repeat(60)}конец` });
 		expect(meta.description.length).toBeLessThanOrEqual(200);
