@@ -20,26 +20,34 @@
 	let tick = $state(0);
 	let prompt: Prompt | null = $state(null);
 
+	const attributes = (invalid: boolean): Record<string, string> => ({
+		role: 'textbox',
+		'aria-multiline': 'true',
+		'aria-labelledby': `${id}-label`,
+		...(invalid ? { 'aria-describedby': `${id}-error`, 'aria-invalid': 'true' } : {}),
+		class: 'rich-text min-h-48 px-3 py-2 focus:outline-none'
+	});
+
 	onMount(() => {
 		html = value.trim();
 		const instance = new Editor({
 			element,
 			extensions: richTextExtensions(),
 			content: value,
-			editorProps: {
-				attributes: {
-					role: 'textbox',
-					'aria-multiline': 'true',
-					'aria-labelledby': `${id}-label`,
-					...(error ? { 'aria-describedby': `${id}-error`, 'aria-invalid': 'true' } : {}),
-					class: 'rich-text min-h-48 px-3 py-2 focus:outline-none'
-				}
-			},
+			editorProps: { attributes: attributes(!!error) },
 			onTransaction: () => tick++,
-			onUpdate: ({ editor: e }) => (html = e.isEmpty ? '' : e.getHTML())
+			onUpdate: ({ editor: e }) => {
+				html = e.isEmpty ? '' : e.getHTML();
+				// Toolbar and dialog edits fire no native input: FormLayout tracks unsaved changes by it.
+				element?.dispatchEvent(new Event('input', { bubbles: true }));
+			}
 		});
 		editor = instance;
 		return () => instance.destroy();
+	});
+
+	$effect(() => {
+		editor?.setOptions({ editorProps: { attributes: attributes(!!error) } });
 	});
 </script>
 
