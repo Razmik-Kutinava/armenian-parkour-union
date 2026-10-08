@@ -22,7 +22,11 @@ export const ADMIN_READS = {
 	'/admin/media/[id]': 'media.write',
 	'/admin/pages': 'pages.write',
 	'/admin/pages/new': 'pages.write',
-	'/admin/pages/[id]': 'pages.write'
+	'/admin/pages/[id]': 'pages.write',
+	'/admin/news': 'posts.write',
+	'/admin/news/new': 'posts.write',
+	'/admin/news/[id]': 'posts.write',
+	'/admin/news/[id]/preview': 'posts.write'
 } as const satisfies Record<string, Access>;
 
 export const ADMIN_WRITES = {
@@ -43,5 +47,10 @@ export const ADMIN_WRITES = {
 	'/admin/pages/new?/default': 'pages.write',
 	'/admin/pages/[id]?/update': 'pages.write',
 	'/admin/pages/[id]?/delete': 'pages.write',
+	'/admin/news/new?/default': 'posts.write',
+	'/admin/news/[id]?/update': 'posts.write',
+	'/admin/news/[id]?/status': 'posts.write',
+	'/admin/news/[id]?/duplicate': 'posts.write',
+	'/admin/news/[id]?/delete': 'posts.write',
 	'POST /admin/locale': 'staff'
 } as const satisfies Record<AdminAction | NotAuditedAction, Access>;

@@ -47,6 +47,14 @@ test('every admin action leaves an audit entry with author and IP', async ({ pag
 	const pageForm = { slug: pageSlug, 'title.en': 'Audit page', status: 'draft' };
 	const pageId = async () =>
 		(await sql`select id from pages where slug = ${pageSlug}`)[0].id as string;
+	const postSlug = `e2e-audit-${crypto.randomUUID().slice(0, 8)}`;
+	const postForm = { slug: postSlug, 'title.en': 'Audit post', status: 'draft' };
+	const postId = async () =>
+		(await sql`select id from posts where slug = ${postSlug}`)[0].id as string;
+	const postRedirect = async (path: string) => {
+		const res = await page.request.post(path, { form: {}, headers: ORIGIN, maxRedirects: 0 });
+		expect(res.status(), path).toBeLessThan(400);
+	};
 
 	/* Typed by the map: a new admin action does not compile until it is exercised here. */
 	const perform: Record<AdminAction, () => Promise<void>> = {
@@ -113,7 +121,22 @@ test('every admin action leaves an audit entry with author and IP', async ({ pag
 				maxRedirects: 0
 			});
 			expect(res.status()).toBeLessThan(400);
-		}
+		},
+		'/admin/news/new?/default': async () => {
+			const res = await page.request.post('/admin/news/new', {
+				form: postForm,
+				headers: ORIGIN,
+				maxRedirects: 0
+			});
+			expect(res.status()).toBeLessThan(400);
+		},
+		'/admin/news/[id]?/update': async () =>
+			post(`/admin/news/${await postId()}?/update`, { ...postForm, 'title.en': 'Audit post 2' }),
+		'/admin/news/[id]?/status': async () =>
+			post(`/admin/news/${await postId()}?/status`, { status: 'published' }),
+		'/admin/news/[id]?/duplicate': async () =>
+			postRedirect(`/admin/news/${await postId()}?/duplicate`),
+		'/admin/news/[id]?/delete': async () => postRedirect(`/admin/news/${await postId()}?/delete`)
 	};
 
 	for (const [action, run] of Object.entries(perform)) await test.step(action, run);

@@ -29,6 +29,13 @@
       "when": 1791440020163,
       "tag": "0003_pages",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1791442004307,
+      "tag": "0004_posts",
+      "breakpoints": true
     }
   ]
 }

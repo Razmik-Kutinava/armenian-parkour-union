@@ -19,7 +19,12 @@ export const ADMIN_AUDIT = {
 	'/admin/media/[id]?/delete': ['media.delete'],
 	'/admin/pages/new?/default': ['page.create'],
 	'/admin/pages/[id]?/update': ['page.update'],
-	'/admin/pages/[id]?/delete': ['page.delete']
+	'/admin/pages/[id]?/delete': ['page.delete'],
+	'/admin/news/new?/default': ['post.create'],
+	'/admin/news/[id]?/update': ['post.update'],
+	'/admin/news/[id]?/status': ['post.update'],
+	'/admin/news/[id]?/duplicate': ['post.create'],
+	'/admin/news/[id]?/delete': ['post.delete']
 } as const;
 
 export type AdminAction = keyof typeof ADMIN_AUDIT;
