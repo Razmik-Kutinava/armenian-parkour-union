@@ -1,10 +1,15 @@
 <script lang="ts">
-	import { t, type MessageKey } from '#lib/i18n/index.svelte.ts';
+	import { currentLocale, t, type Locale, type MessageKey } from '#lib/i18n/index.svelte.ts';
 	import LanguageSwitcher from './LanguageSwitcher.svelte';
 
 	const phone = '+374 77 253039';
 	const email = 'info@parkour.am';
-	const poster = '/fest/yerevan-parkour-fest-2027-poster.png';
+	const posters: Record<Locale, string> = {
+		en: '/fest/yerevan-parkour-fest-2027-poster-en.png',
+		hy: '/fest/yerevan-parkour-fest-2027-poster-hy.png',
+		ru: '/fest/yerevan-parkour-fest-2027-poster.png'
+	};
+	const poster = $derived(posters[currentLocale()]);
 	const lists: { title: MessageKey; items: MessageKey[] }[] = [
 		{ title: 'fest.goalsTitle', items: ['fest.goal1', 'fest.goal2', 'fest.goal3', 'fest.goal4'] },
 		{ title: 'fest.planTitle', items: ['fest.plan1', 'fest.plan2', 'fest.plan3', 'fest.plan4'] }
