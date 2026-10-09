@@ -19,9 +19,9 @@ export const enFest = {
 	'fest.plan3': 'An attempt to set a Guinness World Record in Armenia',
 	'fest.plan4':
 		'The proposed “Yerevan Parkour Charter”: principles of cooperation between the state, the federation and the world parkour community',
-	'fest.guestTitle': 'Probable special guest',
+	'fest.guestTitle': 'Special guests',
 	'fest.guestText':
-		'We plan to invite David Belle (France), the founder of parkour, a stuntman and film actor (“District B13”). His participation is not yet confirmed.',
+		'The founder of parkour, David Belle (France), as well as leading athletes, coaches and judges from more than 15 countries are to be invited to the festival as guests of honour, ambassadors and jury members. The list of guests is being finalised.',
 	'fest.contactsTitle': 'Organising committee',
 	'fest.organizer': 'Armenian Parkour Federation',
 	'fest.address': 'Abovyan, Kotayk Province, Armenia',
