@@ -1,6 +1,7 @@
 import type { Messages } from '../translate';
 import { ruEditor } from './ru-editor';
 import { ruEvents } from './ru-events';
+import { ruFest } from './ru-fest';
 import { ruMedia } from './ru-media';
 import { ruNews } from './ru-news';
 import { ruPages } from './ru-pages';
@@ -15,6 +16,7 @@ export const ru: Partial<Messages> = {
 	...ruPages,
 	...ruNews,
 	...ruEvents,
+	...ruFest,
 	'site.underConstruction': 'Сайт в разработке.',
 	'common.close': 'Закрыть',
 
