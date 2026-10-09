@@ -3,7 +3,8 @@
 	import LanguageSwitcher from './LanguageSwitcher.svelte';
 
 	const phone = '+374 77 253039';
-	const email = 'razmikg1988@gmail.com';
+	const email = 'info@parkour.am';
+	const poster = '/fest/yerevan-parkour-fest-2027-poster.png';
 	const lists: { title: MessageKey; items: MessageKey[] }[] = [
 		{ title: 'fest.goalsTitle', items: ['fest.goal1', 'fest.goal2', 'fest.goal3', 'fest.goal4'] },
 		{ title: 'fest.planTitle', items: ['fest.plan1', 'fest.plan2', 'fest.plan3', 'fest.plan4'] }
@@ -30,11 +31,23 @@
 </section>
 
 <section class="mx-auto flex max-w-4xl flex-col gap-10 px-6 py-14 text-ink-700">
-	<div class="flex flex-col gap-4">
-		<p class="text-lg">{t('fest.lead')}</p>
-		<p class="rounded-md border-l-4 border-accent-500 bg-navy-950/5 px-4 py-3">
-			{t('fest.draftNote')}
-		</p>
+	<div class="grid items-start gap-8 md:grid-cols-[1fr_16rem]">
+		<div class="flex flex-col gap-4">
+			<p class="text-lg">{t('fest.lead')}</p>
+			<p class="rounded-md border-l-4 border-accent-500 bg-navy-950/5 px-4 py-3">
+				{t('fest.draftNote')}
+			</p>
+		</div>
+		<a href={poster} target="_blank" rel="noopener" class="mx-auto block w-64 md:w-full">
+			<img
+				src={poster}
+				alt={t('fest.posterAlt')}
+				width="571"
+				height="1024"
+				loading="lazy"
+				class="h-auto w-full rounded-md shadow-lg"
+			/>
+		</a>
 	</div>
 
 	<div class="grid gap-8 md:grid-cols-2">

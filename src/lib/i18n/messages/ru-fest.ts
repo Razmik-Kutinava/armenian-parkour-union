@@ -26,5 +26,6 @@ export const ruFest: Partial<Messages> = {
 	'fest.contactsTitle': 'Оргкомитет',
 	'fest.organizer': 'Федерация паркура Армении',
 	'fest.address': 'Армения, Котайкская область, г. Абовян',
+	'fest.posterAlt': 'Афиша Yerevan Parkour Fest 2027',
 	'fest.imageAlt': 'Трейсер в прыжке над крышами Еревана на фоне Арарата'
 };

@@ -5,6 +5,8 @@ test('home page announces the festival as planned', async ({ page }) => {
 	await expect(page.getByRole('heading', { level: 1 })).toHaveText('Yerevan Parkour Fest 2027');
 	await expect(page.getByText('Yerevan · 14–17 June 2027')).toBeVisible();
 	await expect(page.getByText('Planned dates')).toBeVisible();
+	await expect(page.getByAltText('Yerevan Parkour Fest 2027 poster')).toBeVisible();
+	await expect(page.getByRole('link', { name: 'info@parkour.am' })).toBeVisible();
 });
 
 test('festival announcement is translated', async ({ page }) => {

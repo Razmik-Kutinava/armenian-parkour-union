@@ -25,5 +25,6 @@ export const enFest = {
 	'fest.contactsTitle': 'Organising committee',
 	'fest.organizer': 'Armenian Parkour Federation',
 	'fest.address': 'Abovyan, Kotayk Province, Armenia',
+	'fest.posterAlt': 'Yerevan Parkour Fest 2027 poster',
 	'fest.imageAlt': 'Parkour athlete jumping over the rooftops of Yerevan with Mount Ararat behind'
 };

@@ -26,5 +26,6 @@ export const hyFest: Partial<Messages> = {
 	'fest.contactsTitle': 'Կազմկոմիտե',
 	'fest.organizer': 'Հայաստանի պարկուրի ֆեդերացիա',
 	'fest.address': 'Հայաստան, Կոտայքի մարզ, ք. Աբովյան',
+	'fest.posterAlt': 'Yerevan Parkour Fest 2027 փառատոնի պաստառ',
 	'fest.imageAlt': 'Պարկուրիստը ցատկում է Երևանի տանիքների վրայով՝ Արարատի ֆոնին'
 };
