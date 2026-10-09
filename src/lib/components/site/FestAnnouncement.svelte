@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { currentLocale, t, type Locale, type MessageKey } from '#lib/i18n/index.svelte.ts';
 	import LanguageSwitcher from './LanguageSwitcher.svelte';
+	import ParkourVideo from './ParkourVideo.svelte';
 
 	const phone = '+374 77 253039';
 	const email = 'info@parkour.am';
@@ -34,6 +35,8 @@
 		<p class="text-sm text-navy-300">{t('fest.datesNote')}</p>
 	</div>
 </section>
+
+<ParkourVideo />
 
 <section class="mx-auto flex max-w-4xl flex-col gap-10 px-6 py-14 text-ink-700">
 	<div class="grid items-start gap-8 md:grid-cols-[1fr_16rem]">

@@ -12,6 +12,19 @@ test('home page announces the festival as planned', async ({ page }) => {
 	await expect(page.getByRole('link', { name: 'info@parkour.am' })).toBeVisible();
 });
 
+test('parkour video loads the player only on click', async ({ page }) => {
+	await page.goto('/');
+	await expect(page.getByRole('heading', { name: 'What is parkour' })).toBeVisible();
+	await expect(page.locator('iframe')).toHaveCount(0);
+	await page.getByRole('button', { name: 'Play video' }).click();
+	await expect(page.locator('iframe')).toHaveAttribute(
+		'src',
+		/^https:\/\/www\.youtube-nocookie\.com\/embed\/kMpYHcuipuY/
+	);
+	await page.goto('/ru');
+	await expect(page.getByRole('heading', { name: 'Что такое паркур' })).toBeVisible();
+});
+
 test('festival announcement is translated', async ({ page }) => {
 	await page.goto('/hy');
 	await expect(page.getByText('Երևան · 2027 թ. հունիսի 14–17')).toBeVisible();

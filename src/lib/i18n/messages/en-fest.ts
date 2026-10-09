@@ -26,5 +26,12 @@ export const enFest = {
 	'fest.organizer': 'Armenian Parkour Federation',
 	'fest.address': 'Abovyan, Kotayk Province, Armenia',
 	'fest.posterAlt': 'Yerevan Parkour Fest 2027 poster',
-	'fest.imageAlt': 'Parkour athlete jumping over the rooftops of Yerevan with Mount Ararat behind'
+	'fest.imageAlt': 'Parkour athlete jumping over the rooftops of Yerevan with Mount Ararat behind',
+	'fest.videoKicker': 'Parkour',
+	'fest.videoTitle': 'What is parkour',
+	'fest.videoText':
+		'Parkour is the art of moving from point A to point B as fast and fluidly as possible using only your body: runs, jumps, vaults and climbs over walls, rails and blocks. Today it is an official discipline of World Gymnastics (FIG), with World Cups and World Championships in two events: Speed and Freestyle.',
+	'fest.videoPlay': 'Play video',
+	'fest.videoCaption':
+		'Parkour World Cup 2024, Montpellier: highlights. Video: World Gymnastics Channel'
 };
