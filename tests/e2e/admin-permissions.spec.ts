@@ -15,8 +15,13 @@ test.beforeEach(async () => {
 type Role = 'member' | 'editor' | 'moderator' | 'admin';
 const ORIGIN = { origin: 'http://localhost:4173' };
 /* Every field any admin form reads: if a guard were missing, the action would really run. */
-const HOSTILE_FORM = (userId: string) => ({
+const HOSTILE_FORM = (userId: string, heroId: string) => ({
 	userId,
+	id: heroId,
+	order: heroId,
+	type: 'custom',
+	isActive: 'on',
+	active: 'true',
 	role: 'admin',
 	comment: 'hostile',
 	email: `e2e-hostile-${crypto.randomUUID()}@example.com`,
@@ -99,6 +104,13 @@ async function insertEvent() {
 	return row.id as string;
 }
 
+async function insertHero() {
+	const [row] = await sql`
+		insert into hero_blocks (type, title) values ('custom', ${sql.json({ en: 'E2e perm hero' })})
+		returning id`;
+	return row.id as string;
+}
+
 /* docs/04 section 5.4: member → 404 for all of /admin, staff without the permission → 403. */
 const expectedStatus = (role: Role, access: Access) =>
 	role === 'member' ? 404 : access === 'staff' || roleCan(role, access) ? 200 : 403;
@@ -110,6 +122,7 @@ type Ids = {
 	pageId: string;
 	postId: string;
 	eventId: string;
+	heroId: string;
 };
 const toPath = (key: string, ids: Ids) =>
 	key
@@ -120,6 +133,7 @@ const toPath = (key: string, ids: Ids) =>
 		.replace('/pages/[id]', `/pages/${ids.pageId}`)
 		.replace('/news/[id]', `/news/${ids.postId}`)
 		.replace('/events/[id]', `/events/${ids.eventId}`)
+		.replace('/hero/[id]', `/hero/${ids.heroId}`)
 		.replace('?/default', '');
 
 const targetRow = async (id: string) =>
@@ -133,6 +147,7 @@ const eventRows = async (id: string) => ({
 	event: (await sql`select * from events where id = ${id}`)[0],
 	categories: await sql`select * from event_categories where event_id = ${id} order by id`
 });
+const heroRow = async (id: string) => (await sql`select * from hero_blocks where id = ${id}`)[0];
 
 for (const role of ['member', 'editor', 'moderator'] as const) {
 	test(`${role}: every admin page and action answers by docs/04, data stays`, async ({ page }) => {
@@ -145,12 +160,14 @@ for (const role of ['member', 'editor', 'moderator'] as const) {
 			mediaId: await insertMedia(target),
 			pageId: await insertPage(),
 			postId: await insertPost(),
-			eventId: await insertEvent()
+			eventId: await insertEvent(),
+			heroId: await insertHero()
 		};
 		const mediaBefore = await mediaRow(ids.mediaId);
 		const pageBefore = await pageRow(ids.pageId);
 		const postBefore = await postRow(ids.postId);
 		const eventBefore = await eventRows(ids.eventId);
+		const heroBefore = await heroRow(ids.heroId);
 		await registerAs(page, role);
 
 		for (const [key, access] of Object.entries(ADMIN_READS)) {
@@ -161,7 +178,7 @@ for (const role of ['member', 'editor', 'moderator'] as const) {
 			const expected = expectedStatus(role, access);
 			if (expected === 200) continue;
 			const res = await page.request.post(toPath(key, ids), {
-				form: HOSTILE_FORM(target),
+				form: HOSTILE_FORM(target, ids.heroId),
 				headers: ORIGIN,
 				maxRedirects: 0
 			});
@@ -173,8 +190,12 @@ for (const role of ['member', 'editor', 'moderator'] as const) {
 		expect(await pageRow(ids.pageId)).toEqual(pageBefore);
 		expect(await postRow(ids.postId)).toEqual(postBefore);
 		expect(await eventRows(ids.eventId)).toEqual(eventBefore);
+		expect(await heroRow(ids.heroId)).toEqual(heroBefore);
 		expect(
-			await sql`select 1 from audit_log where entity_id in (${target}, ${ids.mediaId}, ${ids.pageId}, ${ids.postId}, ${ids.eventId})`
+			await sql`select 1 from audit_log where entity_id in (${target}, ${ids.mediaId}, ${ids.pageId}, ${ids.postId}, ${ids.eventId}, ${ids.heroId})`
+		).toHaveLength(0);
+		expect(
+			await sql`select 1 from hero_blocks where title->>'en' = 'Hacked' and created_at > now() - interval '10 minutes'`
 		).toHaveLength(0);
 		expect(await sql`select 1 from pages where slug like 'e2e-hostile-%'`).toHaveLength(0);
 		expect(await sql`select 1 from posts where slug like 'e2e-hostile-%'`).toHaveLength(0);
@@ -201,7 +222,8 @@ test('admin opens every admin page; audit pages take no writes and the entry sta
 		mediaId: await insertMedia(target),
 		pageId: await insertPage(),
 		postId: await insertPost(),
-		eventId: await insertEvent()
+		eventId: await insertEvent(),
+		heroId: await insertHero()
 	};
 	for (const key of Object.keys(ADMIN_READS)) {
 		const res = await page.request.get(toPath(key, ids), { maxRedirects: 0 });

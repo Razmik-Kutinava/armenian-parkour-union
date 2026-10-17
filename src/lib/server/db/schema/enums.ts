@@ -12,3 +12,4 @@ export const eventStatus = pgEnum('event_status', [
 	'archived'
 ]);
 export const discipline = pgEnum('discipline', ['speed', 'style', 'tricking', 'freerun', 'other']);
+export const heroType = pgEnum('hero_type', ['event', 'presentation', 'video', 'person', 'custom']);

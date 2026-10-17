@@ -30,7 +30,12 @@ export const ADMIN_READS = {
 	'/admin/events': 'events.write',
 	'/admin/events/new': 'events.write',
 	'/admin/events/[id]': 'events.write',
-	'/admin/events/[id]/preview': 'events.write'
+	'/admin/events/[id]/preview': 'events.write',
+	'/admin/hero': 'hero.write',
+	'/admin/hero/new': 'hero.write',
+	'/admin/hero/[id]': 'hero.write',
+	'/admin/hero/[id]/preview': 'hero.write',
+	'GET /admin/hero/persons': 'hero.write'
 } as const satisfies Record<string, Access>;
 
 export const ADMIN_WRITES = {
@@ -68,5 +73,12 @@ export const ADMIN_WRITES = {
 	'/admin/events/[id]?/finish': 'events.cancel',
 	'/admin/events/[id]?/archive': 'events.cancel',
 	'/admin/events/[id]?/restore': 'events.cancel',
+	'/admin/hero/new?/default': 'hero.write',
+	'/admin/hero/[id]?/update': 'hero.write',
+	'/admin/hero?/toggle': 'hero.write',
+	'/admin/hero?/reorder': 'hero.write',
+	'/admin/hero/[id]?/duplicate': 'hero.write',
+	'/admin/hero/[id]?/archive': 'hero.write',
+	'/admin/hero/[id]?/restore': 'hero.write',
 	'POST /admin/locale': 'staff'
 } as const satisfies Record<AdminAction | NotAuditedAction, Access>;

@@ -72,6 +72,13 @@ test('every admin action leaves an audit entry with author and IP', async ({ pag
 		values (${`e2e-audit-${crypto.randomUUID().slice(0, 8)}`}, ${sql.json({ en: 'Started' })},
 			'published', now() - interval '2 days', now() - interval '1 day', now() - interval '20 hours')
 		returning id`;
+	const heroForm = { type: 'custom', 'title.en': `E2e hero audit ${crypto.randomUUID()}` };
+	/* The duplicate has the same title: always the first one. */
+	const heroId = async () =>
+		(
+			await sql`select id from hero_blocks where title->>'en' = ${heroForm['title.en']}
+				order by created_at limit 1`
+		)[0].id as string;
 	const postRedirect = async (path: string, form: Record<string, string> = {}) => {
 		const res = await page.request.post(path, { form, headers: ORIGIN, maxRedirects: 0 });
 		expect(res.status(), path).toBeLessThan(400);
@@ -181,7 +188,28 @@ test('every admin action leaves an audit entry with author and IP', async ({ pag
 		'/admin/events/[id]?/archive': async () => post(`/admin/events/${await eventId()}?/archive`),
 		'/admin/events/[id]?/restore': async () => post(`/admin/events/${await eventId()}?/restore`),
 		'/admin/events/[id]?/delete': async () =>
-			postRedirect(`/admin/events/${await eventId()}?/delete`)
+			postRedirect(`/admin/events/${await eventId()}?/delete`),
+		'/admin/hero/new?/default': () => postRedirect('/admin/hero/new', heroForm),
+		'/admin/hero/[id]?/update': async () =>
+			post(`/admin/hero/${await heroId()}?/update`, { ...heroForm, 'subtitle.en': 'Audit' }),
+		/* On and back off: hero.activate and hero.deactivate, the block stays off. */
+		'/admin/hero?/toggle': async () => {
+			const id = await heroId();
+			await post('/admin/hero?/toggle', { id, active: 'true' });
+			await post('/admin/hero?/toggle', { id, active: 'false' });
+		},
+		/* The whole current list; hero.spec.ts may add a block meanwhile, so read and retry. */
+		'/admin/hero?/reorder': async () => {
+			await expect(async () => {
+				const rows =
+					await sql`select id from hero_blocks where archived_at is null order by sort_order desc`;
+				await post('/admin/hero?/reorder', { order: rows.map((r) => r.id).join(',') });
+			}).toPass({ timeout: 15_000 });
+		},
+		'/admin/hero/[id]?/duplicate': async () =>
+			postRedirect(`/admin/hero/${await heroId()}?/duplicate`),
+		'/admin/hero/[id]?/archive': async () => post(`/admin/hero/${await heroId()}?/archive`),
+		'/admin/hero/[id]?/restore': async () => post(`/admin/hero/${await heroId()}?/restore`)
 	};
 
 	for (const [action, run] of Object.entries(perform)) await test.step(action, run);

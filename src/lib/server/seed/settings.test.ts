@@ -10,6 +10,7 @@ const KEYS = [
 	'contacts',
 	'feature_flags',
 	'footer',
+	'hero_max_active',
 	'membership_fee',
 	'requisites',
 	'site_name',
@@ -26,6 +27,10 @@ describe('seed: site_settings values', () => {
 		for (const key of ['site_name', 'contacts', 'socials', 'footer', 'requisites'] as const) {
 			expect(shape[key].safeParse(SEED_SETTINGS[key]).success, key).toBe(true);
 		}
+	});
+
+	it('hero limit: 5 active blocks (docs/03 section 11)', () => {
+		expect(SEED_SETTINGS.hero_max_active).toBe(5);
 	});
 
 	it('membership fee: integer minor units, AMD, 12 months, amount not set yet', () => {

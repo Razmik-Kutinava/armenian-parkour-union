@@ -36,7 +36,14 @@ export const ADMIN_AUDIT = {
 	'/admin/events/[id]?/finish': ['event.update'],
 	'/admin/events/[id]?/archive': ['event.update'],
 	'/admin/events/[id]?/restore': ['event.update'],
-	'/admin/events/[id]?/delete': ['event.delete']
+	'/admin/events/[id]?/delete': ['event.delete'],
+	'/admin/hero/new?/default': ['hero.create'],
+	'/admin/hero/[id]?/update': ['hero.update'],
+	'/admin/hero?/toggle': ['hero.activate', 'hero.deactivate'],
+	'/admin/hero?/reorder': ['hero.reorder'],
+	'/admin/hero/[id]?/duplicate': ['hero.duplicate'],
+	'/admin/hero/[id]?/archive': ['hero.archive'],
+	'/admin/hero/[id]?/restore': ['hero.restore']
 } as const;
 
 export type AdminAction = keyof typeof ADMIN_AUDIT;

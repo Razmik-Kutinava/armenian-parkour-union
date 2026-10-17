@@ -43,6 +43,13 @@
       "when": 1791452385872,
       "tag": "0005_events",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1792237832267,
+      "tag": "0006_hero_blocks",
+      "breakpoints": true
     }
   ]
 }
