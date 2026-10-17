@@ -3,6 +3,7 @@ import { translate } from '#lib/i18n/translate.ts';
 import { db } from '#lib/server/db/index.ts';
 import { NEWS_PAGE_SIZE, listPublishedPosts } from '#lib/server/services/posts/public.ts';
 import { siteUrl, withCover } from '#lib/server/services/posts/view.ts';
+import { getSeoBase } from '#lib/server/services/seo/base.ts';
 import { buildSeo } from '#lib/seo/meta.ts';
 import { TAG_MAX } from '#lib/validation/posts.ts';
 import type { PageServerLoad } from './$types';
@@ -13,7 +14,10 @@ export const load: PageServerLoad = async ({ params, url }) => {
 	const tag = (url.searchParams.get('tag') ?? '').trim().toLowerCase().slice(0, TAG_MAX) || null;
 	const rawPage = url.searchParams.get('page') ?? '';
 	const page = /^\d{1,6}$/.test(rawPage) && Number(rawPage) >= 1 ? Number(rawPage) : 1;
-	const { rows, total } = await listPublishedPosts(db, { locale, tag: tag ?? undefined, page });
+	const [{ rows, total }, base] = await Promise.all([
+		listPublishedPosts(db, { locale, tag: tag ?? undefined, page }),
+		getSeoBase(db, locale, siteUrl(url))
+	]);
 	const query = new URLSearchParams({
 		...(tag && { tag }),
 		...(page > 1 && { page: String(page) })
@@ -25,10 +29,8 @@ export const load: PageServerLoad = async ({ params, url }) => {
 		pages: Math.max(1, Math.ceil(total / NEWS_PAGE_SIZE)),
 		posts: rows.map(withCover),
 		seo: buildSeo({
-			siteUrl: siteUrl(url),
-			siteName: translate(locale, 'site.name'),
+			...base,
 			path: localizePath('/news', locale) + (query ? `?${query}` : ''),
-			locale,
 			title: tag ? `${title}: #${tag}` : title,
 			description: translate(locale, 'news.list.description')
 		})

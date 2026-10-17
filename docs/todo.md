@@ -56,4 +56,12 @@
 ## Фазы
 
 - [x] SPEC
-- [ ] RED · GREEN · REGRESS · REVIEW · DEPLOY
+- [x] RED (`7484e48`)
+- [x] GREEN — unit 423, e2e «Проверки» 16/16 (`home` «видео по клику» упал 1 раз в общем прогоне — гонка с гидратацией, отдельно 3/3)
+- [ ] REVIEW (`high`: bugbot + security-review) · push · CI
+- [ ] DEPLOY — по апруву
+
+## Отступления от SPEC (GREEN)
+
+- Главная: пока на ней анонс фестиваля (выкачен по апруву 2026-10-09, после SPEC), превью ссылки остаётся фестивальным — title / description / `og:image` анонса; `Organization` берёт описание из `seo_description`. Правило «title = название сайта» сработает, когда анонс снимут (`buildSeo`: title = siteName → без « — »).
+- `postSeo` / `eventSeo` принимают базу SEO (`getSeoBase`) — заодно предпросмотры админки (`shareUrl`).

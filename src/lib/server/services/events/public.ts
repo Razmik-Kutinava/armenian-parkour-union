@@ -66,7 +66,7 @@ export type PublicEvent = EventCard & {
 
 const live = and(lte(events.publishedAt, sql`now()`), isNull(events.deletedAt));
 /** A cancelled or finished event still opens by its link; drafts and archived ones do not. */
-const openable = and(live, inArray(events.status, ['published', 'finished', 'cancelled']));
+export const openable = and(live, inArray(events.status, ['published', 'finished', 'cancelled']));
 /** Listed until it ends: a running multi-day event is still shown. */
 const listed = and(live, eq(events.status, 'published'), gte(events.endsAt, sql`now()`));
 const finished = and(live, eq(events.status, 'finished'));

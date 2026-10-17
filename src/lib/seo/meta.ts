@@ -1,5 +1,7 @@
-import type { Locale } from '#lib/i18n/locales.ts';
+import { locales, type Locale } from '#lib/i18n/locales.ts';
+import { alternateLinks, type Alternate } from './alternates';
 import { eventMarkup } from './event';
+import { organizationMarkup, type SeoOrganization } from './organization';
 
 /* docs/06 section 7: title, description, Open Graph with an image, canonical address, markup. */
 
@@ -14,6 +16,8 @@ export type SeoInput = {
 	image?: { url: string; alt: string } | null;
 	article?: { publishedAt: Date; modifiedAt: Date; tags: string[] };
 	event?: SeoEvent;
+	/** Home page only. */
+	organization?: SeoOrganization;
 };
 export type SeoEvent = {
 	startsAt: Date;
@@ -27,6 +31,7 @@ export type Seo = {
 	title: string;
 	description: string;
 	canonical: string;
+	alternates: Alternate[];
 	tags: MetaTag[];
 	/** Ready for `<script type="application/ld+json">`: `<` is escaped. */
 	jsonLd: string | null;
@@ -62,7 +67,8 @@ export function textFromHtml(html: string): string {
 }
 
 export function buildSeo(input: SeoInput): Seo {
-	const canonical = `${input.siteUrl.replace(/\/+$/, '')}${input.path}`;
+	const origin = input.siteUrl.replace(/\/+$/, '');
+	const canonical = `${origin}${input.path}`;
 	const description = shorten(input.description);
 	const { image, article } = input;
 	const tags: MetaTag[] = [
@@ -71,6 +77,9 @@ export function buildSeo(input: SeoInput): Seo {
 		{ property: 'og:url', content: canonical },
 		{ property: 'og:site_name', content: input.siteName },
 		{ property: 'og:locale', content: OG_LOCALE[input.locale] },
+		...locales
+			.filter((locale) => locale !== input.locale)
+			.map((locale) => ({ property: 'og:locale:alternate', content: OG_LOCALE[locale] })),
 		{ property: 'og:type', content: article ? 'article' : 'website' },
 		{ name: 'twitter:card', content: image ? 'summary_large_image' : 'summary' }
 	];
@@ -101,12 +110,16 @@ export function buildSeo(input: SeoInput): Seo {
 				author: organization,
 				publisher: organization
 			}
-		: input.event && eventMarkup(input, input.event, description, canonical, organization);
+		: input.event
+			? eventMarkup(input, input.event, description, canonical, organization)
+			: input.organization &&
+				organizationMarkup(input.siteName, `${origin}/`, description, input.organization);
 	const jsonLd = markup ? JSON.stringify(markup).replace(/</g, '\\u003c') : null;
 	return {
-		title: `${input.title} — ${input.siteName}`,
+		title: input.title === input.siteName ? input.title : `${input.title} — ${input.siteName}`,
 		description,
 		canonical,
+		alternates: alternateLinks(origin, input.path),
 		tags,
 		jsonLd
 	};

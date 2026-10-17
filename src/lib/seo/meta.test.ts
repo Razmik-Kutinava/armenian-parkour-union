@@ -193,9 +193,7 @@ describe('seo: page meta (docs/06 section 7)', () => {
 			email: 'info@parkour.am',
 			telephone: '+374 10 000000'
 		});
-		const bare = JSON.parse(
-			buildSeo({ ...base, path: '/', organization: { sameAs: [] } }).jsonLd!
-		);
+		const bare = JSON.parse(buildSeo({ ...base, path: '/', organization: { sameAs: [] } }).jsonLd!);
 		expect(bare).not.toHaveProperty('sameAs');
 		expect(bare).not.toHaveProperty('email');
 		expect(bare).not.toHaveProperty('telephone');

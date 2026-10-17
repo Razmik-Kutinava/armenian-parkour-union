@@ -9,6 +9,7 @@ import {
 } from '#lib/server/services/events/public.ts';
 import { withEventCover } from '#lib/server/services/events/view.ts';
 import { siteUrl } from '#lib/server/services/posts/view.ts';
+import { getSeoBase } from '#lib/server/services/seo/base.ts';
 import { buildSeo } from '#lib/seo/meta.ts';
 import { disciplines } from '#lib/validation/events.ts';
 import type { PageServerLoad } from './$types';
@@ -28,9 +29,10 @@ export const load: PageServerLoad = async ({ params, url }) => {
 		discipline: oneOf(q.get('discipline'), disciplines)
 	} satisfies Partial<UpcomingQuery>;
 	const page = /^\d{1,6}$/.test(rawPage) && Number(rawPage) >= 1 ? Number(rawPage) : 1;
-	const [{ rows, total }, cities] = await Promise.all([
+	const [{ rows, total }, cities, base] = await Promise.all([
 		listUpcomingEvents(db, { locale, page, ...filters }),
-		listUpcomingCities(db)
+		listUpcomingCities(db),
+		getSeoBase(db, locale, siteUrl(url))
 	]);
 	const query = new URLSearchParams(
 		Object.entries({ ...filters, page: page > 1 ? String(page) : undefined }).filter(
@@ -44,10 +46,8 @@ export const load: PageServerLoad = async ({ params, url }) => {
 		cities,
 		events: rows.map(withEventCover),
 		seo: buildSeo({
-			siteUrl: siteUrl(url),
-			siteName: translate(locale, 'site.name'),
+			...base,
 			path: localizePath('/events', locale) + (query ? `?${query}` : ''),
-			locale,
 			title: translate(locale, 'nav.events'),
 			description: translate(locale, 'events.list.description')
 		})

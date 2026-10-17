@@ -23,7 +23,7 @@ export type PostCard = {
 export type PublicPost = PostCard & { id: string; html: string; updatedAt: Date };
 
 /** Guests see a post only when it is published and its date has come. */
-const visible = and(
+export const visible = and(
 	eq(posts.status, 'published'),
 	lte(posts.publishedAt, sql`now()`),
 	isNull(posts.deletedAt)

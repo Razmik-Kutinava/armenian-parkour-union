@@ -1,7 +1,8 @@
 import { PUBLIC_SITE_URL } from '$app/env/private';
-import { localizePath, type Locale } from '#lib/i18n/locales.ts';
+import { localizePath } from '#lib/i18n/locales.ts';
 import { translate } from '#lib/i18n/translate.ts';
 import { buildSeo, textFromHtml, type Seo } from '#lib/seo/meta.ts';
+import type { SeoBase } from '../seo/base';
 import { publicUrl } from '../../storage/r2';
 import type { PostCard, PublicPost } from './public';
 
@@ -16,16 +17,14 @@ export const withCover = <T extends PostCard>(post: T): T & { coverUrl: string |
 
 export const siteUrl = (url: URL) => PUBLIC_SITE_URL || url.origin;
 
-export function postSeo(post: PublicPost, locale: Locale, url: URL): Seo {
+export function postSeo(post: PublicPost, base: SeoBase): Seo {
 	const coverUrl = post.coverKey ? publicUrl(post.coverKey) : null;
 	return buildSeo({
-		siteUrl: siteUrl(url),
-		siteName: translate(locale, 'site.name'),
-		path: localizePath(`/news/${post.slug}`, locale),
-		locale,
+		...base,
+		path: localizePath(`/news/${post.slug}`, base.locale),
 		title: post.title,
 		description:
-			post.excerpt || textFromHtml(post.html) || translate(locale, 'news.list.description'),
+			post.excerpt || textFromHtml(post.html) || translate(base.locale, 'news.list.description'),
 		image: coverUrl ? { url: coverUrl, alt: post.coverAlt } : null,
 		article: {
 			publishedAt: post.publishedAt ?? post.updatedAt,

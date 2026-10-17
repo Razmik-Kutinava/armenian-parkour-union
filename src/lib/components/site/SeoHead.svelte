@@ -11,6 +11,9 @@
 	<title>{seo.title}</title>
 	<meta name="description" content={seo.description} />
 	<link rel="canonical" href={seo.canonical} />
+	{#each seo.alternates as link (link.hreflang)}
+		<link rel="alternate" hreflang={link.hreflang} href={link.href} />
+	{/each}
 	{#each seo.tags as tag, i (i)}
 		{#if tag.property}
 			<meta property={tag.property} content={tag.content} />

@@ -7,6 +7,8 @@ import { pages } from '../../db/schema/content';
 
 export type PublicPage = { slug: string; title: string; html: string };
 
+export const published = and(eq(pages.status, 'published'), isNull(pages.deletedAt));
+
 /**
  * docs/06 section 4.5: only a published page is shown, to everyone alike. Title and text fall back
  * to English separately. The HTML was cleaned on save (server/rich-text).
@@ -19,7 +21,7 @@ export async function getPublishedPage(
 	const [row] = await db
 		.select({ slug: pages.slug, title: pages.title, body: pages.body })
 		.from(pages)
-		.where(and(eq(pages.slug, slug), eq(pages.status, 'published'), isNull(pages.deletedAt)));
+		.where(and(eq(pages.slug, slug), published));
 	if (!row) return null;
 	const body = row.body as PageBody;
 	return {

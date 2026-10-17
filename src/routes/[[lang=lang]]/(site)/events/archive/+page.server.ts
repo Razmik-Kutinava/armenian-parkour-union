@@ -4,6 +4,7 @@ import { db } from '#lib/server/db/index.ts';
 import { EVENTS_PAGE_SIZE, listArchivedEvents } from '#lib/server/services/events/public.ts';
 import { withEventCover } from '#lib/server/services/events/view.ts';
 import { siteUrl } from '#lib/server/services/posts/view.ts';
+import { getSeoBase } from '#lib/server/services/seo/base.ts';
 import { buildSeo } from '#lib/seo/meta.ts';
 import type { PageServerLoad } from './$types';
 
@@ -12,16 +13,17 @@ export const load: PageServerLoad = async ({ params, url }) => {
 	const locale = isLocale(params.lang) ? params.lang : defaultLocale;
 	const rawPage = url.searchParams.get('page') ?? '';
 	const page = /^\d{1,6}$/.test(rawPage) && Number(rawPage) >= 1 ? Number(rawPage) : 1;
-	const { rows, total } = await listArchivedEvents(db, { locale, page });
+	const [{ rows, total }, base] = await Promise.all([
+		listArchivedEvents(db, { locale, page }),
+		getSeoBase(db, locale, siteUrl(url))
+	]);
 	return {
 		page,
 		pages: Math.max(1, Math.ceil(total / EVENTS_PAGE_SIZE)),
 		events: rows.map(withEventCover),
 		seo: buildSeo({
-			siteUrl: siteUrl(url),
-			siteName: translate(locale, 'site.name'),
+			...base,
 			path: localizePath('/events/archive', locale) + (page > 1 ? `?page=${page}` : ''),
-			locale,
 			title: translate(locale, 'events.archive.title'),
 			description: translate(locale, 'events.archive.description')
 		})

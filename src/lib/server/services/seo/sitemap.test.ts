@@ -19,7 +19,13 @@ describe.skipIf(!testDbUrl)('seo: sitemap addresses from the database', () => {
 		(
 			await tx
 				.insert(posts)
-				.values({ slug: slug(), title: { en: 'Jam' }, status: 'published', publishedAt: ago(60), ...values })
+				.values({
+					slug: slug(),
+					title: { en: 'Jam' },
+					status: 'published',
+					publishedAt: ago(60),
+					...values
+				})
 				.returning()
 		)[0];
 	const addEvent = async (tx: LimitDb, values: Partial<typeof events.$inferInsert> = {}) =>
@@ -65,7 +71,9 @@ describe.skipIf(!testDbUrl)('seo: sitemap addresses from the database', () => {
 				expect(paths).toContain(p);
 			}
 			expect(entries.find((e) => e.path === `/news/${post.slug}`)?.lastmod).toEqual(post.updatedAt);
-			expect(entries.find((e) => e.path === `/pages/${page.slug}`)?.lastmod).toEqual(page.updatedAt);
+			expect(entries.find((e) => e.path === `/pages/${page.slug}`)?.lastmod).toEqual(
+				page.updatedAt
+			);
 			expect(entries.find((e) => e.path === '/news')?.lastmod).toBeUndefined();
 			expect(new Set(paths).size).toBe(paths.length);
 		});

@@ -18,6 +18,7 @@ export const en = {
 	...enEvents,
 	...enFest,
 	'site.name': 'Armenian Parkour Union',
+	'site.description': 'Armenian Parkour Union: events, news, membership and certification.',
 	'site.underConstruction': 'Site under construction.',
 	'common.close': 'Close',
 

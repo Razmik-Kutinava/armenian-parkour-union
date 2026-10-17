@@ -24,7 +24,9 @@ describe('seo: sitemap.xml (docs/06 section 7.2)', () => {
 			'https://parkour.am/hy/news/jam',
 			'https://parkour.am/ru/news/jam'
 		]);
-		const links = [...urls[4].matchAll(/<xhtml:link rel="alternate" hreflang="([^"]+)" href="([^"]+)"\/>/g)];
+		const links = [
+			...urls[4].matchAll(/<xhtml:link rel="alternate" hreflang="([^"]+)" href="([^"]+)"\/>/g)
+		];
 		expect(links.map((l) => [l[1], l[2]])).toEqual([
 			['en', 'https://parkour.am/news/jam'],
 			['hy', 'https://parkour.am/hy/news/jam'],
