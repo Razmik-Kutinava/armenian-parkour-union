@@ -1,5 +1,6 @@
 import { defaultLocale, isLocale } from '#lib/i18n/locales.ts';
 import { isStaff } from '#lib/server/auth/permissions.ts';
+import { cached } from '#lib/server/cache/index.ts';
 import { db } from '#lib/server/db/index.ts';
 import { getFooterSettings } from '#lib/server/services/site-settings.ts';
 import type { LayoutServerLoad } from './$types';
@@ -11,6 +12,6 @@ export const load: LayoutServerLoad = async ({ locals, params }) => {
 	const user = locals.user;
 	return {
 		viewer: user ? { name: user.name, isStaff: isStaff(user) } : null,
-		footer: await getFooterSettings(db, locale)
+		footer: await cached(['settings'], 'footer', getFooterSettings, db, locale)
 	};
 };

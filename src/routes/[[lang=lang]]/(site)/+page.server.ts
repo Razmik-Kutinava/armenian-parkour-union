@@ -1,5 +1,6 @@
 import { defaultLocale, isLocale, localizePath } from '#lib/i18n/locales.ts';
 import { translate, type MessageKey } from '#lib/i18n/translate.ts';
+import { cached } from '#lib/server/cache/index.ts';
 import { db } from '#lib/server/db/index.ts';
 import { withEventCover } from '#lib/server/services/events/view.ts';
 import { getHeroSlides } from '#lib/server/services/hero/public.ts';
@@ -18,9 +19,9 @@ export const load: PageServerLoad = async ({ params, parent, url }) => {
 	const locale = isLocale(params.lang) ? params.lang : defaultLocale;
 	const [{ footer }, base, slides, sections] = await Promise.all([
 		parent(),
-		getSeoBase(db, locale, siteUrl(url)),
-		getHeroSlides(db, locale),
-		getHomeSections(db, locale)
+		cached(['settings'], 'seoBase', getSeoBase, db, locale, siteUrl(url)),
+		cached(['hero', 'events'], 'heroSlides', getHeroSlides, db, locale),
+		cached(['events', 'posts', 'pages'], 'homeSections', getHomeSections, db, locale)
 	]);
 	const fest = (key: MessageKey) => translate(locale, key);
 	return {

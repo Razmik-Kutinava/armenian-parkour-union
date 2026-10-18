@@ -2,7 +2,12 @@ import { defineConfig } from '@playwright/test';
 
 export default defineConfig({
 	testDir: 'tests/e2e',
-	webServer: { command: 'npm run build && npm run preview', port: 4173 },
+	/* Tests write to the database with SQL, past the admin, so the public cache would show old data. */
+	webServer: {
+		command: 'npm run build && npm run preview',
+		port: 4173,
+		env: { CACHE_TTL_SECONDS: '0' }
+	},
 	use: { baseURL: 'http://localhost:4173' },
 	reporter: process.env.CI ? [['list'], ['html', { open: 'never' }]] : 'list'
 });

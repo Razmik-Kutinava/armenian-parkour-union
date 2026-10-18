@@ -1,5 +1,6 @@
 import { defaultLocale, isLocale, localizePath } from '#lib/i18n/locales.ts';
 import { translate } from '#lib/i18n/translate.ts';
+import { cached } from '#lib/server/cache/index.ts';
 import { db } from '#lib/server/db/index.ts';
 import {
 	EVENTS_PAGE_SIZE,
@@ -30,9 +31,9 @@ export const load: PageServerLoad = async ({ params, url }) => {
 	} satisfies Partial<UpcomingQuery>;
 	const page = /^\d{1,6}$/.test(rawPage) && Number(rawPage) >= 1 ? Number(rawPage) : 1;
 	const [{ rows, total }, cities, base] = await Promise.all([
-		listUpcomingEvents(db, { locale, page, ...filters }),
-		listUpcomingCities(db),
-		getSeoBase(db, locale, siteUrl(url))
+		cached(['events'], 'upcomingEvents', listUpcomingEvents, db, { locale, page, ...filters }),
+		cached(['events'], 'upcomingCities', listUpcomingCities, db),
+		cached(['settings'], 'seoBase', getSeoBase, db, locale, siteUrl(url))
 	]);
 	const query = new URLSearchParams(
 		Object.entries({ ...filters, page: page > 1 ? String(page) : undefined }).filter(

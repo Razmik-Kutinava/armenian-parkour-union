@@ -1,5 +1,6 @@
 import { defaultLocale, isLocale, localizePath } from '#lib/i18n/locales.ts';
 import { translate } from '#lib/i18n/translate.ts';
+import { cached } from '#lib/server/cache/index.ts';
 import { db } from '#lib/server/db/index.ts';
 import { NEWS_PAGE_SIZE, listPublishedPosts } from '#lib/server/services/posts/public.ts';
 import { siteUrl, withCover } from '#lib/server/services/posts/view.ts';
@@ -15,8 +16,8 @@ export const load: PageServerLoad = async ({ params, url }) => {
 	const rawPage = url.searchParams.get('page') ?? '';
 	const page = /^\d{1,6}$/.test(rawPage) && Number(rawPage) >= 1 ? Number(rawPage) : 1;
 	const [{ rows, total }, base] = await Promise.all([
-		listPublishedPosts(db, { locale, tag: tag ?? undefined, page }),
-		getSeoBase(db, locale, siteUrl(url))
+		cached(['posts'], 'posts', listPublishedPosts, db, { locale, tag: tag ?? undefined, page }),
+		cached(['settings'], 'seoBase', getSeoBase, db, locale, siteUrl(url))
 	]);
 	const query = new URLSearchParams({
 		...(tag && { tag }),

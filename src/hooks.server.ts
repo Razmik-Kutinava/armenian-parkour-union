@@ -6,6 +6,7 @@ import { auth } from '#lib/server/auth/index.ts';
 import { canonicalHostRedirect } from '#lib/server/auth/canonical-host.ts';
 import { needsProfile, profileGateRedirect } from '#lib/server/auth/profile-gate.ts';
 import { toLocalsUser } from '#lib/server/auth/session.ts';
+import { groupsToInvalidate, publicCache } from '#lib/server/cache/index.ts';
 import { db } from '#lib/server/db/index.ts';
 
 const isAdminPath = (pathname: string) => pathname === '/admin' || pathname.startsWith('/admin/');
@@ -40,7 +41,12 @@ export const handle: Handle = async ({ event, resolve }) => {
 		profileGateRedirect(event.url.pathname, localeFromPath(event.url.pathname));
 	if (gate) redirect(303, gate);
 
-	return resolve(event, {
-		transformPageChunk: ({ html }) => html.replace('%lang%', locale)
-	});
+	/* Reset even if the write failed halfway: a needless reset costs one query. */
+	try {
+		return await resolve(event, {
+			transformPageChunk: ({ html }) => html.replace('%lang%', locale)
+		});
+	} finally {
+		publicCache.invalidate(groupsToInvalidate(event.request.method, event.url.pathname));
+	}
 };

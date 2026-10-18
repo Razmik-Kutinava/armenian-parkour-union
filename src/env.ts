@@ -15,5 +15,6 @@ export const variables = defineEnvVars({
 	R2_ACCESS_KEY_ID: { schema: optional },
 	R2_SECRET_ACCESS_KEY: { schema: optional },
 	R2_BUCKET: { schema: optional },
-	R2_PUBLIC_URL: { schema: optional }
+	R2_PUBLIC_URL: { schema: optional },
+	CACHE_TTL_SECONDS: { schema: optional }
 });

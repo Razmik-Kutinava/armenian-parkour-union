@@ -1,5 +1,6 @@
 import { defaultLocale, isLocale, localizePath } from '#lib/i18n/locales.ts';
 import { translate } from '#lib/i18n/translate.ts';
+import { cached } from '#lib/server/cache/index.ts';
 import { db } from '#lib/server/db/index.ts';
 import { EVENTS_PAGE_SIZE, listArchivedEvents } from '#lib/server/services/events/public.ts';
 import { withEventCover } from '#lib/server/services/events/view.ts';
@@ -14,8 +15,8 @@ export const load: PageServerLoad = async ({ params, url }) => {
 	const rawPage = url.searchParams.get('page') ?? '';
 	const page = /^\d{1,6}$/.test(rawPage) && Number(rawPage) >= 1 ? Number(rawPage) : 1;
 	const [{ rows, total }, base] = await Promise.all([
-		listArchivedEvents(db, { locale, page }),
-		getSeoBase(db, locale, siteUrl(url))
+		cached(['events'], 'archivedEvents', listArchivedEvents, db, { locale, page }),
+		cached(['settings'], 'seoBase', getSeoBase, db, locale, siteUrl(url))
 	]);
 	return {
 		page,
