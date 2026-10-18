@@ -194,6 +194,8 @@ jobs:
       DATABASE_URL: postgres://postgres:postgres@localhost:5432/apu_e2e
       BETTER_AUTH_SECRET: ci-only-not-a-secret
       PUBLIC_SITE_URL: http://localhost:4173
+      GOOGLE_CLIENT_ID: ci-only-google-client
+      GOOGLE_CLIENT_SECRET: ci-only-not-a-secret
     steps:
       - uses: actions/checkout@v7
 
