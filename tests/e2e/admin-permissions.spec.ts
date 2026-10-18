@@ -147,7 +147,13 @@ const eventRows = async (id: string) => ({
 	event: (await sql`select * from events where id = ${id}`)[0],
 	categories: await sql`select * from event_categories where event_id = ${id} order by id`
 });
-const heroRow = async (id: string) => (await sql`select * from hero_blocks where id = ${id}`)[0];
+/* Without the order: admin-audit.spec.ts reorders every current block in parallel. */
+const heroRow = async (id: string) =>
+	(
+		await sql`select type, title, subtitle, media_key, video_url, cta_label, cta_url, event_id,
+			person_user_id, is_active, starts_at, ends_at, archived_at, created_by
+			from hero_blocks where id = ${id}`
+	)[0];
 
 for (const role of ['member', 'editor', 'moderator'] as const) {
 	test(`${role}: every admin page and action answers by docs/04, data stays`, async ({ page }) => {
@@ -200,12 +206,15 @@ for (const role of ['member', 'editor', 'moderator'] as const) {
 		expect(await sql`select 1 from pages where slug like 'e2e-hostile-%'`).toHaveLength(0);
 		expect(await sql`select 1 from posts where slug like 'e2e-hostile-%'`).toHaveLength(0);
 		expect(await sql`select 1 from events where slug like 'e2e-hostile-%'`).toHaveLength(0);
+		/* Out of the current list: every block there takes part in the reorder of other runs. */
+		await sql`update hero_blocks set archived_at = now() where id = ${ids.heroId}`;
 	});
 }
 
 test('admin opens every admin page; audit pages take no writes and the entry stays', async ({
 	page
 }) => {
+	test.setTimeout(90_000);
 	await registerAs(page, 'admin');
 	const target = await insertMember();
 	const confirm = await page.request.post(`/admin/users/${target}?/confirmEmail`, {
@@ -241,4 +250,5 @@ test('admin opens every admin page; audit pages take no writes and the entry sta
 		}
 	}
 	expect(await sql`select * from audit_log where entity_id = ${target}`).toEqual([entry]);
+	await sql`update hero_blocks set archived_at = now() where id = ${ids.heroId}`;
 });

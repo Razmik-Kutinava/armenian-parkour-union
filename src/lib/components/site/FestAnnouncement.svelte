@@ -29,7 +29,7 @@
 	<div class="mx-auto flex max-w-6xl flex-col gap-5 px-6 py-20 md:py-28">
 		<LanguageSwitcher surface="dark" />
 		<p class="text-sm font-bold tracking-widest text-accent-500 uppercase">{t('fest.kicker')}</p>
-		<h1 class="md:text-6xl max-w-xl text-4xl font-bold">{t('fest.title')}</h1>
+		<h2 class="md:text-6xl max-w-xl text-4xl font-bold">{t('fest.title')}</h2>
 		<p class="text-xl md:text-2xl">{t('fest.subtitle')}</p>
 		<p class="text-2xl font-bold text-accent-500 md:text-3xl">{t('fest.dates')}</p>
 		<p class="text-sm text-navy-300">{t('fest.datesNote')}</p>

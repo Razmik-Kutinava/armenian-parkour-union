@@ -27,7 +27,19 @@ export default defineConfig({
 					// Database tests go to the remote Neon dev database; 5 s is too tight in parallel.
 					testTimeout: 20_000,
 					include: ['src/**/*.{test,spec}.{js,ts}'],
-					exclude: ['src/**/*.svelte.{test,spec}.{js,ts}']
+					exclude: ['src/**/*.svelte.{test,spec}.{js,ts}', 'src/lib/server/services/hero/**']
+				}
+			},
+			{
+				extends: './vite.config.ts',
+				test: {
+					// Hero tests empty the shared table and hold the active-limit lock: files in parallel
+					// only queue on each other's transactions until the timeout.
+					name: 'server-hero',
+					environment: 'node',
+					testTimeout: 20_000,
+					fileParallelism: false,
+					include: ['src/lib/server/services/hero/**/*.{test,spec}.{js,ts}']
 				}
 			}
 		]

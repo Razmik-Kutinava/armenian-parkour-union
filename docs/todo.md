@@ -71,7 +71,8 @@
 - [x] SPEC
 - [x] Migration Gate «go» (2026-10-17), 0006 на dev
 - [x] RED — unit: 9 файлов без модулей + coverage-карты + seed; e2e: 6 новых сценариев падают, 3 старых (анонс) зелёные
-- [ ] GREEN · REGRESS · REVIEW · DEPLOY
+- [x] GREEN — check, lint, unit 473/473, e2e полный 79/79 (2026-10-18)
+- [ ] REGRESS · REVIEW · DEPLOY
 
 ## Решение владельца (2026-10-17, после RED)
 

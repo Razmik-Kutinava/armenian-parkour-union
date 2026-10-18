@@ -7,8 +7,8 @@
 	import { eventDates } from './event-date';
 
 	/* docs/06 section 4.2: cover, title, date and time, city, price or "Free", places indicator. */
-	type Props = { event: EventCardView; eager?: boolean; showWindow?: boolean };
-	let { event, eager = false, showWindow = true }: Props = $props();
+	type Props = { event: EventCardView; eager?: boolean; showWindow?: boolean; level?: 2 | 3 };
+	let { event, eager = false, showWindow = true, level = 2 }: Props = $props();
 </script>
 
 <article class="flex flex-col overflow-hidden rounded-lg border border-line bg-surface">
@@ -28,11 +28,11 @@
 		<time class="text-sm text-ink-500" datetime={event.startsAt.toISOString()}
 			>{eventDates(event.startsAt, event.endsAt, currentLocale())}</time
 		>
-		<h2 class="text-lg font-bold text-ink-900">
+		<svelte:element this={`h${level}`} class="text-lg font-bold text-ink-900">
 			<a class="hover:underline" href={localizePath(`/events/${event.slug}`, currentLocale())}
 				>{event.title}</a
 			>
-		</h2>
+		</svelte:element>
 		<p class="mt-auto flex flex-wrap justify-between gap-2 pt-2 text-sm">
 			<span class="text-ink-700">
 				{#if event.city}{event.city} ·

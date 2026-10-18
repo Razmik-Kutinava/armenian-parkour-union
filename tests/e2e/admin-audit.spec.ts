@@ -72,7 +72,8 @@ test('every admin action leaves an audit entry with author and IP', async ({ pag
 		values (${`e2e-audit-${crypto.randomUUID().slice(0, 8)}`}, ${sql.json({ en: 'Started' })},
 			'published', now() - interval '2 days', now() - interval '1 day', now() - interval '20 hours')
 		returning id`;
-	const heroForm = { type: 'custom', 'title.en': `E2e hero audit ${crypto.randomUUID()}` };
+	/* Not "E2e hero …": hero.spec.ts archives those in parallel. */
+	const heroForm = { type: 'custom', 'title.en': `E2e audit hero ${crypto.randomUUID()}` };
 	/* The duplicate has the same title: always the first one. */
 	const heroId = async () =>
 		(

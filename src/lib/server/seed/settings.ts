@@ -13,6 +13,8 @@ export const SEED_SETTINGS = {
 	footer: {},
 	requisites: {},
 	feature_flags: {},
+	/** docs/03 section 11: active hero blocks at most (decisions.md 2026-10-08, 2.6). */
+	hero_max_active: 5,
 	membership_fee: { amount_minor: 0, currency: 'AMD', period_months: 12 }
 };
 

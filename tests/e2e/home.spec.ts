@@ -8,7 +8,10 @@ test.afterAll(() => sql.end());
 
 test('home page announces the festival as planned', async ({ page }) => {
 	await page.goto('/');
-	await expect(page.getByRole('heading', { level: 1 })).toHaveText('Yerevan Parkour Fest 2027');
+	/* Under the hero (decisions.md 2026-10-17): the page heading is the hero's. */
+	await expect(
+		page.getByRole('heading', { level: 2, name: 'Yerevan Parkour Fest 2027' })
+	).toBeVisible();
 	await expect(page.getByText('Yerevan · 14–17 June 2027')).toBeVisible();
 	await expect(page.getByText('Planned dates')).toBeVisible();
 	await expect(page.getByAltText('Yerevan Parkour Fest 2027 poster')).toHaveAttribute(
@@ -20,10 +23,15 @@ test('home page announces the festival as planned', async ({ page }) => {
 
 test('parkour video loads the player only on click', async ({ page }) => {
 	await page.goto('/');
-	await expect(page.getByRole('heading', { name: 'What is parkour' })).toBeVisible();
-	await expect(page.locator('iframe')).toHaveCount(0);
-	await page.getByRole('button', { name: 'Play video' }).click();
-	await expect(page.locator('iframe')).toHaveAttribute(
+	/* A hero video block (hero.spec.ts) has the same button: only this section. */
+	const video = page
+		.locator('section')
+		.filter({ has: page.getByRole('heading', { name: 'What is parkour' }) })
+		.last();
+	await expect(video.getByRole('heading', { name: 'What is parkour' })).toBeVisible();
+	await expect(video.locator('iframe')).toHaveCount(0);
+	await video.getByRole('button', { name: 'Play video' }).click();
+	await expect(video.locator('iframe')).toHaveAttribute(
 		'src',
 		/^https:\/\/www\.youtube-nocookie\.com\/embed\/kMpYHcuipuY/
 	);
@@ -44,6 +52,8 @@ test('home page sections in the order of docs/06 section 4.1', async ({ page }) 
 	const tag = crypto.randomUUID().slice(0, 8);
 	const eventSlug = `e2e-home-${tag}`;
 	const postSlug = `e2e-home-${tag}`;
+	/* Events of earlier runs are still on and would take the three places. */
+	await sql`update events set deleted_at = now() where slug like 'e2e-home-%' and deleted_at is null`;
 	await sql`insert into events (slug, title, status, published_at, starts_at, ends_at)
 		values (${eventSlug}, ${sql.json({ en: `E2e home event ${tag}` })}, 'published',
 			now() - interval '1 day', now() + interval '2 hours', now() + interval '5 hours')`;
@@ -68,7 +78,7 @@ test('home page sections in the order of docs/06 section 4.1', async ({ page }) 
 		'href',
 		'/register'
 	);
-	await expect(main.getByRole('link', { name: 'Sign in' })).toHaveAttribute('href', '/login');
+	await expect(main.getByRole('link', { name: 'Log in' })).toHaveAttribute('href', '/login');
 
 	const order = ['Upcoming events', 'About the federation', 'News', 'How it works', 'Join us'];
 	const expected =

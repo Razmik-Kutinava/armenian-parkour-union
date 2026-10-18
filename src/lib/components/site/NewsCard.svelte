@@ -5,7 +5,11 @@
 	import { newsDate } from './news-date';
 
 	/* docs/06 section 4.4: cover, title, short text, date, tags. */
-	let { post, eager = false }: { post: CardView; eager?: boolean } = $props();
+	let {
+		post,
+		eager = false,
+		level = 2
+	}: { post: CardView; eager?: boolean; level?: 2 | 3 } = $props();
 	const href = (path: string) => localizePath(path, currentLocale());
 </script>
 
@@ -28,9 +32,9 @@
 				>{newsDate(post.publishedAt, currentLocale())}</time
 			>
 		{/if}
-		<h2 class="text-lg font-bold text-ink-900">
+		<svelte:element this={`h${level}`} class="text-lg font-bold text-ink-900">
 			<a class="hover:underline" href={href(`/news/${post.slug}`)}>{post.title}</a>
-		</h2>
+		</svelte:element>
 		{#if post.excerpt}<p class="text-ink-700">{post.excerpt}</p>{/if}
 		{#if post.tags.length}
 			<ul class="mt-auto flex flex-wrap gap-2 pt-2" aria-label={t('news.tags')}>

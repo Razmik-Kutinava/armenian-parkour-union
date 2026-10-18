@@ -18,7 +18,10 @@ test('Armenian and Russian are served under /hy and /ru', async ({ page }) => {
 
 test('missing translation falls back to English', async ({ page }) => {
 	await page.goto('/hy');
-	await expect(page.getByRole('heading', { level: 1 })).toHaveText('Yerevan Parkour Fest 2027');
+	/* The festival section is under the hero; its title has no Armenian text. */
+	await expect(
+		page.getByRole('heading', { level: 2, name: 'Yerevan Parkour Fest 2027' })
+	).toBeVisible();
 });
 
 test('/en duplicates redirect to the unprefixed page', async ({ request }) => {

@@ -91,7 +91,7 @@ test('blocked user loses access at once, sessions are gone', async ({ page, brow
 	const sessions = await sql`select 1 from session where user_id = ${member.id}`;
 	expect(sessions).toHaveLength(0);
 	await member.page.goto('/');
-	await expect(member.page.getByRole('link', { name: 'Log in' })).toBeVisible();
+	await expect(member.page.getByRole('banner').getByRole('link', { name: 'Log in' })).toBeVisible();
 });
 
 test('admin cannot change their own role or block themselves', async ({ page }) => {

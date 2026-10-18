@@ -1,11 +1,11 @@
-import { existsSync } from 'node:fs';
+﻿import { existsSync } from 'node:fs';
 import { expect, test, type Page } from '@playwright/test';
 import postgres from 'postgres';
 
 if (!process.env.DATABASE_URL && existsSync('.env')) process.loadEnvFile('.env');
 const sql = postgres(process.env.DATABASE_URL ?? '', { max: 1, onnotice: () => {} });
 
-/* Blocks of this file are titled "E2e hero …"; switched off and archived so the limit stays free. */
+/* Blocks of this file are titled "E2e hero вЂ¦"; switched off and archived so the limit stays free. */
 const cleanUp = () =>
 	sql`update hero_blocks set is_active = false, archived_at = coalesce(archived_at, now())
 		where title->>'en' like 'E2e hero%'`;
@@ -29,7 +29,8 @@ async function registerAs(page: Page, role: 'editor' | 'member') {
 	await page.getByLabel('Date of birth').fill('1990-01-01');
 	await page.getByLabel(/privacy policy/).check();
 	await page.getByRole('button', { name: 'Create account' }).click();
-	await expect(page).toHaveURL('/');
+	/* The first sign-up of a run wakes the server and the database. */
+	await expect(page).toHaveURL('/', { timeout: 15_000 });
 	await sql`update users set role = ${role} where email = ${email}`;
 }
 
@@ -53,7 +54,7 @@ test('editor creates a block, previews it, the guest sees it; off and archived i
 	await page.getByRole('link', { name: 'New block' }).click();
 	await expect(page).toHaveURL('/admin/hero/new');
 	await page.getByLabel('Type').selectOption('presentation');
-	await page.getByLabel('Title (English)').fill(heading);
+	await page.getByLabel('Title (English)', { exact: true }).fill(heading);
 	await page.getByLabel('Subtitle (English)').fill('Parkour for everyone');
 	await page.getByLabel('Button text (English)').fill('Train with us');
 	await page.getByLabel('Button link').fill('/events');
@@ -104,13 +105,13 @@ test('editor creates a block, previews it, the guest sees it; off and archived i
 	await page.getByRole('button', { name: 'Duplicate' }).click();
 	await expect(page).toHaveURL(/\/admin\/hero\/[0-9a-f-]{36}$/);
 	expect(page.url()).not.toContain(row.id);
-	await expect(page.getByLabel('Title (English)')).toHaveValue(heading);
+	await expect(page.getByLabel('Title (English)', { exact: true })).toHaveValue(heading);
 
 	await page.goto(`/admin/hero/${row.id}`);
 	await page.getByRole('button', { name: 'Archive' }).click();
 	await expect(page.getByRole('button', { name: 'Restore' })).toBeVisible();
 	expect((await rowByTitle(heading)).archived_at).not.toBeNull();
-	/* The current list keeps only the copy (same title), the archive — the original. */
+	/* The current list keeps only the copy (same title), the archive вЂ” the original. */
 	await page.goto('/admin/hero');
 	await expect(page.getByRole('listitem').filter({ hasText: heading })).toHaveCount(1);
 	await expect(
@@ -132,16 +133,18 @@ test('order: "Move up" puts the block before the previous one', async ({ page })
 	const [a, b] = [title('order-a'), title('order-b')];
 	await sql`insert into hero_blocks (type, title, sort_order)
 		values ('custom', ${sql.json({ en: a })}, 100000), ('custom', ${sql.json({ en: b })}, 100001)`;
-	await page.goto('/admin/hero');
-	await page
-		.getByRole('listitem')
-		.filter({ hasText: b })
-		.getByRole('button', { name: 'Move up' })
-		.click();
+	/* Other files add and archive blocks meanwhile: a stale list is refused, so reload and retry. */
 	await expect(async () => {
+		await page.goto('/admin/hero');
+		await page
+			.getByRole('listitem')
+			.filter({ hasText: b })
+			.getByRole('button', { name: 'Move up' })
+			.click();
+		await page.waitForLoadState();
 		const [rowA, rowB] = [await rowByTitle(a), await rowByTitle(b)];
 		expect(rowB.sort_order).toBeLessThan(rowA.sort_order);
-	}).toPass({ timeout: 10_000 });
+	}).toPass({ timeout: 30_000 });
 	const items = page.getByRole('listitem').filter({ hasText: /E2e hero order-/ });
 	await expect(items.first()).toContainText(b);
 });
@@ -163,7 +166,7 @@ test('event block shows the event and links to it; video block plays only on cli
 	const eventHeading = title('event');
 	await page.goto('/admin/hero/new');
 	await page.getByLabel('Type').selectOption('event');
-	await page.getByLabel('Title (English)').fill(eventHeading);
+	await page.getByLabel('Title (English)', { exact: true }).fill(eventHeading);
 	await page.getByLabel('Event', { exact: true }).selectOption(event.id);
 	await page.getByLabel('Active').check();
 	await page.getByRole('button', { name: 'Save' }).click();
@@ -182,7 +185,7 @@ test('event block shows the event and links to it; video block plays only on cli
 	const videoHeading = title('video');
 	await page.goto('/admin/hero/new');
 	await page.getByLabel('Type').selectOption('video');
-	await page.getByLabel('Title (English)').fill(videoHeading);
+	await page.getByLabel('Title (English)', { exact: true }).fill(videoHeading);
 	await page.getByLabel('Video link').fill('https://www.youtube.com/watch?v=kMpYHcuipuY');
 	await page.getByLabel('Active').check();
 	await page.getByRole('button', { name: 'Save' }).click();
@@ -203,7 +206,7 @@ test('a video link of another site is refused at the field', async ({ page }) =>
 	await registerAs(page, 'editor');
 	await page.goto('/admin/hero/new');
 	await page.getByLabel('Type').selectOption('video');
-	await page.getByLabel('Title (English)').fill(title('bad-video'));
+	await page.getByLabel('Title (English)', { exact: true }).fill(title('bad-video'));
 	await page.getByLabel('Video link').fill('https://vimeo.com/123');
 	await page.getByRole('button', { name: 'Save' }).click();
 	await expect(page).toHaveURL('/admin/hero/new');

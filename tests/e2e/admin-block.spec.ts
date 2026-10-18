@@ -67,7 +67,7 @@ test('admin blocked by another admin loses the panel and its actions on the next
 	});
 	expect((await sql`select role from users where id = ${member.id}`)[0].role).toBe(member.role);
 	await victim.goto('/');
-	await expect(victim.getByRole('link', { name: 'Log in' })).toBeVisible();
+	await expect(victim.getByRole('banner').getByRole('link', { name: 'Log in' })).toBeVisible();
 });
 
 test('status "blocked" set while the session row still exists: staff is a guest at once', async ({
