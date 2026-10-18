@@ -5,6 +5,7 @@ import { CURRENCIES, priceToMinor } from '#lib/money.ts';
 import { disciplines, eventFormStatuses } from './event-enums';
 import { slugSchema } from './pages';
 import { coverKeySchema, yerevanDateTime, type PostText } from './posts';
+import { requireEnIfAny } from './localized';
 import { localizedText } from './site-settings';
 
 /* Admin form "Events" (docs/05 section 5; rules — decisions.md 2026-10-08, 2.5 defaults 1–12). */
@@ -53,7 +54,8 @@ export const eventFormSchema = (mediaBaseUrl: string | null) => {
 					const kept: PostText = {};
 					for (const lang of ['en', 'hy', 'ru'] as const) if (d[lang]) kept[lang] = d[lang];
 					return kept;
-				}),
+				})
+				.superRefine(requireEnIfAny),
 			coverKey: optional(coverKeySchema),
 			startsAt: date('events.error.date'),
 			endsAt: date('events.error.date'),

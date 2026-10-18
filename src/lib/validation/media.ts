@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { requireEnIfAny } from './localized';
 
 /* docs/05 section 20; types and size — decisions.md 2026-10-07. No SVG: it may carry a script. */
 
@@ -72,11 +73,14 @@ const altText = z
 	.optional()
 	.transform((s) => s || undefined);
 
-/** Alt per language, all optional (decorative images keep it empty, docs/08); all blank → null. */
-export const altSchema = z.object({ en: altText, hy: altText, ru: altText }).transform((alt) => {
-	const filled = Object.fromEntries(Object.entries(alt).filter(([, v]) => v));
-	return Object.keys(filled).length > 0
-		? (filled as Partial<Record<'en' | 'hy' | 'ru', string>>)
-		: null;
-});
+/** Alt per language, optional (decorative images keep it empty, docs/08); all blank → null. */
+export const altSchema = z
+	.object({ en: altText, hy: altText, ru: altText })
+	.transform((alt) => {
+		const filled = Object.fromEntries(Object.entries(alt).filter(([, v]) => v));
+		return Object.keys(filled).length > 0
+			? (filled as Partial<Record<'en' | 'hy' | 'ru', string>>)
+			: null;
+	})
+	.superRefine(requireEnIfAny);
 export type AltText = z.output<typeof altSchema>;

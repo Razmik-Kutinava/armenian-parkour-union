@@ -36,8 +36,8 @@ describe('posts: admin form (docs/05 section 18)', () => {
 	});
 
 	it('excerpt is plain text up to 300 characters in any language', () => {
-		const ok = schema.parse({ ...valid, excerpt: { hy: 'Կարճ', ru: 'Коротко' } });
-		expect(ok.excerpt).toEqual({ hy: 'Կարճ', ru: 'Коротко' });
+		const ok = schema.parse({ ...valid, excerpt: { en: 'Short', hy: 'Կարճ', ru: 'Коротко' } });
+		expect(ok.excerpt).toEqual({ en: 'Short', hy: 'Կարճ', ru: 'Коротко' });
 		const long = schema.safeParse({ ...valid, excerpt: { en: 'x'.repeat(301) } });
 		expect(long.error?.issues[0].path).toEqual(['excerpt', 'en']);
 	});

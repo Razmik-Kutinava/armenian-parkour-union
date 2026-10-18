@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { richTextSchema } from '#lib/server/rich-text/schema.ts';
+import { requireEnIfAny } from './localized';
 import { localizedText } from './site-settings';
 
 /* Admin form "Pages" (docs/05 section 19; decisions.md 2026-10-08). */
@@ -38,7 +39,8 @@ export const pageFormSchema = (mediaBaseUrl: string | null) => {
 				const kept: PageBody = {};
 				for (const lang of ['en', 'hy', 'ru'] as const) if (body[lang]) kept[lang] = body[lang];
 				return kept;
-			}),
+			})
+			.superRefine(requireEnIfAny),
 		status: z.enum(pageStatuses, { error: 'pages.error.status' })
 	});
 };

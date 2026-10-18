@@ -2,6 +2,7 @@ import { z } from 'zod';
 import type { MessageKey } from '#lib/i18n/translate.ts';
 import { richTextSchema } from '#lib/server/rich-text/schema.ts';
 import { pageStatuses, slugSchema, type PageBody } from './pages';
+import { requireEnIfAny } from './localized';
 import { localizedText } from './site-settings';
 
 /* Admin form "News" (docs/05 section 18; rules — docs/todo.md 2.4, accepted 2026-10-08). */
@@ -72,11 +73,13 @@ export const postFormSchema = (mediaBaseUrl: string | null) => {
 		excerpt: z
 			.object({ en: excerptText, hy: excerptText, ru: excerptText })
 			.default({})
-			.transform(keepFilled),
+			.transform(keepFilled)
+			.superRefine(requireEnIfAny),
 		body: z
 			.object({ en: rich, hy: rich, ru: rich })
 			.default({})
-			.transform((body): PageBody => keepFilled(body)),
+			.transform((body): PageBody => keepFilled(body))
+			.superRefine(requireEnIfAny),
 		coverKey: coverKeySchema.nullish().transform((v) => v ?? null),
 		tags: tagsSchema.default([]),
 		status: z.enum(postStatuses, { error: 'pages.error.status' }),

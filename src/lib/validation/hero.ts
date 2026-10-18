@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { parseVideoUrl } from '#lib/components/site/hero/youtube.ts';
 import { heroTypes } from './hero-enums';
 import { coverKeySchema, yerevanDateTime, type PostText } from './posts';
+import { requireEnIfAny } from './localized';
 import { localizedText } from './site-settings';
 
 /* Admin form "Hero blocks" (docs/05 section 4; rules — docs/todo.md 2.6). */
@@ -39,7 +40,7 @@ export const heroFormSchema = z
 	.object({
 		type: z.enum(heroTypes, { error: 'hero.error.type' }),
 		title: localizedText(200),
-		subtitle: localizedOptional(300),
+		subtitle: localizedOptional(300).superRefine(requireEnIfAny),
 		mediaKey: optional(coverKeySchema),
 		videoUrl: optional(z.string().trim().max(500, { error: 'auth.error.tooLong' })),
 		ctaLabel: localizedOptional(60),
