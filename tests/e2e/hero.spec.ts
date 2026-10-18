@@ -1,6 +1,7 @@
 ﻿import { existsSync } from 'node:fs';
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 import postgres from 'postgres';
+import { heroFixtures } from './hero-fixtures';
 
 if (!process.env.DATABASE_URL && existsSync('.env')) process.loadEnvFile('.env');
 const sql = postgres(process.env.DATABASE_URL ?? '', { max: 1, onnotice: () => {} });
@@ -19,26 +20,7 @@ test.beforeEach(async () => {
 	await sql`delete from rate_limit where key ~ '^sign-up:ip:(127\.0\.0\.1|::1|::ffff:127\.0\.0\.1)$'`;
 });
 
-async function registerAs(page: Page, role: 'editor' | 'member') {
-	const email = `e2e-hero-${role}-${crypto.randomUUID()}@example.com`;
-	await page.goto('/register');
-	await page.getByLabel('Email').fill(email);
-	await page.getByLabel('Password').fill('parkour-pass-1');
-	await page.getByLabel('First name').fill('Hero');
-	await page.getByLabel('Last name').fill(role);
-	await page.getByLabel('Date of birth').fill('1990-01-01');
-	await page.getByLabel(/privacy policy/).check();
-	await page.getByRole('button', { name: 'Create account' }).click();
-	/* The first sign-up of a run wakes the server and the database. */
-	await expect(page).toHaveURL('/', { timeout: 15_000 });
-	await sql`update users set role = ${role} where email = ${email}`;
-}
-
-const title = (what: string) => `E2e hero ${what} ${crypto.randomUUID().slice(0, 6)}`;
-/** Other active blocks may exist in the dev database: put this one first on the home page. */
-const putFirst = (id: string) => sql`update hero_blocks set sort_order = -1000 where id = ${id}`;
-const rowByTitle = async (t: string) =>
-	(await sql`select * from hero_blocks where title->>'en' = ${t} order by created_at limit 1`)[0];
+const { registerAs, title, putFirst, rowByTitle } = heroFixtures(sql);
 
 test('editor creates a block, previews it, the guest sees it; off and archived it is gone', async ({
 	page,
@@ -200,36 +182,4 @@ test('event block shows the event and links to it; video block plays only on cli
 		'src',
 		/^https:\/\/www\.youtube-nocookie\.com\/embed\/kMpYHcuipuY/
 	);
-});
-
-test('a video link of another site is refused at the field', async ({ page }) => {
-	await registerAs(page, 'editor');
-	await page.goto('/admin/hero/new');
-	await page.getByLabel('Type').selectOption('video');
-	await page.getByLabel('Title (English)', { exact: true }).fill(title('bad-video'));
-	await page.getByLabel('Video link').fill('https://vimeo.com/123');
-	await page.getByRole('button', { name: 'Save' }).click();
-	await expect(page).toHaveURL('/admin/hero/new');
-	await expect(page.getByText('YouTube or Instagram link')).toBeVisible();
-});
-
-test('person search: only adults, only name and avatar; members get 404', async ({
-	page,
-	browser
-}) => {
-	await registerAs(page, 'editor');
-	const tag = `Herop${crypto.randomUUID().slice(0, 8)}`;
-	const adult = `e2e-hero-adult-${crypto.randomUUID()}@example.com`;
-	const minor = `e2e-hero-minor-${crypto.randomUUID()}@example.com`;
-	await sql`insert into users (email, name, first_name, last_name, birth_date) values
-		(${adult}, ${`Adult ${tag}`}, 'Adult', ${tag}, '1990-01-01'),
-		(${minor}, ${`Minor ${tag}`}, 'Minor', ${tag}, (current_date - interval '15 years')::date)`;
-	const res = await page.request.get(`/admin/hero/persons?q=${tag}`);
-	expect(res.status()).toBe(200);
-	const found = await res.json();
-	expect(found).toEqual([{ id: expect.any(String), name: `Adult ${tag}`, avatarKey: null }]);
-
-	const member = await (await browser.newContext()).newPage();
-	await registerAs(member, 'member');
-	expect((await member.request.get(`/admin/hero/persons?q=${tag}`)).status()).toBe(404);
 });

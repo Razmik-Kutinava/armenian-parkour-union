@@ -1,8 +1,14 @@
 import { existsSync } from 'node:fs';
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 import postgres from 'postgres';
-import { roleCan } from '../../src/lib/server/auth/permissions';
-import { ADMIN_READS, ADMIN_WRITES, type Access } from './admin-access-map';
+import { ADMIN_READS, ADMIN_WRITES } from './admin-access-map';
+import {
+	expectedStatus,
+	HOSTILE_FORM,
+	ORIGIN,
+	permissionFixtures,
+	toPath
+} from './admin-permissions-fixtures';
 
 if (!process.env.DATABASE_URL && existsSync('.env')) process.loadEnvFile('.env');
 const sql = postgres(process.env.DATABASE_URL ?? '', { max: 1, onnotice: () => {} });
@@ -12,148 +18,21 @@ test.beforeEach(async () => {
 	await sql`delete from rate_limit where key ~ '^sign-up:ip:(127\.0\.0\.1|::1|::ffff:127\.0\.0\.1)$'`;
 });
 
-type Role = 'member' | 'editor' | 'moderator' | 'admin';
-const ORIGIN = { origin: 'http://localhost:4173' };
-/* Every field any admin form reads: if a guard were missing, the action would really run. */
-const HOSTILE_FORM = (userId: string, heroId: string) => ({
-	userId,
-	id: heroId,
-	order: heroId,
-	type: 'custom',
-	isActive: 'on',
-	active: 'true',
-	role: 'admin',
-	comment: 'hostile',
-	email: `e2e-hostile-${crypto.randomUUID()}@example.com`,
-	firstName: 'Hacked',
-	lastName: 'Hacked',
-	birthDate: '1990-01-01',
-	locale: 'hy',
-	'alt.en': 'Hacked',
-	key: `media/2026/10/${crypto.randomUUID()}.png`,
-	name: 'hacked.png',
-	mime: 'image/png',
-	size: '10',
-	slug: `e2e-hostile-${crypto.randomUUID().slice(0, 8)}`,
-	'title.en': 'Hacked',
-	'body.en': '<p>Hacked</p>',
-	status: 'published',
-	action: 'publish',
-	startsAt: '2099-01-01T10:00',
-	endsAt: '2099-01-01T12:00',
-	price: '0',
-	priceCurrency: 'AMD',
-	'name.en': 'Hacked',
-	discipline: 'speed'
-});
-
-async function registerAs(page: Page, role: Role) {
-	const email = `e2e-perm-${role}-${crypto.randomUUID()}@example.com`;
-	await page.goto('/register');
-	await page.getByLabel('Email').fill(email);
-	await page.getByLabel('Password').fill('parkour-pass-1');
-	await page.getByLabel('First name').fill('Perm');
-	await page.getByLabel('Last name').fill(role);
-	await page.getByLabel('Date of birth').fill('1990-01-01');
-	await page.getByLabel(/privacy policy/).check();
-	await page.getByRole('button', { name: 'Create account' }).click();
-	await expect(page).toHaveURL('/');
-	await sql`update users set role = ${role} where email = ${email}`;
-}
-
-async function insertMember() {
-	const email = `e2e-perm-target-${crypto.randomUUID()}@example.com`;
-	const [row] = await sql`
-		insert into users (email, name, first_name, last_name, birth_date)
-		values (${email}, 'Perm Target', 'Perm', 'Target', '1990-01-01') returning id`;
-	return row.id as string;
-}
-
-async function insertMedia(uploadedBy: string) {
-	const [row] = await sql`
-		insert into media (key, original_name, mime, size_bytes, uploaded_by)
-		values (${`media/2026/10/${crypto.randomUUID()}.png`}, 'perm.png', 'image/png', 10, ${uploadedBy})
-		returning id`;
-	return row.id as string;
-}
-
-async function insertPage() {
-	const [row] = await sql`
-		insert into pages (slug, title, status)
-		values (${`e2e-perm-${crypto.randomUUID().slice(0, 8)}`}, ${sql.json({ en: 'Perm' })}, 'draft')
-		returning id`;
-	return row.id as string;
-}
-
-async function insertPost() {
-	const [row] = await sql`
-		insert into posts (slug, title, status)
-		values (${`e2e-perm-${crypto.randomUUID().slice(0, 8)}`}, ${sql.json({ en: 'Perm' })}, 'draft')
-		returning id`;
-	return row.id as string;
-}
-
-/* Published and started: every status action (publish aside) could really run on it. */
-async function insertEvent() {
-	const [row] = await sql`
-		insert into events (slug, title, status, published_at, starts_at, ends_at)
-		values (${`e2e-perm-${crypto.randomUUID().slice(0, 8)}`}, ${sql.json({ en: 'Perm' })},
-			'published', now() - interval '2 days', now() - interval '1 day', now() - interval '20 hours')
-		returning id`;
-	await sql`insert into event_categories (event_id, name) values (${row.id}, ${sql.json({ en: 'Perm' })})`;
-	return row.id as string;
-}
-
-async function insertHero() {
-	const [row] = await sql`
-		insert into hero_blocks (type, title) values ('custom', ${sql.json({ en: 'E2e perm hero' })})
-		returning id`;
-	return row.id as string;
-}
-
-/* docs/04 section 5.4: member → 404 for all of /admin, staff without the permission → 403. */
-const expectedStatus = (role: Role, access: Access) =>
-	role === 'member' ? 404 : access === 'staff' || roleCan(role, access) ? 200 : 403;
-
-type Ids = {
-	userId: string;
-	auditId: string;
-	mediaId: string;
-	pageId: string;
-	postId: string;
-	eventId: string;
-	heroId: string;
-};
-const toPath = (key: string, ids: Ids) =>
-	key
-		.replace(/^(GET|POST) /, '')
-		.replace('/users/[id]', `/users/${ids.userId}`)
-		.replace('/audit/[id]', `/audit/${ids.auditId}`)
-		.replace('/media/[id]', `/media/${ids.mediaId}`)
-		.replace('/pages/[id]', `/pages/${ids.pageId}`)
-		.replace('/news/[id]', `/news/${ids.postId}`)
-		.replace('/events/[id]', `/events/${ids.eventId}`)
-		.replace('/hero/[id]', `/hero/${ids.heroId}`)
-		.replace('?/default', '');
-
-const targetRow = async (id: string) =>
-	(await sql`select role, status, email_verified, first_name from users where id = ${id}`)[0];
-const mediaRow = async (id: string) =>
-	(await sql`select alt, deleted_at from media where id = ${id}`)[0];
-const pageRow = async (id: string) =>
-	(await sql`select slug, title, body, status, deleted_at from pages where id = ${id}`)[0];
-const postRow = async (id: string) => (await sql`select * from posts where id = ${id}`)[0];
-const eventRows = async (id: string) => ({
-	event: (await sql`select * from events where id = ${id}`)[0],
-	categories: await sql`select * from event_categories where event_id = ${id} order by id`
-});
-/* Without the order: admin-audit.spec.ts reorders every current block in parallel. */
-const heroRow = async (id: string) =>
-	(
-		await sql`select type, title, subtitle, media_key, video_url, cta_label, cta_url, event_id,
-			person_user_id, is_active, starts_at, ends_at, archived_at, created_by
-			from hero_blocks where id = ${id}`
-	)[0];
+const {
+	registerAs,
+	insertMember,
+	insertMedia,
+	insertPage,
+	insertPost,
+	insertEvent,
+	insertHero,
+	targetRow,
+	mediaRow,
+	pageRow,
+	postRow,
+	eventRows,
+	heroRow
+} = permissionFixtures(sql);
 
 for (const role of ['member', 'editor', 'moderator'] as const) {
 	test(`${role}: every admin page and action answers by docs/04, data stays`, async ({ page }) => {
