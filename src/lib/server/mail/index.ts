@@ -1,6 +1,16 @@
-export type Mail = { to: string; subject: string; text: string };
+import { dev } from '$app/env';
+import { MAIL_API_KEY, MAIL_FROM } from '$app/env/private';
+import { createMailer, type Mail } from './resend';
 
-/** The mail provider is deferred (task 0.10): until then every message goes to the server log. */
-export async function sendMail(mail: Mail): Promise<void> {
-	console.info(`[mail] to=${mail.to} subject="${mail.subject}"\n${mail.text}`);
+export type { Mail };
+
+/** Settings are read on each send: the build imports this module without secrets. */
+export function sendMail(mail: Mail): Promise<void> {
+	return createMailer({
+		apiKey: MAIL_API_KEY,
+		from: MAIL_FROM,
+		dev,
+		fetch: globalThis.fetch,
+		log: console
+	})(mail);
 }

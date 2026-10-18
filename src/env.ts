@@ -9,6 +9,8 @@ export const variables = defineEnvVars({
 	PUBLIC_SITE_URL: { schema: optional },
 	GOOGLE_CLIENT_ID: { schema: optional },
 	GOOGLE_CLIENT_SECRET: { schema: optional },
+	MAIL_API_KEY: { schema: optional },
+	MAIL_FROM: { schema: optional },
 	R2_ACCOUNT_ID: { schema: optional },
 	R2_ACCESS_KEY_ID: { schema: optional },
 	R2_SECRET_ACCESS_KEY: { schema: optional },

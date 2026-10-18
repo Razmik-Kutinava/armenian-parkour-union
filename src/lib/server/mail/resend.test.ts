@@ -1,7 +1,11 @@
 import { describe, expect, it, vi } from 'vitest';
 import { createMailer } from './resend';
 
-const mail = { to: 'a@example.com', subject: 'Confirm', text: 'Open https://x/verify?token=SECRET' };
+const mail = {
+	to: 'a@example.com',
+	subject: 'Confirm',
+	text: 'Open https://x/verify?token=SECRET'
+};
 
 function setup(options: { apiKey?: string; from?: string; dev?: boolean; status?: number }) {
 	const fetch = vi.fn(async () => new Response('{}', { status: options.status ?? 200 }));
