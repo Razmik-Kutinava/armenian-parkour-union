@@ -7,6 +7,8 @@ export const variables = defineEnvVars({
 	DATABASE_URL: { schema: optional },
 	BETTER_AUTH_SECRET: { schema: optional },
 	PUBLIC_SITE_URL: { schema: optional },
+	GOOGLE_CLIENT_ID: { schema: optional },
+	GOOGLE_CLIENT_SECRET: { schema: optional },
 	R2_ACCOUNT_ID: { schema: optional },
 	R2_ACCESS_KEY_ID: { schema: optional },
 	R2_SECRET_ACCESS_KEY: { schema: optional },

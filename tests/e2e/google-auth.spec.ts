@@ -72,7 +72,9 @@ test('new Google user must complete the profile before using the site', async ({
 
 	for (const path of ['/', '/events', '/ru/news', '/admin']) {
 		await page.goto(path);
-		await expect(page).toHaveURL(path.startsWith('/ru') ? '/ru/complete-profile' : '/complete-profile');
+		await expect(page).toHaveURL(
+			path.startsWith('/ru') ? '/ru/complete-profile' : '/complete-profile'
+		);
 	}
 	await page.goto('/logout');
 	await expect(page.getByRole('button', { name: 'Log out' })).toBeVisible();

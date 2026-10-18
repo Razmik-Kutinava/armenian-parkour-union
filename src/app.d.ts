@@ -10,6 +10,8 @@ declare global {
 			locale: Locale;
 			/** null for guests and for blocked or deleted users (hooks.server.ts). */
 			user: LocalsUser | null;
+			/** Signed in through Google, consent not given yet: only /complete-profile opens. */
+			needsProfile: boolean;
 		}
 		interface PageData {
 			/** Overrides the URL locale where the address has no prefix (admin: profile language). */

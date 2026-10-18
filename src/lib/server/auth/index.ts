@@ -3,7 +3,12 @@ import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { APIError } from 'better-auth/api';
 import { sveltekitCookies } from 'better-auth/svelte-kit';
 import { eq } from 'drizzle-orm';
-import { BETTER_AUTH_SECRET, PUBLIC_SITE_URL } from '$app/env/private';
+import {
+	BETTER_AUTH_SECRET,
+	GOOGLE_CLIENT_ID,
+	GOOGLE_CLIENT_SECRET,
+	PUBLIC_SITE_URL
+} from '$app/env/private';
 import { getRequestEvent } from '$app/server';
 import { localizePath } from '#lib/i18n/locales.ts';
 import { translate, type MessageKey } from '#lib/i18n/translate.ts';
@@ -33,14 +38,38 @@ const optionalText = { type: 'string', required: false, input: true } as const;
 /** Returned with the session user for hooks.server.ts; never accepted from sign-up input. */
 const readOnly = { required: false, input: false } as const;
 
+/* Google is on only with both keys; its profile photo is not stored (docs/02 section 1). */
+const google =
+	GOOGLE_CLIENT_ID && GOOGLE_CLIENT_SECRET
+		? {
+				google: {
+					clientId: GOOGLE_CLIENT_ID,
+					clientSecret: GOOGLE_CLIENT_SECRET,
+					prompt: 'select_account' as const,
+					mapProfileToUser: (profile: { given_name?: string; family_name?: string }) => ({
+						firstName: profile.given_name,
+						lastName: profile.family_name,
+						image: undefined
+					})
+				}
+			}
+		: undefined;
+
 /*
- * The HTTP handler (/api/auth/*) is not mounted: every call goes through form actions with Zod
- * validation, so parent data and consent cannot be skipped. Attempt limits: ./rate-limit.ts.
+ * Of the HTTP handler (/api/auth/*) only the Google callback is mounted; every other call goes
+ * through form actions with Zod validation, so parent data and consent cannot be skipped. A Google
+ * account without consent is held on /complete-profile (./profile-gate.ts). Attempt limits:
+ * ./rate-limit.ts.
  */
 const createAuth = () =>
 	betterAuth({
 		baseURL: PUBLIC_SITE_URL,
 		secret: BETTER_AUTH_SECRET,
+		socialProviders: google,
+		/* Same email: Google confirms it, so the account is linked — unless the local email is still
+		 * unconfirmed (requireLocalEmailVerified, default): someone may have registered it first. */
+		account: { accountLinking: { enabled: true, trustedProviders: ['google'] } },
+		onAPIError: { errorURL: '/login' },
 		database: drizzleAdapter(db, {
 			provider: 'pg',
 			schema: { user: users, session, account, verification }

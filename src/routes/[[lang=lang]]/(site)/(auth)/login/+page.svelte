@@ -4,6 +4,7 @@
 	import Input from '#lib/components/ui/Input.svelte';
 	import { localizePath, currentLocale, t } from '#lib/i18n/index.svelte.ts';
 	import FormMessage from '../FormMessage.svelte';
+	import GoogleButton from '../GoogleButton.svelte';
 	import { createSubmit } from '../submit.svelte';
 	import type { PageProps } from './$types';
 
@@ -19,6 +20,11 @@
 <svelte:head><title>{t('auth.login.title')} — {t('site.name')}</title></svelte:head>
 
 <h1 class="mb-6 text-2xl font-bold">{t('auth.login.title')}</h1>
+
+{#if data.googleError && !form}
+	<div class="mb-4"><FormMessage tone="error" text={t(data.googleError)} /></div>
+{/if}
+{#if data.google}<GoogleButton returnTo={data.returnTo} />{/if}
 
 <form method="POST" class="flex flex-col gap-4" novalidate use:enhance={sending.submit}>
 	{#if form?.message}<FormMessage tone="error" text={t(form.message)} />{/if}

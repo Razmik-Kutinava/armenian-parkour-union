@@ -1,13 +1,17 @@
 import { fail, redirect } from '@sveltejs/kit';
 import { localizePath } from '#lib/i18n/locales.ts';
 import type { MessageKey } from '#lib/i18n/translate.ts';
+import { googleEnabled } from '#lib/server/auth/google.ts';
 import { register } from '#lib/server/auth/register.ts';
 import { registerSchema } from '#lib/validation/auth.ts';
 import { fieldErrors, keepValues } from '#lib/validation/form.ts';
 import { redirectIfSignedIn } from '../guest';
 import type { Actions, PageServerLoad } from './$types';
 
-export const load: PageServerLoad = ({ locals }) => redirectIfSignedIn(locals);
+export const load: PageServerLoad = ({ locals }) => {
+	redirectIfSignedIn(locals);
+	return { google: googleEnabled() };
+};
 
 const FIELDS = [
 	'email',

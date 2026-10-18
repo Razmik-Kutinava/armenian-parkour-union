@@ -4,7 +4,9 @@ import { getSessionCookie } from 'better-auth/cookies';
 import { defaultLocaleRedirect, localeFromPath } from '#lib/i18n/locales.ts';
 import { auth } from '#lib/server/auth/index.ts';
 import { canonicalHostRedirect } from '#lib/server/auth/canonical-host.ts';
+import { needsProfile, profileGateRedirect } from '#lib/server/auth/profile-gate.ts';
 import { toLocalsUser } from '#lib/server/auth/session.ts';
+import { db } from '#lib/server/db/index.ts';
 
 const isAdminPath = (pathname: string) => pathname === '/admin' || pathname.startsWith('/admin/');
 
@@ -18,9 +20,13 @@ export const handle: Handle = async ({ event, resolve }) => {
 	/* No session cookie — a guest without a database query. Otherwise the session and user status are
 	 * read on every request, so blocking takes effect at once (docs/04 sections 5.2, 8). */
 	event.locals.user = null;
+	event.locals.needsProfile = false;
 	if (getSessionCookie(event.request.headers)) {
 		const session = await auth().api.getSession({ headers: event.request.headers });
 		event.locals.user = toLocalsUser(session?.user);
+		if (session && event.locals.user) {
+			event.locals.needsProfile = await needsProfile(db, session.user);
+		}
 	}
 
 	/* /admin has no language prefix: staff see it in their profile language (decisions, 1.9). */
@@ -28,6 +34,11 @@ export const handle: Handle = async ({ event, resolve }) => {
 	const locale =
 		isAdminPath(event.url.pathname) && user ? user.locale : localeFromPath(event.url.pathname);
 	event.locals.locale = locale;
+
+	const gate =
+		event.locals.needsProfile &&
+		profileGateRedirect(event.url.pathname, localeFromPath(event.url.pathname));
+	if (gate) redirect(303, gate);
 
 	return resolve(event, {
 		transformPageChunk: ({ html }) => html.replace('%lang%', locale)

@@ -6,11 +6,12 @@
 	import { currentLocale, localizePath, t } from '#lib/i18n/index.svelte.ts';
 	import { isMinor } from '#lib/validation/auth.ts';
 	import FormMessage from '../FormMessage.svelte';
+	import GoogleButton from '../GoogleButton.svelte';
 	import { createSubmit } from '../submit.svelte';
 	import GuardianFields from './GuardianFields.svelte';
 	import type { PageProps } from './$types';
 
-	let { form }: PageProps = $props();
+	let { data, form }: PageProps = $props();
 	const sending = createSubmit();
 	let birthDate = $derived(form?.values?.birthDate ?? '');
 	const minor = $derived(isMinor(birthDate, new Date()));
@@ -23,6 +24,8 @@
 <svelte:head><title>{t('auth.register.title')} — {t('site.name')}</title></svelte:head>
 
 <h1 class="mb-6 text-2xl font-bold">{t('auth.register.title')}</h1>
+
+{#if data.google}<GoogleButton />{/if}
 
 <form method="POST" class="flex flex-col gap-4" novalidate use:enhance={sending.submit}>
 	{#if form?.message}<FormMessage tone="error" text={t(form.message)} />{/if}

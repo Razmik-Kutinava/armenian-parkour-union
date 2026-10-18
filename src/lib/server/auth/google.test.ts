@@ -11,6 +11,10 @@ describe('googleErrorMessage (error from the Google callback in /login?error=)',
 		expect(googleErrorMessage('ACCOUNT_BLOCKED')).toBe('auth.error.blocked');
 	});
 
+	it('too many attempts from this address', () => {
+		expect(googleErrorMessage('limited')).toBe('auth.error.limited');
+	});
+
 	it('email taken by an account with an unconfirmed email', () => {
 		expect(googleErrorMessage('account_not_linked')).toBe('auth.google.notLinked');
 	});

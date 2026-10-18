@@ -1,6 +1,7 @@
 import { fail, redirect } from '@sveltejs/kit';
 import { localizePath } from '#lib/i18n/locales.ts';
 import type { MessageKey } from '#lib/i18n/translate.ts';
+import { googleEnabled, googleErrorMessage } from '#lib/server/auth/google.ts';
 import { safeReturnTo } from '#lib/server/auth/return-to.ts';
 import { signIn } from '#lib/server/auth/sign-in.ts';
 import { signInSchema } from '#lib/validation/auth.ts';
@@ -16,7 +17,11 @@ const failures: Record<string, { status: number; message: MessageKey }> = {
 
 export const load: PageServerLoad = ({ url, locals }) => {
 	redirectIfSignedIn(locals);
-	return { returnTo: safeReturnTo(url.searchParams.get('returnTo'), '') };
+	return {
+		returnTo: safeReturnTo(url.searchParams.get('returnTo'), ''),
+		google: googleEnabled(),
+		googleError: googleErrorMessage(url.searchParams.get('error'))
+	};
 };
 
 export const actions: Actions = {
