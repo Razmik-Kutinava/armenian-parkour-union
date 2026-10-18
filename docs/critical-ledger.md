@@ -5,7 +5,7 @@
 
 | Параметр | Значение |
 |---|---|
-| `last_audited_sha` | `f656a2f` |
+| `last_audited_sha` | `7f60662` |
 | Дата | 2026-10-18 |
 | Вердикт | CLEAN |
 
@@ -47,3 +47,4 @@
 | 2026-10-18 | 2.6 hero и главная, 2.8 SEO, анонс фестиваля, 2.11 e2e — общий облегчённый проход `7a7041b..f1f1a0e`: `services/hero/*`, `services/home.ts`, `services/seo/*`, `lib/seo/*`, `routes/admin/hero` (+ `persons/+server.ts`), `sitemap.xml`, `robots.txt`, `components/site/hero`, `drizzle/0006`, `vite.config.ts` | CLEAN | 0 (bugbot: 0; security: 0; не K — `getHeroPerson` без проверки 18+, только имя в форме админки; e2e не прогонялся) | `f1f1a0e` |
 | 2026-10-18 | 1.5g вход через Google `f1f1a0e..1f79f9a`: `server/auth/{index,google,profile-gate,complete-profile}.ts`, `validation/profile.ts`, `hooks.server.ts`, `(auth)/{google,complete-profile,login,register}`, `api/auth/callback/google/+server.ts`, `env.ts`, `.github/workflows/ci.yml` | CLEAN | 0 (bugbot: 0; security: 0; C9 не K; e2e зоны `auth` + `google-auth` 15/15) | `1f79f9a` |
 | 2026-10-18 | 0.10 почта Resend `1f79f9a..f656a2f`: `server/mail/*`, `env.ts` | CLEAN | 0 (bugbot: 0; security: 0; C4 закрыта; не K — без ключа на проде письма молча не уходят, только строка в логе) | `f656a2f` |
+| 2026-10-18 | 2.9 EN обязателен `f656a2f..7f60662`: `validation/{localized,pages,posts,events,hero,media}.ts` | CLEAN | 0 (bugbot: 0) | `7f60662` |
