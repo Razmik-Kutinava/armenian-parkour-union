@@ -4,6 +4,7 @@ import { getSessionCookie } from 'better-auth/cookies';
 import { defaultLocaleRedirect, localeFromPath } from '#lib/i18n/locales.ts';
 import { auth } from '#lib/server/auth/index.ts';
 import { canonicalHostRedirect } from '#lib/server/auth/canonical-host.ts';
+import { isStaff } from '#lib/server/auth/permissions.ts';
 import { needsProfile, profileGateRedirect } from '#lib/server/auth/profile-gate.ts';
 import { toLocalsUser } from '#lib/server/auth/session.ts';
 import { groupsToInvalidate, publicCache } from '#lib/server/cache/index.ts';
@@ -47,6 +48,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 			transformPageChunk: ({ html }) => html.replace('%lang%', locale)
 		});
 	} finally {
-		publicCache.invalidate(groupsToInvalidate(event.request.method, event.url.pathname));
+		const { method } = event.request;
+		publicCache.invalidate(groupsToInvalidate(method, event.url.pathname, isStaff(user)));
 	}
 };

@@ -16,9 +16,12 @@ const BY_SECTION: Record<string, CacheGroup[]> = {
 	locale: []
 };
 
-/** Groups to reset after a request; only admin writes change public data (2.10). */
-export function groupsToInvalidate(method: string, pathname: string): CacheGroup[] {
-	if (method === 'GET' || method === 'HEAD') return [];
+/**
+ * Groups to reset after a request; only admin writes change public data (2.10).
+ * Non-staff writes are refused by the admin routes, so they must not cost everyone a cold cache.
+ */
+export function groupsToInvalidate(method: string, pathname: string, staff: boolean): CacheGroup[] {
+	if (!staff || method === 'GET' || method === 'HEAD') return [];
 	if (pathname !== '/admin' && !pathname.startsWith('/admin/')) return [];
 	const section = pathname.split('/')[2] ?? '';
 	return Object.hasOwn(BY_SECTION, section) ? BY_SECTION[section] : ALL_GROUPS;
