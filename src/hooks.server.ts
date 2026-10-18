@@ -13,8 +13,9 @@ import { db } from '#lib/server/db/index.ts';
 const isAdminPath = (pathname: string) => pathname === '/admin' || pathname.startsWith('/admin/');
 
 export const handle: Handle = async ({ event, resolve }) => {
+	/* Another host for SvelteKit: `redirect()` would refuse it with a 500. */
 	const host = canonicalHostRedirect(event.url);
-	if (host) redirect(301, host);
+	if (host) return new Response(null, { status: 301, headers: { location: host } });
 
 	const canonical = defaultLocaleRedirect(event.url.pathname);
 	if (canonical) redirect(308, canonical + event.url.search);
