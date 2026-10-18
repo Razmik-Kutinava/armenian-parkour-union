@@ -5,8 +5,8 @@
 
 | Параметр | Значение |
 |---|---|
-| `last_audited_sha` | `bb4e8d3` |
-| Дата | 2026-10-08 |
+| `last_audited_sha` | `f1f1a0e` |
+| Дата | 2026-10-18 |
 | Вердикт | CLEAN |
 
 ## Находки
@@ -43,3 +43,4 @@
 | 2026-10-08 | 2.3 страницы: `services/pages/*`, `services/media/usage.ts`, `validation/pages.ts`, `seed/pages.ts`, `routes/admin/pages`, `(site)/pages`, `(site)/federation`, `components/site`, `drizzle/0003` | CLEAN | 0 (bugbot: 0; security: 0; свой проход: гонка двух одновременных созданий с одним адресом → 500, без теста — не K) | `b59755b` |
 | 2026-10-08 | 2.4 новости: `services/posts/*`, `services/media/usage.ts`, `media/list.ts`, `validation/posts.ts`, `lib/seo/*`, `components/site/News*`, `SeoHead`, `ShareButton`, `routes/admin/news`, `(site)/news`, `drizzle/0004` | CLEAN | 0 (bugbot: 1 не K — выбор обложки только из 25 картинок, исправлено `4119ae4`; security: 0; свой проход: невозможная дата в фильтре периода админки → 500, только для staff — не K, исправлено `4119ae4`) | `4119ae4` |
 | 2026-10-08 | 2.5 события: `services/events/*`, `services/media/usage.ts`, `validation/events.ts`, `event-enums.ts`, `money.ts`, `lib/seo/*`, `components/site/Event*`, `components/admin/CoverPicker`, `routes/admin/events`, `(site)/events`, `drizzle/0005` | CLEAN | 0 (bugbot: 0; security: 0; свой проход: два одновременных создания с одним адресом дают 500, как у новостей, — не K; удаление категории жёсткое, в `event_categories` нет `deleted_at` — не K, до регистраций этапа 5) | `0a55421` |
+| 2026-10-18 | 2.6 hero и главная, 2.8 SEO, анонс фестиваля, 2.11 e2e — общий облегчённый проход `7a7041b..f1f1a0e`: `services/hero/*`, `services/home.ts`, `services/seo/*`, `lib/seo/*`, `routes/admin/hero` (+ `persons/+server.ts`), `sitemap.xml`, `robots.txt`, `components/site/hero`, `drizzle/0006`, `vite.config.ts` | CLEAN | 0 (bugbot: 0; security: 0; не K — `getHeroPerson` без проверки 18+, только имя в форме админки; e2e не прогонялся) | `f1f1a0e` |
