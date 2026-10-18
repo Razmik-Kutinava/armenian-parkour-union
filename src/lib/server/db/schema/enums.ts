@@ -13,3 +13,17 @@ export const eventStatus = pgEnum('event_status', [
 ]);
 export const discipline = pgEnum('discipline', ['speed', 'style', 'tricking', 'freerun', 'other']);
 export const heroType = pgEnum('hero_type', ['event', 'presentation', 'video', 'person', 'custom']);
+export const membershipStatus = pgEnum('membership_status', [
+	'pending',
+	'active',
+	'expired',
+	'cancelled'
+]);
+export const paymentKind = pgEnum('payment_kind', ['membership', 'donation', 'event_fee']);
+export const paymentStatus = pgEnum('payment_status', [
+	'pending',
+	'paid',
+	'failed',
+	'cancelled',
+	'refunded'
+]);

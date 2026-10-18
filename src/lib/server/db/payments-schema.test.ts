@@ -89,7 +89,8 @@ describe.skipIf(!url)('payments and memberships schema (migration 0007)', () => 
 				tx`update payment_webhook_events set payload = ${tx.json({ a: 3 })} where id = ${event.id}`,
 				tx`update payment_webhook_events set event_id = 'e-2' where id = ${event.id}`,
 				tx`update payment_webhook_events set provider = 'x' where id = ${event.id}`,
-				tx`delete from payment_webhook_events where id = ${event.id}`
+				tx`delete from payment_webhook_events where id = ${event.id}`,
+				tx`truncate payment_webhook_events`
 			]) {
 				expect((await expectError(tx, () => change)).code).toBe('23001');
 			}
@@ -99,7 +100,8 @@ describe.skipIf(!url)('payments and memberships schema (migration 0007)', () => 
 	it('membership starts pending, ends after it starts, links to its payment both ways', async () => {
 		await inRollback(async (tx) => {
 			const user = await newUser(tx);
-			const [membership] = await tx`insert into memberships (user_id) values (${user.id}) returning *`;
+			const [membership] =
+				await tx`insert into memberships (user_id) values (${user.id}) returning *`;
 			expect(membership).toMatchObject({ status: 'pending', starts_at: null, ends_at: null });
 			expect(membership.updated_at).toBeInstanceOf(Date);
 			const payment = await newPayment(tx, {
@@ -111,7 +113,8 @@ describe.skipIf(!url)('payments and memberships schema (migration 0007)', () => 
 				starts_at = now(), ends_at = now() + interval '1 year' where id = ${membership.id}`;
 			const backwards = await expectError(
 				tx,
-				() => tx`update memberships set ends_at = starts_at - interval '1 day' where id = ${membership.id}`
+				() =>
+					tx`update memberships set ends_at = starts_at - interval '1 day' where id = ${membership.id}`
 			);
 			expect(backwards.code).toBe('23514');
 			const orphan = await expectError(

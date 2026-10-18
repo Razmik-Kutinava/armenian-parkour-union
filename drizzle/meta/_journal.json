@@ -50,6 +50,13 @@
       "when": 1792237832267,
       "tag": "0006_hero_blocks",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1792325070265,
+      "tag": "0007_payments_memberships",
+      "breakpoints": true
     }
   ]
 }
