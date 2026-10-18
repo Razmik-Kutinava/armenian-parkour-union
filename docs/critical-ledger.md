@@ -5,7 +5,7 @@
 
 | Параметр | Значение |
 |---|---|
-| `last_audited_sha` | `7f60662` |
+| `last_audited_sha` | `9012220` |
 | Дата | 2026-10-18 |
 | Вердикт | CLEAN |
 
@@ -24,6 +24,7 @@
 | C7 | K1 | `src/lib/server/seed/admin.ts:37` | пока на сайте нет админа, кто-то регистрируется на email будущего админа → `db:seed` с `SEED_ADMIN_EMAIL` повышает этот аккаунт, пароль `SEED_ADMIN_PASSWORD` не сверяется → чужой человек — admin | `seed/admin.test.ts` «refuses to promote…» | fixed (повышение только при совпадении пароля аккаунта) | `2d60f2e` |
 | C8 | — | `src/lib/server/services/media/upload.ts:61` | editor загружает PDF со встроенным JavaScript (`%PDF-` в начале проходит проверку) → публичная ссылка открывается во встроенном просмотрщике | — | rejected: not-K (загружают только editor/admin; в «Известные проблемы»: отдавать PDF с `Content-Disposition: attachment` при подключении R2) | — |
 | C9 | — | `src/lib/server/auth/index.ts:71` | у staff с подтверждённым email вход через Google (тот же email) привязывается без пароля; строгий лимит попыток staff (`04` 6.7) к Google не применяется | — | rejected: not-K (решение владельца 2026-10-18: автопривязка; защита — аккаунт Google; неподтверждённый локальный email не привязывается) | — |
+| C10 | — | `src/hooks.server.ts:52` | гость шлёт `POST /admin/media/1` → маршрут отказывает, но кеш публичных данных сбрасывается целиком; повторять — сайт всё время ходит в базу | `cache/admin-groups.test.ts` «a guest or member…» | rejected: not-K (доступность, данных не раскрывает; исправлено — сброс только от staff) | `fef0acb` |
 
 ## История аудитов
 
@@ -48,3 +49,4 @@
 | 2026-10-18 | 1.5g вход через Google `f1f1a0e..1f79f9a`: `server/auth/{index,google,profile-gate,complete-profile}.ts`, `validation/profile.ts`, `hooks.server.ts`, `(auth)/{google,complete-profile,login,register}`, `api/auth/callback/google/+server.ts`, `env.ts`, `.github/workflows/ci.yml` | CLEAN | 0 (bugbot: 0; security: 0; C9 не K; e2e зоны `auth` + `google-auth` 15/15) | `1f79f9a` |
 | 2026-10-18 | 0.10 почта Resend `1f79f9a..f656a2f`: `server/mail/*`, `env.ts` | CLEAN | 0 (bugbot: 0; security: 0; C4 закрыта; не K — без ключа на проде письма молча не уходят, только строка в логе) | `f656a2f` |
 | 2026-10-18 | 2.9 EN обязателен `f656a2f..7f60662`: `validation/{localized,pages,posts,events,hero,media}.ts` | CLEAN | 0 (bugbot: 0) | `7f60662` |
+| 2026-10-18 | 2.10 кеш `3bc2f5b..9012220`: `server/cache/*`, `hooks.server.ts`, публичные `(site)/**/+page.server.ts`, `+layout.server.ts`, `sitemap.xml/+server.ts`, `env.ts`, `.env.example`, `playwright.config.ts` | CLEAN | 0 (bugbot: 0; security: 1 средняя — C10 не K, исправлено; e2e 89/89 без кеша, админ-сценарии 13/13 с кешем 60 с) | `9012220` |
