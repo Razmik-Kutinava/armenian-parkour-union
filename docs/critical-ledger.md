@@ -5,7 +5,7 @@
 
 | Параметр | Значение |
 |---|---|
-| `last_audited_sha` | `f1f1a0e` |
+| `last_audited_sha` | `1f79f9a` |
 | Дата | 2026-10-18 |
 | Вердикт | CLEAN |
 
@@ -23,6 +23,7 @@
 | C6 | — | `src/lib/i18n/locales.ts:27` | `https://parkour.am//evil.com` → ссылки переключателя языка `//evil.com` (уход на чужой сайт) | `locales.test.ts` | rejected: not-K (исправлено) | `473d27f` |
 | C7 | K1 | `src/lib/server/seed/admin.ts:37` | пока на сайте нет админа, кто-то регистрируется на email будущего админа → `db:seed` с `SEED_ADMIN_EMAIL` повышает этот аккаунт, пароль `SEED_ADMIN_PASSWORD` не сверяется → чужой человек — admin | `seed/admin.test.ts` «refuses to promote…» | fixed (повышение только при совпадении пароля аккаунта) | `2d60f2e` |
 | C8 | — | `src/lib/server/services/media/upload.ts:61` | editor загружает PDF со встроенным JavaScript (`%PDF-` в начале проходит проверку) → публичная ссылка открывается во встроенном просмотрщике | — | rejected: not-K (загружают только editor/admin; в «Известные проблемы»: отдавать PDF с `Content-Disposition: attachment` при подключении R2) | — |
+| C9 | — | `src/lib/server/auth/index.ts:71` | у staff с подтверждённым email вход через Google (тот же email) привязывается без пароля; строгий лимит попыток staff (`04` 6.7) к Google не применяется | — | rejected: not-K (решение владельца 2026-10-18: автопривязка; защита — аккаунт Google; неподтверждённый локальный email не привязывается) | — |
 
 ## История аудитов
 
@@ -44,3 +45,4 @@
 | 2026-10-08 | 2.4 новости: `services/posts/*`, `services/media/usage.ts`, `media/list.ts`, `validation/posts.ts`, `lib/seo/*`, `components/site/News*`, `SeoHead`, `ShareButton`, `routes/admin/news`, `(site)/news`, `drizzle/0004` | CLEAN | 0 (bugbot: 1 не K — выбор обложки только из 25 картинок, исправлено `4119ae4`; security: 0; свой проход: невозможная дата в фильтре периода админки → 500, только для staff — не K, исправлено `4119ae4`) | `4119ae4` |
 | 2026-10-08 | 2.5 события: `services/events/*`, `services/media/usage.ts`, `validation/events.ts`, `event-enums.ts`, `money.ts`, `lib/seo/*`, `components/site/Event*`, `components/admin/CoverPicker`, `routes/admin/events`, `(site)/events`, `drizzle/0005` | CLEAN | 0 (bugbot: 0; security: 0; свой проход: два одновременных создания с одним адресом дают 500, как у новостей, — не K; удаление категории жёсткое, в `event_categories` нет `deleted_at` — не K, до регистраций этапа 5) | `0a55421` |
 | 2026-10-18 | 2.6 hero и главная, 2.8 SEO, анонс фестиваля, 2.11 e2e — общий облегчённый проход `7a7041b..f1f1a0e`: `services/hero/*`, `services/home.ts`, `services/seo/*`, `lib/seo/*`, `routes/admin/hero` (+ `persons/+server.ts`), `sitemap.xml`, `robots.txt`, `components/site/hero`, `drizzle/0006`, `vite.config.ts` | CLEAN | 0 (bugbot: 0; security: 0; не K — `getHeroPerson` без проверки 18+, только имя в форме админки; e2e не прогонялся) | `f1f1a0e` |
+| 2026-10-18 | 1.5g вход через Google `f1f1a0e..1f79f9a`: `server/auth/{index,google,profile-gate,complete-profile}.ts`, `validation/profile.ts`, `hooks.server.ts`, `(auth)/{google,complete-profile,login,register}`, `api/auth/callback/google/+server.ts`, `env.ts`, `.github/workflows/ci.yml` | CLEAN | 0 (bugbot: 0; security: 0; C9 не K; e2e зоны `auth` + `google-auth` 15/15) | `1f79f9a` |
