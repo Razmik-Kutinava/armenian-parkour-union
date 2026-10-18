@@ -5,7 +5,7 @@
 
 | Параметр | Значение |
 |---|---|
-| `last_audited_sha` | `1f79f9a` |
+| `last_audited_sha` | `f656a2f` |
 | Дата | 2026-10-18 |
 | Вердикт | CLEAN |
 
@@ -18,7 +18,7 @@
 | C1 | — | `src/lib/server/auth/return-to.ts:13` | `/login?returnTo=/.//evil.com` → после входа `//evil.com` (открытый редирект) | `return-to.test.ts` | rejected: not-K (исправлено) | 1.5 REVIEW |
 | C2 | — | `src/lib/server/auth/register.ts:44` | регистрация отвечает «email уже есть» — можно проверить, зарегистрирован ли адрес | — | rejected: not-K (в «Известные проблемы») | — |
 | C3 | — | `src/lib/server/auth/sign-in.ts:31` | «аккаунт заблокирован» видно только при верном пароле | — | rejected: not-K | — |
-| C4 | K4 | `src/lib/server/mail/index.ts:5` | ссылки с токенами сброса и подтверждения пишутся в лог Fly | — | accepted-risk (решение владельца 2026-10-07: письма в лог до 0.10) | — |
+| C4 | K4 | `src/lib/server/mail/index.ts:5` | ссылки с токенами сброса и подтверждения пишутся в лог Fly | `mail/resend.test.ts` | fixed (0.10: Resend; без провайдера собранное приложение пишет в лог только адрес и тему) | `f656a2f` |
 | C5 | — | `verify-email/+page.server.ts:8` | почтовый сканер откроет ссылку раньше пользователя | — | rejected: no-repro (токен — JWT, повторное открытие даёт «подтверждён») | — |
 | C6 | — | `src/lib/i18n/locales.ts:27` | `https://parkour.am//evil.com` → ссылки переключателя языка `//evil.com` (уход на чужой сайт) | `locales.test.ts` | rejected: not-K (исправлено) | `473d27f` |
 | C7 | K1 | `src/lib/server/seed/admin.ts:37` | пока на сайте нет админа, кто-то регистрируется на email будущего админа → `db:seed` с `SEED_ADMIN_EMAIL` повышает этот аккаунт, пароль `SEED_ADMIN_PASSWORD` не сверяется → чужой человек — admin | `seed/admin.test.ts` «refuses to promote…» | fixed (повышение только при совпадении пароля аккаунта) | `2d60f2e` |
@@ -46,3 +46,4 @@
 | 2026-10-08 | 2.5 события: `services/events/*`, `services/media/usage.ts`, `validation/events.ts`, `event-enums.ts`, `money.ts`, `lib/seo/*`, `components/site/Event*`, `components/admin/CoverPicker`, `routes/admin/events`, `(site)/events`, `drizzle/0005` | CLEAN | 0 (bugbot: 0; security: 0; свой проход: два одновременных создания с одним адресом дают 500, как у новостей, — не K; удаление категории жёсткое, в `event_categories` нет `deleted_at` — не K, до регистраций этапа 5) | `0a55421` |
 | 2026-10-18 | 2.6 hero и главная, 2.8 SEO, анонс фестиваля, 2.11 e2e — общий облегчённый проход `7a7041b..f1f1a0e`: `services/hero/*`, `services/home.ts`, `services/seo/*`, `lib/seo/*`, `routes/admin/hero` (+ `persons/+server.ts`), `sitemap.xml`, `robots.txt`, `components/site/hero`, `drizzle/0006`, `vite.config.ts` | CLEAN | 0 (bugbot: 0; security: 0; не K — `getHeroPerson` без проверки 18+, только имя в форме админки; e2e не прогонялся) | `f1f1a0e` |
 | 2026-10-18 | 1.5g вход через Google `f1f1a0e..1f79f9a`: `server/auth/{index,google,profile-gate,complete-profile}.ts`, `validation/profile.ts`, `hooks.server.ts`, `(auth)/{google,complete-profile,login,register}`, `api/auth/callback/google/+server.ts`, `env.ts`, `.github/workflows/ci.yml` | CLEAN | 0 (bugbot: 0; security: 0; C9 не K; e2e зоны `auth` + `google-auth` 15/15) | `1f79f9a` |
+| 2026-10-18 | 0.10 почта Resend `1f79f9a..f656a2f`: `server/mail/*`, `env.ts` | CLEAN | 0 (bugbot: 0; security: 0; C4 закрыта; не K — без ключа на проде письма молча не уходят, только строка в логе) | `f656a2f` |

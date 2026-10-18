@@ -64,11 +64,13 @@ describe('createMailer (task 0.10, Resend)', () => {
 		expect(logged()).toContain('SECRET');
 	});
 
-	it('no key in a built app: only address and subject are logged, never the link', async () => {
-		const { send, fetch, logged } = setup({ dev: false, apiKey: 're_key' });
-		await send(mail);
-		expect(fetch).not.toHaveBeenCalled();
-		expect(logged()).toContain('a@example.com');
-		expect(logged()).not.toContain('SECRET');
+	it('no key or no sender in a built app: only address and subject are logged', async () => {
+		for (const options of [{}, { apiKey: 're_key' }, { from: 'x@parkour.am' }]) {
+			const { send, fetch, logged } = setup({ dev: false, ...options });
+			await send(mail);
+			expect(fetch).not.toHaveBeenCalled();
+			expect(logged()).toContain('a@example.com');
+			expect(logged()).not.toContain('SECRET');
+		}
 	});
 });
