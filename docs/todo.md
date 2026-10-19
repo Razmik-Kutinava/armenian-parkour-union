@@ -52,8 +52,8 @@
 ## Фазы
 
 - [x] SPEC
-- [ ] RED (`test: … [RED]`)
-- [ ] GREEN (`feat: … [GREEN]`)
-- [ ] REGRESS
+- [x] RED (`test: … [RED]`) — `7ea76b7`
+- [x] GREEN (`feat: … [GREEN]`) — `47e3248`; e2e правка: вызов cron с `Content-Type: application/json` (без него SvelteKit 403)
+- [x] REGRESS — Vitest 606/606; e2e 94 + 1 повтором (`auth` «sixth login attempt», отдельно зелёный)
 - [ ] REVIEW — отложен владельцем: общий REVIEW нескольких задач позже (без push до него)
 - [ ] DEPLOY (только по апруву владельца; до него — `CRON_SECRET` в Fly и GitHub)
