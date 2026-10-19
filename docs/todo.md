@@ -59,7 +59,7 @@
 ## Фазы
 
 - [x] SPEC
-- [ ] RED (`test: … [RED]`)
+- [x] RED (`test: … [RED]`)
 - [ ] GREEN (`feat: … [GREEN]`)
 - [ ] REGRESS
 - [ ] REVIEW: local · bugbot · security-review · сверка со SPEC · PROGRESS · push · CI green
