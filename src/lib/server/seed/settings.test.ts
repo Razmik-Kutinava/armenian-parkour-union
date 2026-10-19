@@ -12,6 +12,7 @@ const KEYS = [
 	'footer',
 	'hero_max_active',
 	'membership_fee',
+	'payment_wait_minutes',
 	'requisites',
 	'site_name',
 	'socials'
@@ -39,6 +40,10 @@ describe('seed: site_settings values', () => {
 			currency: 'AMD',
 			period_months: 12
 		});
+	});
+
+	it('payment wait: 30 minutes for the fee and donations (decisions.md 2026-10-19, 3.6)', () => {
+		expect(SEED_SETTINGS.payment_wait_minutes).toBe(30);
 	});
 });
 
