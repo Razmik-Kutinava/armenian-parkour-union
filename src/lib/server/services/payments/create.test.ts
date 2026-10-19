@@ -56,7 +56,7 @@ describe.skipIf(!testDbUrl)('payments: starting an online payment', () => {
 		});
 	});
 
-	it('return addresses are built from the site address and our payment id only', async () => {
+	it('return addresses: the site address, the payment language and our payment id only', async () => {
 		await inRollback(async (tx) => {
 			const { id: userId } = await insertUser(tx);
 			const { mock, calls } = spiedMock();
@@ -73,6 +73,22 @@ describe.skipIf(!testDbUrl)('payments: starting an online payment', () => {
 				description: 'Membership fee',
 				locale: 'hy',
 				payerEmail: 'p@example.com',
+				successUrl: `${SITE}/hy/payment/success?pid=${result.paymentId}`,
+				cancelUrl: `${SITE}/hy/payment/cancel?pid=${result.paymentId}`
+			});
+		});
+	});
+
+	it('return addresses in English have no language prefix', async () => {
+		await inRollback(async (tx) => {
+			const { id: userId } = await insertUser(tx);
+			const { mock, calls } = spiedMock();
+			const result = await startOnlinePayment(tx, membershipPayment(userId), {
+				provider: mock,
+				siteUrl: SITE
+			});
+			if (!result.ok) throw new Error(result.reason);
+			expect(calls[0]).toMatchObject({
 				successUrl: `${SITE}/payment/success?pid=${result.paymentId}`,
 				cancelUrl: `${SITE}/payment/cancel?pid=${result.paymentId}`
 			});
