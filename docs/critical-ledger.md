@@ -5,8 +5,8 @@
 
 | Параметр | Значение |
 |---|---|
-| `last_audited_sha` | `034fc4b` |
-| Дата | 2026-10-18 |
+| `last_audited_sha` | `bc1c124` |
+| Дата | 2026-10-19 |
 | Вердикт | CLEAN |
 
 ## Находки
@@ -51,3 +51,4 @@
 | 2026-10-18 | 2.9 EN обязателен `f656a2f..7f60662`: `validation/{localized,pages,posts,events,hero,media}.ts` | CLEAN | 0 (bugbot: 0) | `7f60662` |
 | 2026-10-18 | 2.10 кеш `3bc2f5b..9012220`: `server/cache/*`, `hooks.server.ts`, публичные `(site)/**/+page.server.ts`, `+layout.server.ts`, `sitemap.xml/+server.ts`, `env.ts`, `.env.example`, `playwright.config.ts` | CLEAN | 0 (bugbot: 0; security: 1 средняя — C10 не K, исправлено; e2e 89/89 без кеша, админ-сценарии 13/13 с кешем 60 с) | `9012220` |
 | 2026-10-18 | 3.1 таблицы платежей `9012220..034fc4b` (код — только `db/schema/{payments,enums,index}.ts`, `drizzle/0007`, `scripts/rollback/0007_down.sql`; сплит e2e — только тесты) | CLEAN | 0 (bugbot: 0; security: 0; триггер журнала вебхуков — SECURITY INVOKER; откат не прогонялся — DROP только по «go») | `034fc4b` |
+| 2026-10-19 | 3.2 провайдеры оплаты `034fc4b..bc1c124`: `services/payments/providers/{types,registry,index,mock,manual}.ts`, `env.ts`, `.env.example` | CLEAN | 0 (bugbot: 0; security: 0; свой проход: `mock` закрыт вне dev и онлайн, и по id, битая подпись / тело / JSON → `null`; e2e: 77 + 11 повтором, `admin-users` «grant a role» падает и на `4db59d0` — не 3.2) | `bc1c124` |
