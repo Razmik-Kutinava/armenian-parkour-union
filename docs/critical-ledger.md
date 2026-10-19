@@ -5,7 +5,7 @@
 
 | Параметр | Значение |
 |---|---|
-| `last_audited_sha` | `bc1c124` |
+| `last_audited_sha` | `7b6b7ee` |
 | Дата | 2026-10-19 |
 | Вердикт | CLEAN |
 
@@ -24,6 +24,9 @@
 | C7 | K1 | `src/lib/server/seed/admin.ts:37` | пока на сайте нет админа, кто-то регистрируется на email будущего админа → `db:seed` с `SEED_ADMIN_EMAIL` повышает этот аккаунт, пароль `SEED_ADMIN_PASSWORD` не сверяется → чужой человек — admin | `seed/admin.test.ts` «refuses to promote…» | fixed (повышение только при совпадении пароля аккаунта) | `2d60f2e` |
 | C8 | — | `src/lib/server/services/media/upload.ts:61` | editor загружает PDF со встроенным JavaScript (`%PDF-` в начале проходит проверку) → публичная ссылка открывается во встроенном просмотрщике | — | rejected: not-K (загружают только editor/admin; в «Известные проблемы»: отдавать PDF с `Content-Disposition: attachment` при подключении R2) | — |
 | C9 | — | `src/lib/server/auth/index.ts:71` | у staff с подтверждённым email вход через Google (тот же email) привязывается без пароля; строгий лимит попыток staff (`04` 6.7) к Google не применяется | — | rejected: not-K (решение владельца 2026-10-18: автопривязка; защита — аккаунт Google; неподтверждённый локальный email не привязывается) | — |
+| C11 | — | `src/lib/server/services/payments/create.ts:64` | security (high): сумму взноса передаёт вызывающий код; если будущий маршрут возьмёт её из формы, можно оплатить взнос за 1 AMD | — | rejected: no-repro (маршрутов нет; по SPEC 3.3 сумму считает сценарий — требование к 3.6 / 3.7 в `PROGRESS.md`) | — |
+| C12 | — | `src/lib/server/services/payments/apply.ts:52`, `create.ts:107` | security (medium): ответ провайдера пишется в `provider_payload` без очистки (`07` § 14 п. 2) | — | rejected: not-K (очистка — обязанность модуля провайдера по контракту, у `mock` чувствительных полей нет; требование к 3.4 / 3.13 в `PROGRESS.md`) | — |
+| C13 | — | `src/lib/server/services/payments/apply.ts:78` | bugbot: после `failed → paid` остаются `needs_review` и `failure_reason` | — | rejected: not-K (флаг намеренно остаётся до проверки админом, причина — история; деньги не затронуты) | — |
 | C10 | — | `src/hooks.server.ts:52` | гость шлёт `POST /admin/media/1` → маршрут отказывает, но кеш публичных данных сбрасывается целиком; повторять — сайт всё время ходит в базу | `cache/admin-groups.test.ts` «a guest or member…» | rejected: not-K (доступность, данных не раскрывает; исправлено — сброс только от staff) | `fef0acb` |
 
 ## История аудитов
@@ -52,3 +55,4 @@
 | 2026-10-18 | 2.10 кеш `3bc2f5b..9012220`: `server/cache/*`, `hooks.server.ts`, публичные `(site)/**/+page.server.ts`, `+layout.server.ts`, `sitemap.xml/+server.ts`, `env.ts`, `.env.example`, `playwright.config.ts` | CLEAN | 0 (bugbot: 0; security: 1 средняя — C10 не K, исправлено; e2e 89/89 без кеша, админ-сценарии 13/13 с кешем 60 с) | `9012220` |
 | 2026-10-18 | 3.1 таблицы платежей `9012220..034fc4b` (код — только `db/schema/{payments,enums,index}.ts`, `drizzle/0007`, `scripts/rollback/0007_down.sql`; сплит e2e — только тесты) | CLEAN | 0 (bugbot: 0; security: 0; триггер журнала вебхуков — SECURITY INVOKER; откат не прогонялся — DROP только по «go») | `034fc4b` |
 | 2026-10-19 | 3.2 провайдеры оплаты `034fc4b..bc1c124`: `services/payments/providers/{types,registry,index,mock,manual}.ts`, `env.ts`, `.env.example` | CLEAN | 0 (bugbot: 0; security: 0; свой проход: `mock` закрыт вне dev и онлайн, и по id, битая подпись / тело / JSON → `null`; e2e: 77 + 11 повтором, `admin-users` «grant a role» падает и на `4db59d0` — не 3.2) | `bc1c124` |
+| 2026-10-19 | 3.3 сервис платежей `bc1c124..7b6b7ee`: `services/payments/{transitions,create,start-checks,reuse,apply,effects,status-log,index}.ts` + тесты | CLEAN | 0 (bugbot: 1 не K — C13; security: 2 не K — C11, C12; e2e 89 + 1 повтором — `auth` «sixth login attempt» отдельно проходит) | `7b6b7ee` |
