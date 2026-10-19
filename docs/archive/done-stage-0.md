@@ -44,3 +44,4 @@
 | `ADMIN-GUIDE` | инструкция для админов | не создан (этап 8) |
 
 - 2026-10-08 | trim | из «В работе»: «0.9 хранилище R2 — отложено владельцем до этапа 2 (до этого фото — заглушки)». Код хранилища сделан в 2.1, подключение бакета — у владельца (см. `PROGRESS.md`, 2.1).
+- 2026-10-19 | 0.9, 0.10, seed прода | `R2_*` и `MAIL_*` из `.env` в Fly secrets (машина перезапущена, health ok); `db:seed` на `parkour_prod`: `hero_max_active`, системные страницы `about`, `rules`, `contacts`, `privacy`, `offer`, `refund-policy` (черновики), админ не тронут; R2: CORS preflight с `https://parkour.am` → 204, PUT по подписанной ссылке → 200, чтение через `media.parkour.am` → 200, тестовый файл удалён; почта: сброс пароля на проде → `sent`, ошибок отправки в логе нет (доставку подтверждает владелец); Google: POST `/google` → 303 на `accounts.google.com`, `redirect_uri` `https://parkour.am/api/auth/callback/google`, cookie состояния ставится; полный вход — владелец | см. коммит docs

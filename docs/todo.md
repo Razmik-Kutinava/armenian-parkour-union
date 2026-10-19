@@ -27,7 +27,8 @@
 - `src/lib/server/services/memberships/` — `fee.ts`, `start.ts`, `effects.ts` (+ активация), `daily.ts`, `mail.ts`, `index.ts`
 - `src/routes/api/cron/memberships/+server.ts`, `.github/workflows/cron.yml`
 - `src/lib/server/seed/settings.ts` (+ тест), `src/lib/i18n/messages/{en,ru}-membership.ts`
-- тесты: `memberships/start.test.ts`, `effects.test.ts`, `daily.test.ts`, `payments/after-commit.test.ts`
+- тесты: `memberships/start.test.ts`, `effects.test.ts`, `daily.test.ts`, `fee.test.ts`, `payments/after-commit.test.ts`, `tests/e2e/cron-memberships.spec.ts`
+- сделано: `memberships/{fee,start,activate,effects,log,mail,daily,reminders,index}.ts`, `payments/settings.ts`, `i18n/messages/{en,ru}-membership.ts`
 
 ## Не ломать
 
@@ -52,8 +53,8 @@
 ## Фазы
 
 - [x] SPEC
-- [ ] RED (`test: … [RED]`)
-- [ ] GREEN (`feat: … [GREEN]`)
-- [ ] REGRESS
+- [x] RED (`test: … [RED]`) — `f767e92`
+- [x] GREEN (`feat: … [GREEN]`) — `3f4b5a8`; настройки (взнос, срок ожидания, период) старт и эффекты получают параметрами: тесты не пишут в общую `site_settings` (соседние тесты делают `DELETE` всей таблицы и ждали блокировок > 20 с); разбор настроек — чистые тесты `fee.test.ts`
+- [x] REGRESS — Vitest 640/640; e2e зоны (cron, cron-memberships, webhooks) 8/8; полный e2e 97 + `admin-users.spec.ts:140` «grant a role» (известный, падает и до 3.2)
 - [ ] REVIEW — общим прогоном позже (решение 2026-10-19), без push до него
 - [ ] DEPLOY (только по апруву: миграция 0008, `db:seed` прода — `payment_wait_minutes`)
