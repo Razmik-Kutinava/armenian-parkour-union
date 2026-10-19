@@ -8,6 +8,7 @@ import { SEED_SETTINGS, seedSettings } from './settings';
 /* docs/02 section 10: keys of site_settings created by the seed script. */
 const KEYS = [
 	'contacts',
+	'donation_limits',
 	'feature_flags',
 	'footer',
 	'hero_max_active',
@@ -44,6 +45,14 @@ describe('seed: site_settings values', () => {
 
 	it('payment wait: 30 minutes for the fee and donations (decisions.md 2026-10-19, 3.6)', () => {
 		expect(SEED_SETTINGS.payment_wait_minutes).toBe(30);
+	});
+
+	it('donation limits: AMD, 1 000 to 1 000 000 (decisions.md 2026-10-19, 3.7)', () => {
+		expect(SEED_SETTINGS.donation_limits).toEqual({
+			currency: 'AMD',
+			min_minor: 1000,
+			max_minor: 1_000_000
+		});
 	});
 });
 

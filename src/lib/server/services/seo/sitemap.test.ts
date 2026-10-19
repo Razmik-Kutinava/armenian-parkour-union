@@ -60,7 +60,7 @@ describe.skipIf(!testDbUrl)('seo: sitemap addresses from the database', () => {
 			const page = await addPage(tx);
 			const entries = await listSitemapEntries(tx);
 			const paths = entries.map((e) => e.path);
-			expect(paths.slice(0, 4)).toEqual(['/', '/events', '/events/archive', '/news']);
+			expect(paths.slice(0, 5)).toEqual(['/', '/events', '/events/archive', '/news', '/donate']);
 			for (const p of [
 				`/news/${post.slug}`,
 				`/events/${upcoming.slug}`,
