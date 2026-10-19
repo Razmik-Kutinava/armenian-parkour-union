@@ -24,6 +24,7 @@
 - 2026-10-06 | процесс | из CoffeeOS: `/crit-audit` (K1–K5 из `sbr.mdc`, падающий тест обязателен, вердикт CLEAN/BLOCKED, журнал `docs/critical-ledger.md`), встроен в шаг 2 `/review`; `/trace-bug` для оплаты, прав, баллов; `.cursor/commands/README.md`; `Next:` в `/trim` | `.cursor/commands/*`, `.cursor/rules/sbr.mdc`, `main.mdc`, `docs/critical-ledger.md` | набрать `/` в чате — видны `crit-audit`, `trace-bug`
 - 2026-10-06 | 0.8 | `backup.yml`: ежедневный `pg_dump` `parkour_prod` под `backup_reader`, восстановление во временный Postgres, шифрование gpg, артефакт 30 дней; ручная расшифровка проверена | `.github/workflows/backup.yml` | запуск Backup в Actions → зелёный, артефакт есть
 - 2026-10-07 | хвосты | Fly secrets `PUBLIC_SITE_URL`, `ORIGIN` = `https://parkour.am`; сертификат `www.parkour.am` `Issued`, https → 200 | — | `fly certs list`
+- 2026-10-18 | 0.10 | почта через Resend (HTTP API, без библиотек): есть `MAIL_API_KEY` + `MAIL_FROM` → письмо уходит, таймаут 10 с, ошибка — строка в логе без ключа и текста, регистрация не падает; нет ключей — в `dev` письмо целиком в лог, в собранном приложении только адрес и тема (C4 закрыта); unit 496 + e2e `auth` 9; REVIEW: bugbot 0, security 0, crit-audit CLEAN | `f656a2f`
 
 ## Статус документации на конец этапа 0
 
