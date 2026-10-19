@@ -6,7 +6,7 @@
 
 ## Сводка
 
-Этап 0 закрыт: сайт на https://parkour.am (Fly, `fra`), Neon (`parkour_dev`, `parkour_prod`), CI, ручной Deploy, ежедневный бэкап; R2 и почта подключены 2026-10-19. На проде — `ee07760` (этапы 1–2 и 3.1, миграции 0003–0007); `db:seed` прода выполнен — системные страницы черновиками, `/federation` и ссылки подвала 404, пока владелец не опубликует их в `/admin/pages`; почта домена без DMARC. Этапы 1–2 ждут проверки владельцем. Этап 3: 3.1–3.6 сделаны (3.2–3.6b — только код; маршрут вебхуков на проде отвечает 404, пока не подключён провайдер); REVIEW с 3.5 — общим прогоном позже (решение 2026-10-19), до него без push; памятка для общего ревью 3.6b — `docs/todo.md`; следующая — 3.7 (донаты).
+Этап 0 закрыт: сайт на https://parkour.am (Fly, `fra`), Neon (`parkour_dev`, `parkour_prod`), CI, ручной Deploy, ежедневный бэкап; R2 и почта подключены 2026-10-19. На проде — `ee07760` (этапы 1–2 и 3.1, миграции 0003–0007); `db:seed` прода выполнен — системные страницы черновиками, `/federation` и ссылки подвала 404, пока владелец не опубликует их в `/admin/pages`; почта домена без DMARC. Этапы 1–2 ждут проверки владельцем. Этап 3: 3.1–3.6 сделаны (3.2–3.6b — только код; маршрут вебхуков на проде отвечает 404, пока не подключён провайдер); REVIEW с 3.5 — общим прогоном позже (решение 2026-10-19), до него без push; памятка для общего ревью 3.6b — `git show c3b6468:docs/todo.md`; в работе — 3.7 (донаты, `docs/todo.md`).
 
 ## Статус
 
@@ -32,7 +32,8 @@
 
 ## В работе
 
-- 3.6b сделана, ждёт общего REVIEW (риск `high`; SPEC и **что проверить на ревью** — `docs/todo.md`). Для 3.7–3.10: кнопка оплаты — `PayFeeForm` (редирект на провайдера через `window.location`, не `goto`), путь страницы `pages` — `pagePath(slug)` (`lib/page-path.ts`), кабинет — `cabinet/+layout.server.ts` (`requireUser`), `/cabinet` (обзор) — 3.10. Проверка цепочки на dev: `.env.development.local` с `PAYMENT_PROVIDER=mock` (переменная процесса не перекрывает `.env`); на dev-базе `db:seed` выполнен 2026-10-19 (`payment_wait_minutes`, `hero_max_active`, страница `join`).
+- 3.7 в работе (SBR, риск `high`; SPEC — `docs/todo.md`; решения владельца — `decisions.md` 2026-10-19, 3.7); REVIEW — в общем прогоне.
+- 3.6b сделана, ждёт общего REVIEW (риск `high`; SPEC и **что проверить на ревью** — `git show c3b6468:docs/todo.md`). Для 3.7–3.10: кнопка оплаты — `PayFeeForm` (редирект на провайдера через `window.location`, не `goto`), путь страницы `pages` — `pagePath(slug)` (`lib/page-path.ts`), кабинет — `cabinet/+layout.server.ts` (`requireUser`), `/cabinet` (обзор) — 3.10. Проверка цепочки на dev: `.env.development.local` с `PAYMENT_PROVIDER=mock` (переменная процесса не перекрывает `.env`); на dev-базе `db:seed` выполнен 2026-10-19 (`payment_wait_minutes`, `hero_max_active`, страница `join`).
 - 3.6a сделана, ждёт общего REVIEW (риск `high`; SPEC — `git show 3f4b5a8:docs/todo.md`, решения — `decisions.md` 2026-10-19). Письма уходят после коммита через `after(job)` эффекта — `applyProviderStatus` не вызывать внутри чужой транзакции (письмо ушло бы до её коммита). До деплоя: миграция 0008 (откат `scripts/rollback/0008_down.sql`, только по «go»), `db:seed` прода (`payment_wait_minutes`), `CRON_SECRET`; сумма взноса на проде — 0, оплата не начнётся, пока владелец не задаст её (3.11).
 - 3.5 сделана, ждёт общего REVIEW (риск `high`; SPEC — `git show 7ea76b7:docs/todo.md`): сверка — `reconcileNow(db)` (`services/payments`), таймер 5 мин — `init` в `hooks.server.ts`, раз в час — `.github/workflows/cron.yml` → `POST /api/cron/payments`. До деплоя: `CRON_SECRET` (≥ 32 символов, `openssl rand -hex 32`) в Fly secrets и GitHub Secrets — без него маршрут 404, workflow пропускается с предупреждением. Вызов cron — с `Content-Type: application/json` (POST без него SvelteKit режет 403 как форму). Для 3.6 и этапа 5: при истечении эффект `paymentEffects[kind].cancelled` (закрыть `pending` членство, освободить место) — в транзакции смены статуса. `pending` старше суток → `needs_review` (список — 3.9). Состояние `mock` в памяти: после перезапуска dev-сервера истёкшие mock-платежи закроются как `not_found`.
 - 3.4 закрыта: вебхук — `receiveWebhook` (`services/payments/webhook.ts`), маршрут `api/webhooks/[provider]` тонкий. Для 3.13: модуль провайдера чистит `raw` до записи — он уходит и в `payment_webhook_events.payload`, и в `provider_payload` (C12); вебхук формой (`x-www-form-urlencoded`) без `Origin` SvelteKit отрежет `403` (CSRF) до маршрута — тогда `csrf.trustedOrigins` или JSON. Уведомление админу о неизвестном платеже и расхождении суммы — пока только `error` в событии, `needs_review` и лог (список — 3.9, мониторинг — 8.7). `/dev/mock-pay` сделан в 3.6b (`simulate()` → `receiveWebhook`); страницы возврата `/payment/success|cancel` — 3.8.
@@ -50,7 +51,8 @@
 | Этап | Вопрос | Статус |
 |---|---|---|
 | 1–2 | Векторный логотип, фото для сайта | владелец внесёт позже, до этого заглушки |
-| 3 | Ключи `site_settings`: минимум и максимум доната, время удержания места (`07` § 17) | предложено: добавить в seed |
+| 3 | Язык письма-благодарности гостю (в `payments` нет языка) | открыт: пока EN; предложено — `payments.locale` (миграция) |
+| 5 | Ключ `site_settings` для времени удержания места события (`07` § 17) | предложено: добавить в seed |
 | 3 | Настройки приватности профиля (город, фото); запрос на удаление аккаунта (`06` § 10) | предложено: поля в `users`; отдельная таблица + раздел админки |
 | 4 | unique(`reversal_of_id`) в `points_ledger`; ключи `site_settings` для параметров правил (`03` § 17) | предложено: да; добавить в seed |
 ## Сделано (последние 5)
