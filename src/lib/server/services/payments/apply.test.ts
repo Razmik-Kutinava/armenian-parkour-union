@@ -1,51 +1,15 @@
-import { eq } from 'drizzle-orm';
 import { afterAll, describe, expect, it } from 'vitest';
-import type { LimitDb } from '../../auth/rate-limit';
-import { payments } from '../../db/schema/payments';
-import { insertUser, testDb, testDbUrl } from '../../db/test-db';
-import { applyProviderStatus, type ProviderReport } from './apply';
-import { startOnlinePayment } from './create';
+import { testDb, testDbUrl } from '../../db/test-db';
+import { applyProviderStatus } from './apply';
+import { countingEffects, started } from './apply-support';
 import type { PaymentEffects } from './effects';
-import { createMockProvider } from './providers/mock';
-import { SITE, auditOf, donationPayment, membershipPayment, paymentRow } from './test-support';
+import { auditOf, paymentRow } from './test-support';
 
-/* docs/07 sections 6 (p. 2.4-2.7, 5), 8, 10: one path for every confirmation from a provider. */
+/* docs/07 sections 6 (p. 2.6-2.7, 5), 8, 10: one path for every confirmation from a provider. */
 
 describe.skipIf(!testDbUrl)('payments: applying a status from the provider', () => {
 	const { inRollback, close } = testDb();
 	afterAll(close);
-
-	async function started(tx: LimitDb, kind: 'membership' | 'donation' = 'membership') {
-		const input = kind === 'membership' ? membershipPayment((await insertUser(tx)).id) : donationPayment();
-		const result = await startOnlinePayment(tx, input, {
-			provider: createMockProvider(),
-			siteUrl: SITE
-		});
-		if (!result.ok) throw new Error(result.reason);
-		const row = await paymentRow(tx, result.paymentId);
-		const report = (status: ProviderReport['status'], extra: Partial<ProviderReport> = {}) => ({
-			provider: 'mock',
-			providerPaymentId: row.providerPaymentId!,
-			status,
-			amountMinor: row.amountMinor,
-			currency: row.currency,
-			raw: { status },
-			...extra
-		});
-		return { id: row.id, report };
-	}
-
-	function countingEffects() {
-		const calls: string[] = [];
-		const effect = (name: string) => async (tx: LimitDb, payment: { id: string }) => {
-			const [row] = await tx.select().from(payments).where(eq(payments.id, payment.id));
-			calls.push(`${name}:${row.status}`);
-		};
-		const effects: PaymentEffects = {
-			membership: { paid: effect('paid'), refunded: effect('refunded'), cancelled: effect('cancelled') }
-		};
-		return { calls, effects };
-	}
 
 	it('paid: status, paid_at, effects inside the same transaction, log entry without an actor', async () => {
 		await inRollback(async (tx) => {
@@ -124,62 +88,6 @@ describe.skipIf(!testDbUrl)('payments: applying a status from the provider', () 
 		});
 	});
 
-	it('a wrong amount or currency never marks paid: the payment fails for review, no effects', async () => {
-		await inRollback(async (tx) => {
-			const { calls, effects } = countingEffects();
-			for (const wrong of [{ amountMinor: 1_999_999 }, { currency: 'USD' }]) {
-				const { id, report } = await started(tx);
-				expect(await applyProviderStatus(tx, report('paid', wrong), effects)).toBe('mismatch');
-				expect(await paymentRow(tx, id)).toMatchObject({
-					status: 'failed',
-					failureReason: 'amount_mismatch',
-					needsReview: true,
-					paidAt: null
-				});
-				const audit = await auditOf(tx, id);
-				expect(audit).toHaveLength(1);
-				expect(audit[0].after).toMatchObject({
-					status: 'failed',
-					failureReason: 'amount_mismatch',
-					needsReview: true
-				});
-				expect(await applyProviderStatus(tx, report('paid', wrong), effects)).toBe('mismatch');
-				expect((await paymentRow(tx, id)).status).toBe('failed');
-			}
-			expect(calls).toEqual([]);
-		});
-	});
-
-	it('a wrong amount on a paid payment flags it for review and keeps it paid', async () => {
-		await inRollback(async (tx) => {
-			const { id, report } = await started(tx, 'donation');
-			await applyProviderStatus(tx, report('paid'), {});
-			expect(await applyProviderStatus(tx, report('refunded', { amountMinor: 100 }), {})).toBe(
-				'mismatch'
-			);
-			expect(await paymentRow(tx, id)).toMatchObject({
-				status: 'paid',
-				needsReview: true,
-				refundedAt: null
-			});
-			expect(await auditOf(tx, id)).toHaveLength(2);
-		});
-	});
-
-	it('an unknown payment is not found and nothing is written', async () => {
-		await inRollback(async (tx) => {
-			const { id, report } = await started(tx);
-			expect(await applyProviderStatus(tx, report('paid', { providerPaymentId: 'mock_none' }), {})).toBe(
-				'not_found'
-			);
-			expect(await applyProviderStatus(tx, report('paid', { provider: 'other' }), {})).toBe(
-				'not_found'
-			);
-			expect((await paymentRow(tx, id)).status).toBe('pending');
-			expect(await auditOf(tx, id)).toEqual([]);
-		});
-	});
-
 	it('pending from a status check changes nothing', async () => {
 		await inRollback(async (tx) => {
 			const { id, report } = await started(tx);
@@ -199,7 +107,9 @@ describe.skipIf(!testDbUrl)('payments: applying a status from the provider', () 
 					}
 				}
 			};
-			await expect(applyProviderStatus(tx, report('paid'), effects)).rejects.toThrow('effect failed');
+			await expect(applyProviderStatus(tx, report('paid'), effects)).rejects.toThrow(
+				'effect failed'
+			);
 			expect(await paymentRow(tx, id)).toMatchObject({ status: 'pending', paidAt: null });
 			expect(await auditOf(tx, id)).toEqual([]);
 			expect(await applyProviderStatus(tx, report('paid'), {})).toBe('applied');

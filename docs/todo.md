@@ -13,6 +13,7 @@
 - `src/lib/server/services/payments/apply.ts` — `applyProviderStatus`: общий путь подтверждения от провайдера (вебхук 3.4, проверка статуса 3.5 / 3.8) — блокировка строки, сверка суммы и валюты, переход, побочные эффекты и аудит в одной транзакции.
 - `src/lib/server/services/payments/effects.ts` — тип побочных эффектов по `kind` (`paid` / `refunded` / `cancelled`); в 3.3 карта пустая, взнос подключит 3.6.
 - Тесты рядом: `transitions.test.ts`, `create.test.ts`, `apply.test.ts` (с базой — проект vitest `server`).
+- GREEN дописал (сплит по лимиту строк): `start-checks.ts` (адрес сайта, проверки входа), `reuse.ts` (повтор «Оплатить»), `status-log.ts` (аудит смены статуса), `index.ts` (`startPayment` — провайдер из `onlineProvider(db)`, адрес из `PUBLIC_SITE_URL`); тесты — `create-checks`, `create-reuse`, `apply-checks` + `apply-support.ts`, `test-support.ts`.
 
 ## Правила (дефолты агента — владелец может поправить)
 
@@ -60,7 +61,7 @@
 
 - [x] SPEC
 - [x] RED (`test: … [RED]`)
-- [ ] GREEN (`feat: … [GREEN]`)
+- [x] GREEN (`feat: … [GREEN]`)
 - [ ] REGRESS
 - [ ] REVIEW: local · bugbot · security-review · сверка со SPEC · PROGRESS · push · CI green
 - [ ] DEPLOY (только по апруву владельца)

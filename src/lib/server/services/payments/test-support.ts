@@ -3,7 +3,11 @@ import type { LimitDb } from '../../auth/rate-limit';
 import { memberships, payments } from '../../db/schema/payments';
 import { auditLog } from '../../db/schema/service';
 import { createMockProvider } from './providers/mock';
-import { PaymentProviderError, type CreatePaymentInput, type OnlineProvider } from './providers/types';
+import {
+	PaymentProviderError,
+	type CreatePaymentInput,
+	type OnlineProvider
+} from './providers/types';
 import type { NewOnlinePayment } from './create';
 
 /* Test support only: payment service tests run inside a rolled-back transaction. */
