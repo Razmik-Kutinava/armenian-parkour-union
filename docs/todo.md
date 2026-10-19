@@ -7,7 +7,7 @@
 
 3.8 — страницы `/payment/success` и `/payment/cancel` (`07` § 1 п. 3, § 3 п. 7, § 7 п. 1, § 15; `06` § 3.3): статус платежа из базы, проверка у провайдера тем же путём, что вебхук, опрос статуса, понятные сообщения. REVIEW — в общем прогоне (без push).
 
-    10|Правила:
+Правила:
 1. **Адрес.** Провайдер возвращает на `{PUBLIC_SITE_URL}{/lang}/payment/success?pid=<payments.id>` и `.../payment/cancel?pid=...`; префикс языка — из `locale` платежа (`localizePath`, EN без префикса). Сейчас адреса без префикса — правка в `create.ts`.
 2. **Сервис** `paymentForReturn(db, pid, deps)` (`services/payments/return.ts`): `pid` не UUID или платежа нет → `null` (страница 404). Платёж `pending`, у него есть `provider_payment_id`, провайдер онлайн (`providerOf`) и `allowCheck()` разрешил → `getStatus` → `applyProviderStatus` (идемпотентность, сумма, эффекты, аудит — как у вебхука и сверки). Ошибка провайдера (`not_found`, недоступен) — не ошибка страницы: лог, показываем статус из базы. Не `pending` — провайдера не спрашиваем. Истечение срока здесь не применяем (это сверка 3.5).
 3. **Что отдаёт** — только `kind`, `status`, `amountMinor`, `currency`. Ни имени, ни email, ни `user_id`, ни назначения: `pid` (случайный UUID) знает только плательщик, проверки владельца нет — гость-донор без сессии тоже должен видеть итог.
@@ -20,7 +20,7 @@
    - `failed` — «Оплата не прошла» + «Попробовать снова»; `cancelled` — «Оплата отменена» + «Попробовать снова»; `refunded` — «Платёж возвращён».
    - «Попробовать снова»: взнос → `/cabinet/membership`, донат → `/donate`, событие → `/events` (регистрации — этап 5). Под заголовком — тип и сумма (`formatPrice`).
 7. **`/dev/mock-pay`** (только dev): ссылка «Вернуться на сайт» ведёт как настоящий банк — `paid` → `/payment/success?pid=`, иначе → `/payment/cancel?pid=`.
-    30|8. Тексты — `i18n/messages/{en,ru}-payment.ts`; HY — откат на EN.
+8. Тексты — `i18n/messages/{en,ru}-payment.ts`; HY — откат на EN.
 
 ## Файлы (ожидаемо)
 
@@ -33,7 +33,7 @@
 
 ## Не ломать
 
-    40|- Возврат на сайт не ставит `paid` сам: только ответ провайдера через `applyProviderStatus`; сумма не совпала → `failed` без эффектов (K2).
+- Возврат на сайт не ставит `paid` сам: только ответ провайдера через `applyProviderStatus`; сумма не совпала → `failed` без эффектов (K2).
 - Повтор страницы и опрос не запускают эффекты дважды (дубль → `unchanged`); вебхук и сверка работают как раньше.
 - На странице нет личных данных плательщика (K4); чужой `pid` не меняет платёж (отмена ничего не отменяет).
 - Старт оплаты взноса и доната (`/join`, `/cabinet/membership`, `/donate`) — без изменений, кроме языка в адресах возврата.
@@ -44,18 +44,30 @@
 - `npx playwright test tests/e2e/payment-return.spec.ts tests/e2e/donate.spec.ts tests/e2e/membership.spec.ts tests/e2e/webhooks.spec.ts`; `npm run check`, `npm run lint`, `npm run test`
 
 ## Риск
-    50|
+
 `high` (платежи: страница запускает проверку статуса у провайдера и применение `paid` с эффектами; гость без сессии).
 
 ## Читать
 
 - `07` § 1, 3, 7, 10, 14, 15; `06` § 3.3 (прочитаны в SPEC).
 
+## Для общего REVIEW — что проверить в 3.8
+
+Дифф: `git diff 8a91883..HEAD -- src tests` (RED `adcbb6a`, GREEN `db2744e`). Риск `high` → bugbot + security-review параллельно, затем `/crit-audit`.
+
+1. **`paid` без провайдера (K2)** — `services/payments/return.ts`: статус меняет только `applyProviderStatus` по ответу `getStatus`; `pid` проверяется `isUuid`; провайдер — `providerById` (вне dev `mock` → `null` → только статус из базы); не `pending` — провайдер не спрашивается; ошибки провайдера глотаются с логом.
+2. **Дубль эффектов (K2)** — опрос 5 раз и повторные заходы: второй `paid` → `unchanged` под `FOR UPDATE` (`apply.ts`), эффекты один раз (unit «effects once»).
+3. **Личные данные (K4)** — `ReturnView` = `kind`, `status`, `amountMinor`, `currency`; страница без имени и email (e2e проверяет HTML). Проверки владельца нет — `pid` как ключ (решение агента; гость без сессии).
+4. **Нагрузка на провайдера** — `limits.paymentReturnPerIp` 20 / мин, считается только для `pending` с онлайн-провайдером; сверх — статус из базы без 429. Ключ — `getClientAddress()` (как у `donatePerIp`).
+5. **Отмена ничего не отменяет** — `/payment/cancel` = тот же `load`; e2e «the visit does not cancel the payment».
+6. **Язык в адресах возврата** — `create.ts`: `localizePath(path, input.locale)`; `locale` типизирован (`Locale`), не из строки запроса.
+7. **Не K, решения агента** — опрос `invalidateAll()` каждые 3 с до 5 раз, без JS — ссылка «Обновить» (`noscript`); `cache-control: no-store`; «Попробовать снова» для `event_fee` → `/events`; `/dev/mock-pay` → success / cancel по статусу (только dev, e2e нет); тексты HY — откат на EN; цепочка `mock` на dev-сервере руками не проверялась (покрыта unit-тестами с `mock`).
+
 ## Фазы
 
-- [x] SPEC
-- [ ] RED (`test: … [RED]`)
-    60|- [ ] GREEN (`feat: … [GREEN]`)
-- [ ] REGRESS
+- [x] SPEC — `8a91883`
+- [x] RED (`test: … [RED]`) — `adcbb6a`
+- [x] GREEN (`feat: … [GREEN]`) — `db2744e`
+- [x] REGRESS — Vitest 703/703; e2e зоны: `payment-return` 8/8, `donate`, `webhooks` зелёные; `membership` в общем прогоне упал на регистрации (`toHaveURL('/')` за 5 с — известная нестабильность), отдельно 6/6
 - [ ] REVIEW — общим прогоном позже (решение 2026-10-19), без push до него
 - [ ] DEPLOY (только по апруву)
