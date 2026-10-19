@@ -92,7 +92,11 @@ describe.skipIf(!testDbUrl)('payments: reconciliation — expiry', () => {
 			const { id, providerPaymentId } = await startedAt(tx, provider);
 			await reconcilePayments(tx, depsFor(provider, later(35)));
 			provider.simulate(providerPaymentId, 'paid');
-			const report = { provider: provider.id, providerPaymentId, ...(await provider.getStatus(providerPaymentId)) };
+			const report = {
+				provider: provider.id,
+				providerPaymentId,
+				...(await provider.getStatus(providerPaymentId))
+			};
 			expect(await applyProviderStatus(tx, report, {})).toBe('applied');
 			expect((await paymentRow(tx, id)).status).toBe('paid');
 		});
@@ -112,7 +116,10 @@ describe.skipIf(!testDbUrl)('payments: reconciliation — expiry', () => {
 			};
 			const summary = await reconcilePayments(tx, depsFor(provider, later(35), effects));
 			expect(summary).toMatchObject({ expired: 1, failed: 1 });
-			expect(await paymentRow(tx, stuck.id)).toMatchObject({ status: 'pending', failureReason: null });
+			expect(await paymentRow(tx, stuck.id)).toMatchObject({
+				status: 'pending',
+				failureReason: null
+			});
 			expect(await auditOf(tx, stuck.id)).toEqual([]);
 			expect((await paymentRow(tx, other.id)).status).toBe('cancelled');
 		});

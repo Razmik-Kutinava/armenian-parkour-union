@@ -1,5 +1,6 @@
 import { redirect } from '@sveltejs/kit';
-import type { Handle } from '@sveltejs/kit/hooks';
+import type { Handle, ServerInit } from '@sveltejs/kit/hooks';
+import { building } from '$app/env';
 import { getSessionCookie } from 'better-auth/cookies';
 import { defaultLocaleRedirect, localeFromPath } from '#lib/i18n/locales.ts';
 import { auth } from '#lib/server/auth/index.ts';
@@ -9,6 +10,11 @@ import { needsProfile, profileGateRedirect } from '#lib/server/auth/profile-gate
 import { toLocalsUser } from '#lib/server/auth/session.ts';
 import { groupsToInvalidate, publicCache } from '#lib/server/cache/index.ts';
 import { db } from '#lib/server/db/index.ts';
+import { startReconcileTimer } from '#lib/server/services/payments/index.ts';
+
+export const init: ServerInit = () => {
+	if (!building) startReconcileTimer(db);
+};
 
 const isAdminPath = (pathname: string) => pathname === '/admin' || pathname.startsWith('/admin/');
 

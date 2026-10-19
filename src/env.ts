@@ -17,5 +17,6 @@ export const variables = defineEnvVars({
 	R2_BUCKET: { schema: optional },
 	R2_PUBLIC_URL: { schema: optional },
 	CACHE_TTL_SECONDS: { schema: optional },
-	PAYMENT_PROVIDER: { schema: optional }
+	PAYMENT_PROVIDER: { schema: optional },
+	CRON_SECRET: { schema: optional }
 });

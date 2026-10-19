@@ -44,7 +44,12 @@ describe.skipIf(!testDbUrl)('payments: reconciliation — status checks', () => 
 		await inRollback(async (tx) => {
 			const { provider } = ownMock();
 			const { id } = await startedAt(tx, provider);
-			provider.getStatus = async () => ({ status: 'paid', amountMinor: 1, currency: 'AMD', raw: {} });
+			provider.getStatus = async () => ({
+				status: 'paid',
+				amountMinor: 1,
+				currency: 'AMD',
+				raw: {}
+			});
 			const { calls, effects } = countingEffects();
 			await reconcilePayments(tx, depsFor(provider, later(3), effects));
 			expect(await paymentRow(tx, id)).toMatchObject({
