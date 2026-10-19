@@ -5,7 +5,7 @@
 
 | Параметр | Значение |
 |---|---|
-| `last_audited_sha` | `7b6b7ee` |
+| `last_audited_sha` | `63c88db` |
 | Дата | 2026-10-19 |
 | Вердикт | CLEAN |
 
@@ -56,3 +56,4 @@
 | 2026-10-18 | 3.1 таблицы платежей `9012220..034fc4b` (код — только `db/schema/{payments,enums,index}.ts`, `drizzle/0007`, `scripts/rollback/0007_down.sql`; сплит e2e — только тесты) | CLEAN | 0 (bugbot: 0; security: 0; триггер журнала вебхуков — SECURITY INVOKER; откат не прогонялся — DROP только по «go») | `034fc4b` |
 | 2026-10-19 | 3.2 провайдеры оплаты `034fc4b..bc1c124`: `services/payments/providers/{types,registry,index,mock,manual}.ts`, `env.ts`, `.env.example` | CLEAN | 0 (bugbot: 0; security: 0; свой проход: `mock` закрыт вне dev и онлайн, и по id, битая подпись / тело / JSON → `null`; e2e: 77 + 11 повтором, `admin-users` «grant a role» падает и на `4db59d0` — не 3.2) | `bc1c124` |
 | 2026-10-19 | 3.3 сервис платежей `bc1c124..7b6b7ee`: `services/payments/{transitions,create,start-checks,reuse,apply,effects,status-log,index}.ts` + тесты | CLEAN | 0 (bugbot: 1 не K — C13; security: 2 не K — C11, C12; e2e 89 + 1 повтором — `auth` «sixth login attempt» отдельно проходит) | `7b6b7ee` |
+| 2026-10-19 | 3.4 маршрут вебхуков `7b6b7ee..63c88db`: `services/payments/{webhook,webhook-body,index}.ts`, `auth/rate-limit.ts`, `api/webhooks/[provider]/+server.ts` + тесты | CLEAN | 0 (bugbot: 0; security: 0, не K — лимит частоты после проверки провайдера, текст ошибки в `error`; свой проход: подпись до записи, событие до обработки, дубль только при `processed_at is null`, эффекты под блокировкой строки; e2e 90 + 2 повтором — `admin-users` «grant a role» и `auth` «sixth login attempt» отдельно 16/16) | `63c88db` |
