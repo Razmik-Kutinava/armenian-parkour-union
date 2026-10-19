@@ -6,7 +6,7 @@
 
 ## Сводка
 
-Этап 0 закрыт: сайт на https://parkour.am (Fly, `fra`), Neon (`parkour_dev`, `parkour_prod`), CI, ручной Deploy, ежедневный бэкап; R2 и почта подключены 2026-10-19. На проде — `ee07760` (этапы 1–2 и 3.1, миграции 0003–0007); `db:seed` прода выполнен — системные страницы черновиками, `/federation` и ссылки подвала 404, пока владелец не опубликует их в `/admin/pages`; почта домена без DMARC. Этапы 1–2 ждут проверки владельцем. Этап 3: 3.1–3.7 сделаны (3.2–3.7 — только код; маршрут вебхуков на проде отвечает 404, пока не подключён провайдер); REVIEW с 3.5 — общим прогоном позже (решение 2026-10-19), до него без push; памятки для общего ревью: 3.6b — `git show c3b6468:docs/todo.md`, 3.7 — `docs/todo.md`; следующая — 3.8 (страницы возврата).
+Этап 0 закрыт: сайт на https://parkour.am (Fly, `fra`), Neon (`parkour_dev`, `parkour_prod`), CI, ручной Deploy, ежедневный бэкап; R2 и почта подключены 2026-10-19. На проде — `ee07760` (этапы 1–2 и 3.1, миграции 0003–0007); `db:seed` прода выполнен — системные страницы черновиками, `/federation` и ссылки подвала 404, пока владелец не опубликует их в `/admin/pages`; почта домена без DMARC. Этапы 1–2 ждут проверки владельцем. Этап 3: 3.1–3.7 сделаны (3.2–3.7 — только код; маршрут вебхуков на проде отвечает 404, пока не подключён провайдер); REVIEW с 3.5 — общим прогоном позже (решение 2026-10-19), до него без push; памятки для общего ревью: 3.6b — `git show c3b6468:docs/todo.md`, 3.7 — `git show 2c0aee1:docs/todo.md`; в работе — 3.8 (страницы возврата).
 
 ## Статус
 
@@ -25,14 +25,15 @@
 | 0 | Подготовка | закрыт (0.1–0.10; R2 и почта подключены 2026-10-19) |
 | 1 | Каркас | ждёт проверки владельцем (1.1–1.13 и вход через Google закрыты) |
 | 2 | Контент | ждёт проверки владельцем (2.1–2.11 закрыты, на проде; системные страницы — опубликовать в `/admin/pages`) |
-| 3 | Членство и платежи | в работе (3.1–3.4 закрыты, 3.5–3.7 ждут общего REVIEW; следующая — 3.8) |
+| 3 | Членство и платежи | в работе (3.1–3.4 закрыты, 3.5–3.7 ждут общего REVIEW; в работе — 3.8) |
 | 4–8 | Баллы → Регистрации и кабинет → Экзамены и сертификаты → Видео и магазин → Доводка и запуск | не начаты |
 
 Статусы: `не начат`, `в работе`, `ждёт проверки владельцем`, `закрыт`.
 
 ## В работе
 
-- 3.7 сделана, ждёт общего REVIEW (риск `high`; SPEC и **что проверить на ревью** — `docs/todo.md`; решения — `decisions.md` 2026-10-19, 3.7). Для 3.8: после доната `/payment/success` — благодарность (`kind = donation`). Для 3.9: назначения — `donation_purposes` (кеш `/donate` — группа `settings`, раздел `donation-purposes` внести в `cache/admin-groups.ts`), письмо о возврате доната и взноса. Для 3.11: `donation_limits` — `{ currency, min_minor, max_minor }`, разбор — `parseDonationLimits`. До деплоя: `db:seed` прода (`donation_limits`).
+- 3.8 в работе: страницы `/payment/success|cancel` — SPEC в `docs/todo.md` (риск `high`).
+- 3.7 сделана, ждёт общего REVIEW (риск `high`; SPEC и **что проверить на ревью** — `git show 2c0aee1:docs/todo.md`; решения — `decisions.md` 2026-10-19, 3.7). Для 3.8: после доната `/payment/success` — благодарность (`kind = donation`). Для 3.9: назначения — `donation_purposes` (кеш `/donate` — группа `settings`, раздел `donation-purposes` внести в `cache/admin-groups.ts`), письмо о возврате доната и взноса. Для 3.11: `donation_limits` — `{ currency, min_minor, max_minor }`, разбор — `parseDonationLimits`. До деплоя: `db:seed` прода (`donation_limits`).
 - 3.6b сделана, ждёт общего REVIEW (риск `high`; SPEC и **что проверить на ревью** — `git show c3b6468:docs/todo.md`). Для 3.7–3.10: кнопка оплаты — `PayFeeForm` (редирект на провайдера через `window.location`, не `goto`), путь страницы `pages` — `pagePath(slug)` (`lib/page-path.ts`), кабинет — `cabinet/+layout.server.ts` (`requireUser`), `/cabinet` (обзор) — 3.10. Проверка цепочки на dev: `.env.development.local` с `PAYMENT_PROVIDER=mock` (переменная процесса не перекрывает `.env`); на dev-базе `db:seed` выполнен 2026-10-19 (`payment_wait_minutes`, `hero_max_active`, страница `join`).
 - 3.6a сделана, ждёт общего REVIEW (риск `high`; SPEC — `git show 3f4b5a8:docs/todo.md`, решения — `decisions.md` 2026-10-19). Письма уходят после коммита через `after(job)` эффекта — `applyProviderStatus` не вызывать внутри чужой транзакции (письмо ушло бы до её коммита). До деплоя: миграция 0008 (откат `scripts/rollback/0008_down.sql`, только по «go»), `db:seed` прода (`payment_wait_minutes`), `CRON_SECRET`; сумма взноса на проде — 0, оплата не начнётся, пока владелец не задаст её (3.11).
 - 3.5 сделана, ждёт общего REVIEW (риск `high`; SPEC — `git show 7ea76b7:docs/todo.md`): сверка — `reconcileNow(db)` (`services/payments`), таймер 5 мин — `init` в `hooks.server.ts`, раз в час — `.github/workflows/cron.yml` → `POST /api/cron/payments`. До деплоя: `CRON_SECRET` (≥ 32 символов, `openssl rand -hex 32`) в Fly secrets и GitHub Secrets — без него маршрут 404, workflow пропускается с предупреждением. Вызов cron — с `Content-Type: application/json` (POST без него SvelteKit режет 403 как форму). Для 3.6 и этапа 5: при истечении эффект `paymentEffects[kind].cancelled` (закрыть `pending` членство, освободить место) — в транзакции смены статуса. `pending` старше суток → `needs_review` (список — 3.9). Состояние `mock` в памяти: после перезапуска dev-сервера истёкшие mock-платежи закроются как `not_found`.
