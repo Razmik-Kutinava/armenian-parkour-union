@@ -115,7 +115,9 @@ test('cancel page: not completed and try again; the visit does not cancel the pa
 	expect(await statusOf(id)).toBe('pending');
 });
 
-test('cancelled and failed membership: clear titles, try again in the cabinet', async ({ page }) => {
+test('cancelled and failed membership: clear titles, try again in the cabinet', async ({
+	page
+}) => {
 	const main = page.locator('main');
 	await page.goto(`/payment/cancel?pid=${await payment('membership', 'cancelled')}`);
 	await expect(main.getByRole('heading', { level: 1, name: /was cancelled/ })).toBeVisible();

@@ -14,7 +14,9 @@ export const limits = {
 	passwordResetPerIp: { windowMs: 15 * 60_000, max: 5 },
 	webhookPerIp: { windowMs: 60_000, max: 120 },
 	/** A guest can start a donation: each one opens a session at the provider. */
-	donatePerIp: { windowMs: 60 * 60_000, max: 10 }
+	donatePerIp: { windowMs: 60 * 60_000, max: 10 },
+	/** The return page asks the provider about a pending payment; the page itself polls 5 times. */
+	paymentReturnPerIp: { windowMs: 60_000, max: 20 }
 } satisfies Record<string, LimitRule>;
 
 /* Fixed window per key; `last_request` holds the start of the current window (ms). */

@@ -1,5 +1,5 @@
 import { eq, sql } from 'drizzle-orm';
-import type { Locale } from '#lib/i18n/locales.ts';
+import { localizePath, type Locale } from '#lib/i18n/locales.ts';
 import type { Currency } from '#lib/money.ts';
 import type { LimitDb } from '../../auth/rate-limit';
 import { payments } from '../../db/schema/payments';
@@ -79,8 +79,8 @@ export async function startOnlinePayment(
 				amountMinor: input.amountMinor,
 				currency: input.currency,
 				description: input.description,
-				successUrl: returnUrl(base, '/payment/success', id),
-				cancelUrl: returnUrl(base, '/payment/cancel', id),
+				successUrl: returnUrl(base, localizePath('/payment/success', input.locale), id),
+				cancelUrl: returnUrl(base, localizePath('/payment/cancel', input.locale), id),
 				locale: input.locale,
 				payerEmail: input.payerEmail
 			});

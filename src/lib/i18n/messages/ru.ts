@@ -10,6 +10,7 @@ import { ruMedia } from './ru-media';
 import { ruMembership } from './ru-membership';
 import { ruNews } from './ru-news';
 import { ruPages } from './ru-pages';
+import { ruPayment } from './ru-payment';
 import { ruSystem } from './ru-system';
 import { ruUsers } from './ru-users';
 
@@ -27,6 +28,7 @@ export const ru: Partial<Messages> = {
 	...ruGoogle,
 	...ruMembership,
 	...ruDonate,
+	...ruPayment,
 	'site.description': 'Союз паркура Армении: события, новости, членство и аттестация.',
 	'site.underConstruction': 'Сайт в разработке.',
 	'common.close': 'Закрыть',

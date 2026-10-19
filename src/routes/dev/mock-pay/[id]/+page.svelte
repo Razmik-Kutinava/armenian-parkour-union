@@ -26,7 +26,9 @@
 			<Button type="submit" name="status" value="cancelled" variant="ghost">Cancel</Button>
 		</form>
 	{/if}
-	<a class="underline" href={payment.kind === 'membership' ? '/cabinet/membership' : '/'}
-		>Back to the site</a
+	<a
+		class="underline"
+		href="/payment/{payment.status === 'paid' ? 'success' : 'cancel'}?pid={payment.id}"
+		>Return to the site</a
 	>
 </main>

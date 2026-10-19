@@ -1,14 +1,16 @@
 import { PUBLIC_SITE_URL } from '$app/env/private';
-import type { LimitDb } from '../../auth/rate-limit';
+import { consume, limits, type LimitDb } from '../../auth/rate-limit';
 import { startOnlinePayment, type NewOnlinePayment, type StartResult } from './create';
 import { onlineProvider, providerById } from './providers';
 import { reconcilePayments, type ReconcileSummary } from './reconcile';
+import { paymentForReturn, type ReturnView } from './return';
 import { singleFlight, startTimer } from './schedule';
 
 export { applyProviderStatus, type ApplyResult, type ProviderReport } from './apply';
 export type { NewOnlinePayment, StartResult } from './create';
 export { paymentEffects, type PaymentEffect, type PaymentEffects } from './effects';
 export type { ReconcileSummary } from './reconcile';
+export type { ReturnView } from './return';
 export { receiveWebhook } from './webhook';
 
 /** A new online payment: provider by `PAYMENT_PROVIDER` + `feature_flags`, addresses by `PUBLIC_SITE_URL`. */
@@ -16,6 +18,18 @@ export async function startPayment(db: LimitDb, input: NewOnlinePayment): Promis
 	return startOnlinePayment(db, input, {
 		provider: await onlineProvider(db),
 		siteUrl: PUBLIC_SITE_URL
+	});
+}
+
+/** docs/07 section 7 p. 1: `/payment/success|cancel`; provider checks are limited per IP. */
+export function checkPaymentReturn(
+	db: LimitDb,
+	pid: string,
+	ip: string
+): Promise<ReturnView | null> {
+	return paymentForReturn(db, pid, {
+		providerOf: providerById,
+		allowCheck: () => consume(db, `payment-return:ip:${ip}`, limits.paymentReturnPerIp)
 	});
 }
 

@@ -94,7 +94,10 @@ describe.skipIf(!testDbUrl)('payments: the return page', () => {
 		await inRollback(async (tx) => {
 			const { provider } = ownMock();
 			const { id } = await startedAt(tx, provider);
-			const errors = [new PaymentProviderError('not_found'), new PaymentProviderError('unreachable')];
+			const errors = [
+				new PaymentProviderError('not_found'),
+				new PaymentProviderError('unreachable')
+			];
 			for (const error of [...errors, new Error('socket hang up')]) {
 				provider.getStatus = async () => {
 					throw error;
