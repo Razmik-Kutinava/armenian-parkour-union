@@ -31,7 +31,11 @@ describe.skipIf(!testDbUrl)('payments: webhook — recording and processing', ()
 			expect((await paymentRow(tx, id)).status).toBe('paid');
 			expect(calls).toEqual(['paid:paid']);
 			const [event] = await webhookEvents(tx, eventIdOf(sent));
-			expect(event).toMatchObject({ provider: 'mock', error: null, payload: JSON.parse(sent.body) });
+			expect(event).toMatchObject({
+				provider: 'mock',
+				error: null,
+				payload: JSON.parse(sent.body)
+			});
 			expect(event.processedAt).toBeInstanceOf(Date);
 		});
 	});
@@ -42,7 +46,9 @@ describe.skipIf(!testDbUrl)('payments: webhook — recording and processing', ()
 			const { calls, effects } = countingEffects();
 			const sent = mock.simulate(providerPaymentId, 'paid');
 			for (let i = 0; i < 2; i++) {
-				expect(await receiveWebhook(tx, mock, toRequest(sent), { ip: testIp(), effects })).toBe(200);
+				expect(await receiveWebhook(tx, mock, toRequest(sent), { ip: testIp(), effects })).toBe(
+					200
+				);
 			}
 			expect(await webhookEvents(tx, eventIdOf(sent))).toHaveLength(1);
 			expect(calls).toEqual(['paid:paid']);

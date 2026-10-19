@@ -6,6 +6,7 @@ import { onlineProvider } from './providers';
 export { applyProviderStatus, type ApplyResult, type ProviderReport } from './apply';
 export type { NewOnlinePayment, StartResult } from './create';
 export { paymentEffects, type PaymentEffect, type PaymentEffects } from './effects';
+export { receiveWebhook } from './webhook';
 
 /** A new online payment: provider by `PAYMENT_PROVIDER` + `feature_flags`, addresses by `PUBLIC_SITE_URL`. */
 export async function startPayment(db: LimitDb, input: NewOnlinePayment): Promise<StartResult> {

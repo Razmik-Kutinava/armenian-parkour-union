@@ -17,8 +17,7 @@ describe.skipIf(!testDbUrl)('payments: webhook — refused before recording', ()
 		await inRollback(async (tx) => {
 			const { mock, providerPaymentId } = await startedAtMock(tx);
 			const sent = mock.simulate(providerPaymentId, 'paid');
-			const { parseWebhook: _, ...withoutWebhooks } = createMockProvider();
-			const silent: OnlineProvider = withoutWebhooks;
+			const silent: OnlineProvider = { ...createMockProvider(), parseWebhook: undefined };
 			for (const provider of [null, manualProvider, silent]) {
 				expect(await receiveWebhook(tx, provider, toRequest(sent), { ip: testIp() })).toBe(404);
 			}

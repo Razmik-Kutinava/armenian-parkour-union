@@ -11,7 +11,8 @@ export const limits = {
 	signInPerIp: { windowMs: 60_000, max: 5 },
 	staffSignInFailures: { windowMs: 15 * 60_000, max: 5 },
 	signUpPerIp: { windowMs: 60 * 60_000, max: 10 },
-	passwordResetPerIp: { windowMs: 15 * 60_000, max: 5 }
+	passwordResetPerIp: { windowMs: 15 * 60_000, max: 5 },
+	webhookPerIp: { windowMs: 60_000, max: 120 }
 } satisfies Record<string, LimitRule>;
 
 /* Fixed window per key; `last_request` holds the start of the current window (ms). */
