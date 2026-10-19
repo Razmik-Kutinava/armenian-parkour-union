@@ -97,8 +97,7 @@ describe.skipIf(!testDbUrl)('donations: starting a payment', () => {
 				).toEqual({ ok: false, reason: 'amount' });
 			}
 			expect(await donationsBy(tx, email)).toEqual([]);
-			const edges = ['1000', '1 000 000'];
-			for (const amount of edges) {
+			for (const amount of ['1000', '1 000 000']) {
 				const result = await startDonationPayment(
 					tx,
 					guestInput({ amount, donorEmail: email }),
@@ -181,11 +180,9 @@ describe.skipIf(!testDbUrl)('donations: starting a payment', () => {
 	it('too many donations from one address: limited, nothing created', async () => {
 		await inRollback(async (tx) => {
 			const email = `flood-${crypto.randomUUID()}@example.com`;
-			const ip = `198.51.100.${Math.floor(Math.random() * 250)}-${crypto.randomUUID()}`;
-			const deps = donationDeps(createMockProvider(), {
-				ip,
-				limit: { windowMs: 60_000, max: 2 }
-			});
+			const ip = `test-${crypto.randomUUID()}`;
+			const limit = { windowMs: 60_000, max: 2 };
+			const deps = donationDeps(createMockProvider(), { ip, limit });
 			for (let i = 0; i < 2; i++) {
 				expect((await startDonationPayment(tx, guestInput({ donorEmail: email }), deps)).ok).toBe(
 					true
