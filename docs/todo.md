@@ -45,11 +45,23 @@
 
 - `06` § 3 (маршруты), 4.9, 5.3, 9; `07` § 3, 5.1 (прочитаны в SPEC: кнопка по трём состояниям, «Ожидаем подтверждение платежа», ошибка оплаты — причина и «Попробовать снова»).
 
+## Для общего REVIEW — что проверить в 3.6b
+
+Дифф: `git diff 3941dd4..22e8eac -- src tests`. Риск `high` → bugbot + security-review.
+
+1. **Сумма (K2, C11)** — `(site)/pay-membership.ts`: форма без полей, сумма только из `membership_fee` через `startMembership`; лишние поля формы ни на что не влияют.
+2. **Кабинет (K1)** — `cabinet/+layout.server.ts` и `cabinet/membership/+page.server.ts`: `userId` только из сессии; действие `pay` само проверяет вход (layout действие не защищает); `getMembershipOverview` не отдаёт чужие строки.
+3. **`/dev/mock-pay` (K2)** — `routes/dev/mock-pay/[id]/+page.server.ts`: `!dev` → 404 и в load, и в action; `settleMockPayment` не меняет статус мимо `receiveWebhook` и только для `provider = 'mock'`; статус из формы — только `paid | failed | cancelled`.
+4. **Редирект** — `PayFeeForm.svelte`: `window.location.assign(result.location)`; адрес — только `checkoutUrl` провайдера или `/login?returnTo=<свой путь>`, без открытого редиректа из запроса.
+5. **Отказы** — `PaymentConfigError` → 503 «недоступна» (не 500); `provider_error` → 502; гость → `/login?returnTo=`; e2e `membership.spec.ts` подменяет `membership_fee` в общей `parkour_dev` и возвращает в `afterAll` (риск гонки с другими спеками).
+6. **Пути страниц** — `lib/page-path.ts`: `/pages/about` и `/pages/join` → 301, sitemap / canonical / ссылка админки как раньше; `join` в `SYSTEM_PAGE_SLUGS` (нельзя удалить, slug не меняется).
+7. **Не K, решения агента** — `/join` открыт и без опубликованной страницы `join` (у `/federation` — 404); `paidUntil` считается только из последних 50 периодов; `/cabinet` (обзор) — 404 до 3.10; тексты HY — откат на EN.
+
 ## Фазы
 
-- [x] SPEC
-- [ ] RED (`test: … [RED]`)
-- [ ] GREEN (`feat: … [GREEN]`)
-- [ ] REGRESS
+- [x] SPEC — `3941dd4`
+- [x] RED (`test: … [RED]`) — `be45bbe`
+- [x] GREEN (`feat: … [GREEN]`) — `22e8eac`
+- [x] REGRESS — Vitest 660/660; e2e зоны 37/37 (membership, webhooks, cron, cron-memberships, site-layout, pages, seo, content-visibility, i18n); полный e2e не гонялся; цепочка на dev с `mock` — скриптом: оплата → членство `active`, повтор «Оплатить» → тот же платёж
 - [ ] REVIEW — общим прогоном позже (решение 2026-10-19), без push до него
 - [ ] DEPLOY (только по апруву; вместе с 3.5–3.6a: миграция 0008, `db:seed` прода — `payment_wait_minutes`, страница `join`)
