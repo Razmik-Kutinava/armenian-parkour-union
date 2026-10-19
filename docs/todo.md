@@ -4,57 +4,52 @@
 
 ## Задача
 
-3.6a — членский взнос, серверная часть (`07` § 5.1, `03` § 2): старт оплаты взноса, эффекты платежа для членства, ежедневная задача (истечение, напоминания), письма. Страницы `/join`, `/cabinet/membership`, `/dev/mock-pay` — 3.6b. Решения владельца — `decisions.md` 2026-10-19 (3.6). SPEC 3.5 — `git show 7ea76b7:docs/todo.md`.
+3.6b — членский взнос, страницы (`06` § 4.9, 5.3; `07` § 3, 5.1): `/join`, `/cabinet/membership`, `/dev/mock-pay/[id]`. Серверная часть — 3.6a (SPEC — `git show 3f4b5a8:docs/todo.md`). Решения — `decisions.md` 2026-10-19 (3.6).
 
 Правила:
-1. **Старт** `startMembershipPayment(db, userId, locale, deps)`: пользователь есть, не удалён, `status = active` (иначе `blocked`), email подтверждён (иначе `email_unverified`, `03` § 1 п. 2). Взнос `membership_fee` (`amount_minor` целое > 0, валюта из `CURRENCIES`, `period_months` целое 1…120) и `payment_wait_minutes` (целое 1…1440) — иначе `unavailable`; онлайн-оплаты нет — тоже `unavailable`. Сумма, валюта — только из настроек (C11). Под тем же advisory-lock, что `startOnlinePayment` (`payment:<user>:membership`): есть `pending` членство с живым `pending` платежом той же суммы, валюты и провайдера — оно (повтор отдаёт тот же адрес оплаты); иначе новое `pending` членство. После старта `memberships.payment_id` = платёж. Ошибка провайдера — платёж `failed`, членство остаётся `pending` (закроет ежедневная задача).
-2. **Оплачен** (эффект `paid`, в транзакции смены статуса): строки пользователя и членства `FOR UPDATE`. Не активируем, платёж `needs_review` + аудит `membership.not_activated` с причиной: у платежа нет членства или пользователя / членство чужое / пользователь заблокирован или удалён (`07` § 8) / членство уже `active` или `expired`. Иначе `active`: `starts_at` = max(сейчас, самый поздний `ends_at` действующих членств пользователя), `ends_at` = `starts_at` + `period_months` (в SQL, `make_interval`); `payment_id` = платёж; `users.level` пуст → `novice` (аудит `user.level`, без исполнителя). Членство было `cancelled` (поздняя оплата) — активируем и `needs_review`. Аудит `membership.status` без исполнителя. Письмо об оплате — **после коммита**: сумма, дата, назначение и период, номер платежа, реквизиты (`07` § 12), ссылка на `/cabinet/membership`, язык — `users.locale`.
-3. **Отменён** (`cancelled`: истёк или отмена): связанное членство `pending` → `cancelled` + аудит. **`failed`** — без эффекта (`07` § 5.1 п. 5). **Возврат** (`refunded`): связанное членство `active` / `expired` → `cancelled` + аудит (степень не трогаем, `03` § 2 п. 6; письмо о возврате — 3.9).
-4. **После коммита**: эффект получает `after(job)`; `applyProviderStatus` и `expirePayment` выполняют задания после транзакции, ошибка задания — в лог, на результат не влияет; откат транзакции — задания не выполняются.
-5. **Ежедневная задача** `runMembershipDaily(db, { now, send })`: (а) `active` с `ends_at <= now` → `expired` + аудит; (б) `pending` старше суток без `pending` платежа → `cancelled` + аудит; (в) напоминания: за 7 дней (`ends_at` в (now; now + 7 сут]) и за 30 (в (now + 7; now + 30 сут]) — только последнее членство пользователя (нет `active` с более поздним `ends_at`), пользователь активен и не удалён, отметка `reminded_7_at` / `reminded_30_at` ставится атомарно (`update … where … is null returning`) до отправки — повтор не шлёт второй раз. Итог `{ expired, closed, reminded }`.
-6. **Маршрут** `POST /api/cron/memberships`: доступ — `cronAccess` (как `/api/cron/payments`), ответ — счётчики JSON. `cron.yml`: расписание `0 5 * * *` (09:00 Ереван) → этот маршрут; ежечасное — только сверка; ручной запуск — обе.
-7. Seed: `payment_wait_minutes: 30`.
-
-## Миграция 0008 (Migration Gate — «go» получен 2026-10-19)
-
-- Что: `ALTER TABLE memberships ADD COLUMN reminded_30_at timestamptz, ADD COLUMN reminded_7_at timestamptz` (nullable, без значений по умолчанию; данных не трогает).
-- Откат: `scripts/rollback/0008_down.sql` — `DROP COLUMN IF EXISTS` обоих полей (теряются только отметки напоминаний), затем удалить запись 0008 из `drizzle.__drizzle_migrations` и `drizzle/meta`.
+1. **Кнопка «Оплатить»** (одно действие `pay` на обеих страницах): гость → `/login?returnTo=`; иначе `startMembership(db, user.id, locals.locale)`; `ok` → `303` на `checkoutUrl`; отказ → сообщение по причине (`email_unverified` — «подтвердите email», `blocked` / `not_found` — как гость не бывает, общее; `unavailable` / `invalid` — «оплата сейчас недоступна»; `provider_error` — «не удалось, попробуйте снова»); `PaymentConfigError` → лог + «недоступна» (не 500). Сумма с формы не принимается (C11): форма без полей.
+2. **`/join`** открыт всем: текст системной страницы `pages` slug `join`, если опубликована (заголовок и SEO — из неё; иначе заголовок из переводов). Блок взноса: сумма и срок из `membershipFee` (`null` → «размер взноса скоро появится», кнопки нет). Кнопка: гость → «Зарегистрироваться» (`/register`) и «Войти»; вошедший с действующим членством → «Вы уже в федерации» + ссылка на `/cabinet/membership`; иначе → «Оплатить». `/pages/join` → `301` на `/join`; в sitemap, каноническом адресе и ссылке админки страница `join` — `/join` (общая функция пути страницы вместо `slug === 'about'` в 4 местах).
+3. **Seed**: `join` — системная страница (черновик, заголовок EN / HY / RU), в `SYSTEM_PAGE_SLUGS`.
+4. **`/cabinet/*`**: общий `+layout.server.ts` — гость → `/login?returnTo=<путь>` (`requireUser` в `auth/guard.ts`). `/cabinet` (обзор) — 3.10, не делаем.
+5. **`/cabinet/membership`**: сервис `getMembershipOverview(db, userId)` — только строки этого пользователя: `current` — `active`, `starts_at <= now < ends_at`; `paidUntil` — самый поздний `ends_at` среди `active` (продление вперёд); `waiting` — есть `pending` членство с `pending` платежом, срок которого не истёк («Ожидаем подтверждение платежа»); `history` — членства с `starts_at` (были оплачены), новые первыми, ≤ 50. Кнопка «Оплатить» / «Продлить» (есть действующее) — то же действие `pay`; при `waiting` повтор отдаёт тот же платёж (3.6a). Блок взноса — как на `/join`.
+6. **`/dev/mock-pay/[id]`**: `if (!dev) error(404)` в load и action. Сервис `services/payments/mock-pay.ts`: `getMockCheckout(db, providerPaymentId)` — платёж `provider = 'mock'` (сумма, валюта, назначение, статус) или `null` → 404; `settleMockPayment(db, provider, providerPaymentId, status)` — `status` из `paid | failed | cancelled` (иное → 400), провайдер не mock (`null` / без `simulate`) → `not_found`; `simulate()` → подписанный запрос → `receiveWebhook` (весь путь: подпись, дедуп, `applyProviderStatus`, эффекты); mock не знает платёж (перезапуск сервера) → `not_found`. После — итог на странице и ссылка на `/cabinet/membership` (страницы возврата — 3.8).
 
 ## Файлы (ожидаемо)
 
-- `src/lib/server/db/schema/payments.ts`, `drizzle/0008_*.sql`, `scripts/rollback/0008_down.sql`
-- `src/lib/server/services/payments/effects.ts`, `apply.ts`, `expire.ts` — `after`; `settings.ts` — `paymentWaitMinutes`
-- `src/lib/server/services/memberships/` — `fee.ts`, `start.ts`, `effects.ts` (+ активация), `daily.ts`, `mail.ts`, `index.ts`
-- `src/routes/api/cron/memberships/+server.ts`, `.github/workflows/cron.yml`
-- `src/lib/server/seed/settings.ts` (+ тест), `src/lib/i18n/messages/{en,ru}-membership.ts`
-- тесты: `memberships/start.test.ts`, `effects.test.ts`, `daily.test.ts`, `fee.test.ts`, `payments/after-commit.test.ts`, `tests/e2e/cron-memberships.spec.ts`
-- сделано: `memberships/{fee,start,activate,effects,log,mail,daily,reminders,index}.ts`, `payments/settings.ts`, `i18n/messages/{en,ru}-membership.ts`
+- `src/lib/server/services/memberships/overview.ts` (+ `overview.test.ts`) — состояние членства для страниц
+- `src/lib/server/services/payments/mock-pay.ts` (+ `mock-pay.test.ts`) — dev-оплата через вебхук
+- `src/lib/page-path.ts` (+ тест) — путь страницы `pages` (`about` → `/federation`, `join` → `/join`); правки `pages/view.ts`, `seo/sitemap.ts`, `admin/pages/[id]/+page.server.ts`, `pages/[slug]/+page.server.ts`
+- `src/lib/server/seed/pages.ts`, `src/lib/validation/pages.ts` (+ их тесты) — `join`
+- `src/lib/server/auth/guard.ts` — `requireUser`
+- маршруты: `[[lang=lang]]/(site)/join/`, `[[lang=lang]]/(site)/cabinet/+layout.server.ts`, `cabinet/membership/`, `(site)/pay-membership.ts` (общее действие), `dev/mock-pay/[id]/`
+- `src/lib/components/site/MembershipFee.svelte` — блок взноса; `src/lib/i18n/messages/{en,ru}-membership.ts`
+- `tests/e2e/membership.spec.ts`
 
 ## Не ломать
 
-- Вебхук, сверка, истечение: тесты 3.3–3.5 зелёные; дубль вебхука не создаёт второго членства (K2, `07` § 15).
-- Членство активируется только эффектом `paid` (подтверждение провайдера), сумма — только из настроек; при `amount_minor = 0` оплату не начинать.
-- Продление не теряет оплаченных дней; истёкшее членство не трогает степень и баллы (`03` § 2 п. 5).
-- Ошибка письма не откатывает оплату (`03` § 14).
+- Сумма — только из `membership_fee` (C11); при 0 / битой — кнопки нет, действие отвечает «недоступна»; оплата не начинается без входа и без подтверждённого email.
+- Членство активируется только эффектом `paid` после подтверждения провайдера: `/dev/mock-pay` идёт через `receiveWebhook`, вне dev — 404 (и mock вне dev недоступен через `providerById`).
+- Кабинет показывает только данные текущего пользователя (`04` § 5.3); гость → вход.
+- Системные страницы (`about` → `/federation`, остальные `/pages/…`), sitemap и канонические адреса — как были.
 
 ## Проверка
 
-- `npx vitest --run src/lib/server/services/memberships src/lib/server/services/payments src/lib/server/seed`
-- `npm run check`, `npm run lint`, `npm run test`
+- `npx vitest --run src/lib/server/services/memberships src/lib/server/services/payments src/lib/server/seed src/lib/validation/pages src/lib/page-path src/lib/server/services/seo`
+- `npx playwright test tests/e2e/membership.spec.ts tests/e2e/pages.spec.ts tests/e2e/seo.spec.ts`; `npm run check`, `npm run lint`, `npm run test`
 
 ## Риск
 
-`high` (взносы, платежи, миграция, `+server.ts`, `.github`).
+`high` (взносы и платежи: действие старта оплаты, dev-маршрут оплаты; права кабинета).
 
 ## Читать
 
-- `07` § 5.1, 7, 8, 10, 11 п. 3, 12 п. 1, 15; `03` § 1 п. 2, § 2, § 14; `02` § 2 `memberships`, § 10 `site_settings`; `06` § 4.9, 5.3, 6 (для 3.6b).
+- `06` § 3 (маршруты), 4.9, 5.3, 9; `07` § 3, 5.1 (прочитаны в SPEC: кнопка по трём состояниям, «Ожидаем подтверждение платежа», ошибка оплаты — причина и «Попробовать снова»).
 
 ## Фазы
 
 - [x] SPEC
-- [x] RED (`test: … [RED]`) — `f767e92`
-- [x] GREEN (`feat: … [GREEN]`) — `3f4b5a8`; настройки (взнос, срок ожидания, период) старт и эффекты получают параметрами: тесты не пишут в общую `site_settings` (соседние тесты делают `DELETE` всей таблицы и ждали блокировок > 20 с); разбор настроек — чистые тесты `fee.test.ts`
-- [x] REGRESS — Vitest 640/640; e2e зоны (cron, cron-memberships, webhooks) 8/8; полный e2e 97 + `admin-users.spec.ts:140` «grant a role» (известный, падает и до 3.2)
+- [ ] RED (`test: … [RED]`)
+- [ ] GREEN (`feat: … [GREEN]`)
+- [ ] REGRESS
 - [ ] REVIEW — общим прогоном позже (решение 2026-10-19), без push до него
-- [ ] DEPLOY (только по апруву: миграция 0008, `db:seed` прода — `payment_wait_minutes`)
+- [ ] DEPLOY (только по апруву; вместе с 3.5–3.6a: миграция 0008, `db:seed` прода — `payment_wait_minutes`, страница `join`)
