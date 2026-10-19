@@ -5,6 +5,7 @@ import { enGoogle } from './en-google';
 import { enHero } from './en-hero';
 import { enHome } from './en-home';
 import { enMedia } from './en-media';
+import { enMembership } from './en-membership';
 import { enNews } from './en-news';
 import { enPages } from './en-pages';
 import { enSystem } from './en-system';
@@ -23,6 +24,7 @@ export const en = {
 	...enHero,
 	...enHome,
 	...enGoogle,
+	...enMembership,
 	'site.name': 'Armenian Parkour Union',
 	'site.description': 'Armenian Parkour Union: events, news, membership and certification.',
 	'site.underConstruction': 'Site under construction.',

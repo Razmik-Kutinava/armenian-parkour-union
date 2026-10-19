@@ -46,6 +46,9 @@ export const memberships = pgTable(
 		startsAt: timestamp('starts_at', { withTimezone: true }),
 		endsAt: timestamp('ends_at', { withTimezone: true }),
 		paymentId: uuid('payment_id').references((): AnyPgColumn => payments.id),
+		/** Set before the "ends soon" letter goes, so a rerun of the daily job does not send it twice. */
+		reminded30At: timestamp('reminded_30_at', { withTimezone: true }),
+		reminded7At: timestamp('reminded_7_at', { withTimezone: true }),
 		createdAt,
 		updatedAt
 	},

@@ -1,7 +1,14 @@
 import { and, eq } from 'drizzle-orm';
 import type { LimitDb } from '../../auth/rate-limit';
 import { payments } from '../../db/schema/payments';
-import { paymentEffects, runEffects, type PaymentEffects, type PaymentRow } from './effects';
+import {
+	paymentEffects,
+	runEffects,
+	withAfterCommit,
+	type AfterCommit,
+	type PaymentEffects,
+	type PaymentRow
+} from './effects';
 import type { ProviderStatus } from './providers/types';
 import { logStatusChange } from './status-log';
 import { canTransition } from './transitions';
@@ -36,6 +43,15 @@ export async function applyProviderStatus(
 	db: LimitDb,
 	report: ProviderReport,
 	effects: PaymentEffects = paymentEffects
+): Promise<ApplyResult> {
+	return withAfterCommit((after) => applyInTransaction(db, report, effects, after));
+}
+
+function applyInTransaction(
+	db: LimitDb,
+	report: ProviderReport,
+	effects: PaymentEffects,
+	after: AfterCommit
 ): Promise<ApplyResult> {
 	return db.transaction(async (tx) => {
 		const [payment] = await tx
@@ -86,7 +102,7 @@ export async function applyProviderStatus(
 			})
 			.where(eq(payments.id, payment.id))
 			.returning();
-		await runEffects(tx, effects, updated);
+		await runEffects(tx, effects, updated, after);
 		await logStatusChange(tx, payment.id, payment, updated);
 		return 'applied';
 	});

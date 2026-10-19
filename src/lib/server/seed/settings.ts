@@ -15,7 +15,9 @@ export const SEED_SETTINGS = {
 	feature_flags: {},
 	/** docs/03 section 11: active hero blocks at most (decisions.md 2026-10-08, 2.6). */
 	hero_max_active: 5,
-	membership_fee: { amount_minor: 0, currency: 'AMD', period_months: 12 }
+	membership_fee: { amount_minor: 0, currency: 'AMD', period_months: 12 },
+	/** How long a fee or donation payment waits at the provider (decisions.md 2026-10-19, 3.6). */
+	payment_wait_minutes: 30
 };
 
 /** Adds missing keys only: values changed in the admin panel are never overwritten. */

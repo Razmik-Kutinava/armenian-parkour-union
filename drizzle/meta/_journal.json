@@ -57,6 +57,13 @@
       "when": 1792325070265,
       "tag": "0007_payments_memberships",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1792418748204,
+      "tag": "0008_membership_reminders",
+      "breakpoints": true
     }
   ]
 }

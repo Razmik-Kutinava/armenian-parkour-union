@@ -8,15 +8,14 @@ import { createMockProvider } from '../payments/providers/mock';
 import { SITE, membershipPayment, paymentRow } from '../payments/test-support';
 import { startMembershipPayment } from './start';
 import {
-	FEE,
 	auditFor,
 	daysFromNow,
 	effectsWith,
-	feeSettings,
 	mailbox,
 	membershipRow,
 	membershipsOf,
 	settle,
+	startDeps,
 	verifiedUser
 } from './test-support';
 
@@ -30,10 +29,9 @@ describe.skipIf(!testDbUrl)('memberships: payment effects', () => {
 	afterAll(close);
 
 	async function begin(tx: Parameters<Parameters<typeof inRollback>[0]>[0], values = {}) {
-		await feeSettings(tx);
 		const user = await verifiedUser(tx, values);
 		const provider = createMockProvider();
-		const result = await startMembershipPayment(tx, user.id, 'en', { provider, siteUrl: SITE });
+		const result = await startMembershipPayment(tx, user.id, 'en', startDeps(provider));
 		if (!result.ok) throw new Error(result.reason);
 		const [membership] = await membershipsOf(tx, user.id);
 		return { user, provider, paymentId: result.paymentId, membershipId: membership.id };
@@ -127,7 +125,11 @@ describe.skipIf(!testDbUrl)('memberships: payment effects', () => {
 			await settle(tx, cancelled.provider, cancelled.paymentId, 'cancelled', effects);
 			expect((await membershipRow(tx, cancelled.membershipId)).status).toBe('cancelled');
 			expect(await auditFor(tx, 'membership', cancelled.membershipId)).toMatchObject([
-				{ action: 'membership.status', before: { status: 'pending' }, after: { status: 'cancelled' } }
+				{
+					action: 'membership.status',
+					before: { status: 'pending' },
+					after: { status: 'cancelled' }
+				}
 			]);
 			const failed = await begin(tx);
 			await settle(tx, failed.provider, failed.paymentId, 'failed', effects);
@@ -174,7 +176,6 @@ describe.skipIf(!testDbUrl)('memberships: payment effects', () => {
 
 	it('a fee payment without a membership: nothing activated, needs review', async () => {
 		await inRollback(async (tx) => {
-			await feeSettings(tx);
 			const user = await verifiedUser(tx);
 			const provider = createMockProvider();
 			const result = await startOnlinePayment(tx, membershipPayment(user.id), {
@@ -213,9 +214,9 @@ describe.skipIf(!testDbUrl)('memberships: payment effects', () => {
 	it('fee period broken at confirmation: the change rolls back, payment stays pending', async () => {
 		await inRollback(async (tx) => {
 			const { provider, paymentId, membershipId } = await begin(tx);
-			await feeSettings(tx, { ...FEE, period_months: 'year' });
 			const { sent, send } = mailbox();
-			await expect(settle(tx, provider, paymentId, 'paid', effectsWith(send))).rejects.toThrow();
+			const broken = effectsWith(send, null);
+			await expect(settle(tx, provider, paymentId, 'paid', broken)).rejects.toThrow();
 			expect((await paymentRow(tx, paymentId)).status).toBe('pending');
 			expect((await membershipRow(tx, membershipId)).status).toBe('pending');
 			expect(sent).toEqual([]);

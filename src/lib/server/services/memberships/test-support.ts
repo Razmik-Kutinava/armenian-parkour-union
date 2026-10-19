@@ -1,29 +1,26 @@
 import { and, asc, eq } from 'drizzle-orm';
 import type { LimitDb } from '../../auth/rate-limit';
 import { memberships } from '../../db/schema/payments';
-import { auditLog, siteSettings } from '../../db/schema/service';
+import { auditLog } from '../../db/schema/service';
 import { insertUser } from '../../db/test-db';
 import type { Mail } from '../../mail/resend';
 import { applyProviderStatus } from '../payments/apply';
 import type { MockProvider } from '../payments/providers/mock';
+import type { OnlineProvider } from '../payments/providers/types';
 import { SITE, paymentRow } from '../payments/test-support';
 import { membershipEffects } from './effects';
+import type { MembershipFee } from './fee';
+import type { MembershipStartDeps } from './start';
 
-/* Test support only: membership tests run inside a rolled-back transaction. */
+/* Test support only: membership tests run inside a rolled-back transaction. Settings are passed in,
+ * not written: other tests empty the shared `site_settings` table and would wait on these rows. */
 
-export const FEE = { amount_minor: 20_000, currency: 'AMD', period_months: 12 };
+export const FEE: MembershipFee = { amountMinor: 20_000, currency: 'AMD', periodMonths: 12 };
 
-export async function putSetting(tx: LimitDb, key: string, value: unknown) {
-	await tx
-		.insert(siteSettings)
-		.values({ key, value })
-		.onConflictDoUpdate({ target: siteSettings.key, set: { value } });
-}
-
-export async function feeSettings(tx: LimitDb, fee: unknown = FEE, waitMinutes: unknown = 30) {
-	await putSetting(tx, 'membership_fee', fee);
-	await putSetting(tx, 'payment_wait_minutes', waitMinutes);
-}
+export const startDeps = (
+	provider: OnlineProvider | null,
+	extra: Partial<MembershipStartDeps> = {}
+): MembershipStartDeps => ({ provider, siteUrl: SITE, fee: FEE, waitMinutes: 30, ...extra });
 
 export const verifiedUser = (tx: LimitDb, values: Parameters<typeof insertUser>[1] = {}) =>
 	insertUser(tx, { emailVerified: true, ...values });
@@ -38,8 +35,10 @@ export function mailbox(failing = false) {
 	return { sent, send };
 }
 
-export function effectsWith(send: (mail: Mail) => Promise<void>) {
-	return { membership: membershipEffects({ send, siteUrl: SITE }) };
+export function effectsWith(send: (mail: Mail) => Promise<void>, periodMonths: number | null = 12) {
+	return {
+		membership: membershipEffects({ send, siteUrl: SITE, periodMonths: async () => periodMonths })
+	};
 }
 
 export async function membershipsOf(tx: LimitDb, userId: string) {
