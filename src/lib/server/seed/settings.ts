@@ -17,7 +17,9 @@ export const SEED_SETTINGS = {
 	hero_max_active: 5,
 	membership_fee: { amount_minor: 0, currency: 'AMD', period_months: 12 },
 	/** How long a fee or donation payment waits at the provider (decisions.md 2026-10-19, 3.6). */
-	payment_wait_minutes: 30
+	payment_wait_minutes: 30,
+	/** Donation range in minor units (decisions.md 2026-10-19, 3.7). */
+	donation_limits: { currency: 'AMD', min_minor: 1000, max_minor: 1_000_000 }
 };
 
 /** Adds missing keys only: values changed in the admin panel are never overwritten. */

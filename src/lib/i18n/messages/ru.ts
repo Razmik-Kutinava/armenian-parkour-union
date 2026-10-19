@@ -1,4 +1,5 @@
 import type { Messages } from '../translate';
+import { ruDonate } from './ru-donate';
 import { ruEditor } from './ru-editor';
 import { ruEvents } from './ru-events';
 import { ruFest } from './ru-fest';
@@ -25,6 +26,7 @@ export const ru: Partial<Messages> = {
 	...ruHome,
 	...ruGoogle,
 	...ruMembership,
+	...ruDonate,
 	'site.description': 'Союз паркура Армении: события, новости, членство и аттестация.',
 	'site.underConstruction': 'Сайт в разработке.',
 	'common.close': 'Закрыть',

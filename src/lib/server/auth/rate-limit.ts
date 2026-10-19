@@ -12,7 +12,9 @@ export const limits = {
 	staffSignInFailures: { windowMs: 15 * 60_000, max: 5 },
 	signUpPerIp: { windowMs: 60 * 60_000, max: 10 },
 	passwordResetPerIp: { windowMs: 15 * 60_000, max: 5 },
-	webhookPerIp: { windowMs: 60_000, max: 120 }
+	webhookPerIp: { windowMs: 60_000, max: 120 },
+	/** A guest can start a donation: each one opens a session at the provider. */
+	donatePerIp: { windowMs: 60 * 60_000, max: 10 }
 } satisfies Record<string, LimitRule>;
 
 /* Fixed window per key; `last_request` holds the start of the current window (ms). */

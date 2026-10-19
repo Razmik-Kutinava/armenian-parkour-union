@@ -1,3 +1,4 @@
+import { enDonate } from './en-donate';
 import { enEditor } from './en-editor';
 import { enEvents } from './en-events';
 import { enFest } from './en-fest';
@@ -25,6 +26,7 @@ export const en = {
 	...enHome,
 	...enGoogle,
 	...enMembership,
+	...enDonate,
 	'site.name': 'Armenian Parkour Union',
 	'site.description': 'Armenian Parkour Union: events, news, membership and certification.',
 	'site.underConstruction': 'Site under construction.',

@@ -41,7 +41,7 @@ export async function addPurpose(
 }
 
 export const donationEffectsWith = (send: (mail: Mail) => Promise<void>) => ({
-	donation: donationEffects({ send, siteUrl: SITE })
+	donation: donationEffects({ send })
 });
 
 /** The "bank" settles the payment, then the provider path applies it (as a webhook would). */

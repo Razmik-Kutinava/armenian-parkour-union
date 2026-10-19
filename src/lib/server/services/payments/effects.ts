@@ -3,6 +3,7 @@ import type { LimitDb } from '../../auth/rate-limit';
 import type { paymentKind } from '../../db/schema/enums';
 import type { payments } from '../../db/schema/payments';
 import { sendMail } from '../../mail';
+import { donationEffects } from '../donations/effects';
 import { membershipEffects } from '../memberships/effects';
 import { membershipPeriodMonths } from '../memberships/fee';
 
@@ -28,7 +29,8 @@ export const paymentEffects: PaymentEffects = {
 		send: sendMail,
 		siteUrl: PUBLIC_SITE_URL,
 		periodMonths: membershipPeriodMonths
-	})
+	}),
+	donation: donationEffects({ send: sendMail })
 };
 
 export async function runEffects(
