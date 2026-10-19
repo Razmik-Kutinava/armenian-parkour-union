@@ -7,9 +7,9 @@ const schema = pageFormSchema(BASE);
 const valid = { slug: 'summer-camp', title: { en: 'Summer camp' }, status: 'draft' };
 
 describe('pages: system slugs (docs/02 seed, decisions.md 2026-10-08)', () => {
-	it('are the six pages created by the seed script', () => {
+	it('are the seven pages created by the seed script ("join" — decisions.md 2026-10-19)', () => {
 		expect([...SYSTEM_PAGE_SLUGS].sort()).toEqual(
-			['about', 'contacts', 'offer', 'privacy', 'refund-policy', 'rules'].sort()
+			['about', 'contacts', 'join', 'offer', 'privacy', 'refund-policy', 'rules'].sort()
 		);
 	});
 });

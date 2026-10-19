@@ -110,4 +110,14 @@ describe.skipIf(!testDbUrl)('seo: sitemap addresses from the database', () => {
 			expect(paths).not.toContain('/pages/about');
 		});
 	});
+
+	it('"Join" is listed at /join, not at /pages/join', async () => {
+		await inRollback(async (tx) => {
+			await tx.delete(pages).where(sql`${pages.slug} = 'join'`);
+			await addPage(tx, { slug: 'join', isSystem: true });
+			const paths = (await listSitemapEntries(tx)).map((e) => e.path);
+			expect(paths).toContain('/join');
+			expect(paths).not.toContain('/pages/join');
+		});
+	});
 });
