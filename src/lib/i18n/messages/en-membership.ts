@@ -7,5 +7,30 @@ export const enMembership = {
 	'membership.mail.requisites': 'Federation details:',
 	'membership.mail.reminder.subject': 'Your membership ends on {date}',
 	'membership.mail.reminder.text':
-		'Hello, {name}!\n\nYour membership in the federation ends on {date}. Renew it to keep registering for events and taking exams: {url}'
+		'Hello, {name}!\n\nYour membership in the federation ends on {date}. Renew it to keep registering for events and taking exams: {url}',
+	'membership.fee.title': 'Membership fee',
+	'membership.fee.amount': '{amount} for {months} months',
+	'membership.fee.notSet': 'The fee amount will be announced soon.',
+	'membership.pay.submit': 'Pay the fee',
+	'membership.pay.renew': 'Renew membership',
+	'membership.pay.emailUnverified':
+		'Confirm your email first: open the link from the letter we sent when you signed up.',
+	'membership.pay.unavailable':
+		'Online payment is not available right now. Please try again later.',
+	'membership.pay.providerError': 'The payment could not be started. Please try again.',
+	'join.title': 'Join the federation',
+	'join.signUp': 'Create an account',
+	'join.logIn': 'Log in',
+	'join.member': 'You are already a member of the federation.',
+	'join.cabinet': 'My membership',
+	'cabinet.membership.title': 'Membership',
+	'cabinet.membership.activeUntil': 'Active until {date}',
+	'cabinet.membership.none': 'No active membership',
+	'cabinet.membership.waiting': 'Awaiting payment confirmation',
+	'cabinet.membership.history': 'History',
+	'cabinet.membership.period': '{from} – {to}',
+	'cabinet.membership.status.active': 'Active',
+	'cabinet.membership.status.expired': 'Expired',
+	'cabinet.membership.status.cancelled': 'Cancelled',
+	'cabinet.membership.status.pending': 'Awaiting payment'
 } as const;

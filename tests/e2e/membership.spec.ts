@@ -87,7 +87,7 @@ test('member: email not confirmed, then online payment off — clear messages', 
 
 	await sql`update users set email_verified = true where id = ${userId}`;
 	await page.goto('/cabinet/membership');
-	await expect(page.getByRole('heading', { name: 'Membership' })).toBeVisible();
+	await expect(page.getByRole('heading', { name: 'Membership', exact: true })).toBeVisible();
 	await expect(main.getByText('No active membership')).toBeVisible();
 	await main.getByRole('button', { name: 'Pay the fee' }).click();
 	await expect(main.getByText(/not available right now/)).toBeVisible();

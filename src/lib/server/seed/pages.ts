@@ -20,7 +20,8 @@ export const SEED_PAGES: Record<string, Required<LocalizedText>> = {
 		en: 'Refund policy',
 		hy: 'Վերադարձի քաղաքականություն',
 		ru: 'Политика возврата'
-	}
+	},
+	join: { en: 'Join the federation', hy: 'Միացիր ֆեդերացիային', ru: 'Вступить в федерацию' }
 };
 
 /** Adds missing pages only: text and status set in the admin panel are never overwritten. */

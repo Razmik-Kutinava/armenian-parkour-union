@@ -1,4 +1,5 @@
 import { asc } from 'drizzle-orm';
+import { pagePath } from '#lib/page-path.ts';
 import type { SitemapEntry } from '#lib/seo/sitemap.ts';
 import type { LimitDb } from '../../auth/rate-limit';
 import { pages, posts } from '../../db/schema/content';
@@ -23,10 +24,7 @@ export async function listSitemapEntries(db: LimitDb): Promise<SitemapEntry[]> {
 	]);
 	return [
 		...LISTS.map((path) => ({ path })),
-		...pageRows.map((r) => ({
-			path: r.slug === 'about' ? '/federation' : `/pages/${r.slug}`,
-			lastmod: r.lastmod
-		})),
+		...pageRows.map((r) => ({ path: pagePath(r.slug), lastmod: r.lastmod })),
 		...postRows.map((r) => ({ path: `/news/${r.slug}`, lastmod: r.lastmod })),
 		...eventRows.map((r) => ({ path: `/events/${r.slug}`, lastmod: r.lastmod }))
 	];

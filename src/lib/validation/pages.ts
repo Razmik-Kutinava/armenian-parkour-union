@@ -11,7 +11,8 @@ export const SYSTEM_PAGE_SLUGS = [
 	'contacts',
 	'privacy',
 	'offer',
-	'refund-policy'
+	'refund-policy',
+	'join'
 ] as const;
 export const isSystemSlug = (slug: string) =>
 	(SYSTEM_PAGE_SLUGS as readonly string[]).includes(slug);

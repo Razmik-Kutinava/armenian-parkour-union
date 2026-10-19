@@ -10,6 +10,12 @@ function toLogin(): never {
 	redirect(303, `/login?returnTo=${encodeURIComponent(url.pathname + url.search)}`);
 }
 
+/** Cabinet pages (docs/06 section 3.2): guest → login and back. */
+export function requireUser(user: LocalsUser | null): LocalsUser {
+	if (!user) toLogin();
+	return user;
+}
+
 /** Entry to /admin: guest → login, member → 404 (decision 2026-10-06). */
 export function requireStaff(user: LocalsUser | null): LocalsUser {
 	if (!user) toLogin();

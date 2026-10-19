@@ -1,4 +1,5 @@
 import { error, fail, redirect } from '@sveltejs/kit';
+import { pagePath } from '#lib/page-path.ts';
 import { requirePermission } from '#lib/server/auth/guard.ts';
 import { db } from '#lib/server/db/index.ts';
 import { deletePage, updatePage } from '#lib/server/services/pages/edit.ts';
@@ -15,7 +16,7 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 	return {
 		page: { id: page.id, slug, title, status, isSystem: page.isSystem },
 		values: flattenValues({ slug, title, body, status }),
-		publicPath: slug === 'about' ? '/federation' : `/pages/${slug}`
+		publicPath: pagePath(slug)
 	};
 };
 
