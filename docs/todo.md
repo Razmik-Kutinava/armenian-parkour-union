@@ -1,73 +1,60 @@
 # todo — текущая задача (SBR)
 
 > Один живой файл на текущую задачу. Ведётся по `.cursor/rules/sbr.mdc`. После REVIEW очищается до шаблона, итог — в `PROGRESS.md` («Сделано»).
-> Памятки для общего REVIEW: 3.6b — `git show c3b6468:docs/todo.md`, 3.7 — `git show 2c0aee1:docs/todo.md` (раздел «Для общего REVIEW»).
+> Памятки для общего REVIEW: 3.6b — `git show c3b6468:docs/todo.md`, 3.7 — `git show 2c0aee1:docs/todo.md`, 3.8 — `git show 8e2b410:docs/todo.md` (раздел «Для общего REVIEW»).
 
 ## Задача
 
-3.8 — страницы `/payment/success` и `/payment/cancel` (`07` § 1 п. 3, § 3 п. 7, § 7 п. 1, § 15; `06` § 3.3): статус платежа из базы, проверка у провайдера тем же путём, что вебхук, опрос статуса, понятные сообщения. REVIEW — в общем прогоне (без push).
+3.9 — админка платежей (`05` § 16, 17; `07` § 8–12; `04` § 3, 4, 5): список, карточка, ручное подтверждение, возврат, повтор квитанции, выгрузка CSV, «требуют проверки», назначения донатов. Миграции нет. REVIEW — в общем прогоне (без push).
 
 Правила:
-1. **Адрес.** Провайдер возвращает на `{PUBLIC_SITE_URL}{/lang}/payment/success?pid=<payments.id>` и `.../payment/cancel?pid=...`; префикс языка — из `locale` платежа (`localizePath`, EN без префикса). Сейчас адреса без префикса — правка в `create.ts`.
-2. **Сервис** `paymentForReturn(db, pid, deps)` (`services/payments/return.ts`): `pid` не UUID или платежа нет → `null` (страница 404). Платёж `pending`, у него есть `provider_payment_id`, провайдер онлайн (`providerOf`) и `allowCheck()` разрешил → `getStatus` → `applyProviderStatus` (идемпотентность, сумма, эффекты, аудит — как у вебхука и сверки). Ошибка провайдера (`not_found`, недоступен) — не ошибка страницы: лог, показываем статус из базы. Не `pending` — провайдера не спрашиваем. Истечение срока здесь не применяем (это сверка 3.5).
-3. **Что отдаёт** — только `kind`, `status`, `amountMinor`, `currency`. Ни имени, ни email, ни `user_id`, ни назначения: `pid` (случайный UUID) знает только плательщик, проверки владельца нет — гость-донор без сессии тоже должен видеть итог.
-4. **Лимит частоты** запросов к провайдеру: `limits.paymentReturnPerIp` = 20 / мин с IP (ключ `payment-return:ip:`), считается только когда проверка нужна (`pending`); сверх лимита — показываем статус из базы, без 429.
-5. **Отмена не меняет статус.** `/payment/cancel` делает ту же проверку и показывает итог; сам платёж не отменяется (адрес возврата не подтверждение — `07` § 1 п. 3; `pending` закроет сверка по сроку). Переход «по поддельной ссылке» не даёт `paid` (`07` § 15).
-6. **Страница** (`[[lang=lang]]/(site)/payment/{success,cancel}`, общий `load` и компонент `PaymentResult.svelte`), `noindex`, `cache-control: no-store`, не в sitemap. Сообщения по статусу:
-   - `paid` — «Оплата получена» + по типу: взнос — «членство активно» и ссылка «Моё членство» (`/cabinet/membership`); донат — благодарность и «квитанция отправлена на email», ссылка на главную; `event_fee` — общее «спасибо».
-   - `pending` на success — «Проверяем платёж…» и опрос: `invalidateAll()` каждые 3 с, до 5 раз; не дождались — «Платёж обрабатывается, мы отправим письмо»; без JS — ссылка «Обновить».
-   - `pending` на cancel — «Оплата не завершена» (если деньги списаны — подтвердим и напишем) + «Попробовать снова».
-   - `failed` — «Оплата не прошла» + «Попробовать снова»; `cancelled` — «Оплата отменена» + «Попробовать снова»; `refunded` — «Платёж возвращён».
-   - «Попробовать снова»: взнос → `/cabinet/membership`, донат → `/donate`, событие → `/events` (регистрации — этап 5). Под заголовком — тип и сумма (`formatPrice`).
-7. **`/dev/mock-pay`** (только dev): ссылка «Вернуться на сайт» ведёт как настоящий банк — `paid` → `/payment/success?pid=`, иначе → `/payment/cancel?pid=`.
-8. Тексты — `i18n/messages/{en,ru}-payment.ts`; HY — откат на EN.
+1. **Права.** Всё — `admin`: просмотр и CSV — `payments.read`, действия — `payments.manage`, назначения — `donations.config`. Сервисы сами проверяют право по `actor` (`04` § 5 п. 6) → `not_allowed`; маршрут — `requirePermission` в каждом `load` и action.
+2. **Список** `/admin/payments`: колонки — дата (`created_at`), плательщик (участник — имя, гость — `donor_name`, нет — «Гость»), тип, сумма с валютой, статус, провайдер, отметка «требует проверки». Фильтры: тип, статус, провайдер (только встречающиеся), период (`from` / `to` — дни по Еревану, по `created_at`), «требуют проверки». Поиск — имя / email участника или гостя, номер платежа (UUID), ID у провайдера. Сортировка — дата, сумма. 25 на страницу.
+3. **Карточка** `/admin/payments/[id]`: все поля платежа, плательщик (ссылка на участника), назначение, связанное членство (статус, период), кто подтвердил вручную, ответ провайдера (`provider_payload`, JSON), история из журнала (`entity_type = payment`). Действия — по статусу (ниже). Не UUID / нет — 404.
+4. **Новый ручной платёж** `/admin/payments/new` (`07` § 9): тип — взнос или донат (`event_fee` — этап 5), сумма (в единицах валюты → `priceToMinor`), валюта (`CURRENCIES`), дата оплаты (не в будущем; `paid_at` = начало дня по Еревану), комментарий (обязателен — основание без провайдера). Плательщик: email участника (взнос — обязателен, участник существует и не удалён) или для доната гость — имя (обязательно), email (необязательно), «Не показывать имя»; назначение — активное или пусто. Создаётся `payments` с `provider = manual`, `status = paid`, `confirmed_by = admin`, комментарий — в `provider_payload` (`{ manual: { comment } }`) и в журнал; для взноса — новое `memberships` (`pending`) и связь. Эффекты `paid` — те же (`paymentEffects`: активация / продление, письмо с квитанцией; донат — благодарность). Журнал `payment.confirm_manual` (исполнитель, IP). Одна транзакция; письма — после коммита.
+5. **Подтвердить по выписке** (карточка; `07` § 8 «деньги списаны, на сайте `pending`», § 10): статус `pending | failed | cancelled` → `paid` (`canTransition`), сумма не меняется, комментарий обязателен, `paid_at = now`, `confirmed_by`, `needs_review = false` (эффекты могут поставить снова); эффекты `paid`; журнал `payment.confirm_manual` (было / стало, комментарий). `event_fee` — отказ (этап 5). Строка под `FOR UPDATE`: вебхук после — `unchanged` / `ignored`.
+6. **Возврат** (`07` § 11): только `paid` → `refunded`, причина обязательна, полный. Режим: `api` — у провайдера платежа (`providerById`) есть `refund`, есть `provider_payment_id`, платёж не подтверждён вручную → вызов `refund(id, amount, reason)`; отказ или ошибка → ничего не меняем, сообщение. Иначе `manual` — админ вернул деньги в банке и отмечает «Возврат выполнен». Затем `refunded_at`, эффекты `refunded` (взнос — членство `cancelled`), журнал `payment.refund` (причина, режим). Письмо о возврате — эффект `refunded` для всех типов (`withRefundLetter` в `paymentEffects`), так что и возврат от провайдера (вебхук) шлёт письмо; получатель — участник по аккаунту или email гостя; сроки зачисления — «зависят от банка».
+7. **Повторить квитанцию** (`paid`, взнос или донат): взнос — `paidLetter` по членству этого платежа (нужны даты; нет — отказ), донат — `thanksLetter`; получателя нет (удалён, гость без email) → отказ; журнал `payment.receipt_resend`.
+8. **«Требуют проверки»**: фильтр списка; в карточке «Проверено» — снять `needs_review`, комментарий обязателен, журнал `payment.review_resolved` (решение агента: иначе список только растёт).
+9. **CSV** `GET /admin/payments/export?kind=membership|donation&from&to` (`07` § 12 п. 4): отдельно взносы и донаты, период — по `paid_at` (дни по Еревану), только оплаченные и возвращённые (`paid_at` есть), до 10 000 строк. Колонки: `paid_at`, `payment_id`, `status`, `payer_name`, `payer_email`, `amount` (в единицах валюты), `currency`, `provider`, `provider_payment_id`, `refunded_at`, `confirmed_by`; донат — ещё `purpose`, `is_anonymous`. Защита от формул — `toCsv`. Без `kind` — 400.
+10. **Назначения донатов** `/admin/donation-purposes` (`05` § 17): список — название, активно, порядок, собрано (сумма `paid` донатов по валютам); создание и правка — название ×3 (EN обязателен), активно, порядок; скрытие — снять «активно», не удаляются. Журнал `donation_purpose.create` / `.update`. Кеш `/donate` — группа `settings` (`cache/admin-groups.ts`: `donation-purposes`, `payments` — ручной донат и возврат меняют публичный список).
+11. Тексты — `i18n/messages/{en,ru}-payments-admin.ts`; HY — откат на EN. Карты e2e: `admin-access-map.ts`, `admin-audit-map.ts` (+ исполнители), фикстуры прав.
 
 ## Файлы (ожидаемо)
 
-- `src/lib/server/services/payments/return.ts` (+ `return.test.ts`), `index.ts` — `checkPaymentReturn(db, pid, ip)` (провайдер — `providerById`, лимит — `consume`)
-- `src/lib/server/services/payments/create.ts` — язык в адресах возврата (+ `create.test.ts`)
-- `src/lib/server/auth/rate-limit.ts` — `paymentReturnPerIp`
-- маршруты `[[lang=lang]]/(site)/payment/{success,cancel}/+page.server.ts`, `+page.svelte`, общий `payment/return.ts`; `components/site/PaymentResult.svelte` (+ `payment-result.ts` — сообщения и ссылки по статусу, + тест)
-- `src/lib/i18n/messages/{en,ru}-payment.ts`, `en.ts`, `ru.ts`; `src/routes/dev/mock-pay/[id]/+page.svelte`
-- `tests/e2e/payment-return.spec.ts`
+- `src/lib/server/services/payments/admin/` — `list.ts`, `card.ts`, `manual.ts`, `confirm.ts`, `refund.ts`, `review.ts`, `receipt.ts`, `export.ts`, `index.ts` (+ тесты, `test-support.ts`)
+- `src/lib/server/services/payments/refund-letter.ts`, `effects.ts` (`withRefundLetter`); `services/donations/mail.ts` — экспорт получателя
+- `src/lib/server/services/donations/purposes-admin.ts` (+ тест)
+- `src/lib/validation/admin-payments.ts`, `donation-purposes.ts` (+ тесты)
+- маршруты `admin/payments/{+page, [id], new, export}`, `admin/donation-purposes/{+page, new, [id]}`
+- `src/lib/server/cache/admin-groups.ts`; `src/lib/i18n/messages/{en,ru}-payments-admin.ts`, `en.ts`, `ru.ts`, `{en,ru}-payment.ts` (письмо о возврате)
+- `tests/e2e/admin-payments.spec.ts`, `admin-access-map.ts`, `admin-audit-map.ts`, `admin-audit-actions.ts` (+ `admin-audit-money.ts`), `admin-permissions-fixtures.ts`, `admin-permissions.spec.ts`
 
 ## Не ломать
 
-- Возврат на сайт не ставит `paid` сам: только ответ провайдера через `applyProviderStatus`; сумма не совпала → `failed` без эффектов (K2).
-- Повтор страницы и опрос не запускают эффекты дважды (дубль → `unchanged`); вебхук и сверка работают как раньше.
-- На странице нет личных данных плательщика (K4); чужой `pid` не меняет платёж (отмена ничего не отменяет).
-- Старт оплаты взноса и доната (`/join`, `/cabinet/membership`, `/donate`) — без изменений, кроме языка в адресах возврата.
+- `paid` без провайдера — только явным действием админа с комментарием и записью в журнал; редактор / модератор / участник не открывают платежи и не вызывают действия ни страницей, ни прямым POST (K1, K2).
+- Эффекты один раз: ручной платёж и подтверждение по выписке запускают `paid` один раз; повтор действия на уже `paid` — отказ; вебхук после — `unchanged`. Возврат — один раз (`refunded` конечный).
+- Вебхук, сверка, страницы возврата, старт взноса и доната — без изменений (кроме письма о возврате на `refunded`).
+- Email донора и плательщика — только в админке (`04` § 4); в CSV нет формул.
 
 ## Проверка
 
-- `npx vitest --run src/lib/server/services/payments src/lib/components/site/payment-result src/lib/server/services/memberships src/lib/server/services/donations`
-- `npx playwright test tests/e2e/payment-return.spec.ts tests/e2e/donate.spec.ts tests/e2e/membership.spec.ts tests/e2e/webhooks.spec.ts`; `npm run check`, `npm run lint`, `npm run test`
+- `npx vitest --run src/lib/server/services/payments src/lib/server/services/donations src/lib/server/services/memberships src/lib/validation src/lib/server/cache src/routes/admin`
+- `npx playwright test tests/e2e/admin-payments.spec.ts tests/e2e/admin-permissions.spec.ts tests/e2e/admin-audit.spec.ts tests/e2e/donate.spec.ts tests/e2e/webhooks.spec.ts`; `npm run check`, `npm run lint`, `npm run test`
 
 ## Риск
 
-`high` (платежи: страница запускает проверку статуса у провайдера и применение `paid` с эффектами; гость без сессии).
+`high` (платежи: `paid` по действию админа, возврат через провайдера, эффекты членства, права, журнал).
 
 ## Читать
 
-- `07` § 1, 3, 7, 10, 14, 15; `06` § 3.3 (прочитаны в SPEC).
-
-## Для общего REVIEW — что проверить в 3.8
-
-Дифф: `git diff 8a91883..HEAD -- src tests` (RED `adcbb6a`, GREEN `db2744e`). Риск `high` → bugbot + security-review параллельно, затем `/crit-audit`.
-
-1. **`paid` без провайдера (K2)** — `services/payments/return.ts`: статус меняет только `applyProviderStatus` по ответу `getStatus`; `pid` проверяется `isUuid`; провайдер — `providerById` (вне dev `mock` → `null` → только статус из базы); не `pending` — провайдер не спрашивается; ошибки провайдера глотаются с логом.
-2. **Дубль эффектов (K2)** — опрос 5 раз и повторные заходы: второй `paid` → `unchanged` под `FOR UPDATE` (`apply.ts`), эффекты один раз (unit «effects once»).
-3. **Личные данные (K4)** — `ReturnView` = `kind`, `status`, `amountMinor`, `currency`; страница без имени и email (e2e проверяет HTML). Проверки владельца нет — `pid` как ключ (решение агента; гость без сессии).
-4. **Нагрузка на провайдера** — `limits.paymentReturnPerIp` 20 / мин, считается только для `pending` с онлайн-провайдером; сверх — статус из базы без 429. Ключ — `getClientAddress()` (как у `donatePerIp`).
-5. **Отмена ничего не отменяет** — `/payment/cancel` = тот же `load`; e2e «the visit does not cancel the payment».
-6. **Язык в адресах возврата** — `create.ts`: `localizePath(path, input.locale)`; `locale` типизирован (`Locale`), не из строки запроса.
-7. **Не K, решения агента** — опрос `invalidateAll()` каждые 3 с до 5 раз, без JS — ссылка «Обновить» (`noscript`); `cache-control: no-store`; «Попробовать снова» для `event_fee` → `/events`; `/dev/mock-pay` → success / cancel по статусу (только dev, e2e нет); тексты HY — откат на EN; цепочка `mock` на dev-сервере руками не проверялась (покрыта unit-тестами с `mock`).
+- `05` § 1, 2, 16, 17; `07` § 8–12, 14, 15; `04` § 3 (строки платежей), 4, 5; `02` § 4 (прочитаны в SPEC).
 
 ## Фазы
 
-- [x] SPEC — `8a91883`
-- [x] RED (`test: … [RED]`) — `adcbb6a`
-- [x] GREEN (`feat: … [GREEN]`) — `db2744e`
-- [x] REGRESS — Vitest 703/703; e2e зоны: `payment-return` 8/8, `donate`, `webhooks` зелёные; `membership` в общем прогоне упал на регистрации (`toHaveURL('/')` за 5 с — известная нестабильность), отдельно 6/6
+- [x] SPEC
+- [ ] RED (`test: … [RED]`)
+- [ ] GREEN (`feat: … [GREEN]`)
+- [ ] REGRESS
 - [ ] REVIEW — общим прогоном позже (решение 2026-10-19), без push до него
 - [ ] DEPLOY (только по апруву)
