@@ -1,7 +1,7 @@
 # todo — текущая задача (SBR)
 
 > Один живой файл на текущую задачу. Ведётся по `.cursor/rules/sbr.mdc`. После REVIEW очищается до шаблона, итог — в `PROGRESS.md` («Сделано»).
-> Памятки для общего REVIEW: 3.6b — `git show c3b6468:docs/todo.md`, 3.7 — `git show 2c0aee1:docs/todo.md`, 3.8 — `git show 8e2b410:docs/todo.md` (раздел «Для общего REVIEW»).
+> Памятки для общего REVIEW: 3.6b — `git show c3b6468:docs/todo.md`, 3.7 — `git show 2c0aee1:docs/todo.md`, 3.8 — `git show 8e2b410:docs/todo.md`, 3.9 — этот файл до следующей задачи (раздел «Для общего REVIEW»).
 
 ## Задача
 
@@ -50,11 +50,24 @@
 
 - `05` § 1, 2, 16, 17; `07` § 8–12, 14, 15; `04` § 3 (строки платежей), 4, 5; `02` § 4 (прочитаны в SPEC).
 
+## Для общего REVIEW — что проверить в 3.9
+
+Дифф: `git diff bf7cc09..HEAD -- src tests` (RED `d68de62`, GREEN `02833d0`). Риск `high` → bugbot + security-review параллельно, затем `/crit-audit`.
+
+1. **`paid` без провайдера (K2)** — `services/payments/admin/manual.ts` и `confirm.ts`: только `payments.manage` (сервис проверяет `actor` сам, маршрут — `requirePermission`), комментарий обязателен (пустой → `invalid`), журнал `payment.confirm_manual` в той же транзакции, `confirmed_by`. Подтверждение — только `pending | failed | cancelled` по `canTransition`, строка `FOR UPDATE` (`support.ts` `lockPayment`); `event_fee` → `unsupported`.
+2. **Эффекты один раз (K2)** — повтор подтверждения на `paid` → `wrong_status`; вебхук после ручного `paid` → `unchanged` (unit `confirm.test.ts`); возврат один раз (`refunded` конечный).
+3. **Права (K1)** — `payments.read` / `payments.manage` / `donations.config` только у `admin`; карта `admin-access-map.ts` + фикстуры прав (редактор / модератор / участник — 403 на страницах, POST и CSV).
+4. **Возврат** — `refund.ts`: режим `api` только если у провайдера есть `refund`, есть `provider_payment_id` и платёж не подтверждён вручную; отказ / исключение провайдера → ничего не меняем (`provider_error`); `manual` — отметка, деньги вернул админ. Журнал `payment.refund` (причина, режим).
+5. **Письмо о возврате** — `payments/refund-letter.ts` `withRefundLetter` в `paymentEffects` для всех типов: теперь уходит и при `refunded` от вебхука (изменение поведения 3.4–3.7). Получатель — `recipient()` из `donations/mail.ts` (участник по аккаунту, гость — email доната).
+6. **Личные данные (K4)** — email плательщика и донора только в админке (карточка, CSV); `provider_payload` показывается админу как есть. CSV — `toCsv` (формулы с `'`), BOM, `no-store`, ≤ 10 000 строк, без `kind` — 400.
+7. **Кеш** — `cache/admin-groups.ts`: `payments`, `donation-purposes` → `settings` (ручной донат и возврат меняют публичный список `/donate`).
+8. **Не K, решения агента** — «Проверено» снимает `needs_review` с комментарием (`payment.review_resolved`); комментарий ручного платежа — в `provider_payload.manual.comment` и журнал; `paid_at` ручного платежа — начало дня по Еревану; период членства от ручного взноса начинается от момента записи, а не от даты оплаты; сумма ручного взноса свободная (не сверяется с `membership_fee`); двойная оплата (вебхук + ручная запись) не обнаруживается; повтор квитанции взноса — только если у членства есть даты; HY — откат на EN. В GREEN поправлен локатор e2e (`exact: true`: чип фильтра тоже содержит имя), логика теста та же.
+
 ## Фазы
 
-- [x] SPEC
-- [ ] RED (`test: … [RED]`)
-- [ ] GREEN (`feat: … [GREEN]`)
-- [ ] REGRESS
+- [x] SPEC — `bf7cc09`
+- [x] RED (`test: … [RED]`) — `d68de62`
+- [x] GREEN (`feat: … [GREEN]`) — `02833d0`
+- [x] REGRESS — Vitest 741/744: `audit-coverage` (таймаут) и `events/edit` отдельно зелёные; `hero/public` падает стабильно из-за часов машины (спешат на ~1,2 с относительно Neon, тест ждёт блок, закончившийся 1 с назад; hero не менялся); e2e зоны: `admin-payments` 3/3, `admin-permissions`, `admin-audit`, `donate`, `webhooks` — 14/14; `check`, `lint` чистые
 - [ ] REVIEW — общим прогоном позже (решение 2026-10-19), без push до него
 - [ ] DEPLOY (только по апруву)
