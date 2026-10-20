@@ -1,63 +1,76 @@
 # todo — текущая задача (SBR)
 
 > Один живой файл на текущую задачу. Ведётся по `.cursor/rules/sbr.mdc`. После REVIEW очищается до шаблона, итог — в `PROGRESS.md` («Сделано»).
-> Памятки для общего REVIEW: 3.6b — `git show c3b6468:docs/todo.md`, 3.7 — `git show 2c0aee1:docs/todo.md`, 3.8 — `git show 8e2b410:docs/todo.md`, 3.9 — `git show b9582c3:docs/todo.md`, 3.10 — `git show 110eb1e:docs/todo.md`, 3.11 — `git show c6b737f:docs/todo.md`, 3.12 — этот файл до следующей задачи (раздел «Для общего REVIEW»).
+> Памятки для общего REVIEW: 3.6b — `git show c3b6468:docs/todo.md`, 3.7 — `git show 2c0aee1:docs/todo.md`, 3.8 — `git show 8e2b410:docs/todo.md`, 3.9 — `git show b9582c3:docs/todo.md`, 3.10 — `git show 110eb1e:docs/todo.md`, 3.11 — `git show c6b737f:docs/todo.md`, 3.12 — `git show 26c7dc5:docs/todo.md`.
 
 ## Задача
 
-3.12 — тесты по списку `07` § 15. Миграции нет, кода приложения нет (если тест найдёт ошибку — исправление тем же шагом, `fix:`). REVIEW — в общем прогоне (без push).
+3.13 — реальный провайдер: **VPOS.am** (посредник, деньги принимает банк — пока Ameriabank, банк может смениться; решение владельца 2026-10-20). Этот шаг — **модуль провайдера по открытой спецификации без доступов**: `https://api.vpos.am/openapi.yaml` (OpenAPI 3.1, v0.1.0). Песочница и боевая проверка малой суммой — после доступов (договор с банком + VPOS.am), отдельным шагом этой же задачи. Миграции нет (`payments.provider` — `text`).
 
-Правила:
-1. **Приёмочные тесты** — сквозные цепочки через публичные входы сервисов (`startMembershipPayment`, `startDonationPayment`, `receiveWebhook` с подписанным уведомлением mock, `paymentForReturn`, `reconcilePayments`, `recordManualPayment`, `refundPayment`) с **боевым набором эффектов** (`allEffects` = взнос + донат + письмо о возврате, как `paymentEffects`), а не со счётчиками. Отдельные модульные тесты уже есть — приёмочные их не заменяют.
-2. **Пункты § 15 → тест:**
-   - дубль вебхука (тот же event id и новое уведомление о том же платеже) — одно активное членство, одно письмо, баллы 0, уровень `novice` один раз в журнале;
-   - неверная подпись — 400, платёж и членство `pending`, без письма и уровня;
-   - сумма или валюта не совпали — `failed` + «требует проверки», членство `pending`, без письма и уровня;
-   - истёкший `pending` — сверка закрывает платёж (`cancelled`, `expired`) и `pending` членство, без письма;
-   - донат гостя — создан без входа, подтверждён вебхуком, одно письмо-благодарность на email гостя;
-   - возврат онлайн-взноса — членство `cancelled`, уровень остаётся, письмо о возврате;
-   - поддельный переход на `/payment/success` (у провайдера `pending`) — платёж и членство `pending`, без письма;
-   - ручной взнос админом — те же эффекты, что онлайн: членство `active` на срок взноса от момента подтверждения, уровень `novice`, одно письмо с той же темой.
-3. **Пункты про события** (поздняя оплата без мест, освобождение места при истечении, отмена регистрации при возврате) — этап 5: `event_fee` без эффектов (`unsupported`), регистраций нет; в роадмапе — 5.4 и 5.10 (решение агента, в отчёт).
-4. Тесты в откатываемой транзакции (`testDb().inRollback`); сверка — только своим mock (`ownMock`, свой id провайдера), чтобы не трогать чужие строки общей базы.
+Факты из спецификации (читать её заново не нужно):
+- Базовый адрес `https://api.vpos.am`, `Authorization: Bearer <token>`; режим (песочница / боевой), банк и ключи банка привязаны к токену на стороне VPOS.am — адрес один.
+    10|- Создать: `POST /v1/payment-sessions`, заголовок `Idempotency-Key` (≤ 160, обязателен), тело `merchantOrderId`, `amountMinor` (целое ≥ 1), `currency` (AMD / USD / EUR), `returnUrl` (один, https), `checkoutLanguage` (hy / ru / en), `customer` (email), `metadata`. Ответ 201 (повтор — 200) `PaymentSession`: `id`, `merchantOrderId`, `amountMinor`, `currency`, `status`, `checkoutUrl`. Ошибки: 401, 409 (ключ или заказ от другого запроса), 422, 503.
+- Статус: `GET /v1/payments?paymentId=<id>` → `PaymentSession`; 404 — нет.
+- Возврат: `POST /v1/payments/{id}/refunds`, `Idempotency-Key`, тело `amountMinor`, `currency`, `reason` (≤ 240). 200 — возвращено; 202 — деньги возвращены, но чек / проверка требуют оператора; 409 — нельзя; 422; 501 — возвраты не включены.
+- Статусы VPOS: `created`, `pending_redirect`, `pending_payment`, `authorized`, `paid`, `failed`, `cancelled`, `reversed`, `partially_refunded`, `refunded`, `expired`, `status_unknown`, `disputed`.
+- Вебхук `payment.status_changed`, JSON: `id` (событие), `type`, `livemode`, `createdAt`, `data.payment` (`id`, `merchantOrderId`, `provider`, `amountMinor`, `currency`, `status`, `fiscalStatus`). Подпись `X-VPOS-Signature: t=<unix>,v1=<hex>[,v1=…]` — HMAC-SHA256 от `<t>.<сырое тело>` секретом вебхука, допуск по времени 5 мин, при смене секрета несколько `v1` (подходит любой).
+
+Правила модуля:
+1. Контракт `07` § 4 (`OnlineProvider`): `createPayment`, `getStatus`, `parseWebhook`, `refund`; id провайдера — `vpos`; вебхук — `/api/webhooks/vpos` (маршрут уже есть).
+2. Создание: `merchantOrderId` = наш `payments.id`, `Idempotency-Key` = `payment-<payments.id>` (повтор сети не создаёт второй оплаты), `returnUrl` = адрес успеха (у VPOS один адрес; `/payment/success` сам показывает отмену и ошибку по статусу из базы), язык = язык платежа, email — только если есть; описание — в `metadata`. Нет `checkoutUrl` в ответе — ошибка `rejected`.
+3. Статусы → наши: `paid` → `paid`; `failed` → `failed`; `cancelled`, `expired` → `cancelled`; `refunded`, `reversed` → `refunded`; `created`, `pending_*`, `authorized`, `status_unknown` → `pending`; `partially_refunded`, `disputed` → `pending` (не трогать автоматически, предупреждение в лог; частичных возвратов в MVP нет — `07` § 11) — в «Известные проблемы».
+    20|4. Вебхук: подпись (HMAC, сравнение за постоянное время, любой из `v1`, допуск 5 мин) → разбор схемы → `livemode` совпадает с настройкой окружения → уведомление; иначе `null` (400). Ключ дедупликации — `id` события из подписанного тела. Статусы «ожидания» → уведомление со статусом `pending` (200, без изменений), а не 400 (иначе VPOS повторяет бесконечно) — для этого `WebhookNotice.status` расширить до `ProviderStatus` (`apply` уже возвращает `unchanged` на `pending`).
+5. `raw` чистится до записи (C12, `07` § 14 п. 2): только `id`, `merchantOrderId`, `provider`, `amountMinor`, `currency`, `status`, `fiscalStatus`, `livemode`, `createdAt`, `updatedAt`, `type`, `trigger`; без `customer`, `metadata`, чеков.
+6. Ошибки сети и 401 / 403 / 429 / 5xx → `unreachable`; 404 → `not_found`; 409 / 422 → `rejected`. Возврат: 200 и 202 → `ok: true`; 409 / 422 / 501 → `ok: false`; сеть — исключение (админка покажет `provider_error`).
+7. Сумма: у нас AMD — целые драмы (`lib/money.ts`), USD / EUR — центы. Что VPOS понимает под `amountMinor` для AMD — **не сказано** (вопрос владельцу → VPOS.am). Перевод — одна функция с явным множителем по валюте; по умолчанию ISO 4217 (AMD × 100), проверяется первой оплатой в песочнице. Ответ с другой суммой проходит проверку `apply` (расхождение → `failed` + проверка), деньги не активируются.
+8. Валюты провайдера — пока только `AMD` (`07` § 13: по умолчанию AMD; USD / EUR — когда банк подтвердит).
+9. Окружение (`07` § 14 п. 1, 4): `PAYMENT_VPOS_API_TOKEN`, `PAYMENT_VPOS_WEBHOOK_SECRET`, `PAYMENT_VPOS_LIVEMODE` (`true` — боевой). Нет токена или секрета — провайдер не регистрируется (вебхук 404, `PAYMENT_PROVIDER=vpos` → `PaymentConfigError`, как сейчас). `PAYMENT_VPOS_LIVEMODE=true` в `development` — провайдер не регистрируется (боевой нельзя в dev).
+10. HTTP — через переданный `fetch` (как `mail/resend.ts`), время — через переданные часы: тесты без сети.
 
 ## Файлы (ожидаемо)
 
-- `src/lib/server/services/payments/acceptance-fee.test.ts` — цепочка взноса: дубль, подпись, сумма, возврат со страницы, истечение
-- `src/lib/server/services/payments/acceptance-money.test.ts` — донат гостя, ручной взнос = онлайн, возврат
-- `src/lib/server/services/payments/acceptance-support.ts` — запуск взноса у mock и уведомление вебхуком (только для тестов)
+- `src/lib/server/services/payments/providers/vpos.ts` — `createVposProvider({ token, webhookSecret, livemode, fetch, now })`: создание, статус, возврат
+- `src/lib/server/services/payments/providers/vpos-webhook.ts` — подпись и разбор вебхука
+    30|- `src/lib/server/services/payments/providers/vpos-map.ts` — статусы, сумма, очистка `raw`
+- `src/lib/server/services/payments/providers/vpos.test.ts`, `vpos-webhook.test.ts` — тесты на ответах из спецификации, `fetch` подменён
+- `src/lib/server/services/payments/providers/registry.ts` — запись `vpos` из окружения (+ `registry.test.ts`)
+- `src/lib/server/services/payments/providers/types.ts` — `WebhookNotice.status: ProviderStatus`
+- `.env.example` — `PAYMENT_VPOS_*`
+- `docs/07-PAYMENTS.md` § 13, `docs/questions.md` — решения владельца (разрешено 2026-10-20)
 
 ## Не ломать
 
-- Существующие тесты платежей, членства, донатов и админки платежей — без изменений (новые файлы рядом).
-- Тесты не пишут в общую базу вне откатываемой транзакции; сверка не трогает чужие платежи.
+- Цепочка на `mock` в dev и все тесты платежей (включая приёмочные 3.12) — без изменений поведения.
+- Без `PAYMENT_VPOS_*` прод ведёт себя как сейчас: `/api/webhooks/vpos` — 404, онлайн-оплата выключена при пустом `PAYMENT_PROVIDER`.
+    40|- Вебхук с неверной / старой подписью, чужим `livemode` или не той формы — 400 и ничего не меняет; дубль события — один раз (`receiveWebhook`).
+- Ответ VPOS с другой суммой или валютой не даёт `paid` (`apply`).
 
 ## Проверка
 
-- `npx vitest --run src/lib/server/services/payments src/lib/server/services/memberships src/lib/server/services/donations`
-- `npm run check`, `npm run lint`, `npm run test`
+- `npx vitest --run src/lib/server/services/payments`
+- `npm run check`, `npm run lint`
 
 ## Риск
 
-`low` по диффу (только тесты); зона — платежи и взносы. Если тест найдёт ошибку и будет исправление в `src` — `high`.
-
+`high` — платежи и вебхуки, `.env.example`.
+    50|
 ## Читать
 
-- `07` § 6, 7, 8, 10, 11, 15 — прочитаны в SPEC. Событийные пункты — `09` этап 5 (5.4, 5.10).
+- `07` § 4 (контракт), § 13 (решения), § 14 (безопасность) — прочитаны в SPEC; факты выше. Спецификация VPOS — выписана выше.
 
-## Для общего REVIEW — что проверить в 3.12
+## Открытые вопросы (не блокируют модуль, блокируют боевую проверку)
 
-Дифф: `git diff 898f443..6c9b987 -- src` (только 3 новых файла в `services/payments`, код приложения не менялся). Риск `low` → без субагентов: свой проход + `/crit-audit`; при желании bugbot.
-
-1. **Покрытие § 15** — каждый пункт есть в `acceptance-fee.test.ts` / `acceptance-money.test.ts` с боевыми эффектами (`allEffects`: членство + донат + письмо о возврате, как `paymentEffects`), а не со счётчиками; ассерты — на последствия (членство, уровень, баллы, письма), а не только на статус платежа.
-2. **Изоляция** — всё в `inRollback`; сверка — только `ownMock` (свой id провайдера), `onlyProvider` не отдаёт чужих провайдеров; IP вебхука — `testIp()` на каждый вызов (общий лимит не мешает).
-3. **Пункты про события** — не покрыты сознательно: `event_fee` без эффектов (этап 5), в роадмапе 5.4 и 5.10.
-4. **Известное ограничение** — сверка берёт 100 самых старых `pending` в окне 2 мин – сутки по всей базе (как и в `reconcile*.test.ts`): если в `parkour_dev` накопится > 100 чужих таких платежей, тест истечения может не увидеть свой (тогда `expired: 0`).
+1. `amountMinor` для AMD у VPOS — драмы или сотые (×100)? Спросить VPOS.am (info@vpos.am) до первой оплаты в песочнице.
+2. Валюты USD / EUR — по договору с банком.
+3. Вебхук в песочнице приходит только на публичный адрес: песочницу локально проверяем созданием оплаты и статусом (страница возврата и сверка ходят в `getStatus`), вебхук — на проде с тестовым токеном (`PAYMENT_VPOS_LIVEMODE=false`) после деплоя этапа 3.
 
 ## Фазы
-
-- [x] SPEC — `898f443`
-- [x] TESTS (`test: …`) — `6c9b987`; новые 7/7 зелёные с первого прогона, ошибок в коде не найдено (`fix:` не понадобился)
-- [x] REGRESS — Vitest зоны (`payments`, `memberships`, `donations`) 36 файлов, 193/193; `npm run check` 0 ошибок; eslint и prettier новых файлов чистые. Полный `npm run test` и `npm run lint` — не прогонялись (общий прогон)
-- [ ] REVIEW — общим прогоном в конце этапа 3, без push до него
+    60|
+- [x] SPEC
+- [ ] RED (`test: … [RED]`)
+- [ ] GREEN (`feat: … [GREEN]`)
+- [ ] REGRESS
+- [ ] Песочница (после доступов) — создание, оплата тестовой картой, статус, возврат, вебхук
+- [ ] Боевая проверка малой суммой (владелец, после деплоя)
+- [ ] REVIEW — общим прогоном этапа 3, без push до него
 - [ ] DEPLOY (только по апруву)
