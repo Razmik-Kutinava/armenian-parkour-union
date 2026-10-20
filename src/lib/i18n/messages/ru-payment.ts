@@ -27,5 +27,8 @@ export const ruPayment: Partial<Messages> = {
 	'payment.retry': 'Попробовать снова',
 	'payment.toMembership': 'Моё членство',
 	'payment.toHome': 'На главную',
-	'payment.refresh': 'Обновить страницу'
+	'payment.refresh': 'Обновить страницу',
+	'payment.mail.refund.subject': 'Платёж возвращён',
+	'payment.mail.refund.text':
+		'Здравствуйте, {name}!\n\nМы вернули ваш платёж Союзу паркура Армении.\n\nСумма: {amount}\nНомер платежа: {payment}\n\nКогда деньги поступят на счёт, зависит от вашего банка — обычно несколько рабочих дней.'
 };

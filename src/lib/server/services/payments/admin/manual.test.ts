@@ -18,7 +18,11 @@ describe.skipIf(!testDbUrl)('admin payments: manual payment', () => {
 	const { inRollback, close } = testDb();
 	afterAll(close);
 
-	const deps = (send = mailbox().send) => ({ effects: allEffects(send), ip: '10.0.0.7', today: TODAY });
+	const deps = (send = mailbox().send) => ({
+		effects: allEffects(send),
+		ip: '10.0.0.7',
+		today: TODAY
+	});
 
 	it('guest donation: paid, manual, confirmed by the admin, comment kept, letter, audit', async () => {
 		await inRollback(async (tx) => {

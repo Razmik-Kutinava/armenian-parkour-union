@@ -33,7 +33,9 @@ async function registerAdmin(page: Page) {
 	await sql`update users set role = 'admin' where email = ${email}`;
 }
 
-test('manual donation: recorded as paid, found in the list, refunded, exported', async ({ page }) => {
+test('manual donation: recorded as paid, found in the list, refunded, exported', async ({
+	page
+}) => {
 	await registerAdmin(page);
 	const donor = `Cash ${TAG}`;
 	await page.goto('/admin/payments/new');
@@ -50,7 +52,7 @@ test('manual donation: recorded as paid, found in the list, refunded, exported',
 	await expect(page.locator('main')).toContainText(`Transfer ${TAG}`);
 
 	await page.goto(`/admin/payments?q=${encodeURIComponent(donor)}`);
-	await expect(page.getByRole('link', { name: donor })).toBeVisible();
+	await expect(page.getByRole('link', { name: donor, exact: true })).toBeVisible();
 
 	const csv = await page.request.get(
 		'/admin/payments/export?kind=donation&from=2026-01-15&to=2026-01-15'
@@ -83,7 +85,7 @@ test('needs review: shown by the filter, cleared with a comment', async ({ page 
 		returning id`;
 	const list = `/admin/payments?review=1&q=${encodeURIComponent(donor)}`;
 	await page.goto(list);
-	await expect(page.getByRole('link', { name: donor })).toBeVisible();
+	await expect(page.getByRole('link', { name: donor, exact: true })).toBeVisible();
 	await page.goto(`/admin/payments/${payment.id}`);
 	await expect(page.locator('main')).toContainText('amount_mismatch');
 	await expect(page.getByRole('button', { name: 'Mark as reviewed' })).toBeVisible();
@@ -93,7 +95,7 @@ test('needs review: shown by the filter, cleared with a comment', async ({ page 
 	});
 	expect(resolve.ok()).toBe(true);
 	await page.goto(list);
-	await expect(page.getByRole('link', { name: donor })).toHaveCount(0);
+	await expect(page.getByRole('link', { name: donor, exact: true })).toHaveCount(0);
 });
 
 test('donation purposes: created with three languages, then hidden', async ({ page }) => {
@@ -106,7 +108,8 @@ test('donation purposes: created with three languages, then hidden', async ({ pa
 	await page.goto('/admin/donation-purposes');
 	const row = page.getByRole('row', { name: new RegExp(title) });
 	await expect(row).toContainText('Yes');
-	const [purpose] = await sql`select id, is_active from donation_purposes where title->>'en' = ${title}`;
+	const [purpose] =
+		await sql`select id, is_active from donation_purposes where title->>'en' = ${title}`;
 	expect(purpose.is_active).toBe(true);
 	const hide = await page.request.post(`/admin/donation-purposes/${purpose.id}?/update`, {
 		form: { 'title.en': title },

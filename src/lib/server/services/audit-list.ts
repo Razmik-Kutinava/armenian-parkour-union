@@ -32,9 +32,9 @@ export type AuditEntryFull = AuditRow & { before: unknown; after: unknown };
 const CODE = /^[a-z0-9_.:-]{1,64}$/;
 const DAY = /^(\d{4})-(\d{2})-(\d{2})$/;
 /** "From" and "to" are calendar days in Yerevan, where the federation works. */
-const ZONE = 'Asia/Yerevan';
+export const ZONE = 'Asia/Yerevan';
 
-function validDay(value: string | undefined): string | undefined {
+export function validDay(value: string | undefined): string | undefined {
 	const m = value ? DAY.exec(value) : null;
 	if (!m) return undefined;
 	const d = new Date(Date.UTC(+m[1], +m[2] - 1, +m[3]));

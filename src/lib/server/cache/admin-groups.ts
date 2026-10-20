@@ -10,6 +10,9 @@ const BY_SECTION: Record<string, CacheGroup[]> = {
 	hero: ['hero'],
 	settings: ['settings'],
 	users: ['hero'],
+	/* /donate: purposes and the recent donations list */
+	'donation-purposes': ['settings'],
+	payments: ['settings'],
 	media: ALL_GROUPS,
 	audit: [],
 	roles: [],

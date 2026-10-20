@@ -153,7 +153,9 @@ export function permissionFixtures(sql: postgres.Sql) {
 				await sql`select status, needs_review, confirmed_by, paid_at, refunded_at
 					from payments where id = ${paymentId}`
 			)[0],
-			purpose: (await sql`select title, is_active, sort_order from donation_purposes where id = ${purposeId}`)[0]
+			purpose: (
+				await sql`select title, is_active, sort_order from donation_purposes where id = ${purposeId}`
+			)[0]
 		}),
 		targetRow: async (id: string) =>
 			(await sql`select role, status, email_verified, first_name from users where id = ${id}`)[0],

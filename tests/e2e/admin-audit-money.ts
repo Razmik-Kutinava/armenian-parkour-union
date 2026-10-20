@@ -1,7 +1,10 @@
 import type postgres from 'postgres';
 import type { AdminAction } from './admin-audit-map';
 
-type MoneyAction = Extract<AdminAction, `/admin/payments${string}` | `/admin/donation-purposes${string}`>;
+type MoneyAction = Extract<
+	AdminAction,
+	`/admin/payments${string}` | `/admin/donation-purposes${string}`
+>;
 type Post = (path: string, form?: Record<string, string>) => Promise<void>;
 
 /** Payment and donation purpose actions for admin-audit.spec.ts, each on its own fresh row. */

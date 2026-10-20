@@ -87,7 +87,9 @@ for (const role of ['member', 'editor', 'moderator'] as const) {
 			await sql`select 1 from audit_log where entity_id in (${target}, ${ids.mediaId}, ${ids.pageId}, ${ids.postId}, ${ids.eventId}, ${ids.heroId}, ${ids.paymentId}, ${ids.purposeId})`
 		).toHaveLength(0);
 		expect(await sql`select 1 from payments where donor_name = 'Hacked'`).toHaveLength(0);
-		expect(await sql`select 1 from donation_purposes where title->>'en' = 'Hacked'`).toHaveLength(0);
+		expect(await sql`select 1 from donation_purposes where title->>'en' = 'Hacked'`).toHaveLength(
+			0
+		);
 		expect(
 			await sql`select 1 from hero_blocks where title->>'en' = 'Hacked' and created_at > now() - interval '10 minutes'`
 		).toHaveLength(0);

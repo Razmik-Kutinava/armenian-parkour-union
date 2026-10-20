@@ -43,7 +43,10 @@ describe.skipIf(!testDbUrl)('admin payments: refund', () => {
 	const { inRollback, close } = testDb();
 	afterAll(close);
 
-	async function paidFee(tx: Parameters<Parameters<typeof inRollback>[0]>[0], provider: MockProvider) {
+	async function paidFee(
+		tx: Parameters<Parameters<typeof inRollback>[0]>[0],
+		provider: MockProvider
+	) {
 		const user = await verifiedUser(tx);
 		const started = await startMembershipPayment(tx, user.id, 'en', startDeps(provider));
 		if (!started.ok) throw new Error(started.reason);

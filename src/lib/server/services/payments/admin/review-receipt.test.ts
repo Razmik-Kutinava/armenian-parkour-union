@@ -18,7 +18,9 @@ describe.skipIf(!testDbUrl)('admin payments: needs review', () => {
 		await inRollback(async (tx) => {
 			const admin = await staff(tx);
 			const payment = await insertPayment(tx, { status: 'failed', needsReview: true });
-			expect(await resolveReview(tx, admin, payment.id, 'Checked with bank', '10.0.0.1')).toBe('ok');
+			expect(await resolveReview(tx, admin, payment.id, 'Checked with bank', '10.0.0.1')).toBe(
+				'ok'
+			);
 			expect((await paymentRow(tx, payment.id)).needsReview).toBe(false);
 			expect(await auditFor(tx, 'payment', payment.id)).toMatchObject([
 				{

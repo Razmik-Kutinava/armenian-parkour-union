@@ -31,7 +31,13 @@ describe.skipIf(!testDbUrl)('admin payments: confirm by statement', () => {
 			const { sent, send } = mailbox();
 			const effects = allEffects(send);
 			const deps = { effects, ip: '10.0.0.8' };
-			const result = await confirmPaymentManually(tx, admin, started.paymentId, 'Statement 77', deps);
+			const result = await confirmPaymentManually(
+				tx,
+				admin,
+				started.paymentId,
+				'Statement 77',
+				deps
+			);
 			expect(result).toBe('ok');
 			const row = await paymentRow(tx, started.paymentId);
 			expect(row).toMatchObject({ status: 'paid', confirmedBy: admin.id, amountMinor: 20_000 });

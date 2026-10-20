@@ -10,6 +10,7 @@ import { enMembership } from './en-membership';
 import { enNews } from './en-news';
 import { enPages } from './en-pages';
 import { enPayment } from './en-payment';
+import { enPaymentsAdmin } from './en-payments-admin';
 import { enSystem } from './en-system';
 import { enUsers } from './en-users';
 
@@ -29,6 +30,7 @@ export const en = {
 	...enMembership,
 	...enDonate,
 	...enPayment,
+	...enPaymentsAdmin,
 	'site.name': 'Armenian Parkour Union',
 	'site.description': 'Armenian Parkour Union: events, news, membership and certification.',
 	'site.underConstruction': 'Site under construction.',

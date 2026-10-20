@@ -10,13 +10,13 @@ import type { Mail } from '../../mail/resend';
 import type { PaymentRow } from '../payments/effects';
 import { getFooterSettings } from '../site-settings';
 
-type Recipient = { email: string; locale: Locale; name: string };
+export type Recipient = { email: string; locale: Locale; name: string };
 
 /**
  * docs/07 section 5.2 p. 4: a member by the account (none once deleted), a guest by the form. A
  * payment keeps no language, so a guest gets English (questions.md, 3.7).
  */
-async function recipient(tx: LimitDb, payment: PaymentRow): Promise<Recipient | null> {
+export async function recipient(tx: LimitDb, payment: PaymentRow): Promise<Recipient | null> {
 	if (!payment.userId) {
 		if (!payment.donorEmail) return null;
 		return { email: payment.donorEmail, locale: 'en', name: payment.donorName ?? '' };

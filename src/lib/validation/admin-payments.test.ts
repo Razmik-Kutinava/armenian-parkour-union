@@ -18,7 +18,9 @@ const donation = (extra: Record<string, string> = {}) => ({
 
 const errorOf = (input: Record<string, string>) => {
 	const result = schema.safeParse(input);
-	return result.success ? null : Object.fromEntries(result.error.issues.map((i) => [i.path[0], i.message]));
+	return result.success
+		? null
+		: Object.fromEntries(result.error.issues.map((i) => [i.path[0], i.message]));
 };
 
 describe('manual payment form', () => {
@@ -40,15 +42,32 @@ describe('manual payment form', () => {
 	it('cents for USD; anonymity and purpose kept for a donation', () => {
 		const purposeId = crypto.randomUUID();
 		const parsed = schema.parse(
-			donation({ currency: 'USD', amount: '12.5', isAnonymous: 'on', purposeId, donorEmail: 'A@B.am' })
+			donation({
+				currency: 'USD',
+				amount: '12.5',
+				isAnonymous: 'on',
+				purposeId,
+				donorEmail: 'A@B.am'
+			})
 		);
-		expect(parsed).toMatchObject({ amountMinor: 1250, isAnonymous: true, purposeId, donorEmail: 'a@b.am' });
+		expect(parsed).toMatchObject({
+			amountMinor: 1250,
+			isAnonymous: true,
+			purposeId,
+			donorEmail: 'a@b.am'
+		});
 	});
 
 	it('fee: the payer email is required; donor fields and purpose are dropped', () => {
-		expect(errorOf(donation({ kind: 'membership' }))).toEqual({ payerEmail: 'payments.error.payer' });
+		expect(errorOf(donation({ kind: 'membership' }))).toEqual({
+			payerEmail: 'payments.error.payer'
+		});
 		const parsed = schema.parse(
-			donation({ kind: 'membership', payerEmail: 'Member@Example.com', purposeId: crypto.randomUUID() })
+			donation({
+				kind: 'membership',
+				payerEmail: 'Member@Example.com',
+				purposeId: crypto.randomUUID()
+			})
 		);
 		expect(parsed).toMatchObject({
 			payerEmail: 'member@example.com',
@@ -69,7 +88,10 @@ describe('manual payment form', () => {
 	it('refusals: kind, amount, currency, date in the future or broken, comment', () => {
 		expect(errorOf(donation({ kind: 'event_fee' }))).toHaveProperty('kind');
 		for (const amount of ['0', '-5', '1.5', 'abc', '']) {
-			expect(errorOf(donation({ amount })), amount).toHaveProperty('amount', 'payments.error.amount');
+			expect(errorOf(donation({ amount })), amount).toHaveProperty(
+				'amount',
+				'payments.error.amount'
+			);
 		}
 		expect(errorOf(donation({ currency: 'RUB' }))).toHaveProperty('currency');
 		expect(errorOf(donation({ paidOn: '2026-10-22' }))).toEqual({ paidOn: 'payments.error.date' });

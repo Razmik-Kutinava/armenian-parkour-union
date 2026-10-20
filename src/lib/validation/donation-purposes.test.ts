@@ -22,9 +22,10 @@ describe('donation purpose form', () => {
 		expect(purposeFormSchema.safeParse({ title: { ru: 'Парк' } }).success).toBe(false);
 		expect(purposeFormSchema.safeParse({}).success).toBe(false);
 		for (const sortOrder of ['-1', '1.5', '10000', 'x']) {
-			expect(purposeFormSchema.safeParse({ title: { en: 'P' }, sortOrder }).success, sortOrder).toBe(
-				false
-			);
+			expect(
+				purposeFormSchema.safeParse({ title: { en: 'P' }, sortOrder }).success,
+				sortOrder
+			).toBe(false);
 		}
 	});
 });

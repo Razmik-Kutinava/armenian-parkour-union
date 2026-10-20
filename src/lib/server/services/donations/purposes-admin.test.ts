@@ -51,7 +51,13 @@ describe.skipIf(!testDbUrl)('donations: purposes in the admin panel', () => {
 			const purpose = { donationPurposeId: created.id };
 			await insertPayment(tx, { ...purpose, status: 'paid', paidAt, amountMinor: 1000 });
 			await insertPayment(tx, { ...purpose, status: 'paid', paidAt, amountMinor: 2500 });
-			await insertPayment(tx, { ...purpose, status: 'paid', paidAt, amountMinor: 700, currency: 'USD' });
+			await insertPayment(tx, {
+				...purpose,
+				status: 'paid',
+				paidAt,
+				amountMinor: 700,
+				currency: 'USD'
+			});
 			await insertPayment(tx, { ...purpose, status: 'refunded', paidAt, amountMinor: 9000 });
 			await insertPayment(tx, { ...purpose, status: 'pending', amountMinor: 9000 });
 			const row = (await listPurposesAdmin(tx)).find((p) => p.id === created.id);
