@@ -5,7 +5,7 @@
 
 | Параметр | Значение |
 |---|---|
-| `last_audited_sha` | `941350a` |
+| `last_audited_sha` | `4de7a8d` |
 | Дата | 2026-10-20 |
 | Вердикт | CLEAN |
 
@@ -58,3 +58,4 @@
 | 2026-10-19 | 3.3 сервис платежей `bc1c124..7b6b7ee`: `services/payments/{transitions,create,start-checks,reuse,apply,effects,status-log,index}.ts` + тесты | CLEAN | 0 (bugbot: 1 не K — C13; security: 2 не K — C11, C12; e2e 89 + 1 повтором — `auth` «sixth login attempt» отдельно проходит) | `7b6b7ee` |
 | 2026-10-19 | 3.4 маршрут вебхуков `7b6b7ee..63c88db`: `services/payments/{webhook,webhook-body,index}.ts`, `auth/rate-limit.ts`, `api/webhooks/[provider]/+server.ts` + тесты | CLEAN | 0 (bugbot: 0; security: 0, не K — лимит частоты после проверки провайдера, текст ошибки в `error`; свой проход: подпись до записи, событие до обработки, дубль только при `processed_at is null`, эффекты под блокировкой строки; e2e 90 + 2 повтором — `admin-users` «grant a role» и `auth` «sixth login attempt» отдельно 16/16) | `63c88db` |
 | 2026-10-20 | общий REVIEW этапа 3 (3.5–3.13) `8f6c188..941350a`: 218 файлов — сверка и истечение, взнос и членство, донаты, страницы возврата, админка платежей и назначений, кабинет, параметры оплаты, приёмочные тесты, провайдер VPOS.am (`providers/vpos*.ts`), cron | CLEAN | 0 (bugbot и security-review тремя проходами 85 + 73 + 60 файлов: критичных 0; bugbot: 3 отклонены валидатором, 1 низкая — битое тире на `/admin/donation-purposes`, исправлено `941350a`; security: ниже порога — редирект на `checkoutUrl` провайдера без белого списка, `pid` в адресе возврата как ключ доступа, `escapeLike` без `ESCAPE`, GET-экспорт CSV как у журнала; свой проход по 3.13: подпись до разбора, окно 5 мин, `livemode`, сумма из VPOS сверяется, токен не в ошибках; e2e 120 + 10 повтором, `admin-users` «grant a role» — известное падение до 3.2) | `941350a` |
+| 2026-10-20 | 4.1–4.3 баллы `941350a..4de7a8d`: `drizzle/0009_points.sql`, `scripts/rollback/0009_down.sql`, `db/schema/{points,enums,index}.ts`, `seed/points-rules.ts`, `scripts/seed.ts`, `services/points/*` + тесты (18 файлов) | CLEAN | 0 (bugbot: 0; security: 0, ниже порога — `awardPoints` не проверяет `sourceId` на uuid, вызывающих пока нет; свой проход: `points_balance` пишет только `services/points/ledger.ts`, баланс считается под блокировкой строки `users`, дубль и вторая отмена — уникальные индексы + `ON CONFLICT DO NOTHING`; гейты: check 0, lint чистый, Vitest 879/880 — `hero/public` часы; e2e skip — маршрутов в диффе нет) | `4de7a8d` |
