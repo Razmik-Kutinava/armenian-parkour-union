@@ -1,71 +1,55 @@
 # todo — текущая задача (SBR)
 
 > Один живой файл на текущую задачу. Ведётся по `.cursor/rules/sbr.mdc`. После REVIEW очищается до шаблона, итог — в `PROGRESS.md` («Сделано»).
-> Памятки для общего REVIEW: 3.6b — `git show c3b6468:docs/todo.md`, 3.7 — `git show 2c0aee1:docs/todo.md`, 3.8 — `git show 8e2b410:docs/todo.md`, 3.9 — `git show b9582c3:docs/todo.md`, 3.10 — этот файл до следующей задачи (раздел «Для общего REVIEW»).
+> Памятки для общего REVIEW: 3.6b — `git show c3b6468:docs/todo.md`, 3.7 — `git show 2c0aee1:docs/todo.md`, 3.8 — `git show 8e2b410:docs/todo.md`, 3.9 — `git show b9582c3:docs/todo.md`, 3.10 — `git show 110eb1e:docs/todo.md`, 3.11 — этот файл до следующей задачи (раздел «Для общего REVIEW»).
 
 ## Задача
 
-3.10 — кабинет: обзор `/cabinet`, профиль `/cabinet/profile`, платежи `/cabinet/payments`, баннер членства (`06` § 2, 5, 5.1, 5.2, 5.9; `04` § 3.1, 4, 5.3, 6.8; `03` § 1, 2, 13; `07` § 12). Миграции нет. REVIEW — в общем прогоне (без push).
+3.11 — параметры оплаты в настройках админки: размер взноса, лимиты донатов, время ожидания оплаты (`05` § 21 «Членство»; `decisions.md` 2026-10-19, 3.6 и 3.7 — «правка — 3.11»). Миграции нет. REVIEW — в общем прогоне (без push).
 
 Правила:
-1. **«Своё».** Всё — только для вошедшего (`cabinet/+layout.server.ts` + `requireUser` в каждом `load` и action), id — из сессии (`locals.user.id`), не из формы или URL (`04` § 5.3). Чужой или несуществующий платёж — 404.
-2. **Меню кабинета** (`cabinet/+layout.svelte`): Обзор, Профиль, Членство, Платежи — только готовые разделы (события, прогресс, баллы, видео, заказы, документы — этапы 4–7). На телефоне — горизонтальная прокрутка над содержимым.
-3. **Обзор** `/cabinet` (`06` § 5.1): приветствие — имя, степень (`level`; пусто — «Ещё не участник федерации»), аватар — инициалы (фото — позже, п. 11); членство — статус и «действует до», «Ожидаем подтверждение платежа», кнопка «Продлить» / «Вступить» → `/cabinet/membership`; баллы — `users.points_balance` (ссылка на журнал — этап 4); «Что требует действия»: email не подтверждён (кнопка «Отправить письмо ещё раз»), членство истекло, членство скоро истекает, ещё не вступил. Ближайшие события, неоплаченная регистрация, согласия, прогресс-экзамены — этапы 5–6, блоки не показываются.
-4. **Напоминание о членстве** — `membershipReminder(overview, now)` (чистая функция): `ends_soon` — членство действует, `paidUntil` ≤ now + 30 дней (как первое письмо, `03` § 2 п. 4); `expired` — не действует, оплата не ждёт, и есть оплаченный период (`active` / `expired`), закончившийся в прошлом (дата — последний конец); возврат (`cancelled`) и «ни разу не вступал» — не напоминание. Платёж ждёт подтверждения — напоминания нет.
-5. **Баннер** (`06` § 2) — в шапке сайта для вошедшего: email не подтверждён → «Подтвердите email» + повторная отправка (POST `/cabinet?/resendVerification`); `expired` / `ends_soon` → текст с датой и «Продлить» → `/cabinet/membership`. Данные — из `(site)/+layout.server.ts` (`viewer.reminder`, `viewer.emailVerified`), только флаги и дата, без контактов.
-6. **Повторное письмо подтверждения**: Better Auth `sendVerificationEmail` с заголовками сессии (письмо — на email из сессии); уже подтверждён → «уже подтверждён»; лимит 3 / час на пользователя (`limits.verifyResendPerUser`), сверх — «слишком часто».
-7. **Профиль** `/cabinet/profile` (`06` § 5.2): правка — имя, фамилия, телефон, страна (ISO-2, список стран по `Intl.DisplayNames`), город (≤ 100), о себе (≤ 1000), язык писем и кабинета (`users.locale`), данные родителя — обязательны, если участнику по **сохранённой** дате рождения меньше 18 (`03` § 13 п. 1), иначе обнуляются. Дата рождения — только показ (менять через админа), пусто — «не указана, обратитесь в федерацию». `name` = «Имя Фамилия». Удалённый — `not_found`. Журнал не пишется (своё, не опасное действие по `main.mdc` арх. 4).
-8. **Смена email** (с подтверждением): Better Auth `changeEmail` (`user.changeEmail.enabled`): письмо со ссылкой — на **новый** адрес (`mailLink` → `/verify-email?token=`), email меняется только после перехода по ссылке (`emailVerified = true`); занятый адрес — тот же ответ «письмо отправлено» (без раскрытия аккаунтов); тот же адрес — ошибка у поля; лимит 3 / час на пользователя (`limits.emailChangePerUser`).
-9. **Пароль**: есть пароль — текущий + новый (8–128), Better Auth `changePassword` с `revokeOtherSessions: true` (`04` § 6.8: остальные сессии завершаются, текущая остаётся); неверный текущий — ошибка у поля; лимит 5 / 15 мин на пользователя (`limits.passwordChangePerUser`). Нет пароля (вход через Google) — «Задать пароль»: письмо со ссылкой (`mailPasswordLink`, лимит `passwordResetPerIp`).
-10. **Платежи** `/cabinet/payments` (`06` § 5.9): свои платежи (`user_id`), новые сверху, до 100: дата (`created_at`), тип, сумма с валютой, статус (общий `StatusBadge`, перенос из `routes/admin/payments` в `components/payments`), «Квитанция» — у `paid` / `refunded` с `paid_at`. Квитанция `/cabinet/payments/[id]` (`07` § 12 п. 1 «копия в кабинете»): номер платежа, дата оплаты, сумма, назначение (взнос — период членства этого платежа; донат — назначение или «Общие нужды федерации»), плательщик (имя из аккаунта), статус, дата возврата, реквизиты федерации (`site_settings.requisites`), кнопка «Печать». Не UUID / чужой / без `paid_at` — 404. `noindex`, `no-store`. Донаты гостем до регистрации (без `user_id`) не показываются.
-11. **Не в 3.10 (решения агента, в отчёт):** приватность города и фото, запрос на удаление аккаунта — открытые вопросы (`questions.md`, этап 3; нужна схема); загрузка фото — вместе с приватностью (публичный показ фото у до 18 — по согласию `privacy`, этап 5); переход после входа в `/cabinet` вместо главной (`06` § 4.11) — отдельным шагом (меняет e2e входа).
-12. Тексты — `i18n/messages/{en,ru}-cabinet.ts`; HY — откат на EN.
+1. **Раздел** `/admin/settings/payments` — вторая вкладка «Настроек сайта» (вкладки «Сайт» / «Членство и оплата» на обеих страницах); меню админки не меняется (`05` § 2). Право — `settings.write` (только admin, `04` стр. 105) в `load` и action; сервис сам проверяет `role = admin`.
+2. **Поля:** взнос — сумма (в основных единицах валюты, `priceToMinor`), валюта (`CURRENCIES`), срок в месяцах (1–120); лимиты доната — валюта, минимум, максимум (≥ 1, минимум ≤ максимума); ожидание оплаты взноса и доната — минуты (5–1440). Сумма взноса **0** разрешена — оплата взноса выключена (как seed, `parseMembershipFee` → `null`, кнопки нет).
+3. **Хранение:** ключи `site_settings` в прежнем формате — `membership_fee` `{ amount_minor, currency, period_months }`, `donation_limits` `{ currency, min_minor, max_minor }`, `payment_wait_minutes` (число); читают их без изменений `parseMembershipFee` / `parsePeriodMonths`, `parseDonationLimits`, `parseWaitMinutes`.
+4. **Журнал** (`05` § 21): каждый изменённый ключ — `settings.update` с прежним и новым значением, в одной транзакции с записью (`FOR UPDATE`); без изменений — записи нет. Общий цикл записи вынести из `saveSettings` (`writeSettings`), поведение `saveSettings` не меняется.
+5. **Сломанное значение в базе** — поле формы пустое (как в 2.7), сохранение перезаписывает ключ целиком.
+6. **Действует сразу:** кеш `/join`, `/cabinet/membership`, `/donate` (группа `settings`) сбрасывается — раздел `settings` уже в `cache/admin-groups.ts`. Уже созданные платежи не меняются (сумма и срок ожидания зафиксированы при создании); срок членства берётся на момент подтверждения оплаты (3.6a) — подсказка у поля.
+7. **Не в 3.11 (решения агента, в отчёт):** время удержания места события — этап 5 (вопрос в `questions.md`, ключа нет); «Параметры правил» (`03` § 16) — этап 4; выбор валюты в форме `/donate` — нет (валюта из лимитов, решение 3.7).
+8. Тексты — `i18n/messages/{en,ru}-system.ts`; HY — откат на EN.
 
 ## Файлы (ожидаемо)
 
-- `src/lib/server/services/cabinet/` — `reminder.ts` (+ тест), `overview.ts`, `profile.ts`, `payments.ts`, `receipt.ts` (+ тесты)
-- `src/lib/server/auth/account.ts` — смена email, пароля, повтор письма (+ тест с лимитами); `auth/index.ts` (`changeEmail`), `auth/rate-limit.ts` (лимиты)
-- `src/lib/validation/cabinet.ts` (+ тест); `src/lib/countries.ts`
-- маршруты `(site)/cabinet/{+layout.svelte, +page, profile, payments, payments/[id]}`, `(site)/+layout.server.ts`, `+layout.svelte`, `components/site/StatusBanner.svelte`, `components/payments/StatusBadge.svelte` (перенос)
-- `src/lib/i18n/messages/{en,ru}-cabinet.ts`, `en.ts`, `ru.ts`
-- `tests/e2e/cabinet.spec.ts`
+- `src/lib/validation/payment-settings.ts` (+ тест) — форма → значения ключей, значения → поля формы
+- `src/lib/server/services/payment-settings.ts` (+ тест с БД) — `getPaymentSettings`, `savePaymentSettings`
+- `src/lib/server/services/site-settings.ts` — `writeSettings` (общий цикл с журналом)
+- `src/routes/admin/settings/payments/{+page.server.ts,+page.svelte}`, `src/routes/admin/settings/SettingsTabs.svelte`, `+page.svelte`
+- `tests/e2e/admin-payment-settings.spec.ts`; карты `admin-audit-map.ts`, `admin-access-map.ts`, исполнитель в `admin-audit-money.ts`
+- `src/lib/i18n/messages/{en,ru}-system.ts`
 
 ## Не ломать
 
-- Чужие платежи, квитанции и профиль недоступны ни по URL, ни прямым POST; гость — на вход (K1); email, телефон, данные родителя не уходят в общий layout и публичные страницы (K4).
-- Смена пароля завершает остальные сессии; email меняется только по ссылке с нового адреса; повтор письма и смена email не раскрывают чужие аккаунты.
-- `/cabinet/membership`, `/join`, оплата взноса, админка платежей, вход / регистрация / сброс пароля / подтверждение email — без изменений поведения.
+- Сумма взноса и лимиты доната берутся только из `site_settings` на сервере (C11): после сохранения `/join` и `/donate` показывают и принимают новые значения; 0 — оплаты взноса нет.
+- Не-админ (editor, moderator, member) не открывает раздел и не сохраняет прямым POST (403) (K1).
+- Форма «Сайт» (`/admin/settings`) сохраняет и журналирует как раньше; сломанное значение ключа не роняет страницу.
 
 ## Проверка
 
-- `npx vitest --run src/lib/server/services/cabinet src/lib/server/auth src/lib/validation src/lib/server/services/memberships`
-- `npx playwright test tests/e2e/cabinet.spec.ts tests/e2e/membership.spec.ts tests/e2e/auth.spec.ts tests/e2e/admin-payments.spec.ts`; `npm run check`, `npm run lint`, `npm run test`
+- `npx vitest --run src/lib/validation src/lib/server/services/site-settings src/lib/server/services/payment-settings src/lib/server/services/memberships src/lib/server/services/donations src/lib/server/seed`
+- `npx playwright test tests/e2e/admin-payment-settings.spec.ts tests/e2e/admin-system.spec.ts tests/e2e/admin-audit.spec.ts tests/e2e/admin-permissions.spec.ts tests/e2e/membership.spec.ts tests/e2e/donate.spec.ts`; `npm run check`, `npm run lint`, `npm run test`
 
 ## Риск
 
-`high` (сессии и Better Auth: смена email и пароля; личные данные и данные до 18; «своё» в платежах).
+`high` (взносы и лимиты денег: сумма, которую сервер берёт в оплату; права админа; журнал действий).
 
 ## Читать
 
-- `06` § 1, 2, 3.2, 5, 5.1–5.3, 5.9, 9, 10; `04` § 3.1, 4, 5.2–5.4, 6, 7; `03` § 1, 2, 13; `07` § 12; `02` § 1 `users` (прочитаны в SPEC).
-
-## Для общего REVIEW — что проверить в 3.10
-
-Дифф: `git diff e15e311..94d426e -- src tests` (RED `5eeb347`, GREEN `94d426e`). Риск `high` → bugbot + security-review параллельно, затем `/crit-audit`.
-
-1. **«Своё» (K1)** — `services/cabinet/{overview,profile,payments,receipt}.ts`: каждая выборка по `user_id` из сессии, `isUuid`, удалённый → `null` / `not_found`; квитанция — `payments.user_id = сессия` + `paid | refunded` + `paid_at` (иначе 404); маршруты `cabinet/**` — `requireUser` в каждом `load` и action, id из формы не берётся.
-2. **Смена email** — `auth/index.ts` `user.changeEmail.enabled` (без `sendChangeEmailConfirmation` и `updateEmailWithoutVerification`): Better Auth шлёт токен `change-email-verification` на **новый** адрес через `sendVerificationEmail` → `/verify-email` (`verifyEmail` без заголовков сессии: если сессии нет, Better Auth **создаёт новую** для владельца токена — вход по ссылке из письма). Занятый адрес — тот же ответ, письма нет. Проверить: адрес, занятый между отправкой и переходом, — `updateUserByEmail` упадёт на unique (500 на `/verify-email`, данные не меняются); старому адресу уведомление не уходит. e2e подделанный токен → 400.
-3. **Смена пароля (`04` § 6.8)** — `auth/account-calls.ts` `changePassword` с `revokeOtherSessions: true` (e2e: вторая сессия выходит, текущая остаётся); лимит 5 / 15 мин на пользователя считается на каждую попытку (и успешную); неизвестные ошибки Better Auth пробрасываются (500).
-4. **Лимиты** — `rate-limit.ts`: `emailChangePerUser`, `verifyResendPerUser` (3 / час), `passwordChangePerUser`; «Задать пароль» — общий `passwordResetPerIp`.
-5. **Личные данные (K4)** — в общий layout (`(site)/+layout.server.ts`) уходят только `emailVerified` и напоминание (вид + дата), без email / телефона; профиль отдаёт email, телефон, данные родителя только владельцу; данные родителя — по **сохранённой** дате рождения (форма её не принимает), взрослому обнуляются; журнал за правку своего профиля не пишется (решение агента).
-6. **Напоминание** — `cabinet/reminder.ts`: `ends_soon` ≤ 30 дней, `expired` — последний оплаченный период закончился, возврат (`cancelled`) и ожидание платежа — без напоминания; layout делает 2 запроса на каждую страницу вошедшего (`getMembershipOverview`).
-7. **Не K, решения агента** — меню кабинета только из готовых разделов; баннер «подтвердите email» ведёт в `/cabinet` (кнопка повтора там, без действия из layout); список платежей — до 100, без пагинации, со всеми статусами; донаты гостем до регистрации в кабинете не видны; квитанция — страница с печатью, без PDF; `StatusBadge` перенесён в `components/payments`; страна — список ISO-2 (`lib/countries.ts`, имена через `Intl.DisplayNames`); не сделано: фото, приватность, запрос на удаление (открытые вопросы), переход в `/cabinet` после входа.
+- `05` § 2, 21; `07` § 5.1, 5.2, 13, 14; `04` стр. 105 (`settings.write`); `decisions.md` 2026-10-19 (3.6, 3.7) — прочитаны в SPEC.
 
 ## Фазы
 
-- [x] SPEC — `e15e311`
-- [x] RED (`test: … [RED]`) — `5eeb347`
-- [x] GREEN (`feat: … [GREEN]`) — `94d426e`
-- [x] REGRESS — Vitest 782/783 (`hero/public` — часы машины, известное); e2e зоны 40/40: `cabinet` 7/7, `membership`, `auth`, `admin-payments`, `site-layout`, `payment-return`; `check`, `lint` чистые
+- [x] SPEC
+- [ ] RED (`test: … [RED]`)
+- [ ] GREEN (`feat: … [GREEN]`)
+- [ ] REGRESS
 - [ ] REVIEW — общим прогоном в конце этапа 3, без push до него
 - [ ] DEPLOY (только по апруву)
