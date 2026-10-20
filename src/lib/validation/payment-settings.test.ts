@@ -138,10 +138,18 @@ describe('payment settings form (docs/05 section 21)', () => {
 
 	it('a broken stored value does not pass the stored schema (the form shows it empty)', () => {
 		const { membership_fee, donation_limits, payment_wait_minutes } = storedPaymentSettings.shape;
-		expect(membership_fee.safeParse({ amount_minor: 0, currency: 'AMD', period_months: 12 }).success).toBe(true);
-		expect(membership_fee.safeParse({ amount_minor: -1, currency: 'AMD', period_months: 12 }).success).toBe(false);
-		expect(membership_fee.safeParse({ amount_minor: 100, currency: 'GBP', period_months: 12 }).success).toBe(false);
-		expect(donation_limits.safeParse({ currency: 'AMD', min_minor: 10, max_minor: 5 }).success).toBe(false);
+		expect(
+			membership_fee.safeParse({ amount_minor: 0, currency: 'AMD', period_months: 12 }).success
+		).toBe(true);
+		expect(
+			membership_fee.safeParse({ amount_minor: -1, currency: 'AMD', period_months: 12 }).success
+		).toBe(false);
+		expect(
+			membership_fee.safeParse({ amount_minor: 100, currency: 'GBP', period_months: 12 }).success
+		).toBe(false);
+		expect(
+			donation_limits.safeParse({ currency: 'AMD', min_minor: 10, max_minor: 5 }).success
+		).toBe(false);
 		expect(payment_wait_minutes.safeParse('30').success).toBe(false);
 	});
 });

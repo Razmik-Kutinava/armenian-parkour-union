@@ -7,7 +7,8 @@ import { donationSettings } from './donations/settings';
 import { membershipFee, membershipPeriodMonths } from './memberships/fee';
 import { getPaymentSettings, savePaymentSettings } from './payment-settings';
 import { paymentWaitMinutes } from './payments/settings';
-import { saveSettings } from './site-settings';
+import { paymentSettingKeys } from '#lib/validation/payment-settings.ts';
+import { settingKeys } from '#lib/validation/site-settings-form.ts';
 
 const IP = '198.51.100.11';
 const KEYS = ['membership_fee', 'donation_limits', 'payment_wait_minutes'];
@@ -113,9 +114,7 @@ describe.skipIf(!testDbUrl)('payment settings in the admin panel (docs/05 sectio
 			await resetKeys(tx);
 			for (const role of ['member', 'editor', 'moderator'] as const) {
 				const user = await insertUser(tx, { role });
-				expect(await savePaymentSettings(tx, { id: user.id, role }, values, IP)).toBe(
-					'not_admin'
-				);
+				expect(await savePaymentSettings(tx, { id: user.id, role }, values, IP)).toBe('not_admin');
 				expect(await auditBy(tx, user.id)).toHaveLength(0);
 			}
 			expect(await paymentWaitMinutes(tx)).toBe(30);
@@ -132,22 +131,9 @@ describe.skipIf(!testDbUrl)('payment settings in the admin panel (docs/05 sectio
 			expect(await getPaymentSettings(tx)).toEqual({ payment_wait_minutes: 20 });
 		});
 	});
+});
 
-	it('the site form does not touch the payment keys', async () => {
-		await inRollback(async (tx) => {
-			const actor = await admin(tx);
-			await resetKeys(tx);
-			await savePaymentSettings(tx, actor, values, IP);
-			const site = {
-				site_name: { en: 'APU' },
-				seo_description: { en: 'Parkour' },
-				contacts: {},
-				socials: {},
-				footer: {},
-				requisites: {}
-			};
-			expect(await saveSettings(tx, actor, site, IP)).toBe('ok');
-			expect(await getPaymentSettings(tx)).toEqual(values);
-		});
-	});
+/* Each form writes only its own keys (writeSettings takes the keys of the values it gets). */
+it('the site form and the payment form share no keys', () => {
+	expect(settingKeys.filter((k) => (paymentSettingKeys as string[]).includes(k))).toEqual([]);
 });

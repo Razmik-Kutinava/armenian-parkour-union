@@ -29,5 +29,30 @@ export const enSystem = {
 	'settings.fixErrors': 'Nothing was saved. Fix the marked fields.',
 	'settings.error.url': 'Enter a link starting with https://',
 	'settings.error.link': 'Enter a link starting with https:// or a site path /…',
-	'settings.error.tooManyLinks': 'No more than 10 links.'
+	'settings.error.tooManyLinks': 'No more than 10 links.',
+
+	'settings.tabs': 'Settings sections',
+	'settings.tab.site': 'Site',
+	'settings.tab.payments': 'Membership and payments',
+	'settings.fee': 'Membership fee',
+	'settings.feeHint':
+		'0 — the fee is not taken and the pay button is hidden. Payments already started keep their amount.',
+	'settings.feeAmount': 'Membership fee amount',
+	'settings.feeCurrency': 'Fee currency',
+	'settings.feePeriod': 'Term, months',
+	'settings.feePeriodHint': 'Applies to payments confirmed after saving. From 1 to 120.',
+	'settings.donations': 'Donations',
+	'settings.donationsHint': 'The donation form accepts amounts only within this range.',
+	'settings.donationCurrency': 'Donation currency',
+	'settings.donationMin': 'Minimum donation',
+	'settings.donationMax': 'Maximum donation',
+	'settings.payment': 'Online payment',
+	'settings.waitMinutes': 'Payment wait, minutes',
+	'settings.waitHint':
+		'How long a fee or donation payment waits for the provider before it is closed. From 5 to 1440; payments already started keep their time.',
+	'settings.error.amount': 'Enter an amount in the chosen currency.',
+	'settings.error.currency': 'Choose a currency.',
+	'settings.error.months': 'Enter a whole number of months from 1 to 120.',
+	'settings.error.limits': 'The maximum must not be below the minimum.',
+	'settings.error.minutes': 'Enter a whole number of minutes from 5 to 1440.'
 } as const;

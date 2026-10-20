@@ -5,6 +5,7 @@
 	import Input from '#lib/components/ui/Input.svelte';
 	import { t } from '#lib/i18n/index.svelte.ts';
 	import FooterLinks from './FooterLinks.svelte';
+	import SettingsTabs from './SettingsTabs.svelte';
 	import type { PageProps } from './$types';
 
 	/* docs/05 section 21; groups of stage 1 — decisions.md 2026-10-07. */
@@ -36,7 +37,8 @@
 
 <svelte:head><title>{t('admin.nav.settings')} — {t('admin.title')}</title></svelte:head>
 
-<h1 class="mb-6 text-2xl font-bold">{t('admin.nav.settings')}</h1>
+<h1 class="mb-4 text-2xl font-bold">{t('admin.nav.settings')}</h1>
+<SettingsTabs current="site" />
 
 {#if form?.saved}
 	<p role="status" class="mb-4 rounded-md bg-success-bg p-3 text-sm text-success-fg">

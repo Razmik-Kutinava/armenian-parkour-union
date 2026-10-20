@@ -125,7 +125,10 @@ test('public list: hidden without the flag; with it — names and amounts, no em
 	await page.goto('/donate');
 	const list = page.locator('main').getByRole('list', { name: 'Recent donations' });
 	await expect(list.getByText(`Named ${TAG}`)).toBeVisible();
-	await expect(list.getByText(/7,000/)).toBeVisible();
+	/* Other specs leave paid donations of the same amount in the dev database. */
+	await expect(list.getByRole('listitem').filter({ hasText: `Named ${TAG}` })).toContainText(
+		/7,000/
+	);
 	await expect(list.getByText('Anonymous').first()).toBeVisible();
 	await expect(page.locator('main').getByText(`Secret ${TAG}`)).toHaveCount(0);
 	expect(await page.content()).not.toContain(`@example.com`);

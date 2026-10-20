@@ -50,7 +50,8 @@ export const paymentSettingsAction = (
 			Object.fromEntries([...new FormData(el.form!)].map(([k, v]) => [k, String(v)]))
 		);
 		for (const [name, value] of Object.entries(PAYMENT_FORM_DEFAULTS)) form[name] ||= value;
-		const wait = String(5 + Math.floor(Math.random() * 1400));
+		/* Always a change: an unchanged key writes no entry. */
+		const wait = form.waitMinutes === '777' ? '778' : '777';
 		await post('/admin/settings/payments', { ...form, waitMinutes: wait });
 	}
 });

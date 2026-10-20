@@ -31,5 +31,30 @@ export const ruSystem: Record<keyof typeof enSystem, string> = {
 	'settings.fixErrors': 'Ничего не сохранено. Исправьте отмеченные поля.',
 	'settings.error.url': 'Введите ссылку, начиная с https://',
 	'settings.error.link': 'Введите ссылку с https:// или путь на сайте /…',
-	'settings.error.tooManyLinks': 'Не больше 10 ссылок.'
+	'settings.error.tooManyLinks': 'Не больше 10 ссылок.',
+
+	'settings.tabs': 'Разделы настроек',
+	'settings.tab.site': 'Сайт',
+	'settings.tab.payments': 'Членство и оплата',
+	'settings.fee': 'Членский взнос',
+	'settings.feeHint':
+		'0 — взнос не принимается, кнопки оплаты нет. Уже начатые платежи сохраняют свою сумму.',
+	'settings.feeAmount': 'Размер взноса',
+	'settings.feeCurrency': 'Валюта взноса',
+	'settings.feePeriod': 'Срок, месяцев',
+	'settings.feePeriodHint': 'Применяется к оплатам, подтверждённым после сохранения. От 1 до 120.',
+	'settings.donations': 'Донаты',
+	'settings.donationsHint': 'Форма доната принимает суммы только в этом диапазоне.',
+	'settings.donationCurrency': 'Валюта доната',
+	'settings.donationMin': 'Минимальный донат',
+	'settings.donationMax': 'Максимальный донат',
+	'settings.payment': 'Онлайн-оплата',
+	'settings.waitMinutes': 'Ожидание оплаты, минут',
+	'settings.waitHint':
+		'Сколько платёж взноса или доната ждёт провайдера, прежде чем закрыться. От 5 до 1440; уже начатые платежи сохраняют своё время.',
+	'settings.error.amount': 'Введите сумму в выбранной валюте.',
+	'settings.error.currency': 'Выберите валюту.',
+	'settings.error.months': 'Введите целое число месяцев от 1 до 120.',
+	'settings.error.limits': 'Максимум не может быть меньше минимума.',
+	'settings.error.minutes': 'Введите целое число минут от 5 до 1440.'
 };

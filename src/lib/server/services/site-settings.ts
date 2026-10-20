@@ -52,21 +52,24 @@ export async function getAdminSettings(db: LimitDb): Promise<Partial<SettingsVal
 	return result as Partial<SettingsValues>;
 }
 
-/** docs/05 section 21: every changed key goes to audit_log with the old and new value, atomically. */
-export async function saveSettings(
+/**
+ * docs/05 section 21: every changed key goes to audit_log with the old and new value, atomically.
+ * The caller checks that the actor is an admin.
+ */
+export async function writeSettings(
 	db: LimitDb,
 	actor: Actor,
-	values: SettingsValues,
+	values: Record<string, unknown>,
 	ip: string | null
-): Promise<'ok' | 'not_admin'> {
-	if (actor.role !== 'admin') return 'not_admin';
-	return db.transaction(async (tx) => {
+): Promise<void> {
+	const changed = Object.keys(values);
+	await db.transaction(async (tx) => {
 		const rows = await tx
 			.select()
 			.from(siteSettings)
-			.where(inArray(siteSettings.key, settingKeys))
+			.where(inArray(siteSettings.key, changed))
 			.for('update');
-		for (const key of settingKeys) {
+		for (const key of changed) {
 			const before = rows.find((r) => r.key === key)?.value ?? null;
 			const after = values[key];
 			if (isDeepStrictEqual(before, after)) continue;
@@ -86,8 +89,18 @@ export async function saveSettings(
 				ip
 			});
 		}
-		return 'ok' as const;
 	});
+}
+
+export async function saveSettings(
+	db: LimitDb,
+	actor: Actor,
+	values: SettingsValues,
+	ip: string | null
+): Promise<'ok' | 'not_admin'> {
+	if (actor.role !== 'admin') return 'not_admin';
+	await writeSettings(db, actor, values, ip);
+	return 'ok';
 }
 
 export async function getFooterSettings(db: LimitDb, locale: Locale): Promise<FooterSettings> {
