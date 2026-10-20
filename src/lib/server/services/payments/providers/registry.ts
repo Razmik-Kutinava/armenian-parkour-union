@@ -1,6 +1,13 @@
+import { dev } from '$app/env';
+import {
+	PAYMENT_VPOS_API_TOKEN,
+	PAYMENT_VPOS_LIVEMODE,
+	PAYMENT_VPOS_WEBHOOK_SECRET
+} from '$app/env/private';
 import { manualProvider } from './manual';
 import { createMockProvider } from './mock';
 import { PaymentConfigError, type OnlineProvider, type PaymentProvider } from './types';
+import { vposFromEnv } from './vpos-env';
 
 type Entry = { provider: PaymentProvider; devOnly?: boolean };
 type Env = { dev: boolean };
@@ -39,8 +46,18 @@ export function onlinePaymentsEnabled(flags: unknown): boolean {
 	return (flags as Record<string, unknown>).payments_online !== false;
 }
 
+const vpos = vposFromEnv(
+	{
+		token: PAYMENT_VPOS_API_TOKEN,
+		webhookSecret: PAYMENT_VPOS_WEBHOOK_SECRET,
+		livemode: PAYMENT_VPOS_LIVEMODE
+	},
+	{ dev, fetch: (...args) => globalThis.fetch(...args) }
+);
+
 /* docs/07 section 4: mock exists only in development. One instance per process keeps its state. */
 export const paymentProviders = createRegistry([
 	{ provider: manualProvider },
-	{ provider: createMockProvider(), devOnly: true }
+	{ provider: createMockProvider(), devOnly: true },
+	...(vpos ? [{ provider: vpos }] : [])
 ]);

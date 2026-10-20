@@ -33,7 +33,8 @@ export type WebhookNotice = {
 	/** Deduplication key in `payment_webhook_events`. */
 	eventId: string;
 	providerPaymentId: string;
-	status: Exclude<ProviderStatus, 'pending'>;
+	/** `pending` — the provider reports a waiting state: recorded, nothing changes. */
+	status: ProviderStatus;
 	amountMinor: number;
 	currency: string;
 	raw: unknown;

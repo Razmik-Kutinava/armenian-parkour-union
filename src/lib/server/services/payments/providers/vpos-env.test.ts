@@ -9,7 +9,12 @@ const keys = { token: 'test-token', webhookSecret: 'whsec' };
 
 describe('VPOS.am from the environment (docs/07 section 14)', () => {
 	it('without a token or a webhook secret there is no provider', () => {
-		for (const env of [{}, { token: 'test-token' }, { webhookSecret: 'whsec' }, { ...keys, token: '' }]) {
+		for (const env of [
+			{},
+			{ token: 'test-token' },
+			{ webhookSecret: 'whsec' },
+			{ ...keys, token: '' }
+		]) {
 			expect(vposFromEnv(env, { dev: false, fetch })).toBeNull();
 		}
 	});

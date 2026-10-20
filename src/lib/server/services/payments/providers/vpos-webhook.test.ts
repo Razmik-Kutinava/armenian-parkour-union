@@ -46,7 +46,11 @@ const hmac = (secret: string, t: number, body: string) =>
 
 function signed(
 	body: unknown,
-	{ t = nowSeconds, secret = SECRET, signature }: { t?: number; secret?: string; signature?: string } = {}
+	{
+		t = nowSeconds,
+		secret = SECRET,
+		signature
+	}: { t?: number; secret?: string; signature?: string } = {}
 ): WebhookRequest {
 	const text = typeof body === 'string' ? body : JSON.stringify(body);
 	const headers = new Headers({

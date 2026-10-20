@@ -18,5 +18,8 @@ export const variables = defineEnvVars({
 	R2_PUBLIC_URL: { schema: optional },
 	CACHE_TTL_SECONDS: { schema: optional },
 	PAYMENT_PROVIDER: { schema: optional },
+	PAYMENT_VPOS_API_TOKEN: { schema: optional },
+	PAYMENT_VPOS_WEBHOOK_SECRET: { schema: optional },
+	PAYMENT_VPOS_LIVEMODE: { schema: optional },
 	CRON_SECRET: { schema: optional }
 });

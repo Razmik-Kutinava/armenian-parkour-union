@@ -9,7 +9,7 @@
 
 Факты из спецификации (читать её заново не нужно):
 - Базовый адрес `https://api.vpos.am`, `Authorization: Bearer <token>`; режим (песочница / боевой), банк и ключи банка привязаны к токену на стороне VPOS.am — адрес один.
-    10|- Создать: `POST /v1/payment-sessions`, заголовок `Idempotency-Key` (≤ 160, обязателен), тело `merchantOrderId`, `amountMinor` (целое ≥ 1), `currency` (AMD / USD / EUR), `returnUrl` (один, https), `checkoutLanguage` (hy / ru / en), `customer` (email), `metadata`. Ответ 201 (повтор — 200) `PaymentSession`: `id`, `merchantOrderId`, `amountMinor`, `currency`, `status`, `checkoutUrl`. Ошибки: 401, 409 (ключ или заказ от другого запроса), 422, 503.
+- Создать: `POST /v1/payment-sessions`, заголовок `Idempotency-Key` (≤ 160, обязателен), тело `merchantOrderId`, `amountMinor` (целое ≥ 1), `currency` (AMD / USD / EUR), `returnUrl` (один, https), `checkoutLanguage` (hy / ru / en), `customer` (email), `metadata`. Ответ 201 (повтор — 200) `PaymentSession`: `id`, `merchantOrderId`, `amountMinor`, `currency`, `status`, `checkoutUrl`. Ошибки: 401, 409 (ключ или заказ от другого запроса), 422, 503.
 - Статус: `GET /v1/payments?paymentId=<id>` → `PaymentSession`; 404 — нет.
 - Возврат: `POST /v1/payments/{id}/refunds`, `Idempotency-Key`, тело `amountMinor`, `currency`, `reason` (≤ 240). 200 — возвращено; 202 — деньги возвращены, но чек / проверка требуют оператора; 409 — нельзя; 422; 501 — возвраты не включены.
 - Статусы VPOS: `created`, `pending_redirect`, `pending_payment`, `authorized`, `paid`, `failed`, `cancelled`, `reversed`, `partially_refunded`, `refunded`, `expired`, `status_unknown`, `disputed`.
@@ -19,7 +19,7 @@
 1. Контракт `07` § 4 (`OnlineProvider`): `createPayment`, `getStatus`, `parseWebhook`, `refund`; id провайдера — `vpos`; вебхук — `/api/webhooks/vpos` (маршрут уже есть).
 2. Создание: `merchantOrderId` = наш `payments.id`, `Idempotency-Key` = `payment-<payments.id>` (повтор сети не создаёт второй оплаты), `returnUrl` = адрес успеха (у VPOS один адрес; `/payment/success` сам показывает отмену и ошибку по статусу из базы), язык = язык платежа, email — только если есть; описание — в `metadata`. Нет `checkoutUrl` в ответе — ошибка `rejected`.
 3. Статусы → наши: `paid` → `paid`; `failed` → `failed`; `cancelled`, `expired` → `cancelled`; `refunded`, `reversed` → `refunded`; `created`, `pending_*`, `authorized`, `status_unknown` → `pending`; `partially_refunded`, `disputed` → `pending` (не трогать автоматически, предупреждение в лог; частичных возвратов в MVP нет — `07` § 11) — в «Известные проблемы».
-    20|4. Вебхук: подпись (HMAC, сравнение за постоянное время, любой из `v1`, допуск 5 мин) → разбор схемы → `livemode` совпадает с настройкой окружения → уведомление; иначе `null` (400). Ключ дедупликации — `id` события из подписанного тела. Статусы «ожидания» → уведомление со статусом `pending` (200, без изменений), а не 400 (иначе VPOS повторяет бесконечно) — для этого `WebhookNotice.status` расширить до `ProviderStatus` (`apply` уже возвращает `unchanged` на `pending`).
+4. Вебхук: подпись (HMAC, сравнение за постоянное время, любой из `v1`, допуск 5 мин) → разбор схемы → `livemode` совпадает с настройкой окружения → уведомление; иначе `null` (400). Ключ дедупликации — `id` события из подписанного тела. Статусы «ожидания» → уведомление со статусом `pending` (200, без изменений), а не 400 (иначе VPOS повторяет бесконечно) — для этого `WebhookNotice.status` расширить до `ProviderStatus` (`apply` уже возвращает `unchanged` на `pending`).
 5. `raw` чистится до записи (C12, `07` § 14 п. 2): только `id`, `merchantOrderId`, `provider`, `amountMinor`, `currency`, `status`, `fiscalStatus`, `livemode`, `createdAt`, `updatedAt`, `type`, `trigger`; без `customer`, `metadata`, чеков.
 6. Ошибки сети и 401 / 403 / 429 / 5xx → `unreachable`; 404 → `not_found`; 409 / 422 → `rejected`. Возврат: 200 и 202 → `ok: true`; 409 / 422 / 501 → `ok: false`; сеть — исключение (админка покажет `provider_error`).
 7. Сумма: у нас AMD — целые драмы (`lib/money.ts`), USD / EUR — центы. Что VPOS понимает под `amountMinor` для AMD — **не сказано** (вопрос владельцу → VPOS.am). Перевод — одна функция с явным множителем по валюте; по умолчанию ISO 4217 (AMD × 100), проверяется первой оплатой в песочнице. Ответ с другой суммой проходит проверку `apply` (расхождение → `failed` + проверка), деньги не активируются.
@@ -30,10 +30,12 @@
 ## Файлы (ожидаемо)
 
 - `src/lib/server/services/payments/providers/vpos.ts` — `createVposProvider({ token, webhookSecret, livemode, fetch, now })`: создание, статус, возврат
+- `src/lib/server/services/payments/providers/vpos-http.ts` — запросы к API (токен, таймаут 15 с, коды ошибок)
 - `src/lib/server/services/payments/providers/vpos-webhook.ts` — подпись и разбор вебхука
-    30|- `src/lib/server/services/payments/providers/vpos-map.ts` — статусы, сумма, очистка `raw`
-- `src/lib/server/services/payments/providers/vpos.test.ts`, `vpos-webhook.test.ts` — тесты на ответах из спецификации, `fetch` подменён
-- `src/lib/server/services/payments/providers/registry.ts` — запись `vpos` из окружения (+ `registry.test.ts`)
+- `src/lib/server/services/payments/providers/vpos-map.ts` — статусы, сумма, очистка `raw`
+- `src/lib/server/services/payments/providers/vpos-env.ts` — провайдер из `PAYMENT_VPOS_*`
+- тесты: `providers/vpos.test.ts`, `vpos-refund.test.ts`, `vpos-webhook.test.ts`, `vpos-env.test.ts` (обвязка `vpos-support.ts`, `fetch` подменён), сквозной с базой — `payments/vpos-chain.test.ts`
+- `src/lib/server/services/payments/providers/registry.ts` — запись `vpos` из окружения; `src/env.ts` — переменные
 - `src/lib/server/services/payments/providers/types.ts` — `WebhookNotice.status: ProviderStatus`
 - `.env.example` — `PAYMENT_VPOS_*`
 - `docs/07-PAYMENTS.md` § 13, `docs/questions.md` — решения владельца (разрешено 2026-10-20)
@@ -42,7 +44,7 @@
 
 - Цепочка на `mock` в dev и все тесты платежей (включая приёмочные 3.12) — без изменений поведения.
 - Без `PAYMENT_VPOS_*` прод ведёт себя как сейчас: `/api/webhooks/vpos` — 404, онлайн-оплата выключена при пустом `PAYMENT_PROVIDER`.
-    40|- Вебхук с неверной / старой подписью, чужим `livemode` или не той формы — 400 и ничего не меняет; дубль события — один раз (`receiveWebhook`).
+- Вебхук с неверной / старой подписью, чужим `livemode` или не той формы — 400 и ничего не меняет; дубль события — один раз (`receiveWebhook`).
 - Ответ VPOS с другой суммой или валютой не даёт `paid` (`apply`).
 
 ## Проверка
@@ -53,7 +55,7 @@
 ## Риск
 
 `high` — платежи и вебхуки, `.env.example`.
-    50|
+
 ## Читать
 
 - `07` § 4 (контракт), § 13 (решения), § 14 (безопасность) — прочитаны в SPEC; факты выше. Спецификация VPOS — выписана выше.
@@ -65,10 +67,10 @@
 3. Вебхук в песочнице приходит только на публичный адрес: песочницу локально проверяем созданием оплаты и статусом (страница возврата и сверка ходят в `getStatus`), вебхук — на проде с тестовым токеном (`PAYMENT_VPOS_LIVEMODE=false`) после деплоя этапа 3.
 
 ## Фазы
-    60|
-- [x] SPEC
-- [ ] RED (`test: … [RED]`)
-- [ ] GREEN (`feat: … [GREEN]`)
+
+- [x] SPEC — `8d64e16`
+- [x] RED — `7328e2d` (29 новых падали на логике, старые 21 зелёные)
+- [x] GREEN — новые 31 + сквозной 2 зелёные с первого прогона; ключ возврата — на каждую попытку (`refund-<id>-<время>`), а не стабильный: VPOS хранит отказ под ключом, со стабильным после одного отказа возврат застрял бы навсегда; зона 225/225, `check` 0, `lint` чистый
 - [ ] REGRESS
 - [ ] Песочница (после доступов) — создание, оплата тестовой картой, статус, возврат, вебхук
 - [ ] Боевая проверка малой суммой (владелец, после деплоя)
