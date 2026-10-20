@@ -7,3 +7,4 @@ export * from './content';
 export * from './events';
 export * from './hero';
 export * from './payments';
+export * from './points';

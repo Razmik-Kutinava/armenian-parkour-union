@@ -27,3 +27,14 @@ export const paymentStatus = pgEnum('payment_status', [
 	'cancelled',
 	'refunded'
 ]);
+export const pointsReason = pgEnum('points_reason', [
+	'certificate',
+	'event_registration',
+	'event_participation',
+	'event_place',
+	'video',
+	'manual',
+	'shop_order',
+	'shop_refund',
+	'reversal'
+]);
