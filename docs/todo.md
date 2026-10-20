@@ -62,5 +62,5 @@
 - [x] SPEC — `220a72f`
 - [x] RED — `9fe7d69` (19 новых, все падали на «not implemented» заглушек)
 - [x] GREEN — зона 47/47 с первого прогона (новых 19 + схема + seed), `check` 0, `lint` чистый
-- [ ] REGRESS — зона + весь Vitest
+- [x] REGRESS — весь Vitest 879/880 (`hero/public` — часы машины, известно)
 - [ ] REVIEW — `bugbot` + `security-review`
