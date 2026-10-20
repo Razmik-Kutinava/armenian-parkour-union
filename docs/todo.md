@@ -45,11 +45,22 @@
 
 - `05` § 2, 21; `07` § 5.1, 5.2, 13, 14; `04` стр. 105 (`settings.write`); `decisions.md` 2026-10-19 (3.6, 3.7) — прочитаны в SPEC.
 
+## Для общего REVIEW — что проверить в 3.11
+
+Дифф: `git diff b08390e..3957e02 -- src tests` (RED `95cda1e`, GREEN `3957e02`). Риск `high` → bugbot + security-review параллельно, затем `/crit-audit`.
+
+1. **Деньги (K2, C11)** — `validation/payment-settings.ts`: сумма взноса и лимиты переводятся в минимальные единицы **по выбранной валюте** (`priceToMinor`: AMD — целые, USD / EUR — до 2 знаков); диапазоны совпадают с читателями (`parseMembershipFee` 0 → «нет оплаты», `parsePeriodMonths` 1–120, `parseDonationLimits` min ≥ 1, min ≤ max, `parseWaitMinutes` 1–1440; форма — 5–1440). Проверить: нельзя сохранить значение, которое читатель сочтёт сломанным (тогда взнос / донаты пропадут молча); `storedPaymentSettings` — то же, что принимают читатели. Уже созданные платежи не меняются (сумма и `expires_at` записаны при создании); срок членства берётся при подтверждении (`activate.ts`) — смена срока действует и на ждущие оплаты.
+2. **Права (K1)** — `routes/admin/settings/payments/+page.server.ts`: `requirePermission('settings.write')` в `load` и action; `savePaymentSettings` сам отказывает не-админу; e2e — editor / moderator 403 на GET и прямой POST; карты `admin-access-map` / `admin-audit-map` дополнены.
+3. **Журнал и транзакция** — `writeSettings` (вынесен из `saveSettings`, `site-settings.ts`): блокирует `FOR UPDATE` только переданные ключи, пишет `settings.update` с before / after на каждый изменённый, без изменений — без записи; `saveSettings` по-прежнему пишет только ключи формы сайта (ключи форм не пересекаются — unit). Проверить, что поведение `saveSettings` не изменилось.
+4. **Кеш** — POST `/admin/settings/*` сбрасывает группу `settings` (`cache/admin-groups.ts`, раздел `settings`): `/join`, `/cabinet/membership`, `/donate` видят новое сразу (e2e в `membership.spec` и `donate.spec`).
+5. **Форма** — одна `transform` проверяет все поля, чтобы все ошибки показывались разом; поле-файл вместо строки даст сообщение zod без перевода (только админ).
+6. **Не K, решения агента** — раздел — вкладка «Членство и оплата» внутри «Настроек сайта» (меню без изменений); валюта взноса и доната — из `CURRENCIES` (AMD / USD / EUR; провайдер может не принять USD / EUR — 3.13); ожидание оплаты от 5 минут (читатель допускает 1); удержание места события — этап 5 (вопрос открыт); e2e: проверки `/join` и `/donate` — в их spec (они владеют ключами при параллельном прогоне), исполнитель журнала меняет только ожидание (777 / 778); `donate.spec` — проверка суммы в публичном списке сужена до своей строки (`cabinet.spec` оставляет платные донаты 7 000 в dev-базе).
+
 ## Фазы
 
-- [x] SPEC
-- [ ] RED (`test: … [RED]`)
-- [ ] GREEN (`feat: … [GREEN]`)
-- [ ] REGRESS
+- [x] SPEC — `b08390e`
+- [x] RED (`test: … [RED]`) — `95cda1e`
+- [x] GREEN (`feat: … [GREEN]`) — `3957e02`
+- [x] REGRESS — Vitest 811/812 (`hero/public` — часы машины, известное); unit зоны 257/257; e2e зоны: параллельно 24 прошли, 3 упали на известной медленной первой регистрации в воркере (`admin-audit`, `admin-system` editor, `admin-payment-settings` editor), эти файлы последовательно 13/13; `check`, `lint` чистые
 - [ ] REVIEW — общим прогоном в конце этапа 3, без push до него
 - [ ] DEPLOY (только по апруву)
