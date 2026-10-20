@@ -32,13 +32,17 @@ async function register(page: Page): Promise<{ id: string; email: string }> {
 	return { id: user.id as string, email };
 }
 
+/* The sign-in limit is per address, and the "sixth attempt" test in auth.spec.ts may hold it for
+ * this one address up to a minute (fixed window): try again until it frees. */
 async function logIn(browser: Browser, email: string): Promise<Page> {
 	const page = await (await browser.newContext()).newPage();
-	await page.goto('/login');
-	await page.getByLabel('Email').fill(email);
-	await page.getByLabel('Password').fill(PASSWORD);
-	await page.getByRole('button', { name: 'Log in' }).click();
-	await expect(page).toHaveURL('/');
+	await expect(async () => {
+		await page.goto('/login');
+		await page.getByLabel('Email').fill(email);
+		await page.getByLabel('Password').fill(PASSWORD);
+		await page.getByRole('button', { name: 'Log in' }).click();
+		await expect(page).toHaveURL('/', { timeout: 5_000 });
+	}).toPass({ intervals: [1_000, 5_000], timeout: 75_000 });
 	return page;
 }
 
@@ -147,6 +151,7 @@ test('password change: wrong current is refused; success signs out other devices
 	page,
 	browser
 }) => {
+	test.setTimeout(120_000);
 	const user = await register(page);
 	const other = await logIn(browser, user.email);
 
