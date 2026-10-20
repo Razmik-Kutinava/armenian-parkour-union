@@ -78,6 +78,9 @@ const createAuth = () =>
 		rateLimit: { enabled: false },
 		user: {
 			fields: { image: 'avatarKey' },
+			/* Cabinet (docs/06 section 5.2): the link goes to the new address through
+			 * sendVerificationEmail; the email changes only when it is opened. */
+			changeEmail: { enabled: true },
 			additionalFields: {
 				firstName: optionalText,
 				lastName: optionalText,

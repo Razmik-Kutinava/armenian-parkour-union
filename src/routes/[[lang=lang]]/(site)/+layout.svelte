@@ -1,6 +1,7 @@
 <script lang="ts">
 	import SiteFooter from '#lib/components/site/SiteFooter.svelte';
 	import SiteHeader from '#lib/components/site/SiteHeader.svelte';
+	import StatusBanner from '#lib/components/site/StatusBanner.svelte';
 	import { t } from '#lib/i18n/index.svelte.ts';
 	import type { LayoutProps } from './$types';
 
@@ -16,6 +17,9 @@
 
 <div class="flex min-h-screen flex-col bg-bg">
 	<SiteHeader viewer={data.viewer} siteName={data.footer.siteName} />
+	{#if data.viewer}
+		<StatusBanner emailVerified={data.viewer.emailVerified} reminder={data.viewer.reminder} />
+	{/if}
 	<main id="content" class="flex-1" tabindex="-1">
 		{@render children()}
 	</main>

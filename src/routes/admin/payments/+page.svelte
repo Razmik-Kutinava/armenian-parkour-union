@@ -3,12 +3,12 @@
 	import DataTable, { type Column } from '#lib/components/admin/DataTable.svelte';
 	import FilterBar, { type Filter } from '#lib/components/admin/FilterBar.svelte';
 	import Pagination from '#lib/components/admin/Pagination.svelte';
+	import StatusBadge from '#lib/components/payments/StatusBadge.svelte';
 	import Badge from '#lib/components/ui/Badge.svelte';
 	import EmptyState from '#lib/components/ui/EmptyState.svelte';
 	import { currentLocale, t } from '#lib/i18n/index.svelte.ts';
 	import { formatPrice } from '#lib/money.ts';
 	import ExportPanel from './ExportPanel.svelte';
-	import StatusBadge from './StatusBadge.svelte';
 	import type { PageProps } from './$types';
 
 	/* docs/05 section 16: list with filters in the URL; "needs review" is one of them. */

@@ -15,7 +15,7 @@
 	<meta name="robots" content="noindex" />
 </svelte:head>
 
-<div class="mx-auto flex max-w-3xl flex-col gap-6 px-4 py-10 sm:py-14">
+<div class="flex max-w-3xl flex-col gap-6">
 	<h1 class="text-3xl font-bold text-ink-900">{t('cabinet.membership.title')}</h1>
 
 	<p class="text-lg font-bold text-ink-900">

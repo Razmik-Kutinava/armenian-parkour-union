@@ -1,3 +1,4 @@
+import { createHmac } from 'node:crypto';
 import { existsSync } from 'node:fs';
 import { expect, test, type Browser, type Page } from '@playwright/test';
 import postgres from 'postgres';
@@ -116,6 +117,29 @@ test('profile: save the fields; birth date is shown, not edited', async ({ page 
 	).toBeVisible();
 	const [after] = await sql`select email from users where id = ${user.id}`;
 	expect(after.email).toBe(user.email);
+});
+
+/** The token Better Auth mails to the new address (HS256 with the auth secret, as in its signJWT). */
+function changeToken(email: string, updateTo: string, secret: string): string {
+	const part = (v: object) => Buffer.from(JSON.stringify(v)).toString('base64url');
+	const now = Math.floor(Date.now() / 1000);
+	const body = `${part({ alg: 'HS256' })}.${part({ email, updateTo, requestType: 'change-email-verification', iat: now, exp: now + 600 })}`;
+	return `${body}.${createHmac('sha256', secret).update(body).digest('base64url')}`;
+}
+
+test('email change link: a forged token changes nothing, the real one switches the email', async ({
+	page
+}) => {
+	const user = await register(page);
+	const next = `e2e-cabinet-new-${crypto.randomUUID()}@example.com`;
+	const forged = await page.goto(`/verify-email?token=${changeToken(user.email, next, 'wrong')}`);
+	expect(forged?.status()).toBe(400);
+	expect((await sql`select email from users where id = ${user.id}`)[0].email).toBe(user.email);
+
+	const secret = process.env.BETTER_AUTH_SECRET ?? '';
+	await page.goto(`/verify-email?token=${changeToken(user.email, next, secret)}`);
+	const [row] = await sql`select email, email_verified from users where id = ${user.id}`;
+	expect(row).toEqual({ email: next, email_verified: true });
 });
 
 test('password change: wrong current is refused; success signs out other devices', async ({

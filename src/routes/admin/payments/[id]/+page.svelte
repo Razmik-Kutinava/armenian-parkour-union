@@ -1,9 +1,9 @@
 <script lang="ts">
+	import StatusBadge from '#lib/components/payments/StatusBadge.svelte';
 	import Badge from '#lib/components/ui/Badge.svelte';
 	import { currentLocale, t } from '#lib/i18n/index.svelte.ts';
 	import { formatPrice } from '#lib/money.ts';
 	import HistoryTable from '../../users/[id]/HistoryTable.svelte';
-	import StatusBadge from '../StatusBadge.svelte';
 	import PaymentActions from './PaymentActions.svelte';
 	import PaymentDetails from './PaymentDetails.svelte';
 	import type { PageProps } from './$types';
