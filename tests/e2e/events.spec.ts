@@ -63,6 +63,8 @@ test('editor creates an event with a category, previews, publishes; guest finds 
 	});
 	expect(row.created_by).not.toBeNull();
 
+	/* A full page load: a discipline chosen before hydration is reset to the default. */
+	await page.waitForLoadState('networkidle');
 	await page.getByLabel('Category name (English)').fill('Speed, 12–14');
 	await page.getByLabel('Discipline').selectOption('speed');
 	await page.getByLabel('Age from').fill('12');

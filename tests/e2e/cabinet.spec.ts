@@ -10,8 +10,9 @@ if (!process.env.DATABASE_URL && existsSync('.env')) process.loadEnvFile('.env')
 const sql = postgres(process.env.DATABASE_URL ?? '', { max: 1, onnotice: () => {} });
 test.afterAll(() => sql.end());
 
+/* Only sign-up counters: auth.spec.ts runs in parallel and checks the sign-in limit. */
 test.beforeEach(async () => {
-	await sql`delete from rate_limit where key ~ ':ip:(127\.0\.0\.1|::1|::ffff:127\.0\.0\.1)$'`;
+	await sql`delete from rate_limit where key ~ '^sign-up:ip:(127\.0\.0\.1|::1|::ffff:127\.0\.0\.1)$'`;
 });
 
 const PASSWORD = 'parkour-pass-1';
