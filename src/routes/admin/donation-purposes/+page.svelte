@@ -18,7 +18,7 @@
 	]);
 </script>
 
-<svelte:head><title>{t('admin.nav.donations')} вЂ” {t('admin.title')}</title></svelte:head>
+<svelte:head><title>{t('admin.nav.donations')} — {t('admin.title')}</title></svelte:head>
 
 <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
 	<h1 class="text-2xl font-bold">{t('admin.nav.donations')}</h1>
@@ -42,7 +42,7 @@
 		{:else if column.key === 'collected'}
 			{row.collected
 				.map((c) => formatPrice(c.amountMinor, c.currency, currentLocale()))
-				.join(', ') || 'вЂ”'}
+				.join(', ') || '—'}
 		{/if}
 	{/snippet}
 	{#snippet empty()}
