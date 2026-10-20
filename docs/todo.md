@@ -1,88 +1,66 @@
 # todo — текущая задача (SBR)
 
 > Один живой файл на текущую задачу. Ведётся по `.cursor/rules/sbr.mdc`. После REVIEW очищается до шаблона, итог — в `PROGRESS.md` («Сделано»).
-> Памятки для общего REVIEW: 3.6b — `git show c3b6468:docs/todo.md`, 3.7 — `git show 2c0aee1:docs/todo.md`, 3.8 — `git show 8e2b410:docs/todo.md`, 3.9 — `git show b9582c3:docs/todo.md`, 3.10 — `git show 110eb1e:docs/todo.md`, 3.11 — `git show c6b737f:docs/todo.md`, 3.12 — `git show 26c7dc5:docs/todo.md`.
+> Памятки: 3.13 (песочница VPOS, боевая проверка, факты спецификации, чек-лист ревью) — `git show c0779a9:docs/todo.md`; общий REVIEW этапа 3 — `git show 26c7dc5:docs/todo.md` и ссылки в его шапке.
 
 ## Задача
 
-3.13 — реальный провайдер: **VPOS.am** (посредник, деньги принимает банк — пока Ameriabank, банк может смениться; решение владельца 2026-10-20). Этот шаг — **модуль провайдера по открытой спецификации без доступов**: `https://api.vpos.am/openapi.yaml` (OpenAPI 3.1, v0.1.0). Песочница и боевая проверка малой суммой — после доступов (договор с банком + VPOS.am), отдельным шагом этой же задачи. Миграции нет (`payments.provider` — `text`).
+4.3 — сервис баллов: начисление по правилу, ручная корректировка, `reversal`, проверка баланса; всё в транзакции с обновлением `users.points_balance`. Миграции нет (схема — 0009, `db/schema/points.ts`). Админка (4.4), кабинет (4.5) и вызовы из сертификатов / регистраций / видео (этапы 5–7) — не в этом шаге.
 
-Факты из спецификации (читать её заново не нужно):
-- Базовый адрес `https://api.vpos.am`, `Authorization: Bearer <token>`; режим (песочница / боевой), банк и ключи банка привязаны к токену на стороне VPOS.am — адрес один.
-- Создать: `POST /v1/payment-sessions`, заголовок `Idempotency-Key` (≤ 160, обязателен), тело `merchantOrderId`, `amountMinor` (целое ≥ 1), `currency` (AMD / USD / EUR), `returnUrl` (один, https), `checkoutLanguage` (hy / ru / en), `customer` (email), `metadata`. Ответ 201 (повтор — 200) `PaymentSession`: `id`, `merchantOrderId`, `amountMinor`, `currency`, `status`, `checkoutUrl`. Ошибки: 401, 409 (ключ или заказ от другого запроса), 422, 503.
-- Статус: `GET /v1/payments?paymentId=<id>` → `PaymentSession`; 404 — нет.
-- Возврат: `POST /v1/payments/{id}/refunds`, `Idempotency-Key`, тело `amountMinor`, `currency`, `reason` (≤ 240). 200 — возвращено; 202 — деньги возвращены, но чек / проверка требуют оператора; 409 — нельзя; 422; 501 — возвраты не включены.
-- Статусы VPOS: `created`, `pending_redirect`, `pending_payment`, `authorized`, `paid`, `failed`, `cancelled`, `reversed`, `partially_refunded`, `refunded`, `expired`, `status_unknown`, `disputed`.
-- Вебхук `payment.status_changed`, JSON: `id` (событие), `type`, `livemode`, `createdAt`, `data.payment` (`id`, `merchantOrderId`, `provider`, `amountMinor`, `currency`, `status`, `fiscalStatus`). Подпись `X-VPOS-Signature: t=<unix>,v1=<hex>[,v1=…]` — HMAC-SHA256 от `<t>.<сырое тело>` секретом вебхука, допуск по времени 5 мин, при смене секрета несколько `v1` (подходит любой).
+Факты (`02` § 5, `03` § 6.1–6.3, `04` 5.1, 5 п. 6):
+- Начисление — только сервисом: запись в журнал + баланс в одной транзакции (`03` 6.2.1). Повтор за тот же источник — тихий пропуск (6.2.2). Правило выключено или 0 баллов — записи нет (6.2.3). Размер — из правила в момент начисления, пишется в `delta` (6.2.4).
+- Ручная корректировка — `reason = manual`, комментарий обязателен, право `points.adjust` (только admin), запись в `audit_log` с IP (6.3.1, 6.3.3; `04` § 6 п. 6).
+- Отмена — `reversal` на противоположную сумму со ссылкой `reversal_of_id`, одна запись — один раз (6.3.2), право `points.adjust` (`04`: отмена — admin).
+- Баланс не уходит ниже нуля — операция отклоняется (6.3.4; в базе — check `users_points_balance_non_negative`).
+- Сервис сам проверяет право по `actor` (`04` § 5 п. 6), как `payments/admin/support.ts`.
 
-Правила модуля:
-1. Контракт `07` § 4 (`OnlineProvider`): `createPayment`, `getStatus`, `parseWebhook`, `refund`; id провайдера — `vpos`; вебхук — `/api/webhooks/vpos` (маршрут уже есть).
-2. Создание: `merchantOrderId` = наш `payments.id`, `Idempotency-Key` = `payment-<payments.id>` (повтор сети не создаёт второй оплаты), `returnUrl` = адрес успеха (у VPOS один адрес; `/payment/success` сам показывает отмену и ошибку по статусу из базы), язык = язык платежа, email — только если есть; описание — в `metadata`. Нет `checkoutUrl` в ответе — ошибка `rejected`.
-3. Статусы → наши: `paid` → `paid`; `failed` → `failed`; `cancelled`, `expired` → `cancelled`; `refunded`, `reversed` → `refunded`; `created`, `pending_*`, `authorized`, `status_unknown` → `pending`; `partially_refunded`, `disputed` → `pending` (не трогать автоматически, предупреждение в лог; частичных возвратов в MVP нет — `07` § 11) — в «Известные проблемы».
-4. Вебхук: подпись (HMAC, сравнение за постоянное время, любой из `v1`, допуск 5 мин) → разбор схемы → `livemode` совпадает с настройкой окружения → уведомление; иначе `null` (400). Ключ дедупликации — `id` события из подписанного тела. Статусы «ожидания» → уведомление со статусом `pending` (200, без изменений), а не 400 (иначе VPOS повторяет бесконечно) — для этого `WebhookNotice.status` расширить до `ProviderStatus` (`apply` уже возвращает `unchanged` на `pending`).
-5. `raw` чистится до записи (C12, `07` § 14 п. 2): только `id`, `merchantOrderId`, `provider`, `amountMinor`, `currency`, `status`, `fiscalStatus`, `livemode`, `createdAt`, `updatedAt`, `type`, `trigger`; без `customer`, `metadata`, чеков.
-6. Ошибки сети и 401 / 403 / 429 / 5xx → `unreachable`; 404 → `not_found`; 409 / 422 → `rejected`. Возврат: 200 и 202 → `ok: true`; 409 / 422 / 501 → `ok: false`; сеть — исключение (админка покажет `provider_error`).
-7. Сумма: у нас AMD — целые драмы (`lib/money.ts`), USD / EUR — центы. Что VPOS понимает под `amountMinor` для AMD — **не сказано** (вопрос владельцу → VPOS.am). Перевод — одна функция с явным множителем по валюте; по умолчанию ISO 4217 (AMD × 100), проверяется первой оплатой в песочнице. Ответ с другой суммой проходит проверку `apply` (расхождение → `failed` + проверка), деньги не активируются.
-8. Валюты провайдера — пока только `AMD` (`07` § 13: по умолчанию AMD; USD / EUR — когда банк подтвердит).
-9. Окружение (`07` § 14 п. 1, 4): `PAYMENT_VPOS_API_TOKEN`, `PAYMENT_VPOS_WEBHOOK_SECRET`, `PAYMENT_VPOS_LIVEMODE` (`true` — боевой). Нет токена или секрета — провайдер не регистрируется (вебхук 404, `PAYMENT_PROVIDER=vpos` → `PaymentConfigError`, как сейчас). `PAYMENT_VPOS_LIVEMODE=true` в `development` — провайдер не регистрируется (боевой нельзя в dev).
-10. HTTP — через переданный `fetch` (как `mail/resend.ts`), время — через переданные часы: тесты без сети.
+Решения шага (документы прямо не говорят — предлагаю так, в отчёте владельцу):
+1. Правило → `reason` и `source_type` — фиксированная карта в коде (коды правил фиксированы `02` § 5): `certificate_*` → `certificate` / `certificate`; `event_registration` → `event_registration` / `event_registration`; `event_participation` → `event_participation` / `event_registration`; `event_place_1..3` → `event_place` / `event_registration`; `video_approved` → `video` / `video`. Вызывающий передаёт код правила, `userId`, `sourceId` — `source_type` без `source_id` невозможен.
+2. Дубль — `INSERT … ON CONFLICT DO NOTHING` (пустой `returning` = дубль), а не перехват `23505`: транзакция вызывающего не ломается, савепоинт не нужен.
+3. Баланс — строка `users` блокируется (`FOR NO KEY UPDATE`), новый баланс считается до записи; < 0 → отказ `insufficient_balance` без записи. Check в базе — страховка.
+4. Правило с баллами ≤ 0 — записи нет (`skipped`): правила начисляют, а не списывают; списание — только вручную.
+5. Отменить `reversal` нельзя (`not_reversible`); отмена, уводящая баланс в минус (баллы уже потрачены), — отказ `insufficient_balance`.
+6. Ручная сумма — целое, ≠ 0, в пределах `integer` Postgres; иначе `invalid`. Пустой комментарий (после `trim`) — `invalid`. Удалённый пользователь — `not_found`; заблокированному корректировать можно.
+7. Журнал: `points.adjust` и `points.reverse`, `entityType = 'user'`, `entityId` = пользователь (видно во вкладке «История» карточки), `before` / `after` — баланс, плюс `delta`, `comment`, id записи.
+8. Системная отмена по источнику (регистрация отменена до начала, `03` 6.2.6) — на этапе 5, через то же ядро отмены.
 
 ## Файлы (ожидаемо)
 
-- `src/lib/server/services/payments/providers/vpos.ts` — `createVposProvider({ token, webhookSecret, livemode, fetch, now })`: создание, статус, возврат
-- `src/lib/server/services/payments/providers/vpos-http.ts` — запросы к API (токен, таймаут 15 с, коды ошибок)
-- `src/lib/server/services/payments/providers/vpos-webhook.ts` — подпись и разбор вебхука
-- `src/lib/server/services/payments/providers/vpos-map.ts` — статусы, сумма, очистка `raw`
-- `src/lib/server/services/payments/providers/vpos-env.ts` — провайдер из `PAYMENT_VPOS_*`
-- тесты: `providers/vpos.test.ts`, `vpos-refund.test.ts`, `vpos-webhook.test.ts`, `vpos-env.test.ts` (обвязка `vpos-support.ts`, `fetch` подменён), сквозной с базой — `payments/vpos-chain.test.ts`
-- `src/lib/server/services/payments/providers/registry.ts` — запись `vpos` из окружения; `src/env.ts` — переменные
-- `src/lib/server/services/payments/providers/types.ts` — `WebhookNotice.status: ProviderStatus`
-- `.env.example` — `PAYMENT_VPOS_*`
-- `docs/07-PAYMENTS.md` § 13, `docs/questions.md` — решения владельца (разрешено 2026-10-20)
+- `src/lib/server/services/points/ledger.ts` — ядро: `appendEntry(tx, entry)` — блокировка пользователя, проверка баланса, вставка без дубля, обновление баланса
+- `src/lib/server/services/points/award.ts` — `awardPoints(tx, { rule, userId, sourceId })` — системное начисление внутри транзакции вызывающего; карта правил
+- `src/lib/server/services/points/adjust.ts` — `adjustPoints(db, actor, { userId, delta, comment }, { ip })`
+- `src/lib/server/services/points/reverse.ts` — `reverseEntry(db, actor, { entryId, comment }, { ip })`
+- `src/lib/server/services/points/index.ts` — экспорт
+- тесты с базой (откат): `award.test.ts`, `adjust.test.ts`, `reverse.test.ts`, обвязка `test-support.ts`
 
 ## Не ломать
 
-- Цепочка на `mock` в dev и все тесты платежей (включая приёмочные 3.12) — без изменений поведения.
-- Без `PAYMENT_VPOS_*` прод ведёт себя как сейчас: `/api/webhooks/vpos` — 404, онлайн-оплата выключена при пустом `PAYMENT_PROVIDER`.
-- Вебхук с неверной / старой подписью, чужим `livemode` или не той формы — 400 и ничего не меняет; дубль события — один раз (`receiveWebhook`).
-- Ответ VPOS с другой суммой или валютой не даёт `paid` (`apply`).
+- Схема 0009 и её тесты (`db/points-schema.test.ts`), seed правил (`seed/points-rules.test.ts`).
+- Баланс на обзоре кабинета (`cabinet/overview`) и в карточке пользователя админки — читают `users.points_balance`.
+- Журнал действий: существующие записи и `audit-coverage` / `access-coverage` (новых маршрутов нет).
 
 ## Проверка
 
-- `npx vitest --run src/lib/server/services/payments`
+- `npx vitest --run src/lib/server/services/points src/lib/server/db/points-schema.test.ts src/lib/server/seed`
 - `npm run check`, `npm run lint`
 
 ## Риск
 
-`high` — платежи и вебхуки, `.env.example`.
+`high` — баллы, журнал действий.
 
 ## Читать
 
-- `07` § 4 (контракт), § 13 (решения), § 14 (безопасность) — прочитаны в SPEC; факты выше. Спецификация VPOS — выписана выше.
+- `02` § 5, `03` § 6.1–6.3, `04` 5.1 и § 5 п. 6 — прочитаны в SPEC, факты выше.
 
-## Открытые вопросы (не блокируют модуль, блокируют боевую проверку)
+## Открытые вопросы (не блокируют шаг)
 
-1. `amountMinor` для AMD у VPOS — драмы или сотые (×100)? Спросить VPOS.am (info@vpos.am) до первой оплаты в песочнице.
-2. Валюты USD / EUR — по договору с банком.
-3. Вебхук в песочнице приходит только на публичный адрес: песочницу локально проверяем созданием оплаты и статусом (страница возврата и сверка ходят в `getStatus`), вебхук — на проде с тестовым токеном (`PAYMENT_VPOS_LIVEMODE=false`) после деплоя этапа 3.
-
-## Для общего REVIEW — что проверить в 3.13
-
-Дифф: `git diff 8d64e16..4b80f0e -- src .env.example`. Риск `high` → `bugbot` + `security-review`.
-
-1. **Подпись вебхука** (`vpos-webhook.ts`) — HMAC от `<t>.<сырое тело>`, сравнение `timingSafeEqual` только для 64-символьного hex, окно 5 мин в обе стороны, `t` не из тела; неверная — 400 без записи события.
-2. **Деньги** — перевод суммы (`vpos-map.ts`, `FACTOR`) в обе стороны; ответ с другой суммой доходит до `apply` как расхождение (`vpos-chain.test.ts`); возврат берёт сумму из VPOS и сверяет с нашей.
-3. **Режимы** — тестовое событие на боевом и наоборот — 400; `PAYMENT_VPOS_LIVEMODE=true` в dev — провайдер не создаётся (`vpos-env.ts`).
-4. **Данные** — в `provider_payload` и `payment_webhook_events.payload` нет `customer`, `metadata`, чеков, `checkoutUrl`; токен не попадает в сообщения ошибок.
-5. **Контракт** — `WebhookNotice.status` расширен до `ProviderStatus`: `pending` из вебхука → `apply` → `unchanged`, событие записано (200).
+1. Решения 4–6 выше — подтвердить владельцу (по умолчанию так).
+2. Лимит одобренных видео в месяц (`03` 6.2.7) и пороги «подозрительного» (6.4) — ключи `site_settings` (`questions.md`, этап 4) — нужны в 4.4 / этапе 7, не здесь.
 
 ## Фазы
 
-- [x] SPEC — `8d64e16`
-- [x] RED — `7328e2d` (29 новых падали на логике, старые 21 зелёные)
-- [x] GREEN — новые 31 + сквозной 2 зелёные с первого прогона; ключ возврата — на каждую попытку (`refund-<id>-<время>`), а не стабильный: VPOS хранит отказ под ключом, со стабильным после одного отказа возврат застрял бы навсегда; зона 225/225, `check` 0, `lint` чистый
-- [x] REGRESS — весь Vitest 849/851 (`hero/public` — часы машины, известно; `posts/list` — таймаут под нагрузкой, отдельно 2/2); e2e платежей (`webhooks`, `payment-return`, `donate`, `membership`) 24/24 по одному воркеру
-- [ ] Песочница (после доступов) — создание, оплата тестовой картой, статус, возврат, вебхук
-- [ ] Боевая проверка малой суммой (владелец, после деплоя)
-- [x] REVIEW — общий прогон этапа 3 2026-10-20: критичных 0, crit-audit CLEAN (`941350a`), push
-- [ ] DEPLOY (только по апруву)
+- [x] SPEC
+- [ ] RED — тесты по требованиям `03` § 6.2–6.3 падают на отсутствии сервиса
+- [ ] GREEN
+- [ ] REGRESS — зона + весь Vitest
+- [ ] REVIEW — `bugbot` + `security-review`
