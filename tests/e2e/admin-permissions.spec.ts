@@ -26,6 +26,9 @@ const {
 	insertPost,
 	insertEvent,
 	insertHero,
+	insertPayment,
+	insertPurpose,
+	moneyRows,
 	targetRow,
 	mediaRow,
 	pageRow,
@@ -46,8 +49,11 @@ for (const role of ['member', 'editor', 'moderator'] as const) {
 			pageId: await insertPage(),
 			postId: await insertPost(),
 			eventId: await insertEvent(),
-			heroId: await insertHero()
+			heroId: await insertHero(),
+			paymentId: await insertPayment(),
+			purposeId: await insertPurpose()
 		};
+		const moneyBefore = await moneyRows(ids.paymentId, ids.purposeId);
 		const mediaBefore = await mediaRow(ids.mediaId);
 		const pageBefore = await pageRow(ids.pageId);
 		const postBefore = await postRow(ids.postId);
@@ -76,9 +82,12 @@ for (const role of ['member', 'editor', 'moderator'] as const) {
 		expect(await postRow(ids.postId)).toEqual(postBefore);
 		expect(await eventRows(ids.eventId)).toEqual(eventBefore);
 		expect(await heroRow(ids.heroId)).toEqual(heroBefore);
+		expect(await moneyRows(ids.paymentId, ids.purposeId)).toEqual(moneyBefore);
 		expect(
-			await sql`select 1 from audit_log where entity_id in (${target}, ${ids.mediaId}, ${ids.pageId}, ${ids.postId}, ${ids.eventId}, ${ids.heroId})`
+			await sql`select 1 from audit_log where entity_id in (${target}, ${ids.mediaId}, ${ids.pageId}, ${ids.postId}, ${ids.eventId}, ${ids.heroId}, ${ids.paymentId}, ${ids.purposeId})`
 		).toHaveLength(0);
+		expect(await sql`select 1 from payments where donor_name = 'Hacked'`).toHaveLength(0);
+		expect(await sql`select 1 from donation_purposes where title->>'en' = 'Hacked'`).toHaveLength(0);
 		expect(
 			await sql`select 1 from hero_blocks where title->>'en' = 'Hacked' and created_at > now() - interval '10 minutes'`
 		).toHaveLength(0);
@@ -111,7 +120,9 @@ test('admin opens every admin page; audit pages take no writes and the entry sta
 		pageId: await insertPage(),
 		postId: await insertPost(),
 		eventId: await insertEvent(),
-		heroId: await insertHero()
+		heroId: await insertHero(),
+		paymentId: await insertPayment(),
+		purposeId: await insertPurpose()
 	};
 	for (const key of Object.keys(ADMIN_READS)) {
 		const res = await page.request.get(toPath(key, ids), { maxRedirects: 0 });

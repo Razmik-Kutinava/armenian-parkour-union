@@ -36,7 +36,13 @@ export const HOSTILE_FORM = (userId: string, heroId: string) => ({
 	price: '0',
 	priceCurrency: 'AMD',
 	'name.en': 'Hacked',
-	discipline: 'speed'
+	discipline: 'speed',
+	kind: 'donation',
+	amount: '1000',
+	currency: 'AMD',
+	paidOn: '2026-01-15',
+	donorName: 'Hacked',
+	sortOrder: '1'
 });
 
 /* docs/04 section 5.4: member → 404 for all of /admin, staff without the permission → 403. */
@@ -51,10 +57,15 @@ export type Ids = {
 	postId: string;
 	eventId: string;
 	heroId: string;
+	paymentId: string;
+	purposeId: string;
 };
 export const toPath = (key: string, ids: Ids) =>
 	key
 		.replace(/^(GET|POST) /, '')
+		.replace('/payments/export', '/payments/export?kind=donation')
+		.replace('/payments/[id]', `/payments/${ids.paymentId}`)
+		.replace('/donation-purposes/[id]', `/donation-purposes/${ids.purposeId}`)
 		.replace('/users/[id]', `/users/${ids.userId}`)
 		.replace('/audit/[id]', `/audit/${ids.auditId}`)
 		.replace('/media/[id]', `/media/${ids.mediaId}`)
@@ -125,6 +136,25 @@ export function permissionFixtures(sql: postgres.Sql) {
 				await sql`insert into hero_blocks (type, title)
 				values ('custom', ${sql.json({ en: 'E2e perm hero' })}) returning id`
 			),
+		/* Pending and flagged: confirm and resolve could really run on it. */
+		insertPayment: async () =>
+			idOf(
+				await sql`insert into payments (kind, amount_minor, currency, provider, donor_name, needs_review)
+				values ('donation', 5000, 'AMD', 'manual', 'E2e perm donor', true) returning id`
+			),
+		/* Hidden: other runs must not see it on /donate. */
+		insertPurpose: async () =>
+			idOf(
+				await sql`insert into donation_purposes (title, is_active)
+				values (${sql.json({ en: 'E2e perm purpose' })}, false) returning id`
+			),
+		moneyRows: async (paymentId: string, purposeId: string) => ({
+			payment: (
+				await sql`select status, needs_review, confirmed_by, paid_at, refunded_at
+					from payments where id = ${paymentId}`
+			)[0],
+			purpose: (await sql`select title, is_active, sort_order from donation_purposes where id = ${purposeId}`)[0]
+		}),
 		targetRow: async (id: string) =>
 			(await sql`select role, status, email_verified, first_name from users where id = ${id}`)[0],
 		mediaRow: async (id: string) =>

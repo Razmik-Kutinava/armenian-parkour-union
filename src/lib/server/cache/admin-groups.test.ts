@@ -28,6 +28,11 @@ describe('groupsToInvalidate (2.10: admin writes reset the public cache)', () =>
 		expect(staffWrite('/admin/users/1')).toEqual(['hero']);
 	});
 
+	it('donation purposes and payments reset /donate (settings group: purposes, recent donations)', () => {
+		expect(staffWrite('/admin/donation-purposes/1')).toEqual(['settings']);
+		expect(staffWrite('/admin/payments/new')).toEqual(['settings']);
+	});
+
 	it('media (alt and covers everywhere) and unknown sections reset everything', () => {
 		expect(staffWrite('/admin/media/1')).toEqual(ALL_GROUPS);
 		expect(staffWrite('/admin/something-new', 'DELETE')).toEqual(ALL_GROUPS);

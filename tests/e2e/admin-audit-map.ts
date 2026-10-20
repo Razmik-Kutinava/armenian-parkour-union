@@ -43,7 +43,14 @@ export const ADMIN_AUDIT = {
 	'/admin/hero?/reorder': ['hero.reorder'],
 	'/admin/hero/[id]?/duplicate': ['hero.duplicate'],
 	'/admin/hero/[id]?/archive': ['hero.archive'],
-	'/admin/hero/[id]?/restore': ['hero.restore']
+	'/admin/hero/[id]?/restore': ['hero.restore'],
+	'/admin/payments/new?/default': ['payment.confirm_manual'],
+	'/admin/payments/[id]?/confirm': ['payment.confirm_manual'],
+	'/admin/payments/[id]?/refund': ['payment.refund'],
+	'/admin/payments/[id]?/resolve': ['payment.review_resolved'],
+	'/admin/payments/[id]?/receipt': ['payment.receipt_resend'],
+	'/admin/donation-purposes/new?/default': ['donation_purpose.create'],
+	'/admin/donation-purposes/[id]?/update': ['donation_purpose.update']
 } as const;
 
 export type AdminAction = keyof typeof ADMIN_AUDIT;

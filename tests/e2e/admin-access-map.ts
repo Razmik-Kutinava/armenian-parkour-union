@@ -35,7 +35,14 @@ export const ADMIN_READS = {
 	'/admin/hero/new': 'hero.write',
 	'/admin/hero/[id]': 'hero.write',
 	'/admin/hero/[id]/preview': 'hero.write',
-	'GET /admin/hero/persons': 'hero.write'
+	'GET /admin/hero/persons': 'hero.write',
+	'/admin/payments': 'payments.read',
+	'/admin/payments/new': 'payments.manage',
+	'/admin/payments/[id]': 'payments.read',
+	'GET /admin/payments/export': 'payments.read',
+	'/admin/donation-purposes': 'donations.config',
+	'/admin/donation-purposes/new': 'donations.config',
+	'/admin/donation-purposes/[id]': 'donations.config'
 } as const satisfies Record<string, Access>;
 
 export const ADMIN_WRITES = {
@@ -80,5 +87,12 @@ export const ADMIN_WRITES = {
 	'/admin/hero/[id]?/duplicate': 'hero.write',
 	'/admin/hero/[id]?/archive': 'hero.write',
 	'/admin/hero/[id]?/restore': 'hero.write',
+	'/admin/payments/new?/default': 'payments.manage',
+	'/admin/payments/[id]?/confirm': 'payments.manage',
+	'/admin/payments/[id]?/refund': 'payments.manage',
+	'/admin/payments/[id]?/resolve': 'payments.manage',
+	'/admin/payments/[id]?/receipt': 'payments.manage',
+	'/admin/donation-purposes/new?/default': 'donations.config',
+	'/admin/donation-purposes/[id]?/update': 'donations.config',
 	'POST /admin/locale': 'staff'
 } as const satisfies Record<AdminAction | NotAuditedAction, Access>;
