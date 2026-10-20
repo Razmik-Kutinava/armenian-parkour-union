@@ -1,4 +1,7 @@
+import { eq } from 'drizzle-orm';
 import type { LimitDb } from '../../auth/rate-limit';
+import { pointsRules } from '../../db/schema/points';
+import { appendEntry } from './ledger';
 
 /** Rule codes are fixed by docs/02 section 5: each one awards one reason for one kind of source. */
 export const RULE_SOURCES = {
@@ -16,15 +19,37 @@ export const RULE_SOURCES = {
 
 export type PointsRuleCode = keyof typeof RULE_SOURCES;
 export type AwardInput = { rule: PointsRuleCode; userId: string; sourceId: string };
+type SkipReason = 'rule_missing' | 'rule_inactive' | 'no_points' | 'duplicate' | 'no_user';
 export type AwardResult =
 	| { status: 'awarded'; entryId: string; points: number }
-	| {
-			status: 'skipped';
-			reason: 'rule_missing' | 'rule_inactive' | 'no_points' | 'duplicate' | 'no_user';
-	  };
+	| { status: 'skipped'; reason: SkipReason };
 
+const skip = (reason: SkipReason): AwardResult => ({ status: 'skipped', reason });
+
+/**
+ * docs/03 section 6.2: a system award inside the caller's transaction (certificate, registration,
+ * video). The rule's current points are written into the entry; a repeat for the same source is a
+ * silent skip. Rules only award: 0 or fewer points writes nothing.
+ */
 export async function awardPoints(tx: LimitDb, input: AwardInput): Promise<AwardResult> {
-	void tx;
-	void input;
-	throw new Error('not implemented');
+	const [rule] = await tx.select().from(pointsRules).where(eq(pointsRules.code, input.rule));
+	if (!rule) return skip('rule_missing');
+	if (!rule.isActive) return skip('rule_inactive');
+	if (rule.points <= 0) return skip('no_points');
+	const source = RULE_SOURCES[input.rule];
+	const result = await appendEntry(tx, {
+		userId: input.userId,
+		delta: rule.points,
+		reason: source.reason,
+		ruleId: rule.id,
+		sourceType: source.sourceType,
+		sourceId: input.sourceId,
+		createdBy: null
+	});
+	if (result.status === 'ok') {
+		return { status: 'awarded', entryId: result.entry.id, points: rule.points };
+	}
+	if (result.status === 'insufficient_balance')
+		throw new Error('a positive award lowered a balance');
+	return skip(result.status);
 }

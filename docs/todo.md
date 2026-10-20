@@ -30,8 +30,8 @@
 - `src/lib/server/services/points/award.ts` — `awardPoints(tx, { rule, userId, sourceId })` — системное начисление внутри транзакции вызывающего; карта правил
 - `src/lib/server/services/points/adjust.ts` — `adjustPoints(db, actor, { userId, delta, comment }, { ip })`
 - `src/lib/server/services/points/reverse.ts` — `reverseEntry(db, actor, { entryId, comment }, { ip })`
-- `src/lib/server/services/points/index.ts` — экспорт
-- тесты с базой (откат): `award.test.ts`, `adjust.test.ts`, `reverse.test.ts`, обвязка `test-support.ts`
+- `src/lib/server/services/points/support.ts` — право `points.adjust`, комментарий, типы результата (`index.ts` не нужен — у сервиса нет зависимостей от окружения)
+- тесты с базой (откат): `award.test.ts`, `adjust.test.ts`, `reverse.test.ts`, обвязка `test-support.ts` (правила меняет под `LOCK TABLE points_rules` — тест seed удаляет все правила разом, иначе возможна взаимная блокировка)
 
 ## Не ломать
 
@@ -59,8 +59,8 @@
 
 ## Фазы
 
-- [x] SPEC
-- [ ] RED — тесты по требованиям `03` § 6.2–6.3 падают на отсутствии сервиса
-- [ ] GREEN
+- [x] SPEC — `220a72f`
+- [x] RED — `9fe7d69` (19 новых, все падали на «not implemented» заглушек)
+- [x] GREEN — зона 47/47 с первого прогона (новых 19 + схема + seed), `check` 0, `lint` чистый
 - [ ] REGRESS — зона + весь Vitest
 - [ ] REVIEW — `bugbot` + `security-review`
