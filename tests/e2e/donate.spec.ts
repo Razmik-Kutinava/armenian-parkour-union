@@ -1,6 +1,7 @@
 import { existsSync } from 'node:fs';
 import { expect, test, type Page } from '@playwright/test';
 import postgres from 'postgres';
+import { openPaymentSettings, registerAdmin } from './payment-settings-form';
 
 /* docs/06 section 4.8, docs/07 section 5.2: /donate for guests and members, the server checks the
  * amount range, the public list only behind the flag and never with an email. The e2e server is a
@@ -155,4 +156,23 @@ test('member: no name and email fields, the account is shown instead', async ({ 
 	await expect(main.getByText(email)).toBeVisible();
 	await expect(main.getByLabel('Your name')).toHaveCount(0);
 	await expect(main.getByLabel('Email')).toHaveCount(0);
+});
+
+/* Last in the file: changes the limits the tests above rely on; afterAll restores them. */
+test('admin: new limits in the settings show on /donate and bind the server', async ({ page }) => {
+	await registerAdmin(page, sql, TAG);
+	await openPaymentSettings(page);
+	await expect(page.getByLabel('Minimum donation')).toHaveValue('1000');
+	await page.getByLabel('Minimum donation').fill('2000');
+	await page.getByLabel('Maximum donation').fill('300000');
+	await page.getByRole('button', { name: 'Save' }).click();
+	await expect(page.getByText('Saved.')).toBeVisible();
+
+	await page.context().clearCookies();
+	await page.goto('/donate');
+	const main = page.locator('main');
+	await expect(main.getByText(/2,000.*300,000/)).toBeVisible();
+	await fillGuest(page, '1500', donorEmail());
+	await main.getByRole('button', { name: 'Donate' }).click();
+	await expect(main.getByText(/from AMD\s?2,000 to AMD\s?300,000/)).toBeVisible();
 });

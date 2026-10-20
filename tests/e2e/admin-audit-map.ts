@@ -14,6 +14,7 @@ export const ADMIN_AUDIT = {
 	'/admin/roles?/grant': ['user.role_change'],
 	'/admin/roles?/revoke': ['user.role_change'],
 	'/admin/settings?/default': ['settings.update'],
+	'/admin/settings/payments?/default': ['settings.update'],
 	'/admin/media?/complete': ['media.upload'],
 	'/admin/media/[id]?/alt': ['media.update'],
 	'/admin/media/[id]?/delete': ['media.delete'],

@@ -1,6 +1,7 @@
 import { existsSync } from 'node:fs';
 import { expect, test, type Page } from '@playwright/test';
 import postgres from 'postgres';
+import { openPaymentSettings, registerAdmin } from './payment-settings-form';
 
 /* docs/06 sections 4.9, 5.3: /join by three states, the cabinet page, the pay button refusals.
  * The e2e server is a production build: no mock provider, `/dev/*` is 404. */
@@ -125,4 +126,29 @@ test('dev mock checkout is not served in production', async ({ request }) => {
 		maxRedirects: 0
 	});
 	expect(post.status()).toBe(404);
+});
+
+/* Last in the file: changes the fee the tests above rely on; afterAll restores it. */
+test('admin: a new fee and term in the settings show on /join at once (docs/05 section 21)', async ({
+	page
+}) => {
+	const adminId = await registerAdmin(page, sql, 'Fee');
+	await openPaymentSettings(page);
+	await expect(page.getByLabel('Membership fee amount')).toHaveValue('20000');
+	await page.getByLabel('Membership fee amount').fill('25000');
+	await page.getByLabel('Term, months').fill('6');
+	await page.getByRole('button', { name: 'Save' }).click();
+	await expect(page.getByText('Saved.')).toBeVisible();
+
+	const [log] = await sql`
+		select before, after from audit_log
+		where actor_id = ${adminId} and action = 'settings.update' and after ? 'membership_fee'`;
+	expect(log.before).toEqual({ membership_fee: FEE });
+	expect(log.after).toEqual({
+		membership_fee: { amount_minor: 25_000, currency: 'AMD', period_months: 6 }
+	});
+	await page.goto('/join');
+	const main = page.locator('main');
+	await expect(main.getByText(/25,000/)).toBeVisible();
+	await expect(main.getByText(/6 months/)).toBeVisible();
 });
