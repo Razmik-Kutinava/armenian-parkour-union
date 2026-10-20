@@ -49,11 +49,23 @@
 
 - `06` § 1, 2, 3.2, 5, 5.1–5.3, 5.9, 9, 10; `04` § 3.1, 4, 5.2–5.4, 6, 7; `03` § 1, 2, 13; `07` § 12; `02` § 1 `users` (прочитаны в SPEC).
 
+## Для общего REVIEW — что проверить в 3.10
+
+Дифф: `git diff e15e311..94d426e -- src tests` (RED `5eeb347`, GREEN `94d426e`). Риск `high` → bugbot + security-review параллельно, затем `/crit-audit`.
+
+1. **«Своё» (K1)** — `services/cabinet/{overview,profile,payments,receipt}.ts`: каждая выборка по `user_id` из сессии, `isUuid`, удалённый → `null` / `not_found`; квитанция — `payments.user_id = сессия` + `paid | refunded` + `paid_at` (иначе 404); маршруты `cabinet/**` — `requireUser` в каждом `load` и action, id из формы не берётся.
+2. **Смена email** — `auth/index.ts` `user.changeEmail.enabled` (без `sendChangeEmailConfirmation` и `updateEmailWithoutVerification`): Better Auth шлёт токен `change-email-verification` на **новый** адрес через `sendVerificationEmail` → `/verify-email` (`verifyEmail` без заголовков сессии: если сессии нет, Better Auth **создаёт новую** для владельца токена — вход по ссылке из письма). Занятый адрес — тот же ответ, письма нет. Проверить: адрес, занятый между отправкой и переходом, — `updateUserByEmail` упадёт на unique (500 на `/verify-email`, данные не меняются); старому адресу уведомление не уходит. e2e подделанный токен → 400.
+3. **Смена пароля (`04` § 6.8)** — `auth/account-calls.ts` `changePassword` с `revokeOtherSessions: true` (e2e: вторая сессия выходит, текущая остаётся); лимит 5 / 15 мин на пользователя считается на каждую попытку (и успешную); неизвестные ошибки Better Auth пробрасываются (500).
+4. **Лимиты** — `rate-limit.ts`: `emailChangePerUser`, `verifyResendPerUser` (3 / час), `passwordChangePerUser`; «Задать пароль» — общий `passwordResetPerIp`.
+5. **Личные данные (K4)** — в общий layout (`(site)/+layout.server.ts`) уходят только `emailVerified` и напоминание (вид + дата), без email / телефона; профиль отдаёт email, телефон, данные родителя только владельцу; данные родителя — по **сохранённой** дате рождения (форма её не принимает), взрослому обнуляются; журнал за правку своего профиля не пишется (решение агента).
+6. **Напоминание** — `cabinet/reminder.ts`: `ends_soon` ≤ 30 дней, `expired` — последний оплаченный период закончился, возврат (`cancelled`) и ожидание платежа — без напоминания; layout делает 2 запроса на каждую страницу вошедшего (`getMembershipOverview`).
+7. **Не K, решения агента** — меню кабинета только из готовых разделов; баннер «подтвердите email» ведёт в `/cabinet` (кнопка повтора там, без действия из layout); список платежей — до 100, без пагинации, со всеми статусами; донаты гостем до регистрации в кабинете не видны; квитанция — страница с печатью, без PDF; `StatusBadge` перенесён в `components/payments`; страна — список ISO-2 (`lib/countries.ts`, имена через `Intl.DisplayNames`); не сделано: фото, приватность, запрос на удаление (открытые вопросы), переход в `/cabinet` после входа.
+
 ## Фазы
 
-- [x] SPEC
-- [ ] RED (`test: … [RED]`)
-- [ ] GREEN (`feat: … [GREEN]`)
-- [ ] REGRESS
+- [x] SPEC — `e15e311`
+- [x] RED (`test: … [RED]`) — `5eeb347`
+- [x] GREEN (`feat: … [GREEN]`) — `94d426e`
+- [x] REGRESS — Vitest 782/783 (`hero/public` — часы машины, известное); e2e зоны 40/40: `cabinet` 7/7, `membership`, `auth`, `admin-payments`, `site-layout`, `payment-return`; `check`, `lint` чистые
 - [ ] REVIEW — общим прогоном в конце этапа 3, без push до него
 - [ ] DEPLOY (только по апруву)
