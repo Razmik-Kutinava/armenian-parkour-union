@@ -5,7 +5,8 @@ import postgres from 'postgres';
 /* docs/05 sections 12–13, docs/03 section 6.4: an admin sees the rules with who and when changed
  * them, edits title, points and "active" but never the code; edits the thresholds of "suspicious";
  * the ledger filter "suspicious" shows manual entries and hides a small system one. Moderators read
- * the ledger with the filter but cannot open the rules. Test rules are inactive e2e codes. */
+ * the ledger with the filter and the rules with thresholds (owner 2026-10-21), but change nothing.
+ * Test rules are inactive e2e codes. */
 
 if (!process.env.DATABASE_URL && existsSync('.env')) process.loadEnvFile('.env');
 const sql = postgres(process.env.DATABASE_URL ?? '', { max: 1, onnotice: () => {} });
@@ -111,7 +112,7 @@ test('admin: rules list, edit without the code, audit; thresholds saved', async 
 	}
 });
 
-test('moderator: the ledger filter "suspicious" shows manual entries; no access to rules', async ({
+test('moderator: the ledger filter "suspicious" shows manual entries; rules read-only', async ({
 	page
 }) => {
 	const moderatorId = await registerAs(page, 'moderator');
@@ -133,10 +134,28 @@ test('moderator: the ledger filter "suspicious" shows manual entries; no access 
 	await expect(page.getByRole('row', { name: new RegExp(manual) })).toBeVisible();
 	await expect(page.getByRole('row')).toHaveCount(2);
 
-	expect((await page.request.get('/admin/point-rules')).status()).toBe(403);
-	const thresholds = await page.request.post('/admin/point-rules?/thresholds', {
-		form: { minAmount: '1', burstCount: '2', burstHours: '1' },
-		headers: ORIGIN
-	});
-	expect(thresholds.status()).toBe(403);
+	const rule = await insertRule();
+	try {
+		await page.goto('/admin/point-rules');
+		const row = page.getByRole('row', { name: new RegExp(rule.code) });
+		await expect(row).toContainText('E2e rule');
+		await expect(row.getByRole('link')).toHaveCount(0);
+		await expect(page.getByLabel('Amount from')).toBeDisabled();
+		await expect(page.getByRole('button', { name: 'Save thresholds' })).toHaveCount(0);
+
+		expect((await page.request.get(`/admin/point-rules/${rule.id}`)).status()).toBe(403);
+		const edit = await page.request.post(`/admin/point-rules/${rule.id}`, {
+			form: { 'title.en': 'Hacked', points: '999' },
+			headers: ORIGIN
+		});
+		expect(edit.status()).toBe(403);
+		expect((await ruleRow(rule.id)).points).toBe(10);
+		const thresholds = await page.request.post('/admin/point-rules?/thresholds', {
+			form: { minAmount: '1', burstCount: '2', burstHours: '1' },
+			headers: ORIGIN
+		});
+		expect(thresholds.status()).toBe(403);
+	} finally {
+		await sql`delete from points_rules where id = ${rule.id}`;
+	}
 });

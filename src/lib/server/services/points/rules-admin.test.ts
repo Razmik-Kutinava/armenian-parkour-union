@@ -125,7 +125,7 @@ describe.skipIf(!testDbUrl)('points: rules in the admin', () => {
 			for (const bad of [
 				values({ points: -1 }),
 				values({ points: 1.5 }),
-				values({ points: 1_000_001 }),
+				values({ points: 1001 }),
 				values({ points: Number.NaN }),
 				values({ title: { en: '   ' } }),
 				values({ title: { en: 'x'.repeat(201) } })

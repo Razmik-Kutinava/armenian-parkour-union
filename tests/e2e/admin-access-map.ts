@@ -44,7 +44,7 @@ export const ADMIN_READS = {
 	'/admin/points': 'points.read',
 	'/admin/points/new': 'points.adjust',
 	'GET /admin/points/export': 'points.adjust',
-	'/admin/point-rules': 'points.rules',
+	'/admin/point-rules': 'points.read',
 	'/admin/point-rules/[id]': 'points.rules',
 	'/admin/donation-purposes': 'donations.config',
 	'/admin/donation-purposes/new': 'donations.config',

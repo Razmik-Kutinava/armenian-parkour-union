@@ -34,7 +34,7 @@ describe('adminNav', () => {
 		]);
 	});
 
-	it('moderator: dashboard, members, moderation, points and orders', () => {
+	it('moderator: dashboard, members, moderation, points, point rules (read) and orders', () => {
 		expect(hrefs('moderator')).toEqual([
 			'/admin',
 			'/admin/users',
@@ -44,6 +44,7 @@ describe('adminNav', () => {
 			'/admin/videos',
 			'/admin/registrations',
 			'/admin/points',
+			'/admin/point-rules',
 			'/admin/orders'
 		]);
 	});

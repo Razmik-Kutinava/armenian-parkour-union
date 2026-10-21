@@ -13,8 +13,9 @@ import { parseSuspicious, readSuspicious, saveSuspicious, SUSPICIOUS_DEFAULTS } 
 import { staffActor } from './test-support';
 
 /* docs/03 section 6.4, decisions.md 2026-10-21: the "suspicious" filter of the ledger — manual
- * operations, |amount| from 100, 5 or more entries of a member within 24 hours; thresholds live in
- * site_settings.points_suspicious and are edited on /admin/point-rules (admin only). */
+ * operations, |amount| from 100, the 5th and later entries of a member within 24 hours (owner
+ * 2026-10-21: the first four are not flagged); thresholds live in site_settings.points_suspicious
+ * and are edited on /admin/point-rules (admin only, moderator reads). */
 
 const IP = { ip: '10.0.0.8' };
 const KEY = 'points_suspicious';
@@ -115,7 +116,7 @@ describe.skipIf(!testDbUrl)('points: suspicious thresholds — storage and filte
 		});
 	});
 
-	it('filter: manual operations, |amount| from the threshold, any member burst — all entries of it', async () => {
+	it('filter: manual operations, |amount| from the threshold, a burst — from its N-th entry on', async () => {
 		await inRollback(async (tx) => {
 			await setKey(tx, { manual: true, min_amount: 100, burst_count: 5, burst_hours: 24 });
 			const admin = await staffActor(tx);
@@ -129,10 +130,11 @@ describe.skipIf(!testDbUrl)('points: suspicious thresholds — storage and filte
 			expect(await suspiciousOf(tx, a.tag)).toEqual([big, exact, manual.entryId].sort());
 
 			const burst = await insertUser(tx);
-			const inBurst = [];
-			for (const h of [0, 1, 2, 3, 23]) inBurst.push(await system(tx, burst.id, 5, h));
+			for (const h of [0, 1, 2, 3]) await system(tx, burst.id, 5, h);
+			const fifth = await system(tx, burst.id, 5, 20);
+			const sixth = await system(tx, burst.id, 5, 23);
 			await system(tx, burst.id, 5, 50);
-			expect(await suspiciousOf(tx, burst.tag)).toEqual(inBurst.sort());
+			expect(await suspiciousOf(tx, burst.tag)).toEqual([fifth, sixth].sort());
 
 			const spread = await insertUser(tx);
 			for (const h of [0, 7, 14, 21, 28]) await system(tx, spread.id, 5, h);
@@ -151,10 +153,11 @@ describe.skipIf(!testDbUrl)('points: suspicious thresholds — storage and filte
 			expect(await suspiciousOf(tx, a.tag)).toEqual([big]);
 
 			const b = await insertUser(tx);
-			const quick = [await system(tx, b.id, 5, 0), await system(tx, b.id, 5, 1)];
-			quick.push(await system(tx, b.id, 5, 2));
+			await system(tx, b.id, 5, 0);
+			await system(tx, b.id, 5, 1);
+			const third = await system(tx, b.id, 5, 2);
 			await system(tx, b.id, 5, 5);
-			expect(await suspiciousOf(tx, b.tag)).toEqual(quick.sort());
+			expect(await suspiciousOf(tx, b.tag)).toEqual([third]);
 		});
 	});
 

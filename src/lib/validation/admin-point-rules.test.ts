@@ -16,13 +16,13 @@ describe('point rule form', () => {
 		expect(ruleFormSchema.parse({ title: { en: 'V' }, points: '0' }).isActive).toBe(false);
 	});
 
-	it('points: a whole number from 0 to 1 000 000; English title required', () => {
-		for (const points of ['-1', '1.5', 'abc', '', '1000001']) {
+	it('points: a whole number from 0 to 1000 (owner, 2026-10-21); English title required', () => {
+		for (const points of ['-1', '1.5', 'abc', '', '1001', '1000000']) {
 			const result = ruleFormSchema.safeParse({ title: { en: 'V' }, points });
 			expect(result.success, points).toBe(false);
 			expect(result.error?.issues[0].message).toBe('pointRules.error.points');
 		}
-		expect(ruleFormSchema.parse({ title: { en: 'V' }, points: '1000000' }).points).toBe(1_000_000);
+		expect(ruleFormSchema.parse({ title: { en: 'V' }, points: '1000' }).points).toBe(1000);
 		expect(ruleFormSchema.safeParse({ title: { ru: 'В' }, points: '5' }).success).toBe(false);
 	});
 });
