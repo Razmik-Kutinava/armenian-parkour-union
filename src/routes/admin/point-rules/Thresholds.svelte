@@ -9,8 +9,9 @@
 	type Props = {
 		values: Record<string, string>;
 		form: { saved?: true; errors?: Partial<Record<string, MessageKey>> } | null | undefined;
+		readonly: boolean;
 	};
-	let { values, form }: Props = $props();
+	let { values, form, readonly }: Props = $props();
 	const errors = $derived(form?.errors ?? {});
 	const field = (name: string, label: MessageKey) => ({
 		name,
@@ -18,7 +19,8 @@
 		value: values[name] ?? '',
 		error: errors[name] && t(errors[name]),
 		inputmode: 'numeric' as const,
-		required: true
+		required: true,
+		disabled: readonly
 	});
 </script>
 
@@ -33,12 +35,17 @@
 		</p>
 	{/if}
 	<FormSection title={t('pointRules.th.title')} text={t('pointRules.th.hint')}>
-		<Checkbox label={t('pointRules.th.manual')} name="manual" checked={values.manual === 'on'} />
+		<Checkbox
+			label={t('pointRules.th.manual')}
+			name="manual"
+			checked={values.manual === 'on'}
+			disabled={readonly}
+		/>
 		<div class="grid gap-4 sm:grid-cols-3">
 			<Input {...field('minAmount', 'pointRules.th.minAmount')} />
 			<Input {...field('burstCount', 'pointRules.th.burstCount')} />
 			<Input {...field('burstHours', 'pointRules.th.burstHours')} />
 		</div>
 	</FormSection>
-	<div><Button type="submit">{t('pointRules.th.save')}</Button></div>
+	{#if !readonly}<div><Button type="submit">{t('pointRules.th.save')}</Button></div>{/if}
 </form>

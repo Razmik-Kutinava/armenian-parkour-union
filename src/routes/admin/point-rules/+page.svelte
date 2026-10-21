@@ -22,15 +22,19 @@
 <svelte:head><title>{t('admin.nav.pointRules')} — {t('admin.title')}</title></svelte:head>
 
 <h1 class="mb-2 text-2xl font-bold">{t('admin.nav.pointRules')}</h1>
-<p class="mb-6 max-w-3xl text-sm text-ink-700">{t('pointRules.hint')}</p>
+<p class="mb-6 max-w-3xl text-sm text-ink-700">
+	{t('pointRules.hint')}
+	{#if !data.canEdit}{t('pointRules.readOnly')}{/if}
+</p>
 
 <DataTable rows={data.rules} {columns} caption={t('admin.nav.pointRules')}>
 	{#snippet cell(row, column)}
-		{#if column.key === 'code'}
+		{#if column.key === 'code' && data.canEdit}
 			<a
 				class="font-mono font-bold text-navy-700 underline-offset-2 hover:underline"
 				href="/admin/point-rules/{row.id}">{row.code}</a
 			>
+		{:else if column.key === 'code'}<span class="font-mono font-bold">{row.code}</span>
 		{:else if column.key === 'title'}{pickLocalized(row.title, currentLocale())}
 		{:else if column.key === 'points'}{row.points}
 		{:else if column.key === 'active'}
@@ -45,4 +49,4 @@
 	{/snippet}
 </DataTable>
 
-<Thresholds values={form?.values ?? data.thresholds} {form} />
+<Thresholds values={form?.values ?? data.thresholds} {form} readonly={!data.canEdit} />

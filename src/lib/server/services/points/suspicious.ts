@@ -67,26 +67,20 @@ export async function saveSuspicious(
 }
 
 /**
- * Any of: a manual operation (an author is set), |amount| from the threshold, or an entry inside
- * some window of `burstHours` where the member has `burstCount` entries or more — every entry of
- * such a burst, not only the ones from the N-th on.
+ * Any of: a manual operation (an author is set), |amount| from the threshold, or an entry that is
+ * the `burstCount`-th or later of its member within the `burstHours` before it — the earlier
+ * entries of a burst are not flagged (owner, 2026-10-21).
  */
 export function suspiciousCondition(t: SuspiciousThresholds): SQL {
-	const hours = sql`make_interval(hours => ${t.burstHours}::int)`;
 	const burst = sql`${pointsLedger.id} in (
-		select e.id from points_ledger e
-		join (
-			select w.user_id, w.created_at from (
-				select user_id, created_at, count(*) over (
-					partition by user_id order by created_at
-					range between ${hours} preceding and current row
-				) as n
-				from points_ledger
-			) w
-			where w.n >= ${t.burstCount}::int
-		) q on q.user_id = e.user_id
-			and q.created_at >= e.created_at
-			and q.created_at <= e.created_at + ${hours}
+		select w.id from (
+			select id, count(*) over (
+				partition by user_id order by created_at
+				range between make_interval(hours => ${t.burstHours}::int) preceding and current row
+			) as n
+			from points_ledger
+		) w
+		where w.n >= ${t.burstCount}::int
 	)`;
 	return or(
 		t.manual ? isNotNull(pointsLedger.createdBy) : undefined,

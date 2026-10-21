@@ -4,7 +4,7 @@ import { localizedText } from './site-settings';
 /* Admin "Point rules" (docs/05 section 13) and the thresholds of "suspicious" entries
  * (docs/03 section 6.4, decisions.md 2026-10-21). Messages are i18n keys. */
 
-const MAX_POINTS = 1_000_000;
+const MAX_POINTS = 1000;
 const checkbox = z.preprocess((v) => v === 'on', z.boolean());
 
 /** A whole number from the form, within the range. */

@@ -72,7 +72,7 @@ const sections: [MessageKey, Section[]][] = [
 		'admin.group.shop',
 		[
 			section('points', 'points', 'points.read'),
-			section('pointRules', 'point-rules', 'points.rules'),
+			section('pointRules', 'point-rules', 'points.read'),
 			section('products', 'products', 'shop.items_write'),
 			section('orders', 'orders', 'shop.orders_manage')
 		]
