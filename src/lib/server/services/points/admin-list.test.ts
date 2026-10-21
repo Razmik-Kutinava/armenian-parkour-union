@@ -177,7 +177,7 @@ describe.skipIf(!testDbUrl)('admin points: ledger list', () => {
 				{ over: '1.5' },
 				{ over: 'abc' },
 				{ over: '9999999999' }
-			]) {
+			] as Record<string, string>[]) {
 				expect(await ids(bad), JSON.stringify(bad)).toEqual(all);
 			}
 		});

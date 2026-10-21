@@ -161,7 +161,8 @@ export function permissionFixtures(sql: postgres.Sql) {
 		},
 		pointsRows: async (userId: string) => ({
 			balance: (await sql`select points_balance from users where id = ${userId}`)[0].points_balance,
-			entries: await sql`select id, delta, reason from points_ledger where user_id = ${userId} order by id`
+			entries:
+				await sql`select id, delta, reason from points_ledger where user_id = ${userId} order by id`
 		}),
 		moneyRows: async (paymentId: string, purposeId: string) => ({
 			payment: (

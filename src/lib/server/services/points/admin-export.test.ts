@@ -40,12 +40,13 @@ describe.skipIf(!testDbUrl)('admin points: CSV export', () => {
 				'created_at,entry_id,user_id,user_name,user_email,delta,reason,source_type,source_id,comment,created_by,reversal_of,reversed_by'
 			);
 			expect(lines).toHaveLength(2);
-			const original = lines.find((l) => l.includes(`,${add.entryId},`))!;
+			const byId = (id: string) => lines.find((l) => l.split(',')[1] === id)!;
+			const original = byId(add.entryId);
 			expect(original).toContain(member.email);
 			expect(original).toContain(',40,manual,');
 			expect(original).toContain(`"'=HYPERLINK(""http://evil"")"`);
 			expect(original.endsWith(`,${back.entryId}`)).toBe(true);
-			const reversal = lines.find((l) => l.includes(`,${back.entryId},`))!;
+			const reversal = byId(back.entryId);
 			expect(reversal).toContain(',-40,reversal,');
 			expect(reversal).toContain(`,${add.entryId},`);
 		});

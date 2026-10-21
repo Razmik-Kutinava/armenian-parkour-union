@@ -59,7 +59,7 @@
 
 - [x] SPEC
 - [x] RED (`test: … [RED]`) — Vitest: 4 файла не находят модули, `access-coverage` / `audit-coverage` падают на новых записях карт; e2e не гонялись (нет маршрутов)
-- [ ] GREEN (`feat: … [GREEN]`)
+- [x] GREEN (`feat: … [GREEN]`) — Vitest зоны 41/41 (`audit-coverage` под параллельной нагрузкой — таймаут 20 с, отдельно зелёный), e2e `admin-points` + `admin-permissions` + `admin-audit` 7/7, `check` 0, eslint чистый. Попутно: `toCsv` не ставит `'` перед числами (иначе `-40` в CSV — текст); `FilterBar` — тип `number`; армянские тексты — откат на EN, как в других разделах
 - [ ] REGRESS
 - [ ] REVIEW: local · bugbot · security-review · сверка со SPEC · PROGRESS · push · CI green
 - [ ] DEPLOY (только по апруву владельца)

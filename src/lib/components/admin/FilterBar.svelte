@@ -1,7 +1,7 @@
 <script lang="ts" module>
 	export type Filter =
 		| { key: string; label: string; type?: 'select'; options: { value: string; label: string }[] }
-		| { key: string; label: string; type: 'date' };
+		| { key: string; label: string; type: 'date' | 'number' };
 </script>
 
 <script lang="ts">
@@ -21,7 +21,7 @@
 	}: { filters: Filter[]; state: ListState; searchLabel: string } = $props();
 
 	const labelOf = (f: Filter, value: string) =>
-		(f.type !== 'date' && f.options.find((o) => o.value === value)?.label) || value;
+		('options' in f && f.options.find((o) => o.value === value)?.label) || value;
 	const chips = $derived([
 		...(state.q ? [{ key: 'q', text: `${searchLabel}: ${state.q}` }] : []),
 		...filters
@@ -62,7 +62,16 @@
 						value={state.filters[f.key] ?? ''}
 						class="{controlClass} px-3 font-normal"
 					/>
-				{:else}
+				{:else if f.type === 'number'}
+					<input
+						type="number"
+						name={f.key}
+						min="0"
+						step="1"
+						value={state.filters[f.key] ?? ''}
+						class="{controlClass} w-32 px-3 font-normal"
+					/>
+				{:else if 'options' in f}
 					<select name={f.key} class="{controlClass} min-w-36 px-3 font-normal">
 						<option value="">{t('filter.any')}</option>
 						{#each f.options as o (o.value)}

@@ -19,6 +19,10 @@ describe('toCsv', () => {
 		for (const cell of cells) expect(cell.replace(/^"/, '').startsWith("'")).toBe(true);
 	});
 
+	it('numbers stay numbers, negative ones too', () => {
+		expect(toCsv(['n'], [[-40], [0], [12]])).toBe('n\r\n-40\r\n0\r\n12\r\n');
+	});
+
 	it('dates as ISO, objects as JSON', () => {
 		const csv = toCsv(['d', 'o'], [[new Date('2026-10-07T10:00:00Z'), { k: 1 }]]);
 		expect(csv).toBe('d,o\r\n2026-10-07T10:00:00.000Z,"{""k"":1}"\r\n');
