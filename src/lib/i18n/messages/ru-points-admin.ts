@@ -3,6 +3,7 @@ import type { Messages } from '../translate';
 /** Админка «Журнал баллов» (docs/05 раздел 12). Часть `ru`. */
 export const ruPointsAdmin: Partial<Messages> = {
 	'points.search': 'Имя, email или ID участника',
+	'points.searchNoEmail': 'Имя или ID участника',
 	'points.col.date': 'Дата',
 	'points.col.member': 'Участник',
 	'points.col.delta': 'Баллы',

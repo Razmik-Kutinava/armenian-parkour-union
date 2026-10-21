@@ -88,7 +88,11 @@
 	</p>
 {/if}
 
-<FilterBar {filters} state={data.state} searchLabel={t('points.search')} />
+<FilterBar
+	{filters}
+	state={data.state}
+	searchLabel={t(data.contacts ? 'points.search' : 'points.searchNoEmail')}
+/>
 
 <DataTable rows={data.rows} {columns} caption={t('admin.nav.points')} state={data.state}>
 	{#snippet cell(row, column)}

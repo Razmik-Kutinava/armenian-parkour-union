@@ -5,13 +5,16 @@ import { pointsQuery, suspiciousFor, type PointsListRow } from './admin-list';
 
 /* docs/05 section 12: CSV of the ledger with the filters of the list. */
 
-/** Same filters and order as the list; capped so a click cannot hang the server. */
+/**
+ * Same filters and order as the list; capped so a click cannot hang the server.
+ * With member emails: the export is admin only (decisions.md 2026-10-21, `points.adjust`).
+ */
 export async function pointsForExport(
 	db: LimitDb,
 	state: ListState,
 	max = 10_000
 ): Promise<PointsListRow[]> {
-	return pointsQuery(db, state, await suspiciousFor(db, state)).limit(max);
+	return pointsQuery(db, state, await suspiciousFor(db, state), true).limit(max);
 }
 
 const HEADER = [

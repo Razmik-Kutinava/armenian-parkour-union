@@ -1,6 +1,7 @@
 /** Admin "Points ledger" (docs/05 section 12). Part of `en`. */
 export const enPointsAdmin = {
 	'points.search': 'Member name, email or ID',
+	'points.searchNoEmail': 'Member name or ID',
 	'points.col.date': 'Date',
 	'points.col.member': 'Member',
 	'points.col.delta': 'Points',

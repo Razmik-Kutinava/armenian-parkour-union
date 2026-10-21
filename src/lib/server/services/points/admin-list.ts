@@ -7,12 +7,13 @@ import {
 	type ListState
 } from '#lib/components/admin/list-state.ts';
 import type { SuspiciousThresholds } from '#lib/validation/admin-point-rules.ts';
+import { roleCan } from '../../auth/permissions';
 import type { LimitDb } from '../../auth/rate-limit';
 import { pointsReason } from '../../db/schema/enums';
 import { pointsLedger } from '../../db/schema/points';
 import { users } from '../../db/schema/users';
 import { validDay, ZONE } from '../audit-list';
-import { isUuid } from '../users/target';
+import { isUuid, type Actor } from '../users/target';
 import { readSuspicious, suspiciousCondition } from './suspicious';
 
 /* docs/05 section 12: the points ledger for staff; filter values are checked before reaching SQL. */
@@ -29,12 +30,11 @@ const reversal = alias(pointsLedger, 'reversal');
 const OVER = /^\d{1,9}$/;
 const escapeLike = (s: string) => s.replace(/[\\%_]/g, (c) => `\\${c}`);
 
-export const pointsColumns = {
+const pointsColumns = {
 	id: pointsLedger.id,
 	createdAt: pointsLedger.createdAt,
 	userId: pointsLedger.userId,
 	userName: users.name,
-	userEmail: users.email,
 	delta: pointsLedger.delta,
 	reason: pointsLedger.reason,
 	sourceType: pointsLedger.sourceType,
@@ -51,7 +51,8 @@ export type PointsListRow = {
 	createdAt: Date;
 	userId: string;
 	userName: string | null;
-	userEmail: string;
+	/** Only for a viewer with `users.read_full` (docs/04 section 4). */
+	userEmail?: string;
 	delta: number;
 	reason: (typeof pointsReason.enumValues)[number];
 	sourceType: string | null;
@@ -73,7 +74,8 @@ export async function suspiciousFor(
 
 export function pointsConditions(
 	state: ListState,
-	suspicious: SuspiciousThresholds | null
+	suspicious: SuspiciousThresholds | null,
+	contacts: boolean
 ): SQL | undefined {
 	const f = state.filters;
 	const where: (SQL | undefined)[] = [];
@@ -82,7 +84,7 @@ export function pointsConditions(
 		where.push(
 			or(
 				ilike(users.name, like),
-				ilike(users.email, like),
+				contacts ? ilike(users.email, like) : undefined,
 				isUuid(state.q) ? eq(pointsLedger.userId, state.q) : undefined
 			)
 		);
@@ -101,36 +103,42 @@ export function pointsConditions(
 	return and(...where);
 }
 
-/** The ledger with the member, the author and the reversal of each entry, if any. */
+/**
+ * The ledger with the member, the author and the reversal of each entry, if any.
+ * `contacts`: the member email is selected and searched (docs/04 section 4).
+ */
 export function pointsQuery(
 	db: LimitDb,
 	state: ListState,
-	suspicious: SuspiciousThresholds | null
+	suspicious: SuspiciousThresholds | null,
+	contacts: boolean
 ) {
 	const column = state.sort === 'delta' ? pointsLedger.delta : pointsLedger.createdAt;
 	return db
-		.select(pointsColumns)
+		.select({ ...pointsColumns, ...(contacts ? { userEmail: users.email } : {}) })
 		.from(pointsLedger)
 		.innerJoin(users, eq(users.id, pointsLedger.userId))
 		.leftJoin(author, eq(author.id, pointsLedger.createdBy))
 		.leftJoin(reversal, eq(reversal.reversalOfId, pointsLedger.id))
-		.where(pointsConditions(state, suspicious))
+		.where(pointsConditions(state, suspicious, contacts))
 		.orderBy(state.dir === 'asc' ? asc(column) : desc(column), desc(pointsLedger.id))
 		.$dynamic();
 }
 
 export async function listPoints(
 	db: LimitDb,
+	viewer: Actor,
 	state: ListState
 ): Promise<{ rows: PointsListRow[]; total: number }> {
+	const contacts = roleCan(viewer.role, 'users.read_full');
 	const suspicious = await suspiciousFor(db, state);
-	const rows = await pointsQuery(db, state, suspicious)
+	const rows = await pointsQuery(db, state, suspicious, contacts)
 		.limit(PAGE_SIZE)
 		.offset(pageOffset(state.page));
 	const [{ total }] = await db
 		.select({ total: count() })
 		.from(pointsLedger)
 		.innerJoin(users, eq(users.id, pointsLedger.userId))
-		.where(pointsConditions(state, suspicious));
+		.where(pointsConditions(state, suspicious, contacts));
 	return { rows, total };
 }

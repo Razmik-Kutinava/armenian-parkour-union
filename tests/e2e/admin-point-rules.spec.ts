@@ -126,7 +126,7 @@ test('moderator: the ledger filter "suspicious" shows manual entries; rules read
 	await sql`insert into points_ledger (user_id, delta, reason, source_type, source_id)
 		values (${member.id}, 5, 'event_participation', 'event_registration', ${crypto.randomUUID()})`;
 
-	await page.goto(`/admin/points?q=${encodeURIComponent(email)}`);
+	await page.goto(`/admin/points?q=${member.id}`);
 	await expect(page.getByRole('row')).toHaveCount(3);
 	await page.getByLabel('Suspicious').selectOption('1');
 	await page.getByRole('button', { name: 'Apply' }).click();

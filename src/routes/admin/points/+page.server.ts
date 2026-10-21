@@ -13,8 +13,14 @@ import type { Actions, PageServerLoad } from './$types';
 export const load: PageServerLoad = async ({ locals, url }) => {
 	const user = requirePermission(locals.user, 'points.read');
 	const state = readListState(url.searchParams, pointsListOptions);
-	const { rows, total } = await listPoints(db, state);
-	return { state, rows, total, canAdjust: can(user, 'points.adjust') };
+	const { rows, total } = await listPoints(db, user, state);
+	return {
+		state,
+		rows,
+		total,
+		canAdjust: can(user, 'points.adjust'),
+		contacts: can(user, 'users.read_full')
+	};
 };
 
 export const actions: Actions = {

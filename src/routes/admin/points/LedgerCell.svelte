@@ -10,9 +10,9 @@
 {#if key === 'member'}
 	<a
 		class="font-bold text-navy-700 underline-offset-2 hover:underline"
-		href="/admin/users/{row.userId}">{row.userName ?? row.userEmail}</a
+		href="/admin/users/{row.userId}">{row.userName ?? row.userEmail ?? row.userId.slice(0, 8)}</a
 	>
-	<span class="block text-xs text-ink-500">{row.userEmail}</span>
+	{#if row.userEmail}<span class="block text-xs text-ink-500">{row.userEmail}</span>{/if}
 {:else if key === 'delta'}
 	<span class="font-bold {row.delta > 0 ? 'text-success-fg' : 'text-error-fg'}"
 		>{row.delta > 0 ? `+${row.delta}` : row.delta}</span
