@@ -2,6 +2,7 @@ import { expect, type Page } from '@playwright/test';
 import type postgres from 'postgres';
 import type { AdminAction } from './admin-audit-map';
 import { moneyActions } from './admin-audit-money';
+import { pointsActions } from './admin-audit-points';
 import { paymentSettingsAction } from './payment-settings-form';
 
 const ORIGIN = { origin: 'http://localhost:4173' };
@@ -187,6 +188,7 @@ export async function adminActions(page: Page, sql: postgres.Sql, adminId: strin
 		'/admin/hero/[id]?/archive': async () => post(`/admin/hero/${await heroId()}?/archive`),
 		'/admin/hero/[id]?/restore': async () => post(`/admin/hero/${await heroId()}?/restore`),
 		...moneyActions(sql, post, postRedirect),
+		...pointsActions(sql, post, target),
 		...paymentSettingsAction(page, post)
 	};
 	return perform;

@@ -50,6 +50,8 @@ export const ADMIN_AUDIT = {
 	'/admin/payments/[id]?/refund': ['payment.refund'],
 	'/admin/payments/[id]?/resolve': ['payment.review_resolved'],
 	'/admin/payments/[id]?/receipt': ['payment.receipt_resend'],
+	'/admin/points/new?/default': ['points.adjust'],
+	'/admin/points?/reverse': ['points.reverse'],
 	'/admin/donation-purposes/new?/default': ['donation_purpose.create'],
 	'/admin/donation-purposes/[id]?/update': ['donation_purpose.update']
 } as const;

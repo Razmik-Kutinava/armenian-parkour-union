@@ -7,8 +7,10 @@ export type Role = 'member' | 'editor' | 'moderator' | 'admin';
 export const ORIGIN = { origin: 'http://localhost:4173' };
 
 /* Every field any admin form reads: if a guard were missing, the action would really run. */
-export const HOSTILE_FORM = (userId: string, heroId: string) => ({
+export const HOSTILE_FORM = (userId: string, heroId: string, entryId: string) => ({
 	userId,
+	entryId,
+	delta: '100',
 	id: heroId,
 	order: heroId,
 	type: 'custom',
@@ -148,6 +150,19 @@ export function permissionFixtures(sql: postgres.Sql) {
 				await sql`insert into donation_purposes (title, is_active)
 				values (${sql.json({ en: 'E2e perm purpose' })}, false) returning id`
 			),
+		/* A manual entry of the target: a reversal could really run on it. */
+		insertPoints: async (userId: string) => {
+			const id = idOf(
+				await sql`insert into points_ledger (user_id, delta, reason, comment)
+				values (${userId}, 10, 'manual', 'E2e perm points') returning id`
+			);
+			await sql`update users set points_balance = points_balance + 10 where id = ${userId}`;
+			return id;
+		},
+		pointsRows: async (userId: string) => ({
+			balance: (await sql`select points_balance from users where id = ${userId}`)[0].points_balance,
+			entries: await sql`select id, delta, reason from points_ledger where user_id = ${userId} order by id`
+		}),
 		moneyRows: async (paymentId: string, purposeId: string) => ({
 			payment: (
 				await sql`select status, needs_review, confirmed_by, paid_at, refunded_at

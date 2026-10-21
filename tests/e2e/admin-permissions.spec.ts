@@ -28,6 +28,8 @@ const {
 	insertHero,
 	insertPayment,
 	insertPurpose,
+	insertPoints,
+	pointsRows,
 	moneyRows,
 	targetRow,
 	mediaRow,
@@ -53,6 +55,8 @@ for (const role of ['member', 'editor', 'moderator'] as const) {
 			paymentId: await insertPayment(),
 			purposeId: await insertPurpose()
 		};
+		const entryId = await insertPoints(target);
+		const pointsBefore = await pointsRows(target);
 		const moneyBefore = await moneyRows(ids.paymentId, ids.purposeId);
 		const mediaBefore = await mediaRow(ids.mediaId);
 		const pageBefore = await pageRow(ids.pageId);
@@ -69,7 +73,7 @@ for (const role of ['member', 'editor', 'moderator'] as const) {
 			const expected = expectedStatus(role, access);
 			if (expected === 200) continue;
 			const res = await page.request.post(toPath(key, ids), {
-				form: HOSTILE_FORM(target, ids.heroId),
+				form: HOSTILE_FORM(target, ids.heroId, entryId),
 				headers: ORIGIN,
 				maxRedirects: 0
 			});
@@ -83,6 +87,7 @@ for (const role of ['member', 'editor', 'moderator'] as const) {
 		expect(await eventRows(ids.eventId)).toEqual(eventBefore);
 		expect(await heroRow(ids.heroId)).toEqual(heroBefore);
 		expect(await moneyRows(ids.paymentId, ids.purposeId)).toEqual(moneyBefore);
+		expect(await pointsRows(target)).toEqual(pointsBefore);
 		expect(
 			await sql`select 1 from audit_log where entity_id in (${target}, ${ids.mediaId}, ${ids.pageId}, ${ids.postId}, ${ids.eventId}, ${ids.heroId}, ${ids.paymentId}, ${ids.purposeId})`
 		).toHaveLength(0);
