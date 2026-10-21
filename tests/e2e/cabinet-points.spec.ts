@@ -45,6 +45,10 @@ test('member: balance, own ledger, reversal marks, filter by reason, how to earn
 	await sql`insert into points_ledger (user_id, delta, reason, comment, reversal_of_id)
 		values (${userId}, -20, 'reversal', 'Did not come', ${award.id})`;
 	await sql`update users set points_balance = 15 where id = ${userId}`;
+	// CI only migrates the e2e database; parkour_dev already has the seeded rule.
+	await sql`insert into points_rules (code, title, points, is_active)
+		values ('video_approved', ${sql.json({ en: 'Approved video' })}, 10, true)
+		on conflict (code) do nothing`;
 
 	await page.goto('/cabinet');
 	const main = page.locator('main');
