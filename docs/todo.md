@@ -5,23 +5,62 @@
 
 ## Задача
 
-(номер из `09-ROADMAP.md` и кратко)
+4.4a — админка «Журнал баллов» `/admin/points` (`05` § 12): список с фильтрами, ручная корректировка, отмена записи, экспорт CSV. Миграции нет.
+4.4 делится на два цикла SBR (как 1.10a/b, предложено — ждёт подтверждения): **4.4a** — журнал (этот todo); **4.4b** — `/admin/point-rules` (`05` § 13) + фильтр «подозрительное» с порогами в `site_settings` (`03` § 6.4 — пороги «УТОЧНИТЬ», вопрос в `questions.md`).
+
+**Что делаем (4.4a):**
+- **Список** `/admin/points` (`points.read`: moderator — только чтение, admin — с действиями), 25 на страницу, фильтры в URL (`readListState`), сортировка по дате и сумме. Колонки: дата, участник (имя + email, ссылка на карточку), сумма (+/−), причина (перевод enum `points_reason`), источник (`source_type` + короткий id), комментарий, кто выполнил (имя или «система»), отметка «отменена» (есть запись с `reversal_of_id` = эта).
+- **Фильтры:** участник — поиск `q` по имени / email (или точный id); причина — enum; период `from` / `to` (дни по Еревану, `validDay`, как платежи); «ручные операции» — `created_by is not null`; «сумма больше N» — `abs(delta) > N` (целое ≥ 0, иначе фильтр игнорируется).
+- **Ручная корректировка** `/admin/points/new` (admin): шаг 1 — email участника (GET `?email=`), страница показывает имя и текущий баланс; шаг 2 — сумма (+ или −, целое ≠ 0) и комментарий (обязателен), диалог подтверждения «было X → станет Y»; сервер — только `adjustPoints`; после — в журнал с фильтром по участнику и сообщением «баланс X → Y». Отказы сервиса (`insufficient_balance`, `not_found`, `invalid`) — понятная ошибка у формы.
+- **Отмена записи** — action `?/reverse` на списке (admin): диалог с подтверждением и комментарием; кнопки нет у `reversal` и у уже отменённых; сервер — только `reverseEntry`; отказы (`already_reversed`, `not_reversible`, `insufficient_balance`) — сообщение.
+- **Экспорт CSV** `GET /admin/points/export` — по текущим фильтрам, до 10 000 строк, BOM, `toCsv` (как платежи). Право — см. вопрос «Экспорт» ниже (предложено: только admin, `points.adjust`).
+- Права — `requirePermission` в каждом load / action / endpoint; actor и IP — из сессии и запроса; сервис сам проверяет `points.adjust`.
+- Журнал действий пишет сервис (`points.adjust`, `points.reverse`) — новые записи в `admin-audit-map.ts`; страницы и действия — в `admin-access-map.ts`.
 
 ## Файлы (ожидаемо)
 
-- (путь — зачем)
+- `src/lib/server/services/points/admin-list.ts` (+ `.test.ts`) — список, фильтры, признак «отменена», `pointsListOptions`
+- `src/lib/server/services/points/admin-export.ts` (+ `.test.ts`) — выборка для CSV и `pointsCsv`
+- `src/lib/server/services/points/member.ts` — участник по email (имя, баланс) для шага 1 корректировки
+- `src/lib/validation/admin-points.ts` — Zod: корректировка, отмена
+- `src/routes/admin/points/+page.server.ts`, `+page.svelte` (+ компонент строки / диалога отмены) — список и `?/reverse`
+- `src/routes/admin/points/new/+page.server.ts`, `+page.svelte` — корректировка
+- `src/routes/admin/points/export/+server.ts` — CSV
+- `src/lib/i18n/messages/{en,hy,ru}-points-admin.ts` — тексты раздела
+- `tests/e2e/admin-points.spec.ts`, `tests/e2e/admin-access-map.ts`, `tests/e2e/admin-audit-map.ts`
 
 ## Не ломать
 
-- (2–4 сценария)
+- Баллы пишет только `services/points` (`appendEntry`): маршруты не трогают `points_ledger` / `users.points_balance` напрямую; баланс ≥ 0, запись отменяется один раз.
+- Модератор видит журнал, но корректировка, отмена (и экспорт, если admin-only) — 403 и по прямому POST / GET; редактор и участник — 403 на всё.
+- Журнал действий: `points.adjust` / `points.reverse` с IP; `audit-coverage` и `access-coverage` зелёные.
+- Остальная админка (меню, `users`, `payments`) и тесты сервиса баллов 4.3.
 
 ## Проверка
 
-- (1–2 команды)
+- `npx vitest run src/lib/server/services/points src/routes/admin` — сервис, список, `access-coverage` / `audit-coverage`
+- `npx playwright test tests/e2e/admin-points.spec.ts tests/e2e/admin-access.spec.ts tests/e2e/admin-audit.spec.ts`
+
+## Риск
+
+`high` — баллы, права (`bugbot` + `security-review`).
+
+## Читать
+
+- `05 § 12` — колонки, фильтры, действия, модератор только читает (выписано выше)
+- `03 § 6.3` — комментарий обязателен, отмена один раз, баланс ≥ 0, всё в `audit_log`
+- `04` — `points.read` moderator + admin; `points.adjust` admin (строки 87–89, 151–153)
+- `02 § 5` — поля `points_ledger`
+
+## Вопросы (ждут ответа владельца)
+
+- Разбивка 4.4 на 4.4a (журнал) и 4.4b (правила + «подозрительное») — предложено.
+- Экспорт CSV: только admin (в `05` § 12 он в «Действия (admin)», отдельного права нет — проверка `points.adjust`) или и модератор (`points.read`)? Предложено: только admin.
+- Пороги «подозрительного» (для 4.4b): ключ `site_settings.points_suspicious`, правка на `/admin/point-rules`; по умолчанию — ручные операции, |сумма| ≥ 100, ≥ 5 записей у участника за 24 ч.
 
 ## Фазы
 
-- [ ] SPEC
+- [x] SPEC
 - [ ] RED (`test: … [RED]`)
 - [ ] GREEN (`feat: … [GREEN]`)
 - [ ] REGRESS
