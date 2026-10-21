@@ -14,6 +14,7 @@ const KEYS = [
 	'hero_max_active',
 	'membership_fee',
 	'payment_wait_minutes',
+	'points_suspicious',
 	'requisites',
 	'site_name',
 	'socials'
@@ -52,6 +53,15 @@ describe('seed: site_settings values', () => {
 			currency: 'AMD',
 			min_minor: 1000,
 			max_minor: 1_000_000
+		});
+	});
+
+	it('suspicious points: manual, |amount| ≥ 100, ≥ 5 entries in 24 h (decisions.md 2026-10-21)', () => {
+		expect(SEED_SETTINGS.points_suspicious).toEqual({
+			manual: true,
+			min_amount: 100,
+			burst_count: 5,
+			burst_hours: 24
 		});
 	});
 });

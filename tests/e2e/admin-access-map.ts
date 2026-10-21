@@ -44,6 +44,8 @@ export const ADMIN_READS = {
 	'/admin/points': 'points.read',
 	'/admin/points/new': 'points.adjust',
 	'GET /admin/points/export': 'points.adjust',
+	'/admin/point-rules': 'points.rules',
+	'/admin/point-rules/[id]': 'points.rules',
 	'/admin/donation-purposes': 'donations.config',
 	'/admin/donation-purposes/new': 'donations.config',
 	'/admin/donation-purposes/[id]': 'donations.config'
@@ -99,6 +101,8 @@ export const ADMIN_WRITES = {
 	'/admin/payments/[id]?/receipt': 'payments.manage',
 	'/admin/points/new?/default': 'points.adjust',
 	'/admin/points?/reverse': 'points.adjust',
+	'/admin/point-rules/[id]?/default': 'points.rules',
+	'/admin/point-rules?/thresholds': 'points.rules',
 	'/admin/donation-purposes/new?/default': 'donations.config',
 	'/admin/donation-purposes/[id]?/update': 'donations.config',
 	'POST /admin/locale': 'staff'

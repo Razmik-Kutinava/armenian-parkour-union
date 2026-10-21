@@ -29,6 +29,8 @@ const {
 	insertPayment,
 	insertPurpose,
 	insertPoints,
+	insertRule,
+	ruleRow,
 	pointsRows,
 	moneyRows,
 	targetRow,
@@ -53,10 +55,12 @@ for (const role of ['member', 'editor', 'moderator'] as const) {
 			eventId: await insertEvent(),
 			heroId: await insertHero(),
 			paymentId: await insertPayment(),
-			purposeId: await insertPurpose()
+			purposeId: await insertPurpose(),
+			ruleId: await insertRule()
 		};
 		const entryId = await insertPoints(target);
 		const pointsBefore = await pointsRows(target);
+		const ruleBefore = await ruleRow(ids.ruleId);
 		const moneyBefore = await moneyRows(ids.paymentId, ids.purposeId);
 		const mediaBefore = await mediaRow(ids.mediaId);
 		const pageBefore = await pageRow(ids.pageId);
@@ -88,8 +92,14 @@ for (const role of ['member', 'editor', 'moderator'] as const) {
 		expect(await heroRow(ids.heroId)).toEqual(heroBefore);
 		expect(await moneyRows(ids.paymentId, ids.purposeId)).toEqual(moneyBefore);
 		expect(await pointsRows(target)).toEqual(pointsBefore);
+		expect(await ruleRow(ids.ruleId)).toEqual(ruleBefore);
 		expect(
-			await sql`select 1 from audit_log where entity_id in (${target}, ${ids.mediaId}, ${ids.pageId}, ${ids.postId}, ${ids.eventId}, ${ids.heroId}, ${ids.paymentId}, ${ids.purposeId})`
+			await sql`select 1 from audit_log where entity_id in (${target}, ${ids.mediaId}, ${ids.pageId}, ${ids.postId}, ${ids.eventId}, ${ids.heroId}, ${ids.paymentId}, ${ids.purposeId}, ${ids.ruleId})`
+		).toHaveLength(0);
+		/* Thresholds are a shared key that admin-audit.spec.ts changes in parallel: check the author. */
+		expect(
+			await sql`select 1 from audit_log a join users u on u.id = a.actor_id
+				where u.email like ${`e2e-perm-${role}-%`} and a.action = 'settings.update'`
 		).toHaveLength(0);
 		expect(await sql`select 1 from payments where donor_name = 'Hacked'`).toHaveLength(0);
 		expect(await sql`select 1 from donation_purposes where title->>'en' = 'Hacked'`).toHaveLength(
@@ -103,6 +113,7 @@ for (const role of ['member', 'editor', 'moderator'] as const) {
 		expect(await sql`select 1 from events where slug like 'e2e-hostile-%'`).toHaveLength(0);
 		/* Out of the current list: every block there takes part in the reorder of other runs. */
 		await sql`update hero_blocks set archived_at = now() where id = ${ids.heroId}`;
+		await sql`delete from points_rules where id = ${ids.ruleId}`;
 	});
 }
 
@@ -129,7 +140,8 @@ test('admin opens every admin page; audit pages take no writes and the entry sta
 		eventId: await insertEvent(),
 		heroId: await insertHero(),
 		paymentId: await insertPayment(),
-		purposeId: await insertPurpose()
+		purposeId: await insertPurpose(),
+		ruleId: await insertRule()
 	};
 	for (const key of Object.keys(ADMIN_READS)) {
 		const res = await page.request.get(toPath(key, ids), { maxRedirects: 0 });
@@ -148,4 +160,5 @@ test('admin opens every admin page; audit pages take no writes and the entry sta
 	}
 	expect(await sql`select * from audit_log where entity_id = ${target}`).toEqual([entry]);
 	await sql`update hero_blocks set archived_at = now() where id = ${ids.heroId}`;
+	await sql`delete from points_rules where id = ${ids.ruleId}`;
 });

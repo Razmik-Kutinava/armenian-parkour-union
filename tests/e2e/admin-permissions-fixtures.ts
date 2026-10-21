@@ -44,7 +44,11 @@ export const HOSTILE_FORM = (userId: string, heroId: string, entryId: string) =>
 	currency: 'AMD',
 	paidOn: '2026-01-15',
 	donorName: 'Hacked',
-	sortOrder: '1'
+	sortOrder: '1',
+	points: '999',
+	minAmount: '1',
+	burstCount: '2',
+	burstHours: '1'
 });
 
 /* docs/04 section 5.4: member → 404 for all of /admin, staff without the permission → 403. */
@@ -61,10 +65,12 @@ export type Ids = {
 	heroId: string;
 	paymentId: string;
 	purposeId: string;
+	ruleId: string;
 };
 export const toPath = (key: string, ids: Ids) =>
 	key
 		.replace(/^(GET|POST) /, '')
+		.replace('/point-rules/[id]', `/point-rules/${ids.ruleId}`)
 		.replace('/payments/export', '/payments/export?kind=donation')
 		.replace('/payments/[id]', `/payments/${ids.paymentId}`)
 		.replace('/donation-purposes/[id]', `/donation-purposes/${ids.purposeId}`)
@@ -159,6 +165,18 @@ export function permissionFixtures(sql: postgres.Sql) {
 			await sql`update users set points_balance = points_balance + 10 where id = ${userId}`;
 			return id;
 		},
+		/* Inactive e2e code: an edit could really run on it, no award and no member sees it. */
+		insertRule: async () =>
+			idOf(
+				await sql`insert into points_rules (code, title, points, is_active)
+				values (${`e2e-perm-${crypto.randomUUID()}`}, ${sql.json({ en: 'E2e perm rule' })}, 10, false)
+				returning id`
+			),
+		ruleRow: async (id: string) =>
+			(
+				await sql`select code, title, points, is_active, updated_by, updated_at
+					from points_rules where id = ${id}`
+			)[0],
 		pointsRows: async (userId: string) => ({
 			balance: (await sql`select points_balance from users where id = ${userId}`)[0].points_balance,
 			entries:
