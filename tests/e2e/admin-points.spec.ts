@@ -101,7 +101,9 @@ test('admin: adjustment with balance before and after, ledger, one reversal, exp
 	expect(text).toContain('Entered by mistake');
 });
 
-test('moderator: reads the ledger, no adjustment, reversal or export', async ({ page }) => {
+test('moderator: reads the ledger without member emails, no adjustment, reversal or export', async ({
+	page
+}) => {
 	await registerAs(page, 'moderator');
 	const member = await insertMember();
 	const comment = `Moderator view ${crypto.randomUUID().slice(0, 8)}`;
@@ -110,8 +112,12 @@ test('moderator: reads the ledger, no adjustment, reversal or export', async ({ 
 		values (${member.id}, 15, 'manual', ${comment}) returning id`;
 	await sql`update users set points_balance = 15 where id = ${member.id}`;
 
-	await page.goto(`/admin/points?q=${encodeURIComponent(member.email)}`);
+	await page.goto(`/admin/points?q=${member.id}`);
 	await expect(page.getByRole('row', { name: new RegExp(comment) })).toBeVisible();
+	expect(await page.content()).not.toContain(member.email);
+	await page.goto(`/admin/points?q=${encodeURIComponent(member.email)}`);
+	await expect(page.getByRole('row', { name: new RegExp(comment) })).toHaveCount(0);
+	await page.goto(`/admin/points?q=${member.id}`);
 	await expect(page.getByRole('button', { name: 'Reverse' })).toHaveCount(0);
 	await expect(page.getByRole('link', { name: 'Adjust points' })).toHaveCount(0);
 	await expect(page.getByRole('link', { name: /CSV/ })).toHaveCount(0);

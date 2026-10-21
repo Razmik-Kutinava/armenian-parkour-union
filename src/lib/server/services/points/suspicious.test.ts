@@ -46,6 +46,7 @@ const suspiciousOf = async (tx: LimitDb, tag: string) =>
 	(
 		await listPoints(
 			tx,
+			await staffActor(tx),
 			readListState(new URLSearchParams({ q: tag, suspicious: '1' }), pointsListOptions)
 		)
 	).rows
@@ -164,15 +165,16 @@ describe.skipIf(!testDbUrl)('points: suspicious thresholds — storage and filte
 	it('broken key — defaults; without the flag nothing is filtered; CSV uses the same filter', async () => {
 		await inRollback(async (tx) => {
 			await setKey(tx, 'broken');
+			const admin = await staffActor(tx);
 			const a = await insertUser(tx);
 			const big = await system(tx, a.id, 100);
 			const small = await system(tx, a.id, 5, 30);
 			expect(await suspiciousOf(tx, a.tag)).toEqual([big]);
 			const state = (query: Record<string, string>) =>
 				readListState(new URLSearchParams({ q: a.tag, ...query }), pointsListOptions);
-			expect((await listPoints(tx, state({}))).total).toBe(2);
-			expect((await listPoints(tx, state({ suspicious: 'yes' }))).total).toBe(2);
-			expect((await listPoints(tx, state({ suspicious: '1' }))).total).toBe(1);
+			expect((await listPoints(tx, admin, state({}))).total).toBe(2);
+			expect((await listPoints(tx, admin, state({ suspicious: 'yes' }))).total).toBe(2);
+			expect((await listPoints(tx, admin, state({ suspicious: '1' }))).total).toBe(1);
 			const csv = await pointsForExport(tx, state({ suspicious: '1' }));
 			expect(csv.map((r) => r.id)).toEqual([big]);
 			expect(csv.map((r) => r.id)).not.toContain(small);

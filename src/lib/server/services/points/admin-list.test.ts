@@ -44,7 +44,7 @@ describe.skipIf(!testDbUrl)('admin points: ledger list', () => {
 				IP
 			);
 			if (!manual.ok) throw new Error(manual.reason);
-			const { rows, total } = await listPoints(tx, state({ q: member.tag }));
+			const { rows, total } = await listPoints(tx, admin, state({ q: member.tag }));
 			expect(total).toBe(2);
 			expect(rows.find((r) => r.id === system.id)).toMatchObject({
 				userId: member.id,
@@ -87,7 +87,7 @@ describe.skipIf(!testDbUrl)('admin points: ledger list', () => {
 				IP
 			);
 			if (!reversal.ok) throw new Error(reversal.reason);
-			const { rows } = await listPoints(tx, state({ q: member.tag }));
+			const { rows } = await listPoints(tx, admin, state({ q: member.tag }));
 			expect(rows.find((r) => r.id === original.id)?.reversedById).toBe(reversal.entryId);
 			expect(rows.find((r) => r.id === reversal.entryId)).toMatchObject({
 				reason: 'reversal',
@@ -100,6 +100,7 @@ describe.skipIf(!testDbUrl)('admin points: ledger list', () => {
 
 	it('search by member name, email or id; newest first by default', async () => {
 		await inRollback(async (tx) => {
+			const admin = await staffActor(tx);
 			const member = await insertUser(tx);
 			const other = await insertUser(tx);
 			const first = await add(tx, {
@@ -125,10 +126,34 @@ describe.skipIf(!testDbUrl)('admin points: ledger list', () => {
 				sourceType: 'event_registration',
 				sourceId: crypto.randomUUID()
 			});
-			const ids = async (q: string) => (await listPoints(tx, state({ q }))).rows.map((r) => r.id);
+			const ids = async (q: string) =>
+				(await listPoints(tx, admin, state({ q }))).rows.map((r) => r.id);
 			expect(await ids(member.tag)).toEqual([second.id, first.id]);
 			expect(await ids(member.email.toUpperCase())).toEqual([second.id, first.id]);
 			expect(await ids(member.id)).toEqual([second.id, first.id]);
+		});
+	});
+
+	it('docs/04 section 4: the moderator gets no member email and cannot search by it', async () => {
+		await inRollback(async (tx) => {
+			const admin = await staffActor(tx);
+			const moderator = await staffActor(tx, 'moderator');
+			const member = await insertUser(tx);
+			const entry = await add(tx, {
+				userId: member.id,
+				delta: 5,
+				reason: 'video',
+				sourceType: 'video',
+				sourceId: crypto.randomUUID()
+			});
+			const asModerator = await listPoints(tx, moderator, state({ q: member.tag }));
+			expect(asModerator.rows.map((r) => r.id)).toEqual([entry.id]);
+			expect(asModerator.rows[0]).not.toHaveProperty('userEmail');
+			const byEmail = await listPoints(tx, moderator, state({ q: member.email }));
+			expect(byEmail.total).toBe(0);
+			expect(byEmail.rows).toEqual([]);
+			const asAdmin = await listPoints(tx, admin, state({ q: member.email }));
+			expect(asAdmin.rows[0]).toMatchObject({ id: entry.id, userEmail: member.email });
 		});
 	});
 
@@ -160,7 +185,9 @@ describe.skipIf(!testDbUrl)('admin points: ledger list', () => {
 			);
 			if (!manual.ok) throw new Error(manual.reason);
 			const ids = async (query: Record<string, string>) =>
-				(await listPoints(tx, state({ q: member.tag, ...query }))).rows.map((r) => r.id).sort();
+				(await listPoints(tx, admin, state({ q: member.tag, ...query }))).rows
+					.map((r) => r.id)
+					.sort();
 			const all = [place.id, small.id, manual.entryId].sort();
 			expect(await ids({})).toEqual(all);
 			expect(await ids({ reason: 'event_place' })).toEqual([place.id]);
@@ -185,6 +212,7 @@ describe.skipIf(!testDbUrl)('admin points: ledger list', () => {
 
 	it('sort by amount', async () => {
 		await inRollback(async (tx) => {
+			const admin = await staffActor(tx);
 			const member = await insertUser(tx);
 			for (const delta of [20, 5, 50]) {
 				await add(tx, {
@@ -195,7 +223,11 @@ describe.skipIf(!testDbUrl)('admin points: ledger list', () => {
 					sourceId: crypto.randomUUID()
 				});
 			}
-			const { rows } = await listPoints(tx, state({ q: member.tag, sort: 'delta', dir: 'asc' }));
+			const { rows } = await listPoints(
+				tx,
+				admin,
+				state({ q: member.tag, sort: 'delta', dir: 'asc' })
+			);
 			expect(rows.map((r) => r.delta)).toEqual([5, 20, 50]);
 		});
 	});
