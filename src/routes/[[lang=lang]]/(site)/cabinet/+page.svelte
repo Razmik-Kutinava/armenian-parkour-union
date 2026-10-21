@@ -90,6 +90,9 @@
 		<section class={card}>
 			<h2 class="text-xl font-bold text-ink-900">{t('cabinet.overview.points')}</h2>
 			<p class="text-3xl font-bold text-ink-900">{o.pointsBalance}</p>
+			<a class="font-bold text-navy-700 underline hover:no-underline" href={href('/cabinet/points')}
+				>{t('cabinet.overview.pointsHistory')}</a
+			>
 		</section>
 	</div>
 </div>

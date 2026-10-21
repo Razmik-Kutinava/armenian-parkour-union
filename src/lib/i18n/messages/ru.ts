@@ -1,5 +1,6 @@
 import type { Messages } from '../translate';
 import { ruCabinet } from './ru-cabinet';
+import { ruCabinetPoints } from './ru-cabinet-points';
 import { ruDonate } from './ru-donate';
 import { ruEditor } from './ru-editor';
 import { ruEvents } from './ru-events';
@@ -37,6 +38,7 @@ export const ru: Partial<Messages> = {
 	...ruPointsAdmin,
 	...ruPointRulesAdmin,
 	...ruCabinet,
+	...ruCabinetPoints,
 	'site.description': 'Союз паркура Армении: события, новости, членство и аттестация.',
 	'site.underConstruction': 'Сайт в разработке.',
 	'common.close': 'Закрыть',

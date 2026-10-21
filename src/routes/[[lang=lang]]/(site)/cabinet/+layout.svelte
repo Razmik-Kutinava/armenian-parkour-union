@@ -5,12 +5,13 @@
 
 	let { children }: LayoutProps = $props();
 
-	/* docs/06 section 5: only the sections that exist; events, progress, points and the rest come
-	 * with stages 4–7. On a phone the menu scrolls sideways above the page. */
+	/* docs/06 section 5: only the sections that exist; events, progress and the rest come with
+	 * stages 5–7. On a phone the menu scrolls sideways above the page. */
 	const sections: [MessageKey, string][] = [
 		['cabinet.nav.overview', '/cabinet'],
 		['cabinet.nav.profile', '/cabinet/profile'],
 		['cabinet.nav.membership', '/cabinet/membership'],
+		['cabinet.nav.points', '/cabinet/points'],
 		['cabinet.nav.payments', '/cabinet/payments']
 	];
 	const current = (path: string) => {

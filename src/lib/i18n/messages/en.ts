@@ -1,4 +1,5 @@
 import { enCabinet } from './en-cabinet';
+import { enCabinetPoints } from './en-cabinet-points';
 import { enDonate } from './en-donate';
 import { enEditor } from './en-editor';
 import { enEvents } from './en-events';
@@ -37,6 +38,7 @@ export const en = {
 	...enPointsAdmin,
 	...enPointRulesAdmin,
 	...enCabinet,
+	...enCabinetPoints,
 	'site.name': 'Armenian Parkour Union',
 	'site.description': 'Armenian Parkour Union: events, news, membership and certification.',
 	'site.underConstruction': 'Site under construction.',
