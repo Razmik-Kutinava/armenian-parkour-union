@@ -19,7 +19,9 @@ export const SEED_SETTINGS = {
 	/** How long a fee or donation payment waits at the provider (decisions.md 2026-10-19, 3.6). */
 	payment_wait_minutes: 30,
 	/** Donation range in minor units (decisions.md 2026-10-19, 3.7). */
-	donation_limits: { currency: 'AMD', min_minor: 1000, max_minor: 1_000_000 }
+	donation_limits: { currency: 'AMD', min_minor: 1000, max_minor: 1_000_000 },
+	/** "Suspicious" in the points ledger (docs/03 section 6.4, decisions.md 2026-10-21). */
+	points_suspicious: { manual: true, min_amount: 100, burst_count: 5, burst_hours: 24 }
 };
 
 /** Adds missing keys only: values changed in the admin panel are never overwritten. */

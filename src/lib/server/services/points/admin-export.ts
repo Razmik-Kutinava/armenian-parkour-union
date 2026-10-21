@@ -1,7 +1,7 @@
 import type { ListState } from '#lib/components/admin/list-state.ts';
 import type { LimitDb } from '../../auth/rate-limit';
 import { toCsv } from '../audit-csv';
-import { pointsQuery, type PointsListRow } from './admin-list';
+import { pointsQuery, suspiciousFor, type PointsListRow } from './admin-list';
 
 /* docs/05 section 12: CSV of the ledger with the filters of the list. */
 
@@ -11,7 +11,7 @@ export async function pointsForExport(
 	state: ListState,
 	max = 10_000
 ): Promise<PointsListRow[]> {
-	return pointsQuery(db, state).limit(max);
+	return pointsQuery(db, state, await suspiciousFor(db, state)).limit(max);
 }
 
 const HEADER = [

@@ -56,8 +56,8 @@
 ## Фазы
 
 - [x] SPEC
-- [ ] RED (`test: … [RED]`)
-- [ ] GREEN (`feat: … [GREEN]`)
+- [x] RED (`5aa1544`) — Vitest: 3 набора не находят модули, seed без ключа, `access-coverage` / `audit-coverage` — нет маршрутов; остальное зелёное
+- [x] GREEN — Vitest зоны 91/91 (`audit-coverage` под параллельной нагрузкой — таймаут 20 с, отдельно 4/4), e2e `admin-point-rules` + `admin-points` + `admin-permissions` + `admin-audit` 9/9, `check` 0, eslint / prettier чистые; `db:seed` dev — ключ уже был (создан e2e через форму, значения = по умолчанию). Армянские тексты раздела — откат на EN, как в других разделах админки
 - [ ] REGRESS
 - [ ] REVIEW (4.4a + 4.4b) — после апрува владельца
 - [ ] DEPLOY (только по апруву владельца)

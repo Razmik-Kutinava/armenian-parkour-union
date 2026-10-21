@@ -13,6 +13,7 @@ import { ruNews } from './ru-news';
 import { ruPages } from './ru-pages';
 import { ruPayment } from './ru-payment';
 import { ruPaymentsAdmin } from './ru-payments-admin';
+import { ruPointRulesAdmin } from './ru-point-rules-admin';
 import { ruPointsAdmin } from './ru-points-admin';
 import { ruSystem } from './ru-system';
 import { ruUsers } from './ru-users';
@@ -34,6 +35,7 @@ export const ru: Partial<Messages> = {
 	...ruPayment,
 	...ruPaymentsAdmin,
 	...ruPointsAdmin,
+	...ruPointRulesAdmin,
 	...ruCabinet,
 	'site.description': 'Союз паркура Армении: события, новости, членство и аттестация.',
 	'site.underConstruction': 'Сайт в разработке.',

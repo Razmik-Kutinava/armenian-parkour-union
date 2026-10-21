@@ -6,18 +6,20 @@ import {
 	type ListOptions,
 	type ListState
 } from '#lib/components/admin/list-state.ts';
+import type { SuspiciousThresholds } from '#lib/validation/admin-point-rules.ts';
 import type { LimitDb } from '../../auth/rate-limit';
 import { pointsReason } from '../../db/schema/enums';
 import { pointsLedger } from '../../db/schema/points';
 import { users } from '../../db/schema/users';
 import { validDay, ZONE } from '../audit-list';
 import { isUuid } from '../users/target';
+import { readSuspicious, suspiciousCondition } from './suspicious';
 
 /* docs/05 section 12: the points ledger for staff; filter values are checked before reaching SQL. */
 
 export const pointsListOptions: ListOptions = {
 	sortable: ['createdAt', 'delta'],
-	filters: ['reason', 'from', 'to', 'manual', 'over'],
+	filters: ['reason', 'from', 'to', 'manual', 'over', 'suspicious'],
 	defaultSort: { key: 'createdAt', dir: 'desc' }
 };
 
@@ -61,7 +63,18 @@ export type PointsListRow = {
 	reversedById: string | null;
 };
 
-export function pointsConditions(state: ListState): SQL | undefined {
+/** Thresholds are read only when the "suspicious" filter is on (docs/03 section 6.4). */
+export async function suspiciousFor(
+	db: LimitDb,
+	state: ListState
+): Promise<SuspiciousThresholds | null> {
+	return state.filters.suspicious === '1' ? readSuspicious(db) : null;
+}
+
+export function pointsConditions(
+	state: ListState,
+	suspicious: SuspiciousThresholds | null
+): SQL | undefined {
 	const f = state.filters;
 	const where: (SQL | undefined)[] = [];
 	if (state.q) {
@@ -84,11 +97,16 @@ export function pointsConditions(state: ListState): SQL | undefined {
 		where.push(sql`${pointsLedger.createdAt} < (${to}::date + 1)::timestamp at time zone ${ZONE}`);
 	if (f.manual === '1') where.push(isNotNull(pointsLedger.createdBy));
 	if (f.over && OVER.test(f.over)) where.push(sql`abs(${pointsLedger.delta}) > ${Number(f.over)}`);
+	if (suspicious) where.push(suspiciousCondition(suspicious));
 	return and(...where);
 }
 
 /** The ledger with the member, the author and the reversal of each entry, if any. */
-export function pointsQuery(db: LimitDb, state: ListState) {
+export function pointsQuery(
+	db: LimitDb,
+	state: ListState,
+	suspicious: SuspiciousThresholds | null
+) {
 	const column = state.sort === 'delta' ? pointsLedger.delta : pointsLedger.createdAt;
 	return db
 		.select(pointsColumns)
@@ -96,7 +114,7 @@ export function pointsQuery(db: LimitDb, state: ListState) {
 		.innerJoin(users, eq(users.id, pointsLedger.userId))
 		.leftJoin(author, eq(author.id, pointsLedger.createdBy))
 		.leftJoin(reversal, eq(reversal.reversalOfId, pointsLedger.id))
-		.where(pointsConditions(state))
+		.where(pointsConditions(state, suspicious))
 		.orderBy(state.dir === 'asc' ? asc(column) : desc(column), desc(pointsLedger.id))
 		.$dynamic();
 }
@@ -105,11 +123,14 @@ export async function listPoints(
 	db: LimitDb,
 	state: ListState
 ): Promise<{ rows: PointsListRow[]; total: number }> {
-	const rows = await pointsQuery(db, state).limit(PAGE_SIZE).offset(pageOffset(state.page));
+	const suspicious = await suspiciousFor(db, state);
+	const rows = await pointsQuery(db, state, suspicious)
+		.limit(PAGE_SIZE)
+		.offset(pageOffset(state.page));
 	const [{ total }] = await db
 		.select({ total: count() })
 		.from(pointsLedger)
 		.innerJoin(users, eq(users.id, pointsLedger.userId))
-		.where(pointsConditions(state));
+		.where(pointsConditions(state, suspicious));
 	return { rows, total };
 }

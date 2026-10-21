@@ -13,6 +13,7 @@ const BY_SECTION: Record<string, CacheGroup[]> = {
 	/* /donate: purposes and the recent donations list */
 	'donation-purposes': ['settings'],
 	payments: ['settings'],
+	'point-rules': [],
 	media: ALL_GROUPS,
 	audit: [],
 	roles: [],

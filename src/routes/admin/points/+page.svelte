@@ -38,7 +38,12 @@
 			label: t('points.filter.manual'),
 			options: [{ value: '1', label: t('points.filter.manualOnly') }]
 		},
-		{ key: 'over', label: t('points.filter.over'), type: 'number' }
+		{ key: 'over', label: t('points.filter.over'), type: 'number' },
+		{
+			key: 'suspicious',
+			label: t('points.filter.suspicious'),
+			options: [{ value: '1', label: t('points.filter.manualOnly') }]
+		}
 	]);
 	type Row = (typeof data.rows)[number];
 	let target = $state<Row | null>(null);
