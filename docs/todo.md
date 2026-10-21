@@ -49,8 +49,8 @@
 ## Фазы
 
 - [x] SPEC
-- [ ] RED (`test: … [RED]`)
-- [ ] GREEN (`feat: … [GREEN]`)
-- [ ] REGRESS
+- [x] RED (`08c0c9d`; Vitest упал на отсутствии сервиса, e2e — маршрута нет)
+- [x] GREEN (`1260f29`; сервис 6/6, e2e 2/2, `check` 0, eslint чистый)
+- [x] REGRESS (Vitest 917/918 — `hero/public` часы; e2e `cabinet` 7/7, `admin-points` 2/2 со второго прогона)
 - [ ] REVIEW — общий в конце этапа 4
 - [ ] DEPLOY (только по апруву владельца)
