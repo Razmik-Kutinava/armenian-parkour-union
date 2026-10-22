@@ -1,58 +1,50 @@
 # todo — текущая задача (SBR)
 
 > Один живой файл на текущую задачу. Ведётся по `.cursor/rules/sbr.mdc`. После REVIEW очищается до шаблона, итог — в `PROGRESS.md` («Сделано»).
-> Памятки: 3.13 (песочница VPOS, боевая проверка, чек-лист ревью) — `git show c0779a9:docs/todo.md`; 4.3 (решения сервиса баллов) — `git show 4de7a8d:docs/todo.md`; 4.4a — `git show f9184bd:docs/todo.md`; 4.4b (с ответами владельца) — `git show d9f7832:docs/todo.md`; 4.5 — `git show 1260f29:docs/todo.md`; 4.6 — `git show 18f968c:docs/todo.md`; фото профиля (долг 3.10, шаг 1) — `git show 587ca52:docs/todo.md`; язык письма гостю (долг 3.7, миграция 0010) — `git show 5775200:docs/todo.md`; 5.1 таблицы (REVIEW — общим шагом в конце этапа 5) — `git show ce61380:docs/todo.md`.
+> Памятки: 3.13 (песочница VPOS, боевая проверка, чек-лист ревью) — `git show c0779a9:docs/todo.md`; 4.3 (решения сервиса баллов) — `git show 4de7a8d:docs/todo.md`; 4.4a — `git show f9184bd:docs/todo.md`; 4.4b (с ответами владельца) — `git show d9f7832:docs/todo.md`; 4.5 — `git show 1260f29:docs/todo.md`; 4.6 — `git show 18f968c:docs/todo.md`; фото профиля (долг 3.10, шаг 1) — `git show 587ca52:docs/todo.md`; язык письма гостю (долг 3.7, миграция 0010) — `git show 5775200:docs/todo.md`; 5.1 таблицы (REVIEW — общим шагом в конце этапа 5) — `git show ce61380:docs/todo.md`; 5.2 согласия — `git show 5729ebd:docs/todo.md`.
 
 ## Задача
 
-5.2 — согласия: загрузка участником (`/cabinet/documents`), админка проверки (`/admin/consents`, `05` § 10). Владелец 2026-10-22: REVIEW 5.1–5.x — одним шагом в конце этапа 5; здесь SPEC → RED → GREEN → REGRESS.
+5.3 — сервис регистраций: условия допуска (`03` § 7.2), лимит и очередь ожидания, транзакции, отмена участником, перевод из очереди с письмом. Только сервис — страница события 5.5, админка 5.7, оплата 5.4, баллы 5.6, остальные письма 5.9. Владелец 2026-10-22: REVIEW этапа 5 — одним шагом в конце; здесь SPEC → RED → GREEN → REGRESS.
 
-Решения владельца (2026-10-22): файлы — в **отдельном приватном бакете** R2 (`R2_PRIVATE_BUCKET`, те же ключи R2; без него загрузка — «недоступно»); JPEG / PNG / WebP / PDF до 10 МБ, тип — по первым байтам.
-
-Решения агента (в `decisions.md`):
-- Ключ `consents/<user id>/<uuid>.<ext>`; подпись — 10 в час на участника; просмотр — подписанная ссылка на 5 мин (`presignGet`, `Content-Type` по ключу), ни публичного URL, ни ключа в интерфейсе.
-- Виды в кабинете: несовершеннолетнему — `parental`, `medical`, `privacy`; взрослому — только `medical` (`03` § 13.4; фото взрослого — флаг `show_avatar`).
-- Каждая загрузка — новая строка `pending`; есть `pending` того же вида — файл заменяется в ней (старый объект удаляется). Одобренная остаётся в силе, пока новая на проверке.
-- `signed_at` — дата подписи, вводит участник (не в будущем); `guardian_name` — из профиля (`parental`, `privacy`).
-- «Действует» = `approved` и (`valid_until` пусто или > сейчас). `valid_until` — по желанию при одобрении, конец дня по Еревану, не в прошлом. Статус `expired` в базе не ставится (нужен cron) — истёкшее показывается «истекло» по дате.
-- Решение — только из `pending` (`FOR UPDATE`); отказ — с причиной (≤ 500); журнал `consent.approve` / `consent.reject` на пользователя; письмо участнику после коммита на его языке.
-- Модератор: имя, возраст, данные родителя; email — только с `users.read_full` (`04` § 4).
-- «Требует действия» в кабинете: несовершеннолетний без действующего `parental` и без `pending` — `consent_parental`.
+Решения агента (дефолты; `03` § 16 «по умолчанию», в `questions.md`):
+- Настройки — ключ `site_settings.event_registration` = `{ hold_minutes: 30, offer_hours: 48, cancel_hours: 0 }` (seed добавит; битый / нет — эти же значения). `cancel_hours` у `03` § 7.5 без дефолта — 0: отмена до начала события.
+- Допуск (порядок отказов): событие не видно (черновик, архив, `published_at > now`, удалено) или участник удалён — `not_found`; завершено / отменено — `closed`; уже есть живая регистрация — `already_registered`; окно — `not_open` / `closed`; заблокирован — `blocked`; email — `email_unverified`; членство — `no_membership`; у события есть категории — категория обязательна (`category_required`), чужая или лишняя — `category_invalid`; нет даты рождения — `birth_date_required`; младше 18 сегодня без действующего `parental` (`hasValidConsent`) — `parental_consent`; возраст на дату начала события (Ереван) вне `age_min…age_max` — `age_mismatch`.
+- Место: занимают `registered`, `pending_payment`, `attended`, `no_show`. Лимиты — `events.capacity` и `event_categories.capacity`; любой полон — `waitlist`. Иначе бесплатное — `registered`, платное — `pending_payment` с `hold_until = now + hold_minutes` (платёж — 5.4).
+- Транзакция: строка события `FOR UPDATE` первой (регистрации и отмены одного события идут по очереди). Повтор после отмены — та же строка: новый статус, категория, `registered_at = now`, результаты и платёж очищены.
+- Отмена участником: свои `registered` / `pending_payment` — до `starts_at − cancel_hours`; `waitlist` — до начала. Статус `cancelled`, `hold_until` пусто. Освободилось место у опубликованного события — `fillFromWaitlist`.
+- `fillFromWaitlist(tx, eventId, …)` (и для 5.4 / 5.7): очередь по `registered_at`, пропуская тех, чья категория полна; бесплатное — `registered`, платное — `pending_payment` с `hold_until = now + offer_hours`. Письмо «место освободилось» — после коммита, на языке участника, ошибка отправки не отменяет перевод. Повторно условия допуска при переводе не проверяются.
+- Журнал действий не пишем (действие участника, не админа). Баллы за регистрацию / снятие при отмене — 5.6; платёж `pending_payment` при отмене — 5.4; возврат — решает админ.
 
 ## Файлы (ожидаемо)
 
-- `src/lib/validation/consents.ts` — типы файлов, ключ, схемы форм
-- `src/lib/server/storage/types.ts`, `r2.ts`, `services/media/fake-storage.ts` — приватный бакет, `presignGet`
-- `src/lib/server/services/consents/` — `files.ts` (загрузка), `own.ts` (кабинет), `review.ts` + `mail.ts` (решение), `admin-list.ts` (список и карточка), `valid.ts` (действующее согласие — и для 5.3)
-- `src/routes/[[lang=lang]]/(site)/cabinet/documents/` — страница, загрузка; меню кабинета; `cabinet/overview.ts` — действие
-- `src/routes/admin/consents/` — список, `[id]` — карточка, «Одобрить» / «Отклонить»
-- `tests/e2e/admin-access-map.ts`, `admin-audit-map.ts`, `admin-audit-actions.ts`; `tests/e2e/consents.spec.ts`
-- `src/lib/i18n/messages/{en,hy,ru}-consents.ts`; `.env.example`
+- `src/lib/server/services/registrations/` — `settings.ts`, `admission.ts` (чистая проверка), `seats.ts`, `register.ts`, `cancel.ts`, `waitlist.ts`, `mail.ts`, `index.ts`, `test-support.ts` + тесты
+- `src/lib/server/seed/settings.ts` (+ test) — ключ `event_registration`
+- `src/lib/i18n/messages/{en,hy,ru}-registrations.ts`, `{en,hy,ru}.ts`
 
 ## Не ломать
 
-- Фото профиля (`services/cabinet/avatar.ts`) и медиатека — публичный бакет как был.
-- Доступ: участник видит только свои согласия; гость и `editor` в `/admin/consents` — 403/404 (`access-coverage`, `admin-permissions`).
-- Журнал: каждое действие админки — в картах (`audit-coverage`).
-- Обзор кабинета взрослого без изменений.
+- Согласия 5.2 (`hasValidConsent`), членство (`getMembershipOverview`) — только читаем.
+- Seed: добавляет только недостающие ключи.
+- Словари: `hy`, `ru` покрывают все ключи (`translate.test`).
 
 ## Проверка
 
-- `npx vitest --run src/lib/server/services/consents src/lib/server/services/cabinet src/routes/admin`
-- `npx playwright test tests/e2e/consents.spec.ts tests/e2e/admin-audit.spec.ts tests/e2e/admin-permissions.spec.ts`; `npm run check`, `npm run lint`
+- `npx vitest --run src/lib/server/services/registrations src/lib/server/seed src/lib/i18n`
+- `npm run check`, `npm run lint`; REGRESS — весь Vitest
 
 ## Риск
 
-`high` (личные данные несовершеннолетних, права, журнал).
+`high` (допуск несовершеннолетних, лимиты под гонкой) — REVIEW в конце этапа 5.
 
 ## Читать
 
-`02` § 9 · `03` § 13 · `04` § 2, 4, 5.1 · `05` § 10 · `06` § 5.1, 5.10
+`02` § 3 (`event_registrations`) · `03` § 7, 13, 16 · `04` § 3.1 · `07` § 5.3
 
 ## Фазы
 
 - [x] SPEC
-- [x] RED (`test: … [RED]`) — `3e016e9`: модулей и маршрутов нет, действия `consent_parental` нет
-- [x] GREEN (`feat: … [GREEN]`) — Vitest зоны 114/114; e2e `consents`, `admin-audit`, `admin-permissions` 7/7; `check` 0, `lint` чистый
-- [x] REGRESS — Vitest 983/983; e2e `cabinet`, `cabinet-avatar`, `i18n`, `csp` 16/16
+- [x] RED (`test: … [RED]`) — модулей `registrations/*` нет, ключа seed `event_registration` нет
+- [ ] GREEN (`feat: … [GREEN]`)
+- [ ] REGRESS
 - [ ] REVIEW — общим шагом в конце этапа 5 (решение владельца 2026-10-22)

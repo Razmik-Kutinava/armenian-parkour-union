@@ -9,6 +9,7 @@ import { SEED_SETTINGS, seedSettings } from './settings';
 const KEYS = [
 	'contacts',
 	'donation_limits',
+	'event_registration',
 	'feature_flags',
 	'footer',
 	'hero_max_active',
@@ -53,6 +54,14 @@ describe('seed: site_settings values', () => {
 			currency: 'AMD',
 			min_minor: 1000,
 			max_minor: 1_000_000
+		});
+	});
+
+	it('event registration: hold 30 min, 48 h to pay after the waitlist, cancel until the start', () => {
+		expect(SEED_SETTINGS.event_registration).toEqual({
+			hold_minutes: 30,
+			offer_hours: 48,
+			cancel_hours: 0
 		});
 	});
 
