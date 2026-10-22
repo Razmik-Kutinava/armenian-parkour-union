@@ -12,7 +12,8 @@
 		['cabinet.nav.profile', '/cabinet/profile'],
 		['cabinet.nav.membership', '/cabinet/membership'],
 		['cabinet.nav.points', '/cabinet/points'],
-		['cabinet.nav.payments', '/cabinet/payments']
+		['cabinet.nav.payments', '/cabinet/payments'],
+		['cabinet.nav.documents', '/cabinet/documents']
 	];
 	const current = (path: string) => {
 		const here = localizePath(page.url.pathname, 'en');

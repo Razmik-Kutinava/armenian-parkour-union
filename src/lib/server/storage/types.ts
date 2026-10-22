@@ -7,4 +7,9 @@ export interface Storage {
 	remove(key: string): Promise<void>;
 }
 
+/** A bucket with no public address: its files open only by a short-lived signed link. */
+export interface PrivateStorage extends Storage {
+	presignGet(key: string, mime: string): Promise<string>;
+}
+
 export class StorageNotConfigured extends Error {}

@@ -2,6 +2,7 @@ import type { Messages } from '../translate';
 import { hyCabinet } from './hy-cabinet';
 import { hyCabinetAvatar } from './hy-cabinet-avatar';
 import { hyCabinetPoints } from './hy-cabinet-points';
+import { hyConsents } from './hy-consents';
 import { hyDonate } from './hy-donate';
 import { hyEditor } from './hy-editor';
 import { hyEvents } from './hy-events';
@@ -41,6 +42,7 @@ export const hy: Partial<Messages> = {
 	...hyCabinet,
 	...hyCabinetPoints,
 	...hyCabinetAvatar,
+	...hyConsents,
 	'site.description':
 		'Armenian Parkour Union՝ միջոցառումներ, նորություններ, անդամակցություն և ատեստավորում։',
 	'site.underConstruction': 'Կայքը մշակման փուլում է։',

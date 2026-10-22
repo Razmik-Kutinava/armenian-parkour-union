@@ -74,7 +74,9 @@ describe('consent review forms', () => {
 	});
 
 	it('a refusal needs a reason up to 500 characters', () => {
-		expect(rejectSchema.parse({ note: '  Unreadable scan  ' })).toEqual({ note: 'Unreadable scan' });
+		expect(rejectSchema.parse({ note: '  Unreadable scan  ' })).toEqual({
+			note: 'Unreadable scan'
+		});
 		expect(rejectSchema.safeParse({ note: '   ' }).success).toBe(false);
 		expect(rejectSchema.safeParse({ note: 'x'.repeat(501) }).success).toBe(false);
 	});

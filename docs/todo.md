@@ -52,7 +52,7 @@
 ## Фазы
 
 - [x] SPEC
-- [ ] RED (`test: … [RED]`)
-- [ ] GREEN (`feat: … [GREEN]`)
-- [ ] REGRESS
+- [x] RED (`test: … [RED]`) — `3e016e9`: модулей и маршрутов нет, действия `consent_parental` нет
+- [x] GREEN (`feat: … [GREEN]`) — Vitest зоны 114/114; e2e `consents`, `admin-audit`, `admin-permissions` 7/7; `check` 0, `lint` чистый
+- [x] REGRESS — Vitest 983/983; e2e `cabinet`, `cabinet-avatar`, `i18n`, `csp` 16/16
 - [ ] REVIEW — общим шагом в конце этапа 5 (решение владельца 2026-10-22)

@@ -86,7 +86,7 @@ test('a moderator rejects with a reason, then approves; the member sees both', a
 
 	const first = await pending(member);
 	await staffPage.goto(`/admin/consents?q=${encodeURIComponent('Consent minor')}&status=pending`);
-	await staffPage.getByRole('link', { name: 'Consent minor' }).first().click();
+	await staffPage.getByRole('table').getByRole('link', { name: 'Consent minor' }).first().click();
 	await expect(staffPage).toHaveURL(new RegExp('/admin/consents/[0-9a-f-]{36}$'));
 	await staffPage.goto(`/admin/consents/${first}`);
 	await expect(staffPage.getByText('Anna Parent').first()).toBeVisible();
@@ -113,6 +113,7 @@ test('a moderator rejects with a reason, then approves; the member sees both', a
 	await expect(parental.getByText('Approved')).toBeVisible();
 	await page.goto('/cabinet');
 	await expect(page.getByText('Upload the parental consent')).toHaveCount(0);
-	const log = await sql`select action from audit_log where actor_id = ${moderator} order by created_at`;
+	const log =
+		await sql`select action from audit_log where actor_id = ${moderator} order by created_at`;
 	expect(log.map((r) => r.action)).toEqual(['consent.reject', 'consent.approve']);
 });

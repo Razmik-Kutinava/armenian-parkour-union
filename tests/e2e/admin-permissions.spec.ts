@@ -49,7 +49,9 @@ const insertConsent = async (userId: string) =>
 			returning id`
 	)[0].id as string;
 const consentRow = async (id: string) =>
-	(await sql`select status, reviewed_by, review_note, valid_until from consents where id = ${id}`)[0];
+	(
+		await sql`select status, reviewed_by, review_note, valid_until from consents where id = ${id}`
+	)[0];
 const pathOf = (key: string, ids: Parameters<typeof toPath>[1], consentId: string) =>
 	toPath(key, ids).replace('/consents/[id]', `/consents/${consentId}`);
 

@@ -22,7 +22,8 @@ export const limits = {
 	verifyResendPerUser: { windowMs: 60 * 60_000, max: 3 },
 	passwordChangePerUser: { windowMs: 15 * 60_000, max: 5 },
 	/** Each link lets the browser put a file of up to 5 MB into the public bucket. */
-	avatarUploadPerUser: { windowMs: 60 * 60_000, max: 10 }
+	avatarUploadPerUser: { windowMs: 60 * 60_000, max: 10 },
+	consentUploadPerUser: { windowMs: 60 * 60_000, max: 10 }
 } satisfies Record<string, LimitRule>;
 
 /* Fixed window per key; `last_request` holds the start of the current window (ms). */

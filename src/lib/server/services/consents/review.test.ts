@@ -29,7 +29,10 @@ const stored = async (tx: LimitDb, id: string) =>
 	(await tx.select().from(consents).where(eq(consents.id, id)))[0];
 
 const auditOf = (tx: LimitDb, actorId: string) =>
-	tx.select().from(auditLog).where(and(eq(auditLog.actorId, actorId)));
+	tx
+		.select()
+		.from(auditLog)
+		.where(and(eq(auditLog.actorId, actorId)));
 
 describe.skipIf(!testDbUrl)('consents: review', () => {
 	const { inRollback, close } = testDb();
@@ -99,9 +102,7 @@ describe.skipIf(!testDbUrl)('consents: review', () => {
 				expect(await approveConsent(tx, moderator, done.id, { validUntil: null }, d)).toBe(
 					'wrong_status'
 				);
-				expect(await rejectConsent(tx, moderator, done.id, { note: 'x' }, d)).toBe(
-					'wrong_status'
-				);
+				expect(await rejectConsent(tx, moderator, done.id, { note: 'x' }, d)).toBe('wrong_status');
 				expect((await stored(tx, done.id)).status).toBe(status);
 				expect(d.sent).toHaveLength(0);
 			}
@@ -119,9 +120,7 @@ describe.skipIf(!testDbUrl)('consents: review', () => {
 				expect(await approveConsent(tx, actorRef, consent.id, { validUntil: null }, d)).toBe(
 					'not_allowed'
 				);
-				expect(await rejectConsent(tx, actorRef, consent.id, { note: 'x' }, d)).toBe(
-					'not_allowed'
-				);
+				expect(await rejectConsent(tx, actorRef, consent.id, { note: 'x' }, d)).toBe('not_allowed');
 			}
 			expect((await stored(tx, consent.id)).status).toBe('pending');
 			const d = deps();
