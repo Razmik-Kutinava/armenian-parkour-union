@@ -65,6 +65,7 @@ export async function startOnlinePayment(
 				currency: input.currency,
 				provider: provider.id,
 				expiresAt: new Date(Date.now() + input.holdMinutes * 60_000),
+				locale: input.locale,
 				membershipId: input.membershipId ?? null,
 				donationPurposeId: input.donation?.purposeId ?? null,
 				donorName: input.donation?.donorName ?? null,
