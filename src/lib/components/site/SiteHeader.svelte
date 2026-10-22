@@ -5,7 +5,7 @@
 	import Disclosure from './Disclosure.svelte';
 	import LanguageSwitcher from './LanguageSwitcher.svelte';
 
-	/* siteName — site_settings; the logo SVG from static/brand/ replaces it when it arrives (docs/08 section 2). */
+	/* siteName — site_settings; the logo is decorative next to it (docs/08 section 2: at least 32 px). */
 	let { viewer, siteName }: { viewer: Viewer | null; siteName: string | null } = $props();
 
 	/* docs/06 section 2. Pages appear in stages 2–7; until then the links lead to 404 (decisions, 1.8). */
@@ -50,8 +50,9 @@
 	<div class="mx-auto flex max-w-6xl items-center gap-2 px-4 py-2">
 		<a
 			href={href('/')}
-			class="mr-auto rounded-sm py-2 text-lg font-bold whitespace-nowrap focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-500 lg:mr-4"
+			class="mr-auto flex items-center gap-3 rounded-sm py-1 text-lg font-bold whitespace-nowrap focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-500 lg:mr-4"
 		>
+			<img src="/brand/logo-square-light.svg" alt="" width="44" height="44" class="size-11" />
 			{siteName ?? t('site.name')}
 		</a>
 

@@ -1,6 +1,5 @@
 <script lang="ts">
 	import '../app.css';
-	import favicon from '#lib/assets/favicon.svg';
 	import { currentLocale } from '#lib/i18n/index.svelte.ts';
 	import type { LayoutProps } from './$types';
 
@@ -13,7 +12,7 @@
 </script>
 
 <svelte:head>
-	<link rel="icon" href={favicon} />
+	<link rel="icon" href="/brand/favicon.svg" type="image/svg+xml" />
 	<link
 		rel="preload"
 		href="/fonts/apu-sans/apu-sans-400.woff2"
