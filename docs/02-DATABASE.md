@@ -261,9 +261,10 @@
 | failure_reason | text null | `amount_mismatch`, `provider_error`, `declined` и т. п. |
 | needs_review | boolean default false | флаг «требует проверки админом» |
 | membership_id | uuid FK memberships null | связь с членством (если нужна прямая ссылка) |
+| locale | text null | язык страницы при онлайн-оплате; письма гостю — на нём, `null` — EN |
 | created_at, updated_at | timestamptz | |
 
-Ограничения: unique(`provider`, `provider_payment_id`) where `provider_payment_id is not null`.
+Ограничения: unique(`provider`, `provider_payment_id`) where `provider_payment_id is not null`; `locale is null or locale in ('en','hy','ru')`.
 Индексы: `user_id`, (`kind`, `status`), `paid_at`, (`status`, `expires_at`) для фоновой сверки.
 Правила:
 - Членский взнос и донат это **разные** `kind`, обрабатываются разными сценариями.
