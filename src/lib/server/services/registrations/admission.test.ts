@@ -32,9 +32,13 @@ describe('registrations: admission', () => {
 	it('the registration window: not open yet, closed, the event has started', () => {
 		const event = input().event;
 		expect(
-			checkAdmission(input({ event: { ...event, registrationOpensAt: new Date(NOW.getTime() + HOUR) } }))
+			checkAdmission(
+				input({ event: { ...event, registrationOpensAt: new Date(NOW.getTime() + HOUR) } })
+			)
 		).toBe('not_open');
-		expect(checkAdmission(input({ event: { ...event, registrationClosesAt: NOW } }))).toBe('closed');
+		expect(checkAdmission(input({ event: { ...event, registrationClosesAt: NOW } }))).toBe(
+			'closed'
+		);
 		expect(checkAdmission(input({ event: { ...event, startsAt: NOW } }))).toBe('closed');
 	});
 
@@ -48,7 +52,13 @@ describe('registrations: admission', () => {
 	});
 
 	it('a live registration blocks a second one; a cancelled one may be renewed', () => {
-		for (const existing of ['registered', 'pending_payment', 'waitlist', 'attended', 'no_show'] as const) {
+		for (const existing of [
+			'registered',
+			'pending_payment',
+			'waitlist',
+			'attended',
+			'no_show'
+		] as const) {
 			expect(checkAdmission(input({ existing })), existing).toBe('already_registered');
 		}
 		expect(checkAdmission(input({ existing: 'cancelled' }))).toBeNull();
@@ -88,7 +98,9 @@ describe('registrations: admission', () => {
 	it('the category age counts on the event start date', () => {
 		const user = { ...input().user, birthDate: bornBefore(12, START) };
 		const twelve = [{ id: CAT, ageMin: 12, ageMax: 14 }];
-		expect(checkAdmission(input({ user, parentalConsent: true, categories: twelve, categoryId: CAT }))).toBeNull();
+		expect(
+			checkAdmission(input({ user, parentalConsent: true, categories: twelve, categoryId: CAT }))
+		).toBeNull();
 		const older = [{ id: CAT, ageMin: 13, ageMax: null }];
 		expect(
 			checkAdmission(input({ user, parentalConsent: true, categories: older, categoryId: CAT }))
@@ -96,7 +108,9 @@ describe('registrations: admission', () => {
 		const adult = { ...input().user, birthDate: bornBefore(15, START) };
 		const younger = [{ id: CAT, ageMin: null, ageMax: 14 }];
 		expect(
-			checkAdmission(input({ user: adult, parentalConsent: true, categories: younger, categoryId: CAT }))
+			checkAdmission(
+				input({ user: adult, parentalConsent: true, categories: younger, categoryId: CAT })
+			)
 		).toBe('age_mismatch');
 	});
 });

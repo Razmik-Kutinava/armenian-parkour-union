@@ -17,6 +17,7 @@ import { enPayment } from './en-payment';
 import { enPaymentsAdmin } from './en-payments-admin';
 import { enPointRulesAdmin } from './en-point-rules-admin';
 import { enPointsAdmin } from './en-points-admin';
+import { enRegistrations } from './en-registrations';
 import { enSystem } from './en-system';
 import { enUsers } from './en-users';
 
@@ -43,6 +44,7 @@ export const en = {
 	...enCabinetPoints,
 	...enCabinetAvatar,
 	...enConsents,
+	...enRegistrations,
 	'site.name': 'Armenian Parkour Union',
 	'site.description': 'Armenian Parkour Union: events, news, membership and certification.',
 	'site.underConstruction': 'Site under construction.',

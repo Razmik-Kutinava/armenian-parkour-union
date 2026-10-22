@@ -15,10 +15,11 @@
 - Отмена участником: свои `registered` / `pending_payment` — до `starts_at − cancel_hours`; `waitlist` — до начала. Статус `cancelled`, `hold_until` пусто. Освободилось место у опубликованного события — `fillFromWaitlist`.
 - `fillFromWaitlist(tx, eventId, …)` (и для 5.4 / 5.7): очередь по `registered_at`, пропуская тех, чья категория полна; бесплатное — `registered`, платное — `pending_payment` с `hold_until = now + offer_hours`. Письмо «место освободилось» — после коммита, на языке участника, ошибка отправки не отменяет перевод. Повторно условия допуска при переводе не проверяются.
 - Журнал действий не пишем (действие участника, не админа). Баллы за регистрацию / снятие при отмене — 5.6; платёж `pending_payment` при отмене — 5.4; возврат — решает админ.
+- Повтор после отмены не трогает `payment_id` (старый платёж может требовать возврата; ссылки из `payments` на регистрацию нет — решить в 5.4). Гонка одновременных регистраций (тест с коммитами) — 5.10; здесь защита — блокировка строки события.
 
 ## Файлы (ожидаемо)
 
-- `src/lib/server/services/registrations/` — `settings.ts`, `admission.ts` (чистая проверка), `seats.ts`, `register.ts`, `cancel.ts`, `waitlist.ts`, `mail.ts`, `index.ts`, `test-support.ts` + тесты
+- `src/lib/server/services/registrations/` — `settings.ts`, `admission.ts` (чистая проверка), `admission-data.ts` (чтение под блокировкой), `seats.ts`, `register.ts`, `cancel.ts`, `waitlist.ts`, `mail.ts`, `index.ts`, `test-support.ts` + тесты
 - `src/lib/server/seed/settings.ts` (+ test) — ключ `event_registration`
 - `src/lib/i18n/messages/{en,hy,ru}-registrations.ts`, `{en,hy,ru}.ts`
 
@@ -45,6 +46,6 @@
 
 - [x] SPEC
 - [x] RED (`test: … [RED]`) — модулей `registrations/*` нет, ключа seed `event_registration` нет
-- [ ] GREEN (`feat: … [GREEN]`)
+- [x] GREEN (`feat: … [GREEN]`) — Vitest зоны 90/90 (registrations 31, seed, i18n); `check` 0, `lint` чистый
 - [ ] REGRESS
 - [ ] REVIEW — общим шагом в конце этапа 5 (решение владельца 2026-10-22)

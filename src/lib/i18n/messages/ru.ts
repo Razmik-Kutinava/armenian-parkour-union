@@ -18,6 +18,7 @@ import { ruPayment } from './ru-payment';
 import { ruPaymentsAdmin } from './ru-payments-admin';
 import { ruPointRulesAdmin } from './ru-point-rules-admin';
 import { ruPointsAdmin } from './ru-points-admin';
+import { ruRegistrations } from './ru-registrations';
 import { ruSystem } from './ru-system';
 import { ruUsers } from './ru-users';
 
@@ -43,6 +44,7 @@ export const ru: Partial<Messages> = {
 	...ruCabinetPoints,
 	...ruCabinetAvatar,
 	...ruConsents,
+	...ruRegistrations,
 	'site.description': 'Союз паркура Армении: события, новости, членство и аттестация.',
 	'site.underConstruction': 'Сайт в разработке.',
 	'common.close': 'Закрыть',

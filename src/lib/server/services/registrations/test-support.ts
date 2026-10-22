@@ -5,6 +5,7 @@ import { memberships } from '../../db/schema/payments';
 import { eventRegistrations } from '../../db/schema/registrations';
 import { insertUser } from '../../db/test-db';
 import type { Mail } from '../../mail/resend';
+import { registerForEvent } from './register';
 import type { RegistrationSettings } from './settings';
 
 /* Test support only: registration tests run inside a rolled-back transaction; settings are passed in. */
@@ -84,4 +85,27 @@ export function mailbox(failing = false) {
 		sent.push(mail);
 	};
 	return { sent, send };
+}
+
+export const cancelDeps = (box = mailbox(), settings = SETTINGS) => ({
+	settings,
+	send: box.send,
+	siteUrl: SITE
+});
+
+/** Registers or throws: for tests about what happens after. */
+export async function registerOk(
+	tx: LimitDb,
+	userId: string,
+	eventId: string,
+	categoryId: string | null = null
+) {
+	const result = await registerForEvent(
+		tx,
+		userId,
+		{ eventId, categoryId },
+		{ settings: SETTINGS }
+	);
+	if (!result.ok) throw new Error(result.reason);
+	return result;
 }
