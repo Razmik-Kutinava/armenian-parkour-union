@@ -1,6 +1,7 @@
 import { existsSync } from 'node:fs';
 import { expect, test, type Page } from '@playwright/test';
 import postgres from 'postgres';
+import { hydrated } from './hydrated';
 
 if (!process.env.DATABASE_URL && existsSync('.env')) process.loadEnvFile('.env');
 const sql = postgres(process.env.DATABASE_URL ?? '', { max: 1, onnotice: () => {} });
@@ -75,6 +76,7 @@ test('settings: saved, logged with before and after, shown in the site footer', 
 	const admin = await registerAs(page, 'admin');
 	const phone = `+374 10 ${String(Math.floor(Math.random() * 1e6)).padStart(6, '0')}`;
 	await page.goto('/admin/settings');
+	await hydrated(page);
 	await page.getByLabel('Federation name (English)').fill('Armenian Parkour Union');
 	await page.getByLabel('Description for search engines (English)').fill('Parkour in Armenia');
 	await page.getByLabel('Phone', { exact: true }).fill(phone);
@@ -96,6 +98,7 @@ test('settings: footer links and the site name in the header come from the datab
 	await registerAs(page, 'admin');
 	const tag = crypto.randomUUID().slice(0, 8);
 	await page.goto('/admin/settings');
+	await hydrated(page);
 	/* Replace links left by earlier runs: the list holds at most 10. */
 	await page
 		.locator('input[name^="footer.links."]')
@@ -122,6 +125,7 @@ test('settings: footer links and the site name in the header come from the datab
 test('settings: a footer link to another host is refused', async ({ page }) => {
 	await registerAs(page, 'admin');
 	await page.goto('/admin/settings');
+	await hydrated(page);
 	await page.locator('input[name="footer.links.0.label.en"]').fill('Evil');
 	await page.locator('input[name="footer.links.0.url"]').fill('//evil.example');
 	await page.getByRole('button', { name: 'Save' }).click();
@@ -133,6 +137,7 @@ test('settings: a footer link to another host is refused', async ({ page }) => {
 test('settings: an http link is refused with a message at the field', async ({ page }) => {
 	await registerAs(page, 'admin');
 	await page.goto('/admin/settings');
+	await hydrated(page);
 	await page.getByLabel('Instagram').fill('http://instagram.com/apu');
 	await page.getByRole('button', { name: 'Save' }).click();
 	await expect(page.getByText('Enter a link starting with https://')).toBeVisible();

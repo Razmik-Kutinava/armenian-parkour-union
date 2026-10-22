@@ -36,12 +36,14 @@ test('editor writes a draft, previews, publishes; guest reads it with Open Graph
 	const guest = await (await browser.newContext()).newPage();
 	const slug = `e2e-news-${crypto.randomUUID().slice(0, 8)}`;
 	const tag = `e2e-${crypto.randomUUID().slice(0, 6)}`;
+	/* Unique: a run cut short leaves its published post in the list. */
+	const title = `Summer jam ${tag}`;
 
 	await page.goto('/admin/news');
 	await page.getByRole('link', { name: 'New post' }).click();
 	await expect(page).toHaveURL('/admin/news/new');
 	await page.getByLabel('Address').fill(slug);
-	await page.getByLabel('Title (English)').fill('Summer jam');
+	await page.getByLabel('Title (English)').fill(title);
 	await page.getByLabel('Excerpt (English)').fill('Jam in Yerevan on Saturday');
 	await page.getByRole('textbox', { name: 'Text (English)' }).click();
 	await page.keyboard.type('Bring water and good shoes');
@@ -54,7 +56,7 @@ test('editor writes a draft, previews, publishes; guest reads it with Open Graph
 
 	expect((await guest.goto(`/news/${slug}`))?.status()).toBe(404);
 	await guest.goto('/news');
-	await expect(guest.getByRole('link', { name: 'Summer jam' })).toHaveCount(0);
+	await expect(guest.getByRole('link', { name: title })).toHaveCount(0);
 
 	const preview = await page.request.get(`/admin/news/${row.id}/preview`);
 	expect(preview.status()).toBe(200);
@@ -68,11 +70,11 @@ test('editor writes a draft, previews, publishes; guest reads it with Open Graph
 	expect((await sql`select status from posts where id = ${row.id}`)[0].status).toBe('published');
 
 	expect((await guest.goto(`/news?tag=${tag}`))?.status()).toBe(200);
-	await guest.getByRole('link', { name: 'Summer jam' }).click();
+	await guest.getByRole('link', { name: title }).click();
 	await expect(guest).toHaveURL(`/news/${slug}`);
-	await expect(guest.getByRole('heading', { level: 1, name: 'Summer jam' })).toBeVisible();
+	await expect(guest.getByRole('heading', { level: 1, name: title })).toBeVisible();
 	await expect(guest.getByText('Bring water and good shoes')).toBeVisible();
-	expect(await meta(guest, 'og:title')).toBe('Summer jam');
+	expect(await meta(guest, 'og:title')).toBe(title);
 	expect(await meta(guest, 'og:description')).toBe('Jam in Yerevan on Saturday');
 	expect(await meta(guest, 'og:type')).toBe('article');
 	expect(await meta(guest, 'og:url')).toMatch(new RegExp(`/news/${slug}$`));
@@ -81,7 +83,7 @@ test('editor writes a draft, previews, publishes; guest reads it with Open Graph
 		new RegExp(`/news/${slug}$`)
 	);
 	const ld = JSON.parse((await guest.locator('script[type="application/ld+json"]').textContent())!);
-	expect(ld).toMatchObject({ '@type': 'Article', headline: 'Summer jam' });
+	expect(ld).toMatchObject({ '@type': 'Article', headline: title });
 
 	await page.getByLabel('Publication date').fill('2099-01-01T10:00');
 	await page.getByRole('button', { name: 'Save' }).click();

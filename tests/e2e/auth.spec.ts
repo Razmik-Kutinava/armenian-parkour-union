@@ -114,13 +114,23 @@ test('blocking takes effect on the next request, not when the session ends', asy
 });
 
 test('sixth login attempt in a minute is refused', async ({ page }) => {
+	test.setTimeout(120_000);
 	const email = newEmail();
-	for (let i = 0; i < 5; i++) {
-		await logIn(page, email, 'wrong-password');
-		await expect(page.getByText('Wrong email or password')).toBeVisible();
+	/* The counter is per address and shared with every spec: another login spends an attempt, and
+	 * google-auth.spec.ts resets the counter. The whole series is repeated until no one cut in. */
+	try {
+		await expect(async () => {
+			await sql`delete from rate_limit where key ~ '^sign-in:ip:(127\.0\.0\.1|::1|::ffff:127\.0\.0\.1)$'`;
+			for (let i = 0; i < 5; i++) {
+				await logIn(page, email, 'wrong-password');
+				await expect(page.getByText('Wrong email or password')).toBeVisible({ timeout: 5000 });
+			}
+			await logIn(page, email, 'wrong-password');
+			await expect(page.getByText('Too many attempts')).toBeVisible({ timeout: 5000 });
+		}).toPass({ timeout: 100_000 });
+	} finally {
+		await sql`delete from rate_limit where key ~ '^sign-in:ip:(127\.0\.0\.1|::1|::ffff:127\.0\.0\.1)$'`;
 	}
-	await logIn(page, email, 'wrong-password');
-	await expect(page.getByText('Too many attempts')).toBeVisible();
 });
 
 test('password reset by link sets a new password', async ({ page }) => {

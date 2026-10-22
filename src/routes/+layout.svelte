@@ -9,6 +9,10 @@
 	$effect(() => {
 		document.documentElement.lang = currentLocale();
 	});
+	/* e2e waits for this mark: input typed before hydration is overwritten or half-applied. */
+	$effect(() => {
+		document.documentElement.dataset.hydrated = '';
+	});
 </script>
 
 <svelte:head>

@@ -34,12 +34,14 @@ test('editor creates and publishes a page, guest reads it, draft and deleted are
 	await registerEditor(page);
 	const guest = await (await browser.newContext()).newPage();
 	const slug = `e2e-page-${crypto.randomUUID().slice(0, 8)}`;
+	/* Unique: a run cut short leaves its page in the list. */
+	const title = `Summer camp ${slug}`;
 
 	await page.goto('/admin/pages');
 	await page.getByRole('link', { name: 'New page' }).click();
 	await expect(page).toHaveURL('/admin/pages/new');
 	await page.getByLabel('Address').fill(slug);
-	await page.getByLabel('Title (English)').fill('Summer camp');
+	await page.getByLabel('Title (English)').fill(title);
 	await page.getByRole('textbox', { name: 'Text (English)' }).click();
 	await page.keyboard.type('Training every morning');
 	await page.getByLabel('Status').selectOption('published');
@@ -50,10 +52,10 @@ test('editor creates and publishes a page, guest reads it, draft and deleted are
 	expect(row.body.en).toContain('Training every morning');
 
 	expect((await guest.goto(`/pages/${slug}`))?.status()).toBe(200);
-	await expect(guest.getByRole('heading', { name: 'Summer camp' })).toBeVisible();
+	await expect(guest.getByRole('heading', { name: title })).toBeVisible();
 	await expect(guest.getByText('Training every morning')).toBeVisible();
 	await guest.goto(`/ru/pages/${slug}`);
-	await expect(guest.getByRole('heading', { name: 'Summer camp' })).toBeVisible();
+	await expect(guest.getByRole('heading', { name: title })).toBeVisible();
 
 	await page.getByLabel('Status').selectOption('draft');
 	await page.getByRole('button', { name: 'Save' }).click();
@@ -63,7 +65,7 @@ test('editor creates and publishes a page, guest reads it, draft and deleted are
 	await page.getByRole('button', { name: 'Delete' }).click();
 	await page.getByRole('dialog').getByRole('button', { name: 'Delete' }).click();
 	await expect(page).toHaveURL('/admin/pages');
-	await expect(page.getByRole('link', { name: 'Summer camp' })).toHaveCount(0);
+	await expect(page.getByRole('link', { name: title })).toHaveCount(0);
 	expect(
 		(await sql`select deleted_at from pages where id = ${row.id}`)[0].deleted_at
 	).not.toBeNull();

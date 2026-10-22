@@ -60,7 +60,7 @@ test('guest: /join shows the fee and offers to sign up or log in, no pay button'
 	const response = await page.goto('/join');
 	expect(response?.status()).toBe(200);
 	const main = page.locator('main');
-	await expect(main.getByText('Membership fee')).toBeVisible();
+	await expect(main.getByRole('heading', { name: 'Membership fee', exact: true })).toBeVisible();
 	await expect(main.getByText(/20,000/)).toBeVisible();
 	await expect(main.getByText(/12 months/)).toBeVisible();
 	await expect(main.getByRole('link', { name: 'Create an account' })).toHaveAttribute(

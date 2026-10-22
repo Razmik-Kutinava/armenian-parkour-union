@@ -48,7 +48,7 @@ describe.skipIf(!testDbUrl)('hero: blocks on the home page', () => {
 			await add(tx, { sortOrder: 0, isActive: false });
 			await add(tx, { sortOrder: 0, archivedAt: new Date() });
 			await add(tx, { sortOrder: 0, startsAt: new Date(now + DAY) });
-			await add(tx, { sortOrder: 0, endsAt: new Date(now - 1000) });
+			await add(tx, { sortOrder: 0, endsAt: new Date(now - DAY) });
 			expect(await ids(tx)).toEqual([first, second]);
 		});
 	});

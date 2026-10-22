@@ -1,6 +1,7 @@
 import { existsSync } from 'node:fs';
 import { expect, test, type Page } from '@playwright/test';
 import postgres from 'postgres';
+import { hydrated } from './hydrated';
 
 if (!process.env.DATABASE_URL && existsSync('.env')) process.loadEnvFile('.env');
 const sql = postgres(process.env.DATABASE_URL ?? '', { max: 1, onnotice: () => {} });
@@ -112,6 +113,7 @@ test('on a phone the sidebar opens from the menu button', async ({ page }) => {
 	await registerAs(page, 'editor');
 	await page.setViewportSize({ width: 360, height: 740 });
 	await page.goto('/admin');
+	await hydrated(page);
 	await expect(sidebar(page).getByRole('link', { name: 'News' })).toBeHidden();
 	await page.getByRole('button', { name: 'Menu' }).click();
 	await expect(sidebar(page).getByRole('link', { name: 'News' })).toBeVisible();

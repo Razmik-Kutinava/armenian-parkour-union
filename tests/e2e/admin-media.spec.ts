@@ -1,6 +1,7 @@
 import { existsSync } from 'node:fs';
 import { expect, test, type Page } from '@playwright/test';
 import postgres from 'postgres';
+import { hydrated } from './hydrated';
 
 if (!process.env.DATABASE_URL && existsSync('.env')) process.loadEnvFile('.env');
 const sql = postgres(process.env.DATABASE_URL ?? '', { max: 1, onnotice: () => {} });
@@ -64,6 +65,7 @@ test('editor finds a file, sets alt, cannot delete it while used, deletes it aft
 
 	await sql`update users set avatar_key = null where id = ${editorId}`;
 	await page.reload();
+	await hydrated(page);
 	await page.getByRole('button', { name: 'Delete' }).click();
 	await page.getByRole('dialog').getByRole('button', { name: 'Delete' }).click();
 	await expect(page).toHaveURL('/admin/media');
@@ -74,6 +76,7 @@ test('editor finds a file, sets alt, cannot delete it while used, deletes it aft
 test('the uploader refuses SVG and files over 10 MB before sending anything', async ({ page }) => {
 	await registerEditor(page);
 	await page.goto('/admin/media');
+	await hydrated(page);
 	const signs: string[] = [];
 	page.on('request', (r) => r.url().includes('?/sign') && signs.push(r.url()));
 
