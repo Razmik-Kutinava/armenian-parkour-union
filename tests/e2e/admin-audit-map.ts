@@ -55,7 +55,9 @@ export const ADMIN_AUDIT = {
 	'/admin/point-rules/[id]?/default': ['points.rule_update'],
 	'/admin/point-rules?/thresholds': ['settings.update'],
 	'/admin/donation-purposes/new?/default': ['donation_purpose.create'],
-	'/admin/donation-purposes/[id]?/update': ['donation_purpose.update']
+	'/admin/donation-purposes/[id]?/update': ['donation_purpose.update'],
+	'/admin/consents/[id]?/approve': ['consent.approve'],
+	'/admin/consents/[id]?/reject': ['consent.reject']
 } as const;
 
 export type AdminAction = keyof typeof ADMIN_AUDIT;

@@ -41,6 +41,18 @@ const {
 	heroRow
 } = permissionFixtures(sql);
 
+/* Pending: approve and reject could really run on it. */
+const insertConsent = async (userId: string) =>
+	(
+		await sql`insert into consents (user_id, kind, file_key, signed_at)
+			values (${userId}, 'medical', ${`consents/${userId}/${crypto.randomUUID()}.pdf`}, now())
+			returning id`
+	)[0].id as string;
+const consentRow = async (id: string) =>
+	(await sql`select status, reviewed_by, review_note, valid_until from consents where id = ${id}`)[0];
+const pathOf = (key: string, ids: Parameters<typeof toPath>[1], consentId: string) =>
+	toPath(key, ids).replace('/consents/[id]', `/consents/${consentId}`);
+
 for (const role of ['member', 'editor', 'moderator'] as const) {
 	test(`${role}: every admin page and action answers by docs/04, data stays`, async ({ page }) => {
 		test.setTimeout(90_000);
@@ -67,16 +79,18 @@ for (const role of ['member', 'editor', 'moderator'] as const) {
 		const postBefore = await postRow(ids.postId);
 		const eventBefore = await eventRows(ids.eventId);
 		const heroBefore = await heroRow(ids.heroId);
+		const consentId = await insertConsent(target);
+		const consentBefore = await consentRow(consentId);
 		await registerAs(page, role);
 
 		for (const [key, access] of Object.entries(ADMIN_READS)) {
-			const res = await page.request.get(toPath(key, ids), { maxRedirects: 0 });
+			const res = await page.request.get(pathOf(key, ids, consentId), { maxRedirects: 0 });
 			expect(res.status(), `GET ${key}`).toBe(expectedStatus(role, access));
 		}
 		for (const [key, access] of Object.entries(ADMIN_WRITES)) {
 			const expected = expectedStatus(role, access);
 			if (expected === 200) continue;
-			const res = await page.request.post(toPath(key, ids), {
+			const res = await page.request.post(pathOf(key, ids, consentId), {
 				form: HOSTILE_FORM(target, ids.heroId, entryId),
 				headers: ORIGIN,
 				maxRedirects: 0
@@ -93,6 +107,7 @@ for (const role of ['member', 'editor', 'moderator'] as const) {
 		expect(await moneyRows(ids.paymentId, ids.purposeId)).toEqual(moneyBefore);
 		expect(await pointsRows(target)).toEqual(pointsBefore);
 		expect(await ruleRow(ids.ruleId)).toEqual(ruleBefore);
+		expect(await consentRow(consentId)).toEqual(consentBefore);
 		expect(
 			await sql`select 1 from audit_log where entity_id in (${target}, ${ids.mediaId}, ${ids.pageId}, ${ids.postId}, ${ids.eventId}, ${ids.heroId}, ${ids.paymentId}, ${ids.purposeId}, ${ids.ruleId})`
 		).toHaveLength(0);
@@ -143,8 +158,9 @@ test('admin opens every admin page; audit pages take no writes and the entry sta
 		purposeId: await insertPurpose(),
 		ruleId: await insertRule()
 	};
+	const consentId = await insertConsent(target);
 	for (const key of Object.keys(ADMIN_READS)) {
-		const res = await page.request.get(toPath(key, ids), { maxRedirects: 0 });
+		const res = await page.request.get(pathOf(key, ids, consentId), { maxRedirects: 0 });
 		expect(res.status(), `GET ${key}`).toBe(200);
 	}
 	for (const path of ['/admin/audit', `/admin/audit/${entry.id}`, '/admin/audit/export']) {

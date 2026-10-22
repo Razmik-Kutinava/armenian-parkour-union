@@ -48,7 +48,9 @@ export const ADMIN_READS = {
 	'/admin/point-rules/[id]': 'points.rules',
 	'/admin/donation-purposes': 'donations.config',
 	'/admin/donation-purposes/new': 'donations.config',
-	'/admin/donation-purposes/[id]': 'donations.config'
+	'/admin/donation-purposes/[id]': 'donations.config',
+	'/admin/consents': 'consents.review',
+	'/admin/consents/[id]': 'consents.review'
 } as const satisfies Record<string, Access>;
 
 export const ADMIN_WRITES = {
@@ -105,5 +107,7 @@ export const ADMIN_WRITES = {
 	'/admin/point-rules?/thresholds': 'points.rules',
 	'/admin/donation-purposes/new?/default': 'donations.config',
 	'/admin/donation-purposes/[id]?/update': 'donations.config',
+	'/admin/consents/[id]?/approve': 'consents.review',
+	'/admin/consents/[id]?/reject': 'consents.review',
 	'POST /admin/locale': 'staff'
 } as const satisfies Record<AdminAction | NotAuditedAction, Access>;

@@ -2,6 +2,7 @@ import { afterAll, describe, expect, it } from 'vitest';
 import type { LimitDb } from '../../auth/rate-limit';
 import { memberships } from '../../db/schema/payments';
 import { insertUser, testDb, testDbUrl } from '../../db/test-db';
+import { bornYearsAgo, insertConsent } from '../consents/test-support';
 import { daysFromNow } from '../memberships/test-support';
 import { getCabinetOverview } from './overview';
 
@@ -83,6 +84,24 @@ describe.skipIf(!testDbUrl)('cabinet: overview', () => {
 			const o = await getCabinetOverview(tx, user.id);
 			expect(o?.membership.active).toBe(false);
 			expect(o?.actions).toEqual(['join']);
+		});
+	});
+
+	it('a minor without a parental consent in force or under review: "consent needed"', async () => {
+		await inRollback(async (tx) => {
+			const child = await insertUser(tx, { emailVerified: true, birthDate: bornYearsAgo(12) });
+			await period(tx, child.id, 'active', -10, 355);
+			expect((await getCabinetOverview(tx, child.id))?.actions).toEqual(['consent_parental']);
+			await insertConsent(tx, child.id, { status: 'rejected' });
+			await insertConsent(tx, child.id, { status: 'approved', validUntil: daysFromNow(-1) });
+			expect((await getCabinetOverview(tx, child.id))?.actions).toEqual(['consent_parental']);
+			await insertConsent(tx, child.id, { status: 'pending' });
+			expect((await getCabinetOverview(tx, child.id))?.actions).toEqual([]);
+
+			const other = await insertUser(tx, { emailVerified: true, birthDate: bornYearsAgo(12) });
+			await period(tx, other.id, 'active', -10, 355);
+			await insertConsent(tx, other.id, { status: 'approved' });
+			expect((await getCabinetOverview(tx, other.id))?.actions).toEqual([]);
 		});
 	});
 
