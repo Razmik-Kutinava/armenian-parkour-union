@@ -22,7 +22,7 @@ async function register(page: Page, email: string) {
 	await page.getByLabel('Date of birth').fill('1995-04-20');
 	await page.getByLabel(/privacy policy/).check();
 	await page.getByRole('button', { name: 'Create account' }).click();
-	await expect(page).toHaveURL('/');
+	await expect(page).toHaveURL('/cabinet');
 }
 
 /** What a first Google sign-in leaves: a Google account and no consent yet. */
@@ -90,7 +90,7 @@ test('new Google user must complete the profile before using the site', async ({
 	await page.getByLabel('Parent or guardian email').fill('parent@example.com');
 	await page.getByLabel(/privacy policy/).check();
 	await page.getByRole('button', { name: 'Save and continue' }).click();
-	await expect(page).toHaveURL('/');
+	await expect(page).toHaveURL('/cabinet');
 
 	await page.goto('/events');
 	await expect(page).toHaveURL('/events');
@@ -107,5 +107,5 @@ test('profile form is for signed-in users who need it only', async ({ page }) =>
 	await expect(page).toHaveURL(/\/login/);
 	await register(page, newEmail());
 	await page.goto('/complete-profile');
-	await expect(page).toHaveURL('/');
+	await expect(page).toHaveURL('/cabinet');
 });

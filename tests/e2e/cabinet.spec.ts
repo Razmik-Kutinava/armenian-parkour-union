@@ -27,7 +27,7 @@ async function register(page: Page): Promise<{ id: string; email: string }> {
 	await page.getByLabel('Date of birth').fill('1990-01-01');
 	await page.getByLabel(/privacy policy/).check();
 	await page.getByRole('button', { name: 'Create account' }).click();
-	await expect(page).toHaveURL('/');
+	await expect(page).toHaveURL('/cabinet');
 	const [user] = await sql`select id from users where email = ${email}`;
 	return { id: user.id as string, email };
 }
@@ -41,7 +41,7 @@ async function logIn(browser: Browser, email: string): Promise<Page> {
 		await page.getByLabel('Email').fill(email);
 		await page.getByLabel('Password').fill(PASSWORD);
 		await page.getByRole('button', { name: 'Log in' }).click();
-		await expect(page).toHaveURL('/', { timeout: 5_000 });
+		await expect(page).toHaveURL('/cabinet', { timeout: 5_000 });
 	}).toPass({ intervals: [1_000, 5_000], timeout: 75_000 });
 	return page;
 }

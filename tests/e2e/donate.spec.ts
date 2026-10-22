@@ -153,7 +153,7 @@ test('member: no name and email fields, the account is shown instead', async ({ 
 	await page.getByLabel('Date of birth').fill('1990-01-01');
 	await page.getByLabel(/privacy policy/).check();
 	await page.getByRole('button', { name: 'Create account' }).click();
-	await expect(page).toHaveURL('/');
+	await expect(page).toHaveURL('/cabinet');
 	await page.goto('/donate');
 	const main = page.locator('main');
 	await expect(main.getByText(email)).toBeVisible();

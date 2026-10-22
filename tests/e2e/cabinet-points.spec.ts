@@ -23,7 +23,7 @@ async function register(page: Page): Promise<string> {
 	await page.getByLabel('Date of birth').fill('1990-01-01');
 	await page.getByLabel(/privacy policy/).check();
 	await page.getByRole('button', { name: 'Create account' }).click();
-	await expect(page).toHaveURL('/');
+	await expect(page).toHaveURL('/cabinet');
 	const [user] = await sql`select id from users where email = ${email}`;
 	return user.id as string;
 }

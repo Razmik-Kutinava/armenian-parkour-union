@@ -20,7 +20,7 @@ async function registerAs(page: Page, role: 'member' | 'editor' | 'moderator' | 
 	await page.getByLabel('Date of birth').fill('1990-01-01');
 	await page.getByLabel(/privacy policy/).check();
 	await page.getByRole('button', { name: 'Create account' }).click();
-	await expect(page).toHaveURL('/');
+	await expect(page).toHaveURL('/cabinet');
 	await sql`update users set role = ${role} where email = ${email}`;
 	return email;
 }

@@ -21,7 +21,7 @@ async function registerEditor(page: Page) {
 	await page.getByLabel('Date of birth').fill('1990-01-01');
 	await page.getByLabel(/privacy policy/).check();
 	await page.getByRole('button', { name: 'Create account' }).click();
-	await expect(page).toHaveURL('/');
+	await expect(page).toHaveURL('/cabinet');
 	const [row] = await sql`update users set role = 'editor' where email = ${email} returning id`;
 	return row.id as string;
 }

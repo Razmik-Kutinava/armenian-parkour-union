@@ -32,7 +32,7 @@ async function fillRegistration(page: Page, email: string, birthDate = '1995-04-
 async function register(page: Page, email: string) {
 	await fillRegistration(page, email);
 	await page.getByRole('button', { name: 'Create account' }).click();
-	await expect(page).toHaveURL('/');
+	await expect(page).toHaveURL('/cabinet');
 	expect(await hasSession(page)).toBe(true);
 }
 
@@ -59,7 +59,7 @@ test('adult registers, logs out and logs back in', async ({ page }) => {
 	expect(await hasSession(page)).toBe(false);
 
 	await logIn(page, email);
-	await expect(page).toHaveURL('/');
+	await expect(page).toHaveURL('/cabinet');
 	expect(await hasSession(page)).toBe(true);
 });
 
@@ -77,7 +77,7 @@ test('return address after login stays on the site', async ({ page }) => {
 	await register(page, email);
 	await logOut(page);
 	await logIn(page, email, PASSWORD, '/login?returnTo=//evil.example');
-	await expect(page).toHaveURL('/');
+	await expect(page).toHaveURL('/cabinet');
 	await logOut(page);
 	await logIn(page, email, PASSWORD, '/login?returnTo=%2Fhy');
 	await expect(page).toHaveURL('/hy');
@@ -93,11 +93,11 @@ test('blocked user cannot log in even with the right password', async ({ page })
 	expect(await hasSession(page)).toBe(false);
 });
 
-test('logged-in user is sent home from guest-only pages', async ({ page }) => {
+test('logged-in user is sent to the cabinet from guest-only pages', async ({ page }) => {
 	await register(page, newEmail());
 	for (const path of ['/login', '/register', '/forgot-password', '/ru/login']) {
 		await page.goto(path);
-		await expect(page).toHaveURL(path.startsWith('/ru') ? '/ru' : '/');
+		await expect(page).toHaveURL(path.startsWith('/ru') ? '/ru/cabinet' : '/cabinet');
 	}
 });
 
@@ -105,7 +105,7 @@ test('blocking takes effect on the next request, not when the session ends', asy
 	const email = newEmail();
 	await register(page, email);
 	await page.goto('/login');
-	await expect(page).toHaveURL('/');
+	await expect(page).toHaveURL('/cabinet');
 
 	await sql`update users set status = 'blocked' where email = ${email}`;
 	await page.goto('/login');
@@ -153,7 +153,7 @@ test('password reset by link sets a new password', async ({ page }) => {
 	await expect(page.getByText('Password changed')).toBeVisible();
 
 	await logIn(page, email, 'brand-new-pass');
-	await expect(page).toHaveURL('/');
+	await expect(page).toHaveURL('/cabinet');
 	expect(await hasSession(page)).toBe(true);
 });
 

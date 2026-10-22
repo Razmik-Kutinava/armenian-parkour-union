@@ -14,7 +14,7 @@ export function heroFixtures(sql: postgres.Sql) {
 		await page.getByLabel(/privacy policy/).check();
 		await page.getByRole('button', { name: 'Create account' }).click();
 		/* The first sign-up of a run wakes the server and the database. */
-		await expect(page).toHaveURL('/', { timeout: 15_000 });
+		await expect(page).toHaveURL('/cabinet', { timeout: 15_000 });
 		await sql`update users set role = ${role} where email = ${email}`;
 	}
 

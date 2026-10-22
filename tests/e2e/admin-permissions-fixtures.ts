@@ -95,7 +95,7 @@ export function permissionFixtures(sql: postgres.Sql) {
 		await page.getByLabel('Date of birth').fill('1990-01-01');
 		await page.getByLabel(/privacy policy/).check();
 		await page.getByRole('button', { name: 'Create account' }).click();
-		await expect(page).toHaveURL('/');
+		await expect(page).toHaveURL('/cabinet');
 		await sql`update users set role = ${role} where email = ${email}`;
 	}
 

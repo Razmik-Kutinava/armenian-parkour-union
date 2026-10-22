@@ -124,7 +124,7 @@ test('an event block leaves the home page when the editor unpublishes its event'
 		await page.getByLabel('Date of birth').fill('1990-01-01');
 		await page.getByLabel(/privacy policy/).check();
 		await page.getByRole('button', { name: 'Create account' }).click();
-		await expect(page).toHaveURL('/', { timeout: 15_000 });
+		await expect(page).toHaveURL('/cabinet', { timeout: 15_000 });
 		await sql`update users set role = 'editor' where email = ${email}`;
 
 		await page.goto(`/admin/events/${event.id}`);
