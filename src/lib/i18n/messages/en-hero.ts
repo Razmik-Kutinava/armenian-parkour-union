@@ -54,7 +54,7 @@ export const enHero = {
 	'hero.form.personSearch': 'Find a person by name',
 	'hero.form.personFind': 'Find',
 	'hero.form.personHint':
-		'Only adult members (by date of birth). Visitors see the name and the avatar.',
+		'Only adult members (by date of birth). Visitors see the name; the photo — only if the member allows it.',
 	'hero.form.personNone': 'Nobody found',
 	'hero.form.personChosen': 'Chosen: {name}',
 	'hero.form.video': 'Video link',

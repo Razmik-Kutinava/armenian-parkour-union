@@ -12,6 +12,7 @@ export type CabinetAction = 'verify_email' | 'membership_expired' | 'membership_
 export type CabinetOverview = {
 	firstName: string | null;
 	name: string;
+	avatarKey: string | null;
 	level: MembershipLevel | null;
 	pointsBalance: number;
 	emailVerified: boolean;
@@ -31,6 +32,7 @@ export async function getCabinetOverview(
 		.select({
 			firstName: users.firstName,
 			name: users.name,
+			avatarKey: users.avatarKey,
 			level: users.level,
 			pointsBalance: users.pointsBalance,
 			emailVerified: users.emailVerified

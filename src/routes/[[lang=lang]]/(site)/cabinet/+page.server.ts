@@ -4,6 +4,7 @@ import { accountCalls } from '#lib/server/auth/account-calls.ts';
 import { requireUser } from '#lib/server/auth/guard.ts';
 import { db } from '#lib/server/db/index.ts';
 import { getCabinetOverview } from '#lib/server/services/cabinet/overview.ts';
+import { publicUrl } from '#lib/server/storage/r2.ts';
 import type { Actions, PageServerLoad } from './$types';
 
 /* docs/06 section 5.1: the user id comes from the session (docs/04 section 5.3). */
@@ -11,7 +12,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 	const user = requireUser(locals.user);
 	const overview = await getCabinetOverview(db, user.id);
 	if (!overview) error(404);
-	return { overview };
+	return { overview, avatarUrl: overview.avatarKey ? publicUrl(overview.avatarKey) : null };
 };
 
 export const actions: Actions = {

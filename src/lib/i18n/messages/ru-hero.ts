@@ -54,7 +54,7 @@ export const ruHero: Partial<Messages> = {
 	'hero.form.personSearch': 'Найти по имени',
 	'hero.form.personFind': 'Найти',
 	'hero.form.personHint':
-		'Только совершеннолетние участники (по дате рождения). Посетители видят имя и аватар.',
+		'Только совершеннолетние участники (по дате рождения). Посетители видят имя; фото — только если участник разрешил.',
 	'hero.form.personNone': 'Никого не нашли',
 	'hero.form.personChosen': 'Выбрано: {name}',
 	'hero.form.video': 'Ссылка на видео',

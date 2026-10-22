@@ -6,6 +6,7 @@ import { requireUser } from '#lib/server/auth/guard.ts';
 import { requestPasswordReset } from '#lib/server/auth/password.ts';
 import { db } from '#lib/server/db/index.ts';
 import { getOwnProfile, updateOwnProfile } from '#lib/server/services/cabinet/profile.ts';
+import { publicUrl } from '#lib/server/storage/r2.ts';
 import {
 	emailChangeSchema,
 	ownProfileSchema,
@@ -13,6 +14,7 @@ import {
 } from '#lib/validation/cabinet.ts';
 import { fieldErrors, keepValues } from '#lib/validation/form.ts';
 import type { Actions, PageServerLoad } from './$types';
+import { avatarActions } from './avatar-actions';
 
 /* docs/06 section 5.2: own profile only (docs/04 section 5.3); birth date is shown, not edited. */
 
@@ -33,10 +35,13 @@ export const load: PageServerLoad = async ({ locals }) => {
 	const user = requireUser(locals.user);
 	const profile = await getOwnProfile(db, user.id);
 	if (!profile) error(404);
-	return { profile, countries: countryOptions(locals.locale) };
+	const avatarUrl = profile.avatarKey ? publicUrl(profile.avatarKey) : null;
+	return { profile, avatarUrl, countries: countryOptions(locals.locale) };
 };
 
 export const actions: Actions = {
+	...avatarActions,
+
 	save: async ({ locals, request }) => {
 		const user = requireUser(locals.user);
 		const profile = await getOwnProfile(db, user.id);

@@ -23,7 +23,7 @@ export type HeroSlide = {
 	video: VideoLink | null;
 	cta: { label: string; url: string } | null;
 	event: { slug: string; title: string; startsAt: Date; endsAt: Date; city: string | null } | null;
-	/** Only the name and the avatar of an adult (K4). */
+	/** Only the name of an adult (K4); the avatar only with the member's consent. */
 	person: { name: string; avatarKey: string | null } | null;
 };
 
@@ -131,7 +131,8 @@ export function toSlide({ block, event, person }: HeroRowJoined, locale: Locale)
 					city: event.city
 				}
 			: null,
-		person: block.type === 'person' && person ? person : null
+		/* decisions.md 2026-10-22: no photo in public until the member allows it (`show_avatar`). */
+		person: block.type === 'person' && person ? { name: person.name, avatarKey: null } : null
 	};
 }
 

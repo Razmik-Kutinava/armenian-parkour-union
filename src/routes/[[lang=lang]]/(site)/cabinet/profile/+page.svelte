@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { t } from '#lib/i18n/index.svelte.ts';
 	import AccountForms from './AccountForms.svelte';
+	import AvatarForm from './AvatarForm.svelte';
 	import ProfileForm from './ProfileForm.svelte';
 	import type { PageProps } from './$types';
 
@@ -14,6 +15,12 @@
 
 <div class="flex max-w-3xl flex-col gap-6">
 	<h1 class="text-3xl font-bold text-ink-900">{t('cabinet.profile.title')}</h1>
+	<AvatarForm
+		name={`${data.profile.firstName ?? ''} ${data.profile.lastName ?? ''}`}
+		url={data.avatarUrl}
+		hasPhoto={data.profile.avatarKey !== null}
+		result={form?.avatar}
+	/>
 	<ProfileForm profile={data.profile} countries={data.countries} result={form?.profile} />
 	<AccountForms
 		email={data.profile.email}

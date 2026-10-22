@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import Avatar from '#lib/components/site/Avatar.svelte';
 	import { newsDate } from '#lib/components/site/news-date.ts';
 	import { currentLocale, localizePath, t } from '#lib/i18n/index.svelte.ts';
 	import type { PageProps } from './$types';
@@ -7,14 +8,6 @@
 	let { data, form }: PageProps = $props();
 	const o = $derived(data.overview);
 	const href = (path: string) => localizePath(path, currentLocale());
-	const initials = $derived(
-		o.name
-			.split(/\s+/)
-			.filter(Boolean)
-			.slice(0, 2)
-			.map((w) => w[0]?.toUpperCase())
-			.join('')
-	);
 	const card = 'flex flex-col gap-2 rounded-md border border-line bg-surface p-5';
 	const button =
 		'inline-flex min-h-11 w-fit items-center rounded-md bg-accent-500 px-4 font-bold text-navy-950 hover:bg-accent-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-500';
@@ -27,10 +20,7 @@
 
 <div class="flex max-w-3xl flex-col gap-6">
 	<div class="flex items-center gap-4">
-		<span
-			class="flex size-14 shrink-0 items-center justify-center rounded-full bg-navy-900 text-lg font-bold text-surface"
-			aria-hidden="true">{initials}</span
-		>
+		<Avatar name={o.name} url={data.avatarUrl} />
 		<div>
 			<h1 class="text-3xl font-bold text-ink-900">
 				{t('cabinet.overview.hello', { name: o.firstName ?? o.name })}

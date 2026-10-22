@@ -37,7 +37,7 @@
 ## Проверка
 
 - `npx vitest run src/lib/validation/avatar.test.ts src/lib/server/services/cabinet src/lib/server/services/hero`
-- `npx playwright test tests/e2e/cabinet.spec.ts tests/e2e/admin-media.spec.ts`
+- `npx playwright test tests/e2e/cabinet-avatar.spec.ts tests/e2e/cabinet.spec.ts tests/e2e/admin-media.spec.ts tests/e2e/hero-fields.spec.ts tests/e2e/hero.spec.ts tests/e2e/home.spec.ts`
 
 ## Риск
 
@@ -52,8 +52,8 @@
 ## Фазы
 
 - [x] SPEC
-- [ ] RED (`test: … [RED]`)
-- [ ] GREEN (`feat: … [GREEN]`)
+- [x] RED (`test: … [RED]`) — `01b2190`
+- [x] GREEN (`feat: … [GREEN]`) — Vitest задачи 77/77, e2e зоны 20/20 (+ `cabinet-avatar.spec.ts`), `check` 0
 - [ ] REGRESS
 - [ ] REVIEW: local · bugbot · security-review · сверка со SPEC · PROGRESS · push · CI green
 - [ ] DEPLOY (только по апруву владельца)

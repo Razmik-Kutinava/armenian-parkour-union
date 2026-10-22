@@ -15,6 +15,7 @@ export type OwnProfile = {
 	country: string | null;
 	city: string | null;
 	bio: string | null;
+	avatarKey: string | null;
 	locale: string;
 	guardianName: string | null;
 	guardianPhone: string | null;
@@ -44,6 +45,7 @@ export async function getOwnProfile(
 			country: users.country,
 			city: users.city,
 			bio: users.bio,
+			avatarKey: users.avatarKey,
 			locale: users.locale,
 			guardianName: users.guardianName,
 			guardianPhone: users.guardianPhone,
