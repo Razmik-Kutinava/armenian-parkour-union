@@ -5,8 +5,8 @@
 
 | Параметр | Значение |
 |---|---|
-| `last_audited_sha` | `18f968c` |
-| Дата | 2026-10-21 |
+| `last_audited_sha` | `587ca52` |
+| Дата | 2026-10-22 |
 | Вердикт | CLEAN |
 
 ## Находки
@@ -62,3 +62,4 @@
 | 2026-10-20 | 4.1–4.3 баллы `941350a..4de7a8d`: `drizzle/0009_points.sql`, `scripts/rollback/0009_down.sql`, `db/schema/{points,enums,index}.ts`, `seed/points-rules.ts`, `scripts/seed.ts`, `services/points/*` + тесты (18 файлов) | CLEAN | 0 (bugbot: 0; security: 0, ниже порога — `awardPoints` не проверяет `sourceId` на uuid, вызывающих пока нет; свой проход: `points_balance` пишет только `services/points/ledger.ts`, баланс считается под блокировкой строки `users`, дубль и вторая отмена — уникальные индексы + `ON CONFLICT DO NOTHING`; гейты: check 0, lint чистый, Vitest 879/880 — `hero/public` часы; e2e skip — маршрутов в диффе нет) | `4de7a8d` |
 | 2026-10-21 | 4.4a + 4.4b админка баллов `8a8551b..d9f7832` (42 файла): `services/points/{admin-list,admin-export,member,rules-admin,suspicious}.ts`, `validation/admin-point{s,-rules}.ts`, `seed/settings.ts`, `routes/admin/{points,point-rules}`, `admin/nav.ts`, `cache/admin-groups.ts`, `audit-csv.ts`, `FilterBar` + e2e-карты | CLEAN | 1 (C14 K4 — fixed; первый проход: bugbot 1 отклонена валидатором, security 1 → C14; после фикса: bugbot 0, security 0; свой проход: права в каждом load / action и в сервисах, правка правила и порогов — `FOR UPDATE` / `writeSettings` с журналом и IP, SQL фильтров — только параметры; гейты: check 0, lint чистый, Vitest 911/912 — `hero/public` часы; e2e зоны 9/9) | `d9f7832` |
 | 2026-10-21 | общий REVIEW этапа 4 — 4.5 кабинет баллов и 4.6 тесты инвариантов `d9f7832..18f968c` (11 файлов без i18n): `services/cabinet/points.ts`, `(site)/cabinet/points/*`, `cabinet/+layout.svelte`, `cabinet/+page.svelte`, `services/points/{race,invariants}.test.ts`, `tests/e2e/cabinet-points.spec.ts` | CLEAN | 0 (bugbot: 0; security: 0; свой проход: id пользователя только из сессии, поиск принудительно пустой, staff-фильтры `manual` / `over` / `suspicious` не входят в ключи кабинета, автор записи и email не выбираются, страница без `actions`; гейты: check 0, lint чистый, Vitest 922/923 — `hero/public` часы; e2e зоны 19/20 — `admin-points` «adjustment…» в параллельном прогоне, отдельно 4/4) | `18f968c` |
+| 2026-10-22 | долг 3.10 фото профиля `4d089c6..587ca52` (19 файлов без i18n): `services/cabinet/{avatar,overview,profile}.ts`, `validation/avatar.ts`, `auth/rate-limit.ts`, `services/hero/public.ts`, `(site)/cabinet/{+page.*,profile/*}`, `components/site/Avatar.svelte`, `tests/e2e/cabinet-avatar.spec.ts` | CLEAN | 0 (bugbot: 2 отклонены валидатором; security: 0, ниже порога — объекты без `complete` остаются в бакете (до 50 МБ / ч на участника), `nosniff` на R2 — к шагу приватности; свой проход: id только из сессии, ключ только `avatars/<свой id>/<uuid>.(jpg|png|webp)`, файл медиатеки не удаляется, тип по байтам, замена под `FOR UPDATE`, hero не отдаёт фото; гейты: check 0, lint чистый, Vitest 942/942, e2e 143/143) | `587ca52` |
