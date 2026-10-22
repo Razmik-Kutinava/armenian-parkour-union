@@ -32,6 +32,13 @@ describe('translate', () => {
 		}
 	});
 
+	it('hy and ru translate every key except brand names', () => {
+		const brand = new Set<string>(['site.name', 'fest.title']);
+		for (const dict of [hy, ru]) {
+			expect(Object.keys(en).filter((k) => !brand.has(k) && !Object.hasOwn(dict, k))).toEqual([]);
+		}
+	});
+
 	it('hy and ru contain only known keys', () => {
 		const known = new Set(Object.keys(en));
 		for (const dict of [hy, ru]) {
