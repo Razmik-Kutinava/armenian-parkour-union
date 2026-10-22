@@ -47,5 +47,5 @@
 - [x] SPEC
 - [x] RED (`test: … [RED]`) — модулей `registrations/*` нет, ключа seed `event_registration` нет
 - [x] GREEN (`feat: … [GREEN]`) — Vitest зоны 90/90 (registrations 31, seed, i18n); `check` 0, `lint` чистый
-- [ ] REGRESS
+- [x] REGRESS — Vitest 1015/1015 (168 файлов); e2e не трогали (маршрутов нет)
 - [ ] REVIEW — общим шагом в конце этапа 5 (решение владельца 2026-10-22)
