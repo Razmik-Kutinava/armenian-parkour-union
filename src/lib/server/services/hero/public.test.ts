@@ -116,7 +116,8 @@ describe.skipIf(!testDbUrl)('hero: blocks on the home page', () => {
 		});
 	});
 
-	it('person block shows only the name and the avatar of an active adult (K4)', async () => {
+	/* decisions.md 2026-10-22: no photo in public until the member allows it (`show_avatar`). */
+	it('person block shows only the name of an active adult, no photo (K4)', async () => {
 		await inRollback(async (tx) => {
 			await clearHero(tx);
 			const avatar = await insertImage(tx);
@@ -128,8 +129,9 @@ describe.skipIf(!testDbUrl)('hero: blocks on the home page', () => {
 			});
 			const id = await add(tx, { type: 'person', personUserId: person.id });
 			const [slide] = await getHeroSlides(tx, 'en');
-			expect(slide.person).toEqual({ name: 'Aram Petrosyan', avatarKey: avatar });
+			expect(slide.person).toEqual({ name: 'Aram Petrosyan', avatarKey: null });
 			expect(JSON.stringify(slide)).not.toMatch(/example\.com|111111|birth/i);
+			expect(JSON.stringify(slide)).not.toContain(avatar);
 			for (const change of [
 				{ birthDate: birthDateAgo(17) },
 				{ birthDate: null },

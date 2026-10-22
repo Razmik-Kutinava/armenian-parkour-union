@@ -30,6 +30,7 @@ describe.skipIf(!testDbUrl)('cabinet: overview', () => {
 			expect(o).toMatchObject({
 				firstName: 'Ani',
 				name: 'Ani Hakobyan',
+				avatarKey: null,
 				level: null,
 				pointsBalance: 0,
 				emailVerified: false,
