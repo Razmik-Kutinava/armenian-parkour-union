@@ -29,7 +29,12 @@ describe.skipIf(!testDbUrl)('hero: switching blocks on and off', () => {
 			expect(await setHeroActive(tx, actor, id, true, IP)).toBe('ok');
 			expect(await setHeroActive(tx, actor, id, false, IP)).toBe('ok');
 			expect(await activeOf(tx, id)).toBe(false);
-			expect(await actionsOf(tx, id)).toEqual(['hero.create', 'hero.activate', 'hero.deactivate']);
+			/* One transaction: same `created_at`, random ids — the rows have no order. */
+			expect((await actionsOf(tx, id)).sort()).toEqual([
+				'hero.activate',
+				'hero.create',
+				'hero.deactivate'
+			]);
 		});
 	});
 
