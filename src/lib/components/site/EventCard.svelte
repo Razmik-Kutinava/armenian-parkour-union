@@ -5,6 +5,7 @@
 	import type { EventCardView } from '#lib/server/services/events/view.ts';
 	import EventWindowNote from './EventWindowNote.svelte';
 	import { eventDates } from './event-date';
+	import { placeholderPhoto } from './placeholder-photo';
 
 	/* docs/06 section 4.2: cover, title, date and time, city, price or "Free", places indicator. */
 	type Props = { event: EventCardView; eager?: boolean; showWindow?: boolean; level?: 2 | 3 };
@@ -13,16 +14,14 @@
 
 <article class="flex flex-col overflow-hidden rounded-lg border border-line bg-surface">
 	<div class="aspect-video bg-navy-100">
-		{#if event.coverUrl}
-			<img
-				src={event.coverUrl}
-				alt={event.coverAlt}
-				loading={eager ? 'eager' : 'lazy'}
-				width="1280"
-				height="720"
-				class="size-full object-cover"
-			/>
-		{/if}
+		<img
+			src={event.coverUrl ?? placeholderPhoto(event.slug)}
+			alt={event.coverUrl ? event.coverAlt : ''}
+			loading={eager ? 'eager' : 'lazy'}
+			width="1280"
+			height="720"
+			class="size-full object-cover"
+		/>
 	</div>
 	<div class="flex flex-1 flex-col gap-2 p-4">
 		<time class="text-sm text-ink-500" datetime={event.startsAt.toISOString()}

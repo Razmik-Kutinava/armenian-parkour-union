@@ -1,0 +1,11 @@
+Temporary placeholder photos, all CC0 (public domain dedication), from Wikimedia Commons.
+Replace with the federation's own photos; then delete this folder and src/lib/components/site/placeholder-photo.ts.
+
+parkour-1.webp — "Freerunning Calgary (Unsplash).jpg", Redd Angelo, CC0
+  https://commons.wikimedia.org/wiki/File:Freerunning_Calgary_(Unsplash).jpg
+parkour-2.webp — "Parkour - Archway.jpg", RuthieGledhill, CC0
+  https://commons.wikimedia.org/wiki/File:Parkour_-_Archway.jpg
+parkour-3.webp — "Precision jump.jpg", Ryan.pasco, CC0
+  https://commons.wikimedia.org/wiki/File:Precision_jump.jpg
+
+Cropped to 1600x900 and converted to WebP.

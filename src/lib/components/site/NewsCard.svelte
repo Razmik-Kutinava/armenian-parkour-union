@@ -3,6 +3,7 @@
 	import { localizePath } from '#lib/i18n/locales.ts';
 	import type { CardView } from '#lib/server/services/posts/view.ts';
 	import { newsDate } from './news-date';
+	import { placeholderPhoto } from './placeholder-photo';
 
 	/* docs/06 section 4.4: cover, title, short text, date, tags. */
 	let {
@@ -15,16 +16,14 @@
 
 <article class="flex flex-col overflow-hidden rounded-lg border border-line bg-surface">
 	<div class="aspect-[1.91/1] bg-navy-100">
-		{#if post.coverUrl}
-			<img
-				src={post.coverUrl}
-				alt={post.coverAlt}
-				loading={eager ? 'eager' : 'lazy'}
-				width="1200"
-				height="630"
-				class="size-full object-cover"
-			/>
-		{/if}
+		<img
+			src={post.coverUrl ?? placeholderPhoto(post.slug)}
+			alt={post.coverUrl ? post.coverAlt : ''}
+			loading={eager ? 'eager' : 'lazy'}
+			width="1200"
+			height="630"
+			class="size-full object-cover"
+		/>
 	</div>
 	<div class="flex flex-1 flex-col gap-2 p-4">
 		{#if post.publishedAt}

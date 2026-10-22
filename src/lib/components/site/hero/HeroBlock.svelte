@@ -3,11 +3,12 @@
 	import { localizePath } from '#lib/i18n/locales.ts';
 	import type { HeroSlideView } from '#lib/server/services/hero/view.ts';
 	import { eventDates } from '../event-date';
+	import { placeholderPhoto } from '../placeholder-photo';
 	import HeroVideo from './HeroVideo.svelte';
 
 	/*
 	 * docs/08: one frame for every type — background, navy shade, title, subtitle, one button.
-	 * Works without a picture. The first slide is the page heading and loads its image eagerly.
+	 * Without a picture — a placeholder photo. The first slide is the page heading and loads its image eagerly.
 	 */
 	type Props = { slide: HeroSlideView; level?: 1 | 2; eager?: boolean };
 	let { slide, level = 1, eager = false }: Props = $props();
@@ -29,17 +30,15 @@
 </script>
 
 <div class="relative isolate flex h-full items-center overflow-hidden bg-navy-950 text-surface">
-	{#if slide.mediaUrl}
-		<img
-			src={slide.mediaUrl}
-			alt=""
-			width="1600"
-			height="900"
-			loading={eager ? 'eager' : 'lazy'}
-			fetchpriority={eager ? 'high' : 'auto'}
-			class="absolute inset-0 -z-10 size-full object-cover"
-		/>
-	{/if}
+	<img
+		src={slide.mediaUrl ?? placeholderPhoto(slide.id ?? title)}
+		alt=""
+		width="1600"
+		height="900"
+		loading={eager ? 'eager' : 'lazy'}
+		fetchpriority={eager ? 'high' : 'auto'}
+		class="absolute inset-0 -z-10 size-full object-cover"
+	/>
 	<div
 		class="absolute inset-0 -z-10 bg-gradient-to-r from-navy-950/95 via-navy-950/75 to-navy-950/30"
 	></div>
