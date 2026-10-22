@@ -76,6 +76,7 @@ describe.skipIf(!testDbUrl)('payments: starting an online payment', () => {
 				successUrl: `${SITE}/hy/payment/success?pid=${result.paymentId}`,
 				cancelUrl: `${SITE}/hy/payment/cancel?pid=${result.paymentId}`
 			});
+			expect((await paymentRow(tx, result.paymentId)).locale).toBe('hy');
 		});
 	});
 

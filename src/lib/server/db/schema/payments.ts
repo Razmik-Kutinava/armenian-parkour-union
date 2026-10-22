@@ -88,6 +88,8 @@ export const payments = pgTable(
 		failureReason: text('failure_reason'),
 		needsReview: boolean('needs_review').notNull().default(false),
 		membershipId: uuid('membership_id').references((): AnyPgColumn => memberships.id),
+		/** The page language at an online start; a guest's letters use it. `null` — unknown. */
+		locale: text('locale'),
 		createdAt,
 		updatedAt
 	},
@@ -99,7 +101,8 @@ export const payments = pgTable(
 		index('payments_kind_status_idx').on(t.kind, t.status),
 		index('payments_paid_at_idx').on(t.paidAt),
 		index('payments_status_expires_at_idx').on(t.status, t.expiresAt),
-		check('payments_amount_positive', sql`${t.amountMinor} > 0`)
+		check('payments_amount_positive', sql`${t.amountMinor} > 0`),
+		check('payments_locale_valid', sql`${t.locale} is null or ${t.locale} in ('en', 'hy', 'ru')`)
 	]
 );
 

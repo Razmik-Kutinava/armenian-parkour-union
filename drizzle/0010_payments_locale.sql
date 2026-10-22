@@ -1,0 +1,2 @@
+ALTER TABLE "payments" ADD COLUMN "locale" text;--> statement-breakpoint
+ALTER TABLE "payments" ADD CONSTRAINT "payments_locale_valid" CHECK ("payments"."locale" is null or "payments"."locale" in ('en', 'hy', 'ru'));

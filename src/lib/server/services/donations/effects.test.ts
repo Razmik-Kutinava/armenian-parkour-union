@@ -50,6 +50,22 @@ describe.skipIf(!testDbUrl)('donations: payment effects', () => {
 		});
 	});
 
+	it('guest, paid: the letter is in the language of the donation page', async () => {
+		await inRollback(async (tx) => {
+			const purpose = await addPurpose(tx);
+			const { provider, paymentId } = await begin(
+				tx,
+				guestInput({ purposeId: purpose.id, locale: 'ru' })
+			);
+			const { sent, send } = mailbox();
+			await settleDonation(tx, provider, paymentId, 'paid', donationEffectsWith(send));
+			expect(sent).toHaveLength(1);
+			expect(sent[0].to).toBe('anna.guest@example.com');
+			expect(sent[0].subject).toBe('Спасибо за пожертвование');
+			expect(sent[0].text).toContain('Паркур-парк');
+		});
+	});
+
 	it('member, paid: the letter goes to the account email in the account language', async () => {
 		await inRollback(async (tx) => {
 			const user = await insertUser(tx, { locale: 'ru', firstName: 'Арам' });

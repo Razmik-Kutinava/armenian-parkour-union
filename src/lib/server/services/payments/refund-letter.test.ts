@@ -24,10 +24,19 @@ describe.skipIf(!testDbUrl)('payments: refund letter', () => {
 		});
 	});
 
+	it('guest: the letter is in the language the payment was started in', async () => {
+		await inRollback(async (tx) => {
+			const payment = await insertPayment(tx, { status: 'refunded', locale: 'ru' });
+			const letter = await refundLetter(tx, payment);
+			expect(letter?.to).toBe('anna.guest@example.com');
+			expect(letter?.subject).toBe('Платёж возвращён');
+		});
+	});
+
 	it('member: account email in the account language; deleted member or no email — none', async () => {
 		await inRollback(async (tx) => {
 			const member = await insertUser(tx, { locale: 'ru' });
-			const own = await insertPayment(tx, { kind: 'membership', userId: member.id });
+			const own = await insertPayment(tx, { kind: 'membership', userId: member.id, locale: 'en' });
 			const letter = await refundLetter(tx, own);
 			expect(letter?.to).toBe(member.email);
 			expect(letter?.subject).toBe('Платёж возвращён');
