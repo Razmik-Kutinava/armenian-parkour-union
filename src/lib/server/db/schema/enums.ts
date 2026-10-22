@@ -38,3 +38,18 @@ export const pointsReason = pgEnum('points_reason', [
 	'shop_refund',
 	'reversal'
 ]);
+export const registrationStatus = pgEnum('registration_status', [
+	'registered',
+	'pending_payment',
+	'waitlist',
+	'cancelled',
+	'attended',
+	'no_show'
+]);
+export const consentKind = pgEnum('consent_kind', ['parental', 'medical', 'privacy']);
+export const consentStatus = pgEnum('consent_status', [
+	'pending',
+	'approved',
+	'rejected',
+	'expired'
+]);

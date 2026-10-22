@@ -43,7 +43,7 @@
 | `content_status` | `draft`, `published`, `archived` |
 | `event_status` | `draft`, `published`, `finished`, `cancelled`, `archived` |
 | `discipline` | `speed`, `style`, `tricking`, `freerun`, `other` |
-| `registration_status` | `registered`, `waitlist`, `cancelled`, `attended`, `no_show` |
+| `registration_status` | `registered`, `pending_payment`, `waitlist`, `cancelled`, `attended`, `no_show` |
 | `payment_kind` | `membership`, `donation`, `event_fee` |
 | `payment_status` | `pending`, `paid`, `failed`, `cancelled`, `refunded` |
 | `video_status` | `pending`, `approved`, `rejected` |
@@ -217,6 +217,7 @@
 | category_id | uuid FK event_categories null | |
 | status | registration_status default 'registered' | |
 | payment_id | uuid FK payments null | если событие платное |
+| hold_until | timestamptz null | до какого момента `pending_payment` держит место: удержание при оплате или срок оплаты после очереди |
 | registered_at | timestamptz default now | |
 | attended_at | timestamptz null | |
 | place | smallint null | итоговое место, `1` победа |
@@ -227,7 +228,7 @@
 Ограничения: unique(`event_id`, `user_id`).
 Индексы: `user_id`, (`event_id`, `status`).
 Правила:
-- Для платного события регистрация становится активной после оплаты (`payments.status='paid'`).
+- Для платного события регистрация создаётся в `pending_payment` с `hold_until` и становится активной (`registered`) после оплаты (`payments.status='paid'`); `pending_payment` занимает место в лимите.
 - Баллы за регистрацию начисляются при создании активной регистрации.
 - Баллы за участие при смене статуса на `attended`.
 - Баллы за победу при установке `place = 1`.
@@ -482,7 +483,8 @@
 | signed_at | timestamptz null | |
 | valid_until | timestamptz null | |
 | reviewed_by | uuid FK users null | |
-| created_at | timestamptz | |
+| review_note | text null | причина отказа, видна участнику |
+| created_at, updated_at | timestamptz | |
 
 Индексы: `user_id`, (`kind`, `status`).
 Правило: для пользователя младше 18 регистрация на событие требует действующего согласия `parental` со статусом `approved`.

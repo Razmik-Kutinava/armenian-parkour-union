@@ -44,8 +44,8 @@
 ## Фазы
 
 - [x] SPEC
-- [ ] RED (`test: … [RED]`)
-- [ ] GREEN (`feat: … [GREEN]`)
-- [ ] REGRESS
+- [x] RED (`test: … [RED]`) — `2111929`, 5/5 падают: таблиц нет
+- [x] GREEN (`feat: … [GREEN]`) — 0011 на `parkour_dev`; `src/lib/server/db` 23/23
+- [x] REGRESS — Vitest 950/950, `check` 0, `lint` чистый
 - [ ] REVIEW: local · bugbot · security-review · сверка со SPEC · PROGRESS · push · CI green
 - [ ] DEPLOY (только по апруву владельца)

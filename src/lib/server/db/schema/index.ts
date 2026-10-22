@@ -8,3 +8,5 @@ export * from './events';
 export * from './hero';
 export * from './payments';
 export * from './points';
+export * from './registrations';
+export * from './consents';

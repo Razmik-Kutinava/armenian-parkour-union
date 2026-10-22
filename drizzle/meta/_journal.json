@@ -78,6 +78,13 @@
       "when": 1792662644062,
       "tag": "0010_payments_locale",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1792674129106,
+      "tag": "0011_registrations_consents",
+      "breakpoints": true
     }
   ]
 }
