@@ -4,6 +4,15 @@ import adapter from '@sveltejs/adapter-node';
 import { sveltekit } from '@sveltejs/kit/vite';
 import { csp } from './csp.config.ts';
 
+/* Tests that change `points_rules` (`setRules`) hold its table lock until their rollback: a new
+ * such file goes here, or it queues on the others until the timeout. */
+const RULES_TESTS = [
+	'src/lib/server/services/points/{award,reverse,invariants,rules-admin}.test.ts',
+	'src/lib/server/services/registrations/points*.test.ts',
+	'src/lib/server/services/cabinet/points.test.ts',
+	'src/lib/server/seed/points-rules.test.ts'
+];
+
 export default defineConfig({
 	plugins: [
 		tailwindcss(),
@@ -29,7 +38,22 @@ export default defineConfig({
 					// Database tests go to the remote Neon dev database; 5 s is too tight in parallel.
 					testTimeout: 20_000,
 					include: ['src/**/*.{test,spec}.{js,ts}'],
-					exclude: ['src/**/*.svelte.{test,spec}.{js,ts}', 'src/lib/server/services/hero/**']
+					exclude: [
+						'src/**/*.svelte.{test,spec}.{js,ts}',
+						'src/lib/server/services/hero/**',
+						...RULES_TESTS
+					]
+				}
+			},
+			{
+				extends: './vite.config.ts',
+				test: {
+					// Same as hero: in parallel these files only queue on the rules lock until the timeout.
+					name: 'server-points',
+					environment: 'node',
+					testTimeout: 20_000,
+					fileParallelism: false,
+					include: RULES_TESTS
 				}
 			},
 			{
