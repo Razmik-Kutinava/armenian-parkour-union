@@ -126,6 +126,12 @@ describe.skipIf(!testDbUrl)('registrations: cancel', () => {
 				(e) => e.action === 'event_fee.review'
 			);
 			expect(reviews.map((e) => e.after)).toMatchObject([{ reason: 'cancelled_by_member' }]);
+
+			const again = await register(tx, member.id, event.id);
+			expect(await registrationOf(tx, again.id)).toMatchObject({
+				status: 'pending_payment',
+				paymentId: null
+			});
 		});
 	});
 });

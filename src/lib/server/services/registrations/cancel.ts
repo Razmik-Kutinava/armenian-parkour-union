@@ -5,11 +5,12 @@ import { eventRegistrations } from '../../db/schema/registrations';
 import type { Mail } from '../../mail/resend';
 import { isUuid } from '../users/target';
 import { holdsSeat } from './seats';
+import { settleCancelledPayment } from './settle-cancel';
 import { fillFromWaitlist, sendLetters, type WaitlistDeps } from './waitlist';
 
 /* docs/03 section 7.5, docs/04 section 3.1: the member cancels their own registration before the
  * start (a seat — `cancel_hours` before it); the freed seat goes to the waitlist. A refund is the
- * admin's decision; points for the registration are taken back in 5.6. */
+ * admin's decision (settle-cancel.ts); points for the registration are taken back in 5.6. */
 
 export type CancelDeps = WaitlistDeps & { send: (mail: Mail) => Promise<void> };
 export type CancelResult = 'ok' | 'not_found' | 'wrong_status' | 'too_late';
@@ -32,7 +33,11 @@ export async function cancelRegistration(
 			.for('update');
 		if (!event) return 'not_found' as const;
 		const [row] = await tx
-			.select({ id: eventRegistrations.id, status: eventRegistrations.status })
+			.select({
+				id: eventRegistrations.id,
+				status: eventRegistrations.status,
+				paymentId: eventRegistrations.paymentId
+			})
 			.from(eventRegistrations)
 			.where(and(eq(eventRegistrations.eventId, eventId), eq(eventRegistrations.userId, userId)))
 			.for('update');
@@ -45,9 +50,15 @@ export async function cancelRegistration(
 			.update(eventRegistrations)
 			.set({ status: 'cancelled', holdUntil: null })
 			.where(eq(eventRegistrations.id, row.id));
-		return seat ? fillFromWaitlist(tx, eventId, deps, now) : [];
+		const letters = seat ? await fillFromWaitlist(tx, eventId, deps, now) : [];
+		return { letters, paymentId: seat ? row.paymentId : null, id: row.id };
 	});
 	if (typeof outcome === 'string') return outcome;
-	await sendLetters(deps.send, outcome);
+	if (outcome.paymentId) {
+		await settleCancelledPayment(db, outcome.paymentId, { id: outcome.id, eventId }).catch((e) =>
+			console.error(`registration ${outcome.id}: payment ${outcome.paymentId} not settled`, e)
+		);
+	}
+	await sendLetters(deps.send, outcome.letters);
 	return 'ok';
 }

@@ -22,8 +22,8 @@ export type RegisterResult =
 
 const refuse = (reason: Refusal | 'not_found') => ({ ok: false, reason }) as const;
 
-/* `payment_id` stays on a renewed row: an earlier payment may still need a refund (5.4 decides). */
-const CLEARED = { attendedAt: null, place: null, score: null, resultNote: null };
+/* An earlier payment is unlinked: the cancel already sent a paid one to review (settle-cancel.ts). */
+const CLEARED = { attendedAt: null, place: null, score: null, resultNote: null, paymentId: null };
 
 export async function registerForEvent(
 	db: LimitDb,

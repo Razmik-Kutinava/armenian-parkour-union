@@ -8,9 +8,7 @@
 	/* docs/05 section 16, docs/07 sections 8-11: by status; the server re-checks every one. */
 	let { card }: { card: PaymentCard } = $props();
 
-	const canConfirm = $derived(
-		card.kind !== 'event_fee' && ['pending', 'failed', 'cancelled'].includes(card.status)
-	);
+	const canConfirm = $derived(['pending', 'failed', 'cancelled'].includes(card.status));
 	const paid = $derived(card.status === 'paid');
 	const canReceipt = $derived(paid && card.kind !== 'event_fee');
 	const refundLabel = $derived(

@@ -1,5 +1,6 @@
 import { PUBLIC_SITE_URL } from '$app/env/private';
 import { consume, limits, type LimitDb } from '../../auth/rate-limit';
+import { releaseHoldsNow } from '../registrations';
 import { startOnlinePayment, type NewOnlinePayment, type StartResult } from './create';
 import { onlineProvider, providerById } from './providers';
 import { reconcilePayments, type ReconcileSummary } from './reconcile';
@@ -33,12 +34,19 @@ export function checkPaymentReturn(
 	});
 }
 
-let reconcileOnce: (() => Promise<ReconcileSummary>) | null = null;
+type ReconcileRun = ReconcileSummary & { released: number };
+let reconcileOnce: (() => Promise<ReconcileRun>) | null = null;
 
-/** docs/07 section 7: one reconciliation run; the timer and `/api/cron/payments` share it. */
-export function reconcileNow(db: LimitDb): Promise<ReconcileSummary> {
+/**
+ * docs/07 section 7: one reconciliation run; the timer and `/api/cron/payments` share it. Expired
+ * event payments are cancelled first, then their seats are released (docs/07 section 5.3 p. 4).
+ */
+export function reconcileNow(db: LimitDb): Promise<ReconcileRun> {
 	reconcileOnce ??= singleFlight(async () => {
-		const summary = await reconcilePayments(db, { providerOf: providerById });
+		const summary = {
+			...(await reconcilePayments(db, { providerOf: providerById })),
+			released: await releaseHoldsNow(db)
+		};
 		if (Object.values(summary).some(Boolean)) console.info('reconcile:', JSON.stringify(summary));
 		return summary;
 	});

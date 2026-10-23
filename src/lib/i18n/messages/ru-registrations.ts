@@ -1,7 +1,8 @@
 import type { Messages } from '../translate';
 
-/** Регистрации на события: письма. Часть `ru`. */
+/** Регистрации на события: письма, оплата участия. Часть `ru`. */
 export const ruRegistrations: Partial<Messages> = {
+	'registrations.payment.description': 'Участие: {event}',
 	'registrations.mail.promoted.subject': 'Освободилось место: {event}',
 	'registrations.mail.promoted.text':
 		'Здравствуйте, {name}!\n\nНа событии «{event}» ({date}) освободилось место — вы зарегистрированы.\n\nСтраница события: {url}',

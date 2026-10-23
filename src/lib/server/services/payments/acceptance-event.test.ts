@@ -35,7 +35,10 @@ describe.skipIf(!testDbUrl)('payments acceptance: event fee', () => {
 			const { registrationId, payment } = await payStarted(tx, mock, event.id);
 			const paid = mock.simulate(payment.providerPaymentId!, 'paid');
 			for (const notice of [paid, paid]) expect(await deliver(tx, mock, notice, effects)).toBe(200);
-			expect(await paymentRow(tx, payment.id)).toMatchObject({ status: 'paid', needsReview: false });
+			expect(await paymentRow(tx, payment.id)).toMatchObject({
+				status: 'paid',
+				needsReview: false
+			});
 			expect((await registrationOf(tx, registrationId)).status).toBe('registered');
 		});
 	});

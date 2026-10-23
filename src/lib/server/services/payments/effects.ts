@@ -6,6 +6,8 @@ import { sendMail } from '../../mail';
 import { donationEffects } from '../donations/effects';
 import { membershipEffects } from '../memberships/effects';
 import { membershipPeriodMonths } from '../memberships/fee';
+import { eventFeeEffects } from '../registrations/payment-effects';
+import { registrationSettings } from '../registrations/settings';
 import { withRefundLetter } from './refund-letter';
 
 export type PaymentRow = typeof payments.$inferSelect;
@@ -24,7 +26,7 @@ export type PaymentEffects = Partial<
 	Record<PaymentKind, Partial<Record<EffectStatus, PaymentEffect>>>
 >;
 
-/** Event fee — stage 5; the refund letter goes for every kind. */
+/** The refund letter goes for every kind. */
 export const paymentEffects: PaymentEffects = withRefundLetter(
 	{
 		membership: membershipEffects({
@@ -32,7 +34,12 @@ export const paymentEffects: PaymentEffects = withRefundLetter(
 			siteUrl: PUBLIC_SITE_URL,
 			periodMonths: membershipPeriodMonths
 		}),
-		donation: donationEffects({ send: sendMail })
+		donation: donationEffects({ send: sendMail }),
+		event_fee: eventFeeEffects({
+			send: sendMail,
+			siteUrl: PUBLIC_SITE_URL,
+			settings: registrationSettings
+		})
 	},
 	sendMail
 );

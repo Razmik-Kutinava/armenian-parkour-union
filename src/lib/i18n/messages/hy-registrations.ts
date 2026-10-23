@@ -1,7 +1,8 @@
 import type { Messages } from '../translate';
 
-/** Գրանցումներ միջոցառումներին՝ նամակներ։ `hy`-ի մաս։ */
+/** Գրանցումներ միջոցառումներին՝ նամակներ, մասնակցության վճար։ `hy`-ի մաս։ */
 export const hyRegistrations: Partial<Messages> = {
+	'registrations.payment.description': 'Մասնակցություն՝ {event}',
 	'registrations.mail.promoted.subject': 'Տեղ է ազատվել՝ {event}',
 	'registrations.mail.promoted.text':
 		'Բարև, {name}։\n\n«{event}» միջոցառմանը ({date}) տեղ է ազատվել, և դուք գրանցված եք։\n\nՄիջոցառման էջը՝ {url}',

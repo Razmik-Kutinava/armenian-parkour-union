@@ -3,7 +3,7 @@ import type { LimitDb } from '../../auth/rate-limit';
 import { payments } from '../../db/schema/payments';
 import type { NewOnlinePayment } from './create';
 
-const checkoutOf = (payload: unknown): string | null => {
+export const checkoutOf = (payload: unknown): string | null => {
 	const url = (payload as { checkoutUrl?: unknown } | null)?.checkoutUrl;
 	return typeof url === 'string' ? url : null;
 };

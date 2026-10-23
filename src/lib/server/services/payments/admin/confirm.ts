@@ -27,8 +27,6 @@ export async function confirmPaymentManually(
 		db.transaction(async (tx): Promise<AdminPaymentResult> => {
 			const payment = await lockPayment(tx, paymentId);
 			if (!payment) return 'not_found';
-			// registrations and places of an event fee — stage 5
-			if (payment.kind === 'event_fee') return 'unsupported';
 			if (!canTransition(payment.status, 'paid')) return 'wrong_status';
 			const [paid] = await tx
 				.update(payments)
