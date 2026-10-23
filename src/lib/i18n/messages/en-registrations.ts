@@ -57,5 +57,20 @@ export const enRegistrations = {
 	'registrations.mail.promoted.text':
 		'Hello, {name}!\n\nA place has opened at “{event}” ({date}), and you are now registered.\n\nEvent page: {url}',
 	'registrations.mail.promoted.textPay':
-		'Hello, {name}!\n\nA place has opened at “{event}” ({date}). Pay the participation fee by {until} to keep it; after that the place goes to the next person in line.\n\nEvent page: {url}'
+		'Hello, {name}!\n\nA place has opened at “{event}” ({date}). Pay the participation fee by {until} to keep it; after that the place goes to the next person in line.\n\nEvent page: {url}',
+	'registrations.mail.confirmed.subject': 'You are registered: {event}',
+	'registrations.mail.confirmed.text':
+		'Hello, {name}!\n\nYou are registered for “{event}” ({date}). See you there!\n\nYour events: {url}',
+	'registrations.mail.waitlist.subject': 'You are on the waitlist: {event}',
+	'registrations.mail.waitlist.text':
+		'Hello, {name}!\n\nThere are no places left at “{event}” ({date}), so you are on the waitlist. When a place frees up and it is your turn, we will email you.\n\nYour events: {url}',
+	'registrations.mail.paid.subject': 'Payment received, you are registered: {event}',
+	'registrations.mail.paid.text':
+		'Hello, {name}!\n\nWe have received your payment for “{event}” ({date}), and you are registered. Thank you!\n\nAmount: {amount}\nDate: {paidAt}\nPurpose: participation in “{event}”\nPayment number: {payment}\n\nYour events: {url}',
+	'registrations.mail.requisites': 'Federation details:',
+	'registrations.mail.eventCancelled.subject': 'Event cancelled: {event}',
+	'registrations.mail.eventCancelled.text':
+		'Hello, {name}!\n\nUnfortunately, “{event}” ({date}) has been cancelled, and your registration is cancelled with it.{refund}\n\nYour events: {url}',
+	'registrations.mail.eventCancelled.refund':
+		'You have paid for participation: the federation will contact you about the refund.'
 } as const;

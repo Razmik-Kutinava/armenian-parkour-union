@@ -46,6 +46,11 @@
 ## Фазы 5.9
 
 - [x] SPEC
-- [ ] RED
-- [ ] GREEN
+- [x] RED (`ced6e21`) — `letters.test.ts`, `letters-event.test.ts` падают: писем нет, ключей переводов нет
+- [x] GREEN — `mail.ts` (общий `eventLetter`, `registeredLetter`, `eventCancelledLetter`), `fee-mail.ts` (квитанция участия), `recipient.ts`; `registerForEvent` — письмо после коммита при `send` в зависимостях (`registerNow` подставляет `sendMail`); `payment-effects` — письмо об оплате через `after`; `cancelEventRegistrations` читает строки `FOR UPDATE` до отмены (прежний статус — «оплачено»), `sendEventCancelled` после разбора платежей; маршрут — `cancelEventNow`. Приёмочный `acceptance-event` и `payment-effects.test` «возврат» — теперь участник получает и письмо об оплате. Vitest зоны 186/186 + `payments/acceptance-event` 4/4, `check` 0, `lint` чистый
 - [ ] REVIEW — общим шагом в конце этапа 5
+
+Не сделано / для REVIEW 5.9:
+- Письма при ручном добавлении сотрудником, отмене регистрации сотрудником, возврате места из-за неоплаты — в `03` § 14 не перечислены; вопрос владельцу.
+- Повторной попытки отправки нет (`03` § 14 «повторная попытка»): ошибка — только в лог, как у остальных писем проекта.
+- Живую доставку (Resend) руками не проверяли.

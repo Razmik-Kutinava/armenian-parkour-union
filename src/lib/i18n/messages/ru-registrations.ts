@@ -58,5 +58,20 @@ export const ruRegistrations: Partial<Messages> = {
 	'registrations.mail.promoted.text':
 		'Здравствуйте, {name}!\n\nНа событии «{event}» ({date}) освободилось место — вы зарегистрированы.\n\nСтраница события: {url}',
 	'registrations.mail.promoted.textPay':
-		'Здравствуйте, {name}!\n\nНа событии «{event}» ({date}) освободилось место. Оплатите участие до {until}, чтобы сохранить его; после этого место перейдёт следующему в очереди.\n\nСтраница события: {url}'
+		'Здравствуйте, {name}!\n\nНа событии «{event}» ({date}) освободилось место. Оплатите участие до {until}, чтобы сохранить его; после этого место перейдёт следующему в очереди.\n\nСтраница события: {url}',
+	'registrations.mail.confirmed.subject': 'Вы зарегистрированы: {event}',
+	'registrations.mail.confirmed.text':
+		'Здравствуйте, {name}!\n\nВы зарегистрированы на «{event}» ({date}). До встречи!\n\nМои события: {url}',
+	'registrations.mail.waitlist.subject': 'Вы в очереди ожидания: {event}',
+	'registrations.mail.waitlist.text':
+		'Здравствуйте, {name}!\n\nНа «{event}» ({date}) мест нет, поэтому вы в очереди ожидания. Когда место освободится и подойдёт ваша очередь, мы напишем.\n\nМои события: {url}',
+	'registrations.mail.paid.subject': 'Оплата получена, вы зарегистрированы: {event}',
+	'registrations.mail.paid.text':
+		'Здравствуйте, {name}!\n\nМы получили оплату участия в «{event}» ({date}) — вы зарегистрированы. Спасибо!\n\nСумма: {amount}\nДата: {paidAt}\nНазначение: участие в «{event}»\nНомер платежа: {payment}\n\nМои события: {url}',
+	'registrations.mail.requisites': 'Реквизиты федерации:',
+	'registrations.mail.eventCancelled.subject': 'Событие отменено: {event}',
+	'registrations.mail.eventCancelled.text':
+		'Здравствуйте, {name}!\n\nК сожалению, «{event}» ({date}) отменено, и ваша регистрация отменена вместе с ним.{refund}\n\nМои события: {url}',
+	'registrations.mail.eventCancelled.refund':
+		'Вы оплатили участие: о возврате оплаты федерация свяжется с вами.'
 };

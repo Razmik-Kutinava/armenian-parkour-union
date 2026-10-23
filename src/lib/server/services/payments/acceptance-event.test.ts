@@ -95,6 +95,7 @@ describe.skipIf(!testDbUrl)('payments acceptance: event fee', () => {
 			const event = await paidEvent(tx, { capacity: 1 });
 			const { member, registrationId, payment } = await payStarted(tx, mock, event.id);
 			await deliver(tx, mock, mock.simulate(payment.providerPaymentId!, 'paid'), effects);
+			expect(sent.splice(0).map((m) => m.to)).toEqual([member.email]);
 			const queued = await insertMember(tx);
 			const waiting = await registerOk(tx, queued.id, event.id);
 			const admin = await staff(tx);

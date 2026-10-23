@@ -1,12 +1,16 @@
 import { eq, sql } from 'drizzle-orm';
 import type { LimitDb } from '../../auth/rate-limit';
 import { eventRegistrations } from '../../db/schema/registrations';
+import type { Mail } from '../../mail/resend';
 import { isUuid } from '../users/target';
 import { checkAdmission, type Refusal } from './admission';
 import { lockShownEvent, readAdmission, readMember } from './admission-data';
+import { registeredLetter, type LetterDeps } from './mail';
 import { awardRegistration } from './points';
+import { recipientOf } from './recipient';
 import { hasSeat, readSeats } from './seats';
 import type { RegistrationSettings } from './settings';
+import { sendLetters } from './waitlist';
 
 /* docs/03 section 7.2–7.4: one transaction with the event row locked first, so registrations and
  * cancels of one event go one at a time and the limit holds under simultaneous clicks. */
@@ -23,8 +27,14 @@ export type RegisterResult =
 
 /** `payment_unavailable` — a paid event while online payment is off: the seat could not be paid. */
 export type RegisterRefusal = Refusal | 'not_found' | 'payment_unavailable';
-/** `paymentsOn: false` — online payment is off (no provider or wait time); default — on. */
-export type RegisterDeps = { settings: RegistrationSettings; paymentsOn?: boolean };
+/**
+ * `paymentsOn: false` — online payment is off (no provider or wait time); default — on.
+ * `send` — the letter of docs/03 section 14 after the commit; a held paid seat gets none yet.
+ */
+export type RegisterDeps = {
+	settings: RegistrationSettings;
+	paymentsOn?: boolean;
+} & Partial<LetterDeps>;
 
 const refuse = (reason: RegisterRefusal) => ({ ok: false, reason }) as const;
 
@@ -46,7 +56,8 @@ export async function registerForEvent(
 ): Promise<RegisterResult> {
 	if (!isUuid(userId) || !isUuid(input.eventId)) return refuse('not_found');
 	if (input.categoryId !== null && !isUuid(input.categoryId)) return refuse('category_invalid');
-	return db.transaction(async (tx) => {
+	const letters: Mail[] = [];
+	const result = await db.transaction(async (tx) => {
 		const event = await lockShownEvent(tx, input.eventId, now);
 		const user = event && (await readMember(tx, userId));
 		if (!event || !user) return refuse('not_found');
@@ -85,6 +96,12 @@ export async function registerForEvent(
 					.values({ eventId: event.id, userId, ...values })
 					.returning({ id: eventRegistrations.id });
 		if (status === 'registered') await awardRegistration(tx, { id: row.id, userId });
-		return { ok: true, id: row.id, status, holdUntil };
+		if (deps.send && status !== 'pending_payment') {
+			const to = await recipientOf(tx, userId);
+			if (to) letters.push(registeredLetter(to, event, status, deps.siteUrl));
+		}
+		return { ok: true as const, id: row.id, status, holdUntil };
 	});
+	if (deps.send) await sendLetters(deps.send, letters);
+	return result;
 }

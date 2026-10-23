@@ -58,5 +58,20 @@ export const hyRegistrations: Partial<Messages> = {
 	'registrations.mail.promoted.text':
 		'Բարև, {name}։\n\n«{event}» միջոցառմանը ({date}) տեղ է ազատվել, և դուք գրանցված եք։\n\nՄիջոցառման էջը՝ {url}',
 	'registrations.mail.promoted.textPay':
-		'Բարև, {name}։\n\n«{event}» միջոցառմանը ({date}) տեղ է ազատվել։ Վճարեք մասնակցության վճարը մինչև {until}, որպեսզի պահպանեք այն․ դրանից հետո տեղը կանցնի հերթի հաջորդին։\n\nՄիջոցառման էջը՝ {url}'
+		'Բարև, {name}։\n\n«{event}» միջոցառմանը ({date}) տեղ է ազատվել։ Վճարեք մասնակցության վճարը մինչև {until}, որպեսզի պահպանեք այն․ դրանից հետո տեղը կանցնի հերթի հաջորդին։\n\nՄիջոցառման էջը՝ {url}',
+	'registrations.mail.confirmed.subject': 'Դուք գրանցված եք՝ {event}',
+	'registrations.mail.confirmed.text':
+		'Բարև, {name}։\n\nԴուք գրանցված եք «{event}» միջոցառմանը ({date})։ Կհանդիպենք։\n\nԻմ միջոցառումները՝ {url}',
+	'registrations.mail.waitlist.subject': 'Դուք հերթում եք՝ {event}',
+	'registrations.mail.waitlist.text':
+		'Բարև, {name}։\n\n«{event}» միջոցառմանը ({date}) տեղեր չկան, ուստի դուք հերթում եք։ Երբ տեղ ազատվի և ձեր հերթը գա, մենք ձեզ կգրենք։\n\nԻմ միջոցառումները՝ {url}',
+	'registrations.mail.paid.subject': 'Վճարումը ստացված է, դուք գրանցված եք՝ {event}',
+	'registrations.mail.paid.text':
+		'Բարև, {name}։\n\nՄենք ստացել ենք «{event}» միջոցառմանը ({date}) մասնակցության վճարը, և դուք գրանցված եք։ Շնորհակալություն։\n\nԳումար՝ {amount}\nԱմսաթիվ՝ {paidAt}\nՆպատակ՝ մասնակցություն «{event}» միջոցառմանը\nՎճարման համար՝ {payment}\n\nԻմ միջոցառումները՝ {url}',
+	'registrations.mail.requisites': 'Ֆեդերացիայի վավերապայմանները՝',
+	'registrations.mail.eventCancelled.subject': 'Միջոցառումը չեղարկված է՝ {event}',
+	'registrations.mail.eventCancelled.text':
+		'Բարև, {name}։\n\nՑավոք, «{event}» միջոցառումը ({date}) չեղարկվել է, և ձեր գրանցումը չեղարկվել է դրա հետ։{refund}\n\nԻմ միջոցառումները՝ {url}',
+	'registrations.mail.eventCancelled.refund':
+		'Դուք վճարել եք մասնակցության համար․ վճարի վերադարձի հարցով ֆեդերացիան կկապվի ձեզ հետ։'
 };

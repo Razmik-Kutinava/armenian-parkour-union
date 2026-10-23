@@ -58,14 +58,19 @@ export async function registrationViewNow(
 	return { ...view, categories };
 }
 
-/** The member registers; the user id comes from the session. */
+/** The member registers; the user id comes from the session. The letter goes after the commit. */
 export async function registerNow(
 	db: LimitDb,
 	userId: string,
 	input: RegisterInput
 ): Promise<RegisterResult> {
 	const [settings, paymentsOn] = await Promise.all([registrationSettings(db), paymentsOnNow(db)]);
-	return registerForEvent(db, userId, input, { settings, paymentsOn });
+	return registerForEvent(db, userId, input, {
+		settings,
+		paymentsOn,
+		send: sendMail,
+		siteUrl: PUBLIC_SITE_URL
+	});
 }
 
 /** The member cancels their own registration; letters to the waitlist go after the commit. */

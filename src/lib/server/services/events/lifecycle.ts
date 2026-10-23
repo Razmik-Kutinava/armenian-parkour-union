@@ -7,8 +7,10 @@ import { writeAudit } from '../audit';
 import {
 	cancelEventRegistrations,
 	hasRegistrations,
+	sendEventCancelled,
 	settleEventPayments
 } from '../registrations/event-cancel';
+import type { LetterDeps } from '../registrations/mail';
 import { isUuid, type Actor } from '../users/target';
 import { dbNow, lockEvent } from './checks';
 
@@ -68,14 +70,15 @@ export async function changeEventStatus(
 
 /**
  * Admin only, with a reason in the log. Active registrations are cancelled with the event; their
- * payments are settled after the commit (letters to the members — 5.9).
+ * payments are settled after the commit, then the members get letters (the reason is not in them).
  */
 export async function cancelEvent(
 	db: LimitDb,
 	actor: Actor,
 	id: string,
 	reason: string,
-	ip: string | null
+	ip: string | null,
+	mail: LetterDeps | null = null
 ): Promise<'ok' | 'bad_status' | Missing> {
 	if (!roleCan(actor.role, 'events.cancel')) return 'not_allowed';
 	if (!isUuid(id)) return 'not_found';
@@ -94,10 +97,11 @@ export async function cancelEvent(
 			after: { status: 'cancelled', reason, registrationsCancelled: cancelled.length },
 			ip
 		});
-		return cancelled;
+		return { event, cancelled };
 	});
 	if (typeof outcome === 'string') return outcome;
-	await settleEventPayments(db, id, outcome);
+	await settleEventPayments(db, id, outcome.cancelled);
+	if (mail) await sendEventCancelled(mail, outcome.event, outcome.cancelled);
 	return 'ok';
 }
 

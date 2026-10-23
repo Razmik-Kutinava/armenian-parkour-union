@@ -2,9 +2,9 @@ import { error, fail, redirect, type RequestEvent } from '@sveltejs/kit';
 import { requirePermission } from '#lib/server/auth/guard.ts';
 import { can } from '#lib/server/auth/permissions.ts';
 import { db } from '#lib/server/db/index.ts';
+import { cancelEventNow } from '#lib/server/services/events/cancel-now.ts';
 import { listEventCategories } from '#lib/server/services/events/categories.ts';
 import {
-	cancelEvent,
 	changeEventStatus,
 	deleteEvent,
 	duplicateEvent,
@@ -74,7 +74,7 @@ export const actions: Actions = {
 		const reason = cancelReasonSchema.safeParse((await event.request.formData()).get('comment'));
 		if (!reason.success) return fail(400, { badReason: true as const });
 		const ip = event.getClientAddress();
-		const result = await cancelEvent(db, actor, event.params.id, reason.data, ip);
+		const result = await cancelEventNow(db, actor, event.params.id, reason.data, ip);
 		if (result === 'bad_status') return fail(400, { badStatus: true as const });
 		if (result !== 'ok') missing(result);
 		return { saved: true as const };

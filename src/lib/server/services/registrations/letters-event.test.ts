@@ -27,9 +27,7 @@ describe.skipIf(!testDbUrl)('registrations: letters on payment and event cancel'
 			const event = await paidEvent(tx);
 			const { member, payment } = await payStarted(tx, mock, event.id);
 			expect(await settleFee(tx, mock, payment.id, 'paid', feeEffects(box.send))).toBe('applied');
-			expect(await settleFee(tx, mock, payment.id, 'paid', feeEffects(box.send))).toBe(
-				'unchanged'
-			);
+			expect(await settleFee(tx, mock, payment.id, 'paid', feeEffects(box.send))).toBe('unchanged');
 			expect(box.sent).toHaveLength(1);
 			const [letter] = box.sent;
 			expect(letter.to).toBe(member.email);
