@@ -5,6 +5,8 @@ import { insertUser } from '../../../db/test-db';
 import type { Mail } from '../../../mail/resend';
 import { donationEffects } from '../../donations/effects';
 import { effectsWith } from '../../memberships/test-support';
+import { eventFeeEffects } from '../../registrations/payment-effects';
+import { SETTINGS, SITE } from '../../registrations/test-support';
 import type { PaymentEffects } from '../effects';
 import { withRefundLetter } from '../refund-letter';
 import type { ManualPaymentInput } from './manual';
@@ -18,7 +20,11 @@ export async function staff(tx: LimitDb, role: UserRole = 'admin') {
 
 /** The production set of effects, letters into `send`. */
 export function allEffects(send: (mail: Mail) => Promise<void>): PaymentEffects {
-	return withRefundLetter({ ...effectsWith(send), donation: donationEffects({ send }) }, send);
+	const eventFee = eventFeeEffects({ send, siteUrl: SITE, settings: async () => SETTINGS });
+	return withRefundLetter(
+		{ ...effectsWith(send), donation: donationEffects({ send }), event_fee: eventFee },
+		send
+	);
 }
 
 export async function insertPayment(

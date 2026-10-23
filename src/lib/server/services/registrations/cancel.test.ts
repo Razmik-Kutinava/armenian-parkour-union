@@ -2,7 +2,11 @@ import { eq } from 'drizzle-orm';
 import { afterAll, describe, expect, it, vi } from 'vitest';
 import { events } from '../../db/schema/events';
 import { testDb, testDbUrl } from '../../db/test-db';
+import { auditFor } from '../memberships/test-support';
+import { createMockProvider } from '../payments/providers/mock';
+import { paymentRow } from '../payments/test-support';
 import { cancelRegistration } from './cancel';
+import { feeEffects, paidEvent, payStarted, settleFee } from './pay-support';
 import {
 	HOUR,
 	SETTINGS,
@@ -95,6 +99,33 @@ describe.skipIf(!testDbUrl)('registrations: cancel', () => {
 			warn.mockRestore();
 			expect((await registrationOf(tx, first.id)).status).toBe('cancelled');
 			expect((await registrationOf(tx, queued.id)).status).toBe('registered');
+		});
+	});
+
+	it('cancelled before paying: the waiting payment is cancelled too', async () => {
+		await inRollback(async (tx) => {
+			const event = await paidEvent(tx);
+			const { member, payment } = await payStarted(tx, createMockProvider(), event.id);
+			expect(await cancelRegistration(tx, member.id, event.id, deps())).toBe('ok');
+			expect(await paymentRow(tx, payment.id)).toMatchObject({
+				status: 'cancelled',
+				failureReason: 'registration_cancelled'
+			});
+		});
+	});
+
+	it('cancelled after paying: the money stays, the payment goes to review (the admin decides)', async () => {
+		await inRollback(async (tx) => {
+			const mock = createMockProvider();
+			const event = await paidEvent(tx);
+			const { member, payment } = await payStarted(tx, mock, event.id);
+			await settleFee(tx, mock, payment.id, 'paid', feeEffects());
+			expect(await cancelRegistration(tx, member.id, event.id, deps())).toBe('ok');
+			expect(await paymentRow(tx, payment.id)).toMatchObject({ status: 'paid', needsReview: true });
+			const reviews = (await auditFor(tx, 'payment', payment.id)).filter(
+				(e) => e.action === 'event_fee.review'
+			);
+			expect(reviews.map((e) => e.after)).toMatchObject([{ reason: 'cancelled_by_member' }]);
 		});
 	});
 });
