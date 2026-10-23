@@ -34,7 +34,8 @@ async function withResult(
 	return { member, registration: await registrationOf(tx, id) };
 }
 
-describe.skipIf(!testDbUrl)('registrations: points for the result', () => {
+/* `setRules` holds the rules table lock until the rollback: other files' tests queue on it. */
+describe.skipIf(!testDbUrl)('registrations: points for the result', { timeout: 60_000 }, () => {
 	const { inRollback, close } = testDb();
 	afterAll(close);
 

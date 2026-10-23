@@ -52,6 +52,7 @@ export const enRegistrations = {
 	'registrations.payError.hold_expired': 'The time to pay has run out.',
 	'registrations.payError.closed': 'Registration for this event is closed.',
 	'registrations.payment.description': 'Participation: {event}',
+	'registrations.points.cancelled': 'Registration for “{event}” cancelled before the start',
 	'registrations.mail.promoted.subject': 'A place has opened: {event}',
 	'registrations.mail.promoted.text':
 		'Hello, {name}!\n\nA place has opened at “{event}” ({date}), and you are now registered.\n\nEvent page: {url}',

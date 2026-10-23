@@ -6,6 +6,7 @@ import { users } from '../../db/schema/users';
 import type { Mail } from '../../mail/resend';
 import type { AfterCommit, PaymentEffect, PaymentRow } from '../payments/effects';
 import { reviewEventFee } from './fee-review';
+import { awardRegistration, takeBackRegistration } from './points';
 import { hasSeat, readSeats } from './seats';
 import type { RegistrationSettings } from './settings';
 import { fillFromWaitlist, sendLetters } from './waitlist';
@@ -47,6 +48,12 @@ async function setStatus(tx: LimitDb, id: string, status: 'registered' | 'cancel
 		.where(eq(eventRegistrations.id, id));
 }
 
+/** The paid seat counts, and so do the registration points (docs/03 section 6.2 p. 5). */
+async function admit(tx: LimitDb, registration: { id: string; userId: string }) {
+	await setStatus(tx, registration.id, 'registered');
+	await awardRegistration(tx, registration);
+}
+
 /** Paid in time — counts; paid after the seat was released — only into a free seat (p. 5). */
 async function countIn(tx: LimitDb, payment: PaymentRow) {
 	const locked = await lockFeeRegistration(tx, payment.id);
@@ -60,24 +67,24 @@ async function countIn(tx: LimitDb, payment: PaymentRow) {
 	if (user?.status !== 'active' || user.deletedAt) {
 		return reviewEventFee(tx, payment.id, 'user_blocked', ref);
 	}
-	if (registration.status === 'pending_payment')
-		return setStatus(tx, registration.id, 'registered');
+	if (registration.status === 'pending_payment') return admit(tx, registration);
 	if (registration.status !== 'cancelled' && registration.status !== 'waitlist') {
 		return reviewEventFee(tx, payment.id, 'registration_already_active', ref);
 	}
 	const open = event.status === 'published' && !event.deletedAt && event.startsAt > new Date();
 	if (open && hasSeat(await readSeats(tx, event.id, event.capacity), registration.categoryId)) {
-		return setStatus(tx, registration.id, 'registered');
+		return admit(tx, registration);
 	}
 	return reviewEventFee(tx, payment.id, 'late_payment_no_seat', ref);
 }
 
-/** Refunded: the seat is given back; a past event's attendance stays. */
+/** Refunded: the seat is given back, before the start — with the points; attendance stays. */
 async function giveBack(tx: LimitDb, payment: PaymentRow, after: AfterCommit, deps: EventFeeDeps) {
 	const locked = await lockFeeRegistration(tx, payment.id);
 	const status = locked?.registration.status;
 	if (!locked || (status !== 'registered' && status !== 'pending_payment')) return;
 	await setStatus(tx, locked.registration.id, 'cancelled');
+	await takeBackRegistration(tx, locked.registration, locked.event);
 	const waitlist = { settings: await deps.settings(tx), siteUrl: deps.siteUrl };
 	const letters = await fillFromWaitlist(tx, locked.event.id, waitlist);
 	after(() => sendLetters(deps.send, letters));

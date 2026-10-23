@@ -5,11 +5,13 @@ import { eventRegistrations } from '../../db/schema/registrations';
 import { users } from '../../db/schema/users';
 import type { Mail } from '../../mail/resend';
 import { promotedLetter } from './mail';
+import { awardRegistration } from './points';
 import { hasSeat, readSeats, takeSeat } from './seats';
 import type { RegistrationSettings } from './settings';
 
 /* docs/03 section 7.3: when a seat frees up, the first in line takes it; a paid event gives them
- * `offer_hours` to pay. Members whose category is still full keep their place in line. */
+ * `offer_hours` to pay. Members whose category is still full keep their place in line. A free
+ * seat counts at once and earns the registration points (section 6.2 p. 5). */
 
 export type WaitlistDeps = { settings: RegistrationSettings; siteUrl: string | undefined };
 
@@ -32,6 +34,7 @@ export async function fillFromWaitlist(
 	const queue = await tx
 		.select({
 			id: eventRegistrations.id,
+			userId: eventRegistrations.userId,
 			categoryId: eventRegistrations.categoryId,
 			user: {
 				email: users.email,
@@ -58,6 +61,7 @@ export async function fillFromWaitlist(
 			.update(eventRegistrations)
 			.set({ status: paid ? 'pending_payment' : 'registered', holdUntil })
 			.where(eq(eventRegistrations.id, row.id));
+		if (!paid) await awardRegistration(tx, row);
 		letters.push(promotedLetter(row.user, event, holdUntil, deps.siteUrl));
 	}
 	return letters;

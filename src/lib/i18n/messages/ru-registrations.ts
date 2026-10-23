@@ -53,6 +53,7 @@ export const ruRegistrations: Partial<Messages> = {
 	'registrations.payError.hold_expired': 'Время на оплату истекло.',
 	'registrations.payError.closed': 'Регистрация на это событие закрыта.',
 	'registrations.payment.description': 'Участие: {event}',
+	'registrations.points.cancelled': 'Регистрация на «{event}» отменена до начала',
 	'registrations.mail.promoted.subject': 'Освободилось место: {event}',
 	'registrations.mail.promoted.text':
 		'Здравствуйте, {name}!\n\nНа событии «{event}» ({date}) освободилось место — вы зарегистрированы.\n\nСтраница события: {url}',

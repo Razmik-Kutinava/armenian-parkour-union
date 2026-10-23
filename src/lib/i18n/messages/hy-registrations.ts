@@ -53,6 +53,7 @@ export const hyRegistrations: Partial<Messages> = {
 	'registrations.payError.hold_expired': 'Վճարման ժամանակը սպառվել է։',
 	'registrations.payError.closed': 'Այս միջոցառման գրանցումը փակ է։',
 	'registrations.payment.description': 'Մասնակցություն՝ {event}',
+	'registrations.points.cancelled': '«{event}» միջոցառման գրանցումը չեղարկվել է մինչև մեկնարկը',
 	'registrations.mail.promoted.subject': 'Տեղ է ազատվել՝ {event}',
 	'registrations.mail.promoted.text':
 		'Բարև, {name}։\n\n«{event}» միջոցառմանը ({date}) տեղ է ազատվել, և դուք գրանցված եք։\n\nՄիջոցառման էջը՝ {url}',

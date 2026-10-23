@@ -5,6 +5,7 @@ import { eventRegistrations } from '../../db/schema/registrations';
 import type { Mail } from '../../mail/resend';
 import { isUuid } from '../users/target';
 import type { RegistrationStatus } from './admission';
+import { takeBackRegistration } from './points';
 import { holdsSeat } from './seats';
 import type { RegistrationSettings } from './settings';
 import { settleCancelledPayment } from './settle-cancel';
@@ -12,7 +13,7 @@ import { fillFromWaitlist, sendLetters, type WaitlistDeps } from './waitlist';
 
 /* docs/03 section 7.5, docs/04 section 3.1: the member cancels their own registration before the
  * start (a seat — `cancel_hours` before it); the freed seat goes to the waitlist. A refund is the
- * admin's decision (settle-cancel.ts); points for the registration are taken back in 5.6. */
+ * admin's decision (settle-cancel.ts); points for the registration are taken back (points.ts). */
 
 export type CancelDeps = WaitlistDeps & { send: (mail: Mail) => Promise<void> };
 export type CancelResult = 'ok' | 'not_found' | 'wrong_status' | 'too_late';
@@ -39,7 +40,7 @@ export async function cancelRegistration(
 	if (!isUuid(userId) || !isUuid(eventId)) return 'not_found';
 	const outcome = await db.transaction(async (tx) => {
 		const [event] = await tx
-			.select({ startsAt: events.startsAt })
+			.select({ startsAt: events.startsAt, title: events.title })
 			.from(events)
 			.where(and(eq(events.id, eventId), isNull(events.deletedAt)))
 			.for('update');
@@ -62,6 +63,7 @@ export async function cancelRegistration(
 			.update(eventRegistrations)
 			.set({ status: 'cancelled', holdUntil: null })
 			.where(eq(eventRegistrations.id, row.id));
+		if (seat) await takeBackRegistration(tx, { id: row.id, userId }, event, now);
 		const letters = seat ? await fillFromWaitlist(tx, eventId, deps, now) : [];
 		return { letters, paymentId: seat ? row.paymentId : null, id: row.id };
 	});

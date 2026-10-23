@@ -4,6 +4,7 @@ import { eventRegistrations } from '../../db/schema/registrations';
 import { isUuid } from '../users/target';
 import { checkAdmission, type Refusal } from './admission';
 import { lockShownEvent, readAdmission, readMember } from './admission-data';
+import { awardRegistration } from './points';
 import { hasSeat, readSeats } from './seats';
 import type { RegistrationSettings } from './settings';
 
@@ -77,6 +78,7 @@ export async function registerForEvent(
 					.insert(eventRegistrations)
 					.values({ eventId: event.id, userId, ...values })
 					.returning({ id: eventRegistrations.id });
+		if (status === 'registered') await awardRegistration(tx, { id: row.id, userId });
 		return { ok: true, id: row.id, status, holdUntil };
 	});
 }
