@@ -48,5 +48,10 @@
 - [x] SPEC
 - [x] RED (`be5c815`) — `cabinet/events.test.ts` падает: модуля `services/cabinet/events` нет; e2e `cabinet-events.spec` — страницы нет
 - [x] GREEN — `services/cabinet/events.ts` (`listOwnEvents`), `/cabinet/events` (вкладки ссылками `?tab=past`, действия `pay` / `cancel` с `eventId` → `payForEventNow` / `cancelNow`, сообщения оплаты — общий `payMessage` страницы события), пункт меню, словари `*-cabinet-events.ts`; Vitest зоны 81/81, e2e `cabinet` + `cabinet-events` + `event-registration` 14/14, `check` 0, eslint чистый
-- [ ] REGRESS
+- [x] REGRESS — весь Vitest 1114/1114 (первый прогон 1113/1114: `registrations/points.test.ts` 5.6 — под нагрузкой параллельного `lint`, второй прогон зелёный); `lint` чистый; e2e `cabinet` + `cabinet-events` + `event-registration` 14/14
 - [ ] REVIEW — общим шагом в конце этапа 5
+
+Не сделано / для REVIEW 5.8:
+- Обзор `/cabinet` (`06` § 5.1): «Ближайшие события» и «неоплаченная регистрация» в «Требует действия» — отдельным шагом.
+- «Оплатить» из кабинета до провайдера в e2e не доходит (на e2e-сервере онлайн-оплата выключена); проверено сервисом 5.4 и ответом «недоступна» на странице события.
+- Экран руками в браузере (и на телефоне) не смотрели — только e2e.
