@@ -1,4 +1,4 @@
-import { eq, inArray } from 'drizzle-orm';
+import { eq, inArray, sql } from 'drizzle-orm';
 import { afterAll, describe, expect, it } from 'vitest';
 import { localizedText } from '#lib/validation/site-settings.ts';
 import { pointsRules } from '../db/schema/points';
@@ -49,7 +49,11 @@ describe.skipIf(!testDbUrl)('seed: points rules in the database', () => {
 
 	it('adds missing rules as active and never overwrites one edited by the owner', async () => {
 		await inRollback(async (tx) => {
-			await tx.delete(pointsRules).where(inArray(pointsRules.code, CODES));
+			// The ledger refers to the rules and is append-only: the rows stay, their codes move aside.
+			await tx
+				.update(pointsRules)
+				.set({ code: sql`'old-' || ${pointsRules.id}` })
+				.where(inArray(pointsRules.code, CODES));
 			const edited = { code: 'video_approved', title: { en: 'Video' }, points: 0, isActive: false };
 			await tx.insert(pointsRules).values(edited);
 
