@@ -95,7 +95,7 @@ export const enEvents = {
 	'events.cancel': 'Cancel event',
 	'events.cancelTitle': 'Cancel the event?',
 	'events.cancelText':
-		'The event leaves the lists; its page shows that it is cancelled. This cannot be undone.',
+		'The event leaves the lists; its page shows that it is cancelled. Its registrations are cancelled too, paid ones go to payment review for a refund. This cannot be undone.',
 	'events.open': 'Open on the site',
 	'events.scheduledNote': 'Will appear on the site on {date} (Yerevan time).',
 
@@ -114,6 +114,9 @@ export const enEvents = {
 	'events.error.ageOrder': '"From" cannot be above "to"',
 	'events.error.sortOrder': 'A whole number from 0',
 	'events.error.status': 'Not available in the current status',
+	'events.error.hasRegistrations':
+		'The event has registrations: it cannot be deleted, only cancelled',
+	'events.error.categoryInUse': 'The category has registrations: it cannot be removed',
 
 	'events.list.description': 'Parkour events in Armenia: jams, competitions and workshops',
 	'events.list.empty': 'No upcoming events',

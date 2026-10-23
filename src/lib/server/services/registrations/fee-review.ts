@@ -8,7 +8,8 @@ export type FeeReview =
 	| 'user_blocked'
 	| 'registration_already_active'
 	| 'late_payment_no_seat'
-	| 'cancelled_by_member';
+	| 'cancelled_by_member'
+	| 'event_cancelled';
 
 /** docs/07 section 8: the money is kept, an admin decides (list "Needs review"). */
 export async function reviewEventFee(

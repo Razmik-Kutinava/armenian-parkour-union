@@ -4,6 +4,11 @@ import { roleCan } from '../../auth/permissions';
 import type { LimitDb } from '../../auth/rate-limit';
 import { events } from '../../db/schema/events';
 import { writeAudit } from '../audit';
+import {
+	cancelEventRegistrations,
+	hasRegistrations,
+	settleEventPayments
+} from '../registrations/event-cancel';
 import { isUuid, type Actor } from '../users/target';
 import { dbNow, lockEvent } from './checks';
 
@@ -61,7 +66,10 @@ export async function changeEventStatus(
 	});
 }
 
-/** Admin only, with a reason in the log; no letters until registrations and mail exist. */
+/**
+ * Admin only, with a reason in the log. Active registrations are cancelled with the event; their
+ * payments are settled after the commit (letters to the members — 5.9).
+ */
 export async function cancelEvent(
 	db: LimitDb,
 	actor: Actor,
@@ -71,36 +79,41 @@ export async function cancelEvent(
 ): Promise<'ok' | 'bad_status' | Missing> {
 	if (!roleCan(actor.role, 'events.cancel')) return 'not_allowed';
 	if (!isUuid(id)) return 'not_found';
-	return db.transaction(async (tx) => {
+	const outcome = await db.transaction(async (tx) => {
 		const event = await lockEvent(tx, id);
 		if (!event) return 'not_found' as const;
 		if (event.status !== 'draft' && event.status !== 'published') return 'bad_status' as const;
 		await tx.update(events).set({ status: 'cancelled' }).where(eq(events.id, event.id));
+		const cancelled = await cancelEventRegistrations(tx, event);
 		await writeAudit(tx, {
 			actorId: actor.id,
 			action: 'event.cancel',
 			entityType: 'event',
 			entityId: event.id,
 			before: { status: event.status },
-			after: { status: 'cancelled', reason },
+			after: { status: 'cancelled', reason, registrationsCancelled: cancelled.length },
 			ip
 		});
-		return 'ok' as const;
+		return cancelled;
 	});
+	if (typeof outcome === 'string') return outcome;
+	await settleEventPayments(db, id, outcome);
+	return 'ok';
 }
 
-/** Soft: the row and its categories stay. Refused with registrations — from stage 5. */
+/** Soft: the row and its categories stay. With registrations — refused, only a cancel. */
 export async function deleteEvent(
 	db: LimitDb,
 	actor: Actor,
 	id: string,
 	ip: string | null
-): Promise<'ok' | Missing> {
+): Promise<'ok' | 'has_registrations' | Missing> {
 	if (!roleCan(actor.role, 'events.write')) return 'not_allowed';
 	if (!isUuid(id)) return 'not_found';
 	return db.transaction(async (tx) => {
 		const event = await lockEvent(tx, id);
 		if (!event) return 'not_found' as const;
+		if (await hasRegistrations(tx, { eventId: event.id })) return 'has_registrations' as const;
 		await tx
 			.update(events)
 			.set({ deletedAt: sql`now()` })

@@ -89,6 +89,10 @@
 	<p role="alert" class="mb-4 rounded-md bg-error-bg p-3 text-sm text-error-fg">
 		{t('events.error.status')}
 	</p>
+{:else if form && 'hasRegistrations' in form}
+	<p role="alert" class="mb-4 rounded-md bg-error-bg p-3 text-sm text-error-fg">
+		{t('events.error.hasRegistrations')}
+	</p>
 {/if}
 
 {#key data.values}
@@ -100,6 +104,7 @@
 		categories={data.categories}
 		failed={form && 'category' in form ? form.category : undefined}
 		errors={form && 'categoryErrors' in form ? form.categoryErrors : undefined}
+		inUse={!!form && 'categoryInUse' in form}
 	/>
 </div>
 

@@ -36,7 +36,10 @@ describe.skipIf(!testDbUrl)('registrations: the event is cancelled', () => {
 
 			expect(await cancelEvent(tx, admin, event.id, 'Bad weather', IP)).toBe('ok');
 			for (const id of [paid.registrationId, unpaid.registrationId, queued.id]) {
-				expect(await registrationOf(tx, id)).toMatchObject({ status: 'cancelled', holdUntil: null });
+				expect(await registrationOf(tx, id)).toMatchObject({
+					status: 'cancelled',
+					holdUntil: null
+				});
 			}
 			expect((await registrationOf(tx, came.id)).status).toBe('attended');
 			const [entry] = (await auditFor(tx, 'event', event.id)).filter(

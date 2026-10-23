@@ -51,6 +51,7 @@ export async function categoryDelete(event: RequestEvent<{ id: string }>) {
 	const categoryId = String((await event.request.formData()).get('categoryId') ?? '');
 	const ip = event.getClientAddress();
 	const result = await deleteEventCategory(db, actor, event.params.id, categoryId, ip);
+	if (result === 'in_use') return fail(400, { category: categoryId, categoryInUse: true as const });
 	if (result !== 'ok') missing(result);
 	return { categorySaved: true as const };
 }

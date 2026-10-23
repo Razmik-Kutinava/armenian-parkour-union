@@ -6,9 +6,11 @@ import { roleCan } from '../../auth/permissions';
 import type { LimitDb } from '../../auth/rate-limit';
 import { eventCategories, events } from '../../db/schema/events';
 import { writeAudit } from '../audit';
+import { hasRegistrations } from '../registrations/event-cancel';
 import { isUuid, type Actor } from '../users/target';
 
-/* docs/05 section 5, tab "Categories". Delete is refused with registrations — from stage 5. */
+/* docs/05 section 5, tab "Categories". Delete is refused with registrations: they lock the event
+ * row FOR UPDATE, the delete holds it FOR SHARE, so none can slip in between. */
 
 type Missing = 'not_allowed' | 'not_found';
 export type EventCategory = {
@@ -128,12 +130,13 @@ export async function deleteEventCategory(
 	eventId: string,
 	id: string,
 	ip: string | null
-): Promise<'ok' | Missing> {
+): Promise<'ok' | 'in_use' | Missing> {
 	if (!roleCan(actor.role, 'events.write')) return 'not_allowed';
 	if (!isUuid(eventId)) return 'not_found';
 	return db.transaction(async (tx) => {
 		const category = await lockCategory(tx, eventId, id);
 		if (!category) return 'not_found' as const;
+		if (await hasRegistrations(tx, { categoryId: category.id })) return 'in_use' as const;
 		await tx.delete(eventCategories).where(eq(eventCategories.id, category.id));
 		await writeAudit(tx, {
 			actorId: actor.id,

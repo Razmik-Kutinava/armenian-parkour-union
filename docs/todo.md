@@ -46,7 +46,7 @@
 ## Фазы 5.7a
 
 - [x] SPEC
-- [ ] RED
-- [ ] GREEN
+- [x] RED (`58c19cd`) — 5 из 7 падают (отказов нет, FK-ошибка, регистрации и платежи не трогаются); «возврат после отмены» и «после начала баллы остаются» — зелёные сразу (охрана)
+- [x] GREEN — `registrations/event-cancel.ts` (`cancelEventRegistrations`, `settleEventPayments`, `hasRegistrations`), отказы `in_use` / `has_registrations`, `settleCancelledPayment(…, 'event_cancelled')`; Vitest зоны 315/315, `check` 0, `lint` чистый
 - [ ] REGRESS
 - [ ] REVIEW — общим шагом в конце этапа 5

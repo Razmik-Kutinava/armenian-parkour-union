@@ -17,8 +17,10 @@
 		/** Which form failed: 'new' or a category id. */
 		failed?: string;
 		errors?: Partial<Record<string, MessageKey>>;
+		/** The failed category was not removed: it has registrations. */
+		inUse?: boolean;
 	};
-	let { categories, failed, errors = {} }: Props = $props();
+	let { categories, failed, errors = {}, inUse = false }: Props = $props();
 	const shown = (id: string) =>
 		failed === id ? Object.fromEntries(Object.entries(errors).map(([k, v]) => [k, v && t(v)])) : {};
 	const disciplineOptions = $derived(
@@ -98,7 +100,12 @@
 							<Button type="submit" variant="ghost" size="sm">{t('events.categoryRemove')}</Button>
 						</form>
 					</div>
-					<details open={failed === category.id}>
+					{#if inUse && failed === category.id}
+						<p role="alert" class="rounded-md bg-error-bg p-2 text-sm text-error-fg">
+							{t('events.error.categoryInUse')}
+						</p>
+					{/if}
+					<details open={failed === category.id && !inUse}>
 						<summary class="cursor-pointer text-sm text-navy-700"
 							>{t('events.categoryEdit')}</summary
 						>

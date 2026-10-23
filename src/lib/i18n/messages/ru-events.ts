@@ -98,7 +98,7 @@ export const ruEvents: Record<keyof typeof enEvents, string> = {
 	'events.cancel': 'Отменить событие',
 	'events.cancelTitle': 'Отменить событие?',
 	'events.cancelText':
-		'Событие уйдёт из списков, на его странице будет видно, что оно отменено. Вернуть нельзя.',
+		'Событие уйдёт из списков, на его странице будет видно, что оно отменено. Регистрации отменятся вместе с ним, оплаченные попадут в «Платежи» на проверку для возврата. Вернуть нельзя.',
 	'events.open': 'Открыть на сайте',
 	'events.scheduledNote': 'Появится на сайте {date} (время Еревана).',
 
@@ -117,6 +117,8 @@ export const ruEvents: Record<keyof typeof enEvents, string> = {
 	'events.error.ageOrder': '«От» не может быть больше «до»',
 	'events.error.sortOrder': 'Целое число от 0',
 	'events.error.status': 'Недоступно в текущем статусе',
+	'events.error.hasRegistrations': 'На событие есть регистрации: удалить нельзя, только отменить',
+	'events.error.categoryInUse': 'В категории есть регистрации: убрать её нельзя',
 
 	'events.list.description': 'Паркур-события в Армении: джемы, соревнования и мастер-классы',
 	'events.list.empty': 'Ближайших событий нет',

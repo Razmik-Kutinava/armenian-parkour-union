@@ -84,6 +84,7 @@ export const actions: Actions = {
 	delete: async (event) => {
 		const actor = requirePermission(event.locals.user, 'events.write');
 		const result = await deleteEvent(db, actor, event.params.id, event.getClientAddress());
+		if (result === 'has_registrations') return fail(400, { hasRegistrations: true as const });
 		if (result !== 'ok') missing(result);
 		redirect(303, '/admin/events');
 	},
