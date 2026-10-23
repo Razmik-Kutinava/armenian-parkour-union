@@ -1,4 +1,4 @@
-import { and, eq, isNull } from 'drizzle-orm';
+import { and, asc, eq, isNull } from 'drizzle-orm';
 import type { LimitDb } from '../../auth/rate-limit';
 import { eventCategories, events } from '../../db/schema/events';
 import { eventRegistrations } from '../../db/schema/registrations';
@@ -33,13 +33,22 @@ export async function readMember(tx: LimitDb, userId: string) {
 	return user && !user.deletedAt ? user : null;
 }
 
-/** The member's row for the event (locked), membership, consent and the event categories. */
-export async function readAdmission(tx: LimitDb, eventId: string, userId: string, now: Date) {
-	const [existing] = await tx
+/**
+ * The member's row for the event (locked inside the registration transaction, `lock = false` for
+ * the page view), membership, consent and the event categories.
+ */
+export async function readAdmission(
+	tx: LimitDb,
+	eventId: string,
+	userId: string,
+	now: Date,
+	lock = true
+) {
+	const own = tx
 		.select({ id: eventRegistrations.id, status: eventRegistrations.status })
 		.from(eventRegistrations)
-		.where(and(eq(eventRegistrations.eventId, eventId), eq(eventRegistrations.userId, userId)))
-		.for('update');
+		.where(and(eq(eventRegistrations.eventId, eventId), eq(eventRegistrations.userId, userId)));
+	const [existing] = lock ? await own.for('update') : await own;
 	const [membership, parentalConsent, categories] = await Promise.all([
 		getMembershipOverview(tx, userId, now),
 		hasValidConsent(tx, userId, 'parental', now),
@@ -51,6 +60,7 @@ export async function readAdmission(tx: LimitDb, eventId: string, userId: string
 			})
 			.from(eventCategories)
 			.where(eq(eventCategories.eventId, eventId))
+			.orderBy(asc(eventCategories.sortOrder), asc(eventCategories.createdAt))
 	]);
 	const facts: Pick<
 		AdmissionInput,

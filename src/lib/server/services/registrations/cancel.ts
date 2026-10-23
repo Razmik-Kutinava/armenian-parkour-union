@@ -4,7 +4,9 @@ import { events } from '../../db/schema/events';
 import { eventRegistrations } from '../../db/schema/registrations';
 import type { Mail } from '../../mail/resend';
 import { isUuid } from '../users/target';
+import type { RegistrationStatus } from './admission';
 import { holdsSeat } from './seats';
+import type { RegistrationSettings } from './settings';
 import { settleCancelledPayment } from './settle-cancel';
 import { fillFromWaitlist, sendLetters, type WaitlistDeps } from './waitlist';
 
@@ -15,7 +17,17 @@ import { fillFromWaitlist, sendLetters, type WaitlistDeps } from './waitlist';
 export type CancelDeps = WaitlistDeps & { send: (mail: Mail) => Promise<void> };
 export type CancelResult = 'ok' | 'not_found' | 'wrong_status' | 'too_late';
 
-const CANCELLABLE = ['registered', 'pending_payment', 'waitlist'];
+export const CANCELLABLE: RegistrationStatus[] = ['registered', 'pending_payment', 'waitlist'];
+
+/** A seat may be given back until `cancel_hours` before the start, a place in line until the start. */
+export function cancelDeadline(
+	startsAt: Date,
+	status: RegistrationStatus,
+	settings: RegistrationSettings
+): Date {
+	const hours = holdsSeat(status) ? settings.cancelHours : 0;
+	return new Date(startsAt.getTime() - hours * 3_600_000);
+}
 
 export async function cancelRegistration(
 	db: LimitDb,
@@ -44,8 +56,8 @@ export async function cancelRegistration(
 		if (!row) return 'not_found' as const;
 		if (!CANCELLABLE.includes(row.status)) return 'wrong_status' as const;
 		const seat = holdsSeat(row.status);
-		const deadline = event.startsAt.getTime() - (seat ? deps.settings.cancelHours * 3_600_000 : 0);
-		if (now.getTime() >= deadline) return 'too_late' as const;
+		const deadline = cancelDeadline(event.startsAt, row.status, deps.settings);
+		if (now >= deadline) return 'too_late' as const;
 		await tx
 			.update(eventRegistrations)
 			.set({ status: 'cancelled', holdUntil: null })

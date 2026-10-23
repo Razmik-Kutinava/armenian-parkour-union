@@ -8,7 +8,7 @@ import {
 	HOUR,
 	SETTINGS,
 	bornBefore,
-    10|	insertCategory,
+	insertCategory,
 	insertEvent,
 	insertMember,
 	registerOk
@@ -18,7 +18,7 @@ import { registrationView } from './view';
 /* docs/06 section 4.3: one server service decides what the registration block shows; the
  * conditions are docs/03 section 7 (the same `checkAdmission` the form action runs). */
 
-    20|const deps = { settings: SETTINGS, paymentsOn: true };
+const deps = { settings: SETTINGS, paymentsOn: true };
 
 describe.skipIf(!testDbUrl)('registrations: the event page block', () => {
 	const { inRollback, close } = testDb();
@@ -28,7 +28,7 @@ describe.skipIf(!testDbUrl)('registrations: the event page block', () => {
 		await inRollback(async (tx) => {
 			const event = await insertEvent(tx);
 			expect(await registrationView(tx, null, event.id, deps)).toEqual({ state: 'guest' });
-    30|			const member = await insertMember(tx);
+			const member = await insertMember(tx);
 			for (const status of ['finished', 'cancelled'] as const) {
 				const closed = await insertEvent(tx, { status });
 				expect(await registrationView(tx, member.id, closed.id, deps)).toEqual({ state: 'none' });
@@ -38,7 +38,7 @@ describe.skipIf(!testDbUrl)('registrations: the event page block', () => {
 				state: 'none'
 			});
 		});
-    40|	});
+	});
 
 	it('admission refusals in the order the member fixes them', async () => {
 		await inRollback(async (tx) => {
@@ -48,7 +48,7 @@ describe.skipIf(!testDbUrl)('registrations: the event page block', () => {
 			expect(await refused(unverified.id)).toEqual({
 				state: 'refused',
 				reason: 'email_unverified',
-    50|				opensAt: null
+				opensAt: null
 			});
 			const stranger = await insertUser(tx, { emailVerified: true });
 			expect(await refused(stranger.id)).toMatchObject({ reason: 'no_membership' });
@@ -58,7 +58,7 @@ describe.skipIf(!testDbUrl)('registrations: the event page block', () => {
 			expect(await refused(minor.id)).toMatchObject({ reason: 'parental_consent' });
 			await insertConsent(tx, minor.id, { status: 'approved' });
 			expect(await refused(minor.id)).toMatchObject({ state: 'open' });
-    60|			const blocked = await insertMember(tx, { status: 'blocked' });
+			const blocked = await insertMember(tx, { status: 'blocked' });
 			expect(await refused(blocked.id)).toMatchObject({ reason: 'blocked' });
 		});
 	});
@@ -68,7 +68,7 @@ describe.skipIf(!testDbUrl)('registrations: the event page block', () => {
 			const member = await insertMember(tx);
 			const opensAt = new Date(Date.now() + DAY);
 			const later = await insertEvent(tx, { registrationOpensAt: opensAt });
-    70|			expect(await registrationView(tx, member.id, later.id, deps)).toEqual({
+			expect(await registrationView(tx, member.id, later.id, deps)).toEqual({
 				state: 'refused',
 				reason: 'not_open',
 				opensAt
@@ -78,7 +78,7 @@ describe.skipIf(!testDbUrl)('registrations: the event page block', () => {
 				reason: 'closed'
 			});
 		});
-    80|	});
+	});
 
 	it('categories: only the ones the age fits; none fits — age mismatch', async () => {
 		await inRollback(async (tx) => {
@@ -88,7 +88,7 @@ describe.skipIf(!testDbUrl)('registrations: the event page block', () => {
 			const adult = await insertMember(tx);
 			expect(await registrationView(tx, adult.id, event.id, deps)).toEqual({
 				state: 'open',
-    90|				full: false,
+				full: false,
 				categories: [{ id: open.id, full: false }]
 			});
 			expect(kids.id).not.toBe(open.id);
@@ -98,7 +98,7 @@ describe.skipIf(!testDbUrl)('registrations: the event page block', () => {
 			expect(await registrationView(tx, adult.id, onlyKids.id, deps)).toEqual({
 				state: 'refused',
 				reason: 'age_mismatch',
-   100|				opensAt: null
+				opensAt: null
 			});
 		});
 	});
@@ -108,7 +108,7 @@ describe.skipIf(!testDbUrl)('registrations: the event page block', () => {
 			const event = await insertEvent(tx, { capacity: 1 });
 			const [a, b] = [await insertMember(tx), await insertMember(tx)];
 			expect(await registrationView(tx, b.id, event.id, deps)).toEqual({
-   110|				state: 'open',
+				state: 'open',
 				full: false,
 				categories: []
 			});
@@ -118,7 +118,7 @@ describe.skipIf(!testDbUrl)('registrations: the event page block', () => {
 			const split = await insertEvent(tx);
 			const small = await insertCategory(tx, split.id, { capacity: 1, sortOrder: 0 });
 			const big = await insertCategory(tx, split.id, { sortOrder: 1 });
-   120|			await registerOk(tx, a.id, split.id, small.id);
+			await registerOk(tx, a.id, split.id, small.id);
 			expect(await registrationView(tx, b.id, split.id, deps)).toEqual({
 				state: 'open',
 				full: false,
@@ -128,7 +128,7 @@ describe.skipIf(!testDbUrl)('registrations: the event page block', () => {
 				]
 			});
 		});
-   130|	});
+	});
 
 	it('own registration: registered, waiting for payment with the hold, in line; cancel deadline', async () => {
 		await inRollback(async (tx) => {
@@ -138,7 +138,7 @@ describe.skipIf(!testDbUrl)('registrations: the event page block', () => {
 			await registerOk(tx, a.id, free.id);
 			await registerOk(tx, b.id, free.id);
 			expect(await registrationView(tx, a.id, free.id, deps)).toEqual({
-   140|				state: 'mine',
+				state: 'mine',
 				status: 'registered',
 				holdUntil: null,
 				expired: false,
@@ -148,7 +148,7 @@ describe.skipIf(!testDbUrl)('registrations: the event page block', () => {
 				state: 'mine',
 				status: 'waitlist',
 				cancelUntil: startsAt
-   150|			});
+			});
 			const strict = { ...deps, settings: { ...SETTINGS, cancelHours: 24 } };
 			expect(await registrationView(tx, a.id, free.id, strict)).toMatchObject({
 				cancelUntil: new Date(startsAt.getTime() - 24 * HOUR)
@@ -158,7 +158,7 @@ describe.skipIf(!testDbUrl)('registrations: the event page block', () => {
 			const { holdUntil } = await registerOk(tx, a.id, paid.id);
 			expect(await registrationView(tx, a.id, paid.id, deps)).toEqual({
 				state: 'mine',
-   160|				status: 'pending_payment',
+				status: 'pending_payment',
 				holdUntil,
 				expired: false,
 				cancelUntil: startsAt
@@ -168,7 +168,7 @@ describe.skipIf(!testDbUrl)('registrations: the event page block', () => {
 				.set({ holdUntil: new Date(Date.now() - 1000) })
 				.where(eq(eventRegistrations.eventId, paid.id));
 			expect(await registrationView(tx, a.id, paid.id, deps)).toMatchObject({ expired: true });
-   170|		});
+		});
 	});
 
 	it('cancel is too late after the start; a cancelled registration may register again', async () => {
@@ -178,7 +178,7 @@ describe.skipIf(!testDbUrl)('registrations: the event page block', () => {
 			await registerOk(tx, member.id, soon.id);
 			const strict = { ...deps, settings: { ...SETTINGS, cancelHours: 24 } };
 			expect(await registrationView(tx, member.id, soon.id, strict)).toMatchObject({
-   180|				status: 'registered',
+				status: 'registered',
 				cancelUntil: null
 			});
 			await tx
@@ -188,7 +188,7 @@ describe.skipIf(!testDbUrl)('registrations: the event page block', () => {
 			expect(await registrationView(tx, member.id, soon.id, deps)).toMatchObject({
 				state: 'open'
 			});
-   190|		});
+		});
 	});
 
 	it('a paid event while online payment is off: registration is closed with a reason', async () => {
@@ -198,7 +198,7 @@ describe.skipIf(!testDbUrl)('registrations: the event page block', () => {
 			const member = await insertMember(tx);
 			const off = { ...deps, paymentsOn: false };
 			expect(await registrationView(tx, member.id, paid.id, off)).toEqual({
-   200|				state: 'refused',
+				state: 'refused',
 				reason: 'payment_unavailable',
 				opensAt: null
 			});

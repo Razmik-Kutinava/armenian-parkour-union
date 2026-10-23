@@ -131,8 +131,6 @@ export const ruEvents: Record<keyof typeof enEvents, string> = {
 	'events.window.open': 'Регистрация открыта',
 	'events.window.notOpen': 'Регистрация откроется {date}',
 	'events.window.closed': 'Регистрация закрыта',
-	'events.register': 'Зарегистрироваться',
-	'events.registerSoon': 'Регистрация на сайте появится позже.',
 	'events.map': 'Открыть на карте',
 	'events.cancelledBanner': 'Событие отменено',
 	'events.finishedBanner': 'Событие завершилось',

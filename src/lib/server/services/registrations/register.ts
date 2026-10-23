@@ -18,9 +18,14 @@ export type RegisterResult =
 			status: 'registered' | 'pending_payment' | 'waitlist';
 			holdUntil: Date | null;
 	  }
-	| { ok: false; reason: Refusal | 'not_found' };
+	| { ok: false; reason: RegisterRefusal };
 
-const refuse = (reason: Refusal | 'not_found') => ({ ok: false, reason }) as const;
+/** `payment_unavailable` — a paid event while online payment is off: the seat could not be paid. */
+export type RegisterRefusal = Refusal | 'not_found' | 'payment_unavailable';
+/** `paymentsOn: false` — online payment is off (no provider or wait time); default — on. */
+export type RegisterDeps = { settings: RegistrationSettings; paymentsOn?: boolean };
+
+const refuse = (reason: RegisterRefusal) => ({ ok: false, reason }) as const;
 
 /* An earlier payment is unlinked: the cancel already sent a paid one to review (settle-cancel.ts). */
 const CLEARED = { attendedAt: null, place: null, score: null, resultNote: null, paymentId: null };
@@ -29,7 +34,7 @@ export async function registerForEvent(
 	db: LimitDb,
 	userId: string,
 	input: RegisterInput,
-	deps: { settings: RegistrationSettings },
+	deps: RegisterDeps,
 	now = new Date()
 ): Promise<RegisterResult> {
 	if (!isUuid(userId) || !isUuid(input.eventId)) return refuse('not_found');
@@ -42,6 +47,9 @@ export async function registerForEvent(
 		const { existingId, facts } = await readAdmission(tx, event.id, userId, now);
 		const refusal = checkAdmission({ now, event, user, categoryId: input.categoryId, ...facts });
 		if (refusal) return refuse(refusal);
+		if (event.priceAmountMinor > 0 && deps.paymentsOn === false) {
+			return refuse('payment_unavailable');
+		}
 
 		const seats = await readSeats(tx, event.id, event.capacity);
 		const status = !hasSeat(seats, input.categoryId)

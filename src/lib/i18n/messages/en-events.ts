@@ -128,8 +128,6 @@ export const enEvents = {
 	'events.window.open': 'Registration open',
 	'events.window.notOpen': 'Registration opens {date}',
 	'events.window.closed': 'Registration closed',
-	'events.register': 'Register',
-	'events.registerSoon': 'Registration on the site will appear later.',
 	'events.map': 'Open on the map',
 	'events.cancelledBanner': 'This event is cancelled',
 	'events.finishedBanner': 'This event has finished',

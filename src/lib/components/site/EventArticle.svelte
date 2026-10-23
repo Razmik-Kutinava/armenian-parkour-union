@@ -1,4 +1,5 @@
 <script lang="ts">
+	import type { Snippet } from 'svelte';
 	import { currentLocale, t } from '#lib/i18n/index.svelte.ts';
 	import { formatPrice } from '#lib/money.ts';
 	import type { PublicEvent } from '#lib/server/services/events/public.ts';
@@ -9,9 +10,14 @@
 	import { mapLink } from './event-map';
 
 	/* docs/06 section 4.3: cover, title, dates, place and map, description, price, categories,
-	 * registration block (a placeholder until stage 5), share. HTML was cleaned on save. */
-	type Props = { event: PublicEvent & { coverUrl: string | null }; shareUrl: string };
-	let { event, shareUrl }: Props = $props();
+	 * registration block (the site page passes it; the admin preview has none), share. HTML was
+	 * cleaned on save. */
+	type Props = {
+		event: PublicEvent & { coverUrl: string | null };
+		shareUrl: string;
+		registration?: Snippet;
+	};
+	let { event, shareUrl, registration }: Props = $props();
 	const map = $derived(mapLink(event));
 	const place = $derived(
 		[event.locationName, event.address, event.city].filter(Boolean).join(', ')
@@ -105,14 +111,10 @@
 				{/if}
 			</dl>
 			{#if open}
-				<p class="text-sm"><EventWindowNote window={event.window} /></p>
-				<button
-					type="button"
-					disabled
-					class="min-h-11 rounded-md bg-navy-700 px-4 font-bold text-surface opacity-60"
-					>{t('events.register')}</button
-				>
-				<p class="text-sm text-ink-500">{t('events.registerSoon')}</p>
+				<section aria-label={t('registrations.title')} class="flex flex-col gap-3">
+					<p class="text-sm"><EventWindowNote window={event.window} /></p>
+					{@render registration?.()}
+				</section>
 			{/if}
 			<ShareButton title={event.title} url={shareUrl} />
 		</aside>

@@ -132,8 +132,6 @@ export const hyEvents: Partial<Messages> = {
 	'events.window.open': 'Գրանցումը բաց է',
 	'events.window.notOpen': 'Գրանցումը կբացվի՝ {date}',
 	'events.window.closed': 'Գրանցումը փակ է',
-	'events.register': 'Գրանցվել',
-	'events.registerSoon': 'Կայքում գրանցումը կհայտնվի ավելի ուշ։',
 	'events.map': 'Բացել քարտեզում',
 	'events.cancelledBanner': 'Այս միջոցառումը չեղարկված է',
 	'events.finishedBanner': 'Այս միջոցառումն ավարտված է',

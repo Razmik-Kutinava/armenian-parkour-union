@@ -5,7 +5,8 @@ import type { MessageKey } from '#lib/i18n/translate.ts';
 export type PaymentKind = 'membership' | 'donation' | 'event_fee';
 export type PaymentStatus = 'pending' | 'paid' | 'failed' | 'cancelled' | 'refunded';
 export type ReturnMode = 'success' | 'cancel';
-export type ReturnPayment = { kind: PaymentKind; status: PaymentStatus };
+/** `eventSlug` — the event of an event fee, if it opens on the site. */
+export type ReturnPayment = { kind: PaymentKind; status: PaymentStatus; eventSlug?: string | null };
 
 export type PaymentOutcome = {
 	title: MessageKey;
@@ -16,7 +17,7 @@ export type PaymentOutcome = {
 export const MAX_CHECKS = 5;
 export const CHECK_EVERY_MS = 3_000;
 
-/** Where the payment can be started again (event registrations come with stage 5). */
+/** Where the payment can be started again; an event fee — on the page of its event. */
 const retryPath: Record<PaymentKind, string> = {
 	membership: '/cabinet/membership',
 	donation: '/donate',
@@ -24,17 +25,21 @@ const retryPath: Record<PaymentKind, string> = {
 };
 
 const home = { path: '/', label: 'payment.toHome' } as const;
-const retry = (kind: PaymentKind) => ({ path: retryPath[kind], label: 'payment.retry' as const });
+const retry = ({ kind, eventSlug }: ReturnPayment) => ({
+	path: kind === 'event_fee' && eventSlug ? `/events/${eventSlug}` : retryPath[kind],
+	label: 'payment.retry' as const
+});
 const next = (kind: PaymentKind) =>
 	kind === 'membership'
 		? { path: '/cabinet/membership', label: 'payment.toMembership' as const }
 		: home;
 
 export function paymentOutcome(
-	{ kind, status }: ReturnPayment,
+	payment: ReturnPayment,
 	mode: ReturnMode,
 	waitedOut: boolean
 ): PaymentOutcome {
+	const { kind, status } = payment;
 	switch (status) {
 		case 'paid':
 			return { title: 'payment.paid.title', text: `payment.paid.${kind}`, link: next(kind) };
@@ -43,7 +48,7 @@ export function paymentOutcome(
 				return {
 					title: 'payment.notCompleted.title',
 					text: 'payment.notCompleted.text',
-					link: retry(kind)
+					link: retry(payment)
 				};
 			}
 			return waitedOut
@@ -55,7 +60,7 @@ export function paymentOutcome(
 			return {
 				title: `payment.${status}.title`,
 				text: `payment.${status}.text`,
-				link: retry(kind)
+				link: retry(payment)
 			};
 	}
 }

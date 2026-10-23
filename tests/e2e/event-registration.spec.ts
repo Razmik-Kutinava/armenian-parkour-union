@@ -111,6 +111,39 @@ test('register, the waitlist when full, cancel — the first in line takes the p
 	expect(await statusOf(event.id, second)).toBe('registered');
 });
 
+test('categories: only the ones the age fits, a full one leads to the waitlist', async ({
+	page
+}) => {
+	const event = await insertEvent();
+	const category = (
+		name: string,
+		sort: number,
+		extra: { min?: number; max?: number; cap?: number }
+	) =>
+		sql`insert into event_categories (event_id, name, age_min, age_max, capacity, sort_order)
+			values (${event.id}, ${sql.json({ en: name })}, ${extra.min ?? null}, ${extra.max ?? null},
+				${extra.cap ?? null}, ${sort}) returning id`;
+	await category('Kids', 0, { min: 8, max: 12 });
+	await category('Open A', 1, { cap: 0 });
+	const [open] = await category('Open B', 2, {});
+	const id = await signUp(page, 'category');
+	await makeMember(id);
+
+	await page.goto(`/events/${event.slug}`);
+	await hydrated(page);
+	const select = page.getByLabel('Category');
+	await expect(select.locator('option')).toHaveText(['Open A — no places, waitlist', 'Open B']);
+	await expect(select).toHaveValue(open.id);
+	await select.selectOption({ label: 'Open A — no places, waitlist' });
+	await expect(page.getByRole('button', { name: 'Join the waitlist' })).toBeVisible();
+	await select.selectOption({ label: 'Open B' });
+	await page.getByRole('button', { name: 'Register' }).click();
+	await expect(page.getByText('You are registered.')).toBeVisible();
+	const [row] = await sql`select status, category_id from event_registrations
+		where event_id = ${event.id} and user_id = ${id}`;
+	expect(row).toEqual({ status: 'registered', category_id: open.id });
+});
+
 test('a paid event while online payment is off: closed for new; a held place shows "Pay"', async ({
 	page
 }) => {
