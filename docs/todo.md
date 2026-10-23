@@ -50,8 +50,8 @@
 
 - [x] SPEC
 - [x] RED (`5dd1e28`) — модулей `view` / `return-link` нет, `registerForEvent` пускает на платное при выключенной оплате, «Попробовать снова» — на `/events`
-- [x] GREEN — Vitest зоны 317/317 (registrations, events, payments, components/site, i18n); e2e `event-registration` 5/5, `events` 3/3, `payment-return` 10/10; `check` 0
-- [ ] REGRESS
+- [x] GREEN (`3979969`) — Vitest зоны 317/317 (registrations, events, payments, components/site, i18n); e2e `event-registration` 5/5, `events` 3/3, `payment-return` 10/10; `check` 0
+- [x] REGRESS — Vitest 1051/1051, `lint` чистый; полный e2e 151/152 — упал только `cron.spec` (с 5.4 ответ cron содержит `released`, тест не обновили; поправлен, 3/3)
 
 Уточнения при GREEN:
 - Названия категорий для выбора подставляет `registrationViewNow` (`listEventCategories`, язык страницы): `events/public.ts` уже 208 строк — правило «> 200 не дописывать», `id` категории в `PublicEvent` не добавлен. `readAdmission` теперь отдаёт категории по `sort_order` (порядок в списке).

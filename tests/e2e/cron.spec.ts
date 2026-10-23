@@ -25,7 +25,8 @@ test('cron: the right token runs reconciliation and returns its counters', async
 		applied: expect.any(Number),
 		expired: expect.any(Number),
 		flagged: expect.any(Number),
-		failed: expect.any(Number)
+		failed: expect.any(Number),
+		released: expect.any(Number)
 	});
 });
 
