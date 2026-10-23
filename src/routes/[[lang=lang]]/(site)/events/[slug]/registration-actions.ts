@@ -18,7 +18,7 @@ import {
 
 type PayRefusal = Extract<EventPayResult, { ok: false }>['reason'];
 
-const payMessage = (reason: PayRefusal | 'unavailable'): MessageKey => {
+export const payMessage = (reason: PayRefusal | 'unavailable'): MessageKey => {
 	if (reason === 'unavailable' || reason === 'invalid') return 'registrations.payError.unavailable';
 	if (reason === 'provider_error' || reason === 'hold_expired' || reason === 'closed') {
 		return `registrations.payError.${reason}`;

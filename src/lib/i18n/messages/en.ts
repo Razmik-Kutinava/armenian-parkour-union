@@ -1,5 +1,6 @@
 import { enCabinet } from './en-cabinet';
 import { enCabinetAvatar } from './en-cabinet-avatar';
+import { enCabinetEvents } from './en-cabinet-events';
 import { enCabinetPoints } from './en-cabinet-points';
 import { enConsents } from './en-consents';
 import { enDonate } from './en-donate';
@@ -44,6 +45,7 @@ export const en = {
 	...enCabinet,
 	...enCabinetPoints,
 	...enCabinetAvatar,
+	...enCabinetEvents,
 	...enConsents,
 	...enRegistrations,
 	...enRegistrationsAdmin,

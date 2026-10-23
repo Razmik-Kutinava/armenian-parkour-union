@@ -46,7 +46,7 @@
 ## Фазы 5.8
 
 - [x] SPEC
-- [ ] RED
-- [ ] GREEN
+- [x] RED (`be5c815`) — `cabinet/events.test.ts` падает: модуля `services/cabinet/events` нет; e2e `cabinet-events.spec` — страницы нет
+- [x] GREEN — `services/cabinet/events.ts` (`listOwnEvents`), `/cabinet/events` (вкладки ссылками `?tab=past`, действия `pay` / `cancel` с `eventId` → `payForEventNow` / `cancelNow`, сообщения оплаты — общий `payMessage` страницы события), пункт меню, словари `*-cabinet-events.ts`; Vitest зоны 81/81, e2e `cabinet` + `cabinet-events` + `event-registration` 14/14, `check` 0, eslint чистый
 - [ ] REGRESS
 - [ ] REVIEW — общим шагом в конце этапа 5

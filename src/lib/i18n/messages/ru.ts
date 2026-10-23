@@ -1,6 +1,7 @@
 import type { Messages } from '../translate';
 import { ruCabinet } from './ru-cabinet';
 import { ruCabinetAvatar } from './ru-cabinet-avatar';
+import { ruCabinetEvents } from './ru-cabinet-events';
 import { ruCabinetPoints } from './ru-cabinet-points';
 import { ruConsents } from './ru-consents';
 import { ruDonate } from './ru-donate';
@@ -44,6 +45,7 @@ export const ru: Partial<Messages> = {
 	...ruCabinet,
 	...ruCabinetPoints,
 	...ruCabinetAvatar,
+	...ruCabinetEvents,
 	...ruConsents,
 	...ruRegistrations,
 	...ruRegistrationsAdmin,

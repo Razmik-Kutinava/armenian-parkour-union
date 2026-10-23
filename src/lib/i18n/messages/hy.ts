@@ -1,6 +1,7 @@
 import type { Messages } from '../translate';
 import { hyCabinet } from './hy-cabinet';
 import { hyCabinetAvatar } from './hy-cabinet-avatar';
+import { hyCabinetEvents } from './hy-cabinet-events';
 import { hyCabinetPoints } from './hy-cabinet-points';
 import { hyConsents } from './hy-consents';
 import { hyDonate } from './hy-donate';
@@ -44,6 +45,7 @@ export const hy: Partial<Messages> = {
 	...hyCabinet,
 	...hyCabinetPoints,
 	...hyCabinetAvatar,
+	...hyCabinetEvents,
 	...hyConsents,
 	...hyRegistrations,
 	...hyRegistrationsAdmin,
