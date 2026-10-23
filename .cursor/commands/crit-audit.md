@@ -18,7 +18,7 @@
 1. Прочитать шапку и таблицу журнала. Взять scope по правилу 5.
 2. Дифф пустой → гейты → `CLEAN`, стоп. Не искать «ещё что-нибудь».
 3. Кандидаты: свой проход по диффу + находки `bugbot` / `security-review` (если из `/review`). Каждый — по правилам 1–4.
-4. Гейты: `npm run check`, `npm run lint`, `npm run test`; дифф в опасной зоне — плюс `npm run test:e2e`; CI на HEAD — `gh run list -L 1` (до push — `CI: pending`).
+4. Гейты: `npm run check`, `npm run lint`, `npm run test`; дифф в опасной зоне — плюс `npm run test:e2e`; CI на HEAD — `gh run list -L 1` (до push — `CI: pending`). Из `/review` — взять результаты его шага 1, не перегонять (если после них код не менялся).
 5. Вердикт. **`CLEAN`** — гейты зелёные и нет `open` находок. **`BLOCKED: N`** — N `open` находок с падающим тестом. Мнение без теста вердикт не меняет.
 6. Журнал: новые строки, «История аудитов», шапка (`last_audited_sha` = HEAD, дата, вердикт). Коммит `docs: crit-audit …` (вне `/review`).
 
