@@ -45,10 +45,16 @@
 ## Фазы 5.7c
 
 - [x] SPEC
-- [ ] RED
-- [ ] GREEN
-- [ ] REGRESS
+- [x] RED (`21a590f`) — 5 файлов падают: модулей `staff/{attendance,results,roster}`, `validation/registration-results` нет
+- [x] GREEN — сервисы `staff/attendance.ts` (`markAttendance`, `marksOpen`), `staff/results.ts` (`saveResults`), `staff/roster.ts` (`eventRoster`), `lock.ts` + `place`; страницы `[id]/day`, `[id]/results` (+ `finish`), ссылки на вкладке; карты e2e; Vitest зоны — новые 16/16, `check` 0, `lint` чистый
+- [x] REGRESS — весь Vitest 1106/1106; e2e `admin-permissions` + `admin-audit` + `events` + `event-registration` 13/13 (первый прогон Vitest зоны — 4 таймаута 20 с в `server-points` под нагрузкой, отдельно 50/50, полный прогон зелёный)
 - [ ] REVIEW — общим шагом в конце этапа 5
+
+Не сделано / для REVIEW 5.7c:
+- Экраны в браузере руками (и на телефоне) не проверялись: e2e открывает их модератором и админом (200) и выполняет три действия через HTTP.
+- «Не пришёл» после «пришёл» баллы не снимает, смена места — тоже (вручную в `/admin/points`, `03` 7.7); подсказка на экранах.
+- «Завершить» регистрации не трогает: без отметки остаются `registered`, очередь и `pending_payment` — как были (письма и кабинет — 5.8 / 5.9).
+- Публичные результаты в архиве события — не в этом шаге (`06`, отдельная задача по роадмапу).
 
 ### 5.7b — памятка (SPEC)
 

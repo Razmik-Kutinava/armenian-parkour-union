@@ -66,6 +66,38 @@ export const ruRegistrationsAdmin: Partial<Messages> = {
 	'registrationsAdmin.refused.birth_date_required': 'У участника не указана дата рождения.',
 	'registrationsAdmin.refused.parental_consent': 'До 18 лет нужно одобренное согласие родителя.',
 	'registrationsAdmin.refused.age_mismatch': 'Возраст не подходит категории.',
+	'registrationsAdmin.dayLink': 'День события',
+	'registrationsAdmin.resultsLink': 'Результаты',
+	'registrationsAdmin.toTab': 'Регистрации',
+	'registrationsAdmin.day.title': 'День события',
+	'registrationsAdmin.day.summary': 'Пришли: {came} из {total}.',
+	'registrationsAdmin.day.search': 'Найти участника',
+	'registrationsAdmin.day.came': 'Пришёл',
+	'registrationsAdmin.day.noShow': 'Не пришёл',
+	'registrationsAdmin.day.closed':
+		'Отмечать можно в день события, если оно опубликовано или завершено.',
+	'registrationsAdmin.day.hint':
+		'«Пришёл» начисляет баллы за участие один раз. «Не пришёл» их не снимает — это исправляет админ в журнале баллов.',
+	'registrationsAdmin.day.empty': 'Некого отмечать: зарегистрированных участников нет.',
+	'registrationsAdmin.day.noMatch': 'По запросу никого нет.',
+	'registrationsAdmin.results.title': 'Результаты',
+	'registrationsAdmin.results.hint':
+		'Только участники с отметкой «пришёл». Места в разных категориях могут повторяться. Место 1–3 начисляет баллы один раз; смену места потом исправляют вручную в журнале баллов.',
+	'registrationsAdmin.results.empty': 'Пока никто не отмечен «пришёл».',
+	'registrationsAdmin.results.save': 'Сохранить результаты',
+	'registrationsAdmin.results.unmarked': 'Без отметки: {count}.',
+	'registrationsAdmin.finish': 'Завершить событие',
+	'registrationsAdmin.finishTitle': 'Завершить событие?',
+	'registrationsAdmin.finishText':
+		'Событие уйдёт в архив с результатами. Участники без отметки ({count}) не получат баллы за участие. Отметки и результаты можно будет исправить и потом.',
+	'registrationsAdmin.done.results': 'Результаты сохранены.',
+	'registrationsAdmin.done.finished': 'Событие завершено.',
+	'registrationsAdmin.error.too_early': 'Отмечать можно с дня события.',
+	'registrationsAdmin.error.invalid': 'Проверьте места (целые числа 1–999) и оценки (0–9999,99).',
+	'registrationsAdmin.error.results_closed':
+		'Отметки и результаты доступны только для опубликованного или завершённого события.',
+	'registrationsAdmin.error.finish':
+		'Завершить можно только опубликованное и уже начавшееся событие.',
 	'events.registrationsCount': 'Регистраций: {seats} из {capacity}, в очереди {waitlist}.',
 	'events.registrationsOpen': 'Открыть регистрации'
 };

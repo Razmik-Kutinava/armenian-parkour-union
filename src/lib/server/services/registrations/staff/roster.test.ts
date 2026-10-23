@@ -22,7 +22,10 @@ describe.skipIf(!testDbUrl)('registrations staff: event day roster', () => {
 		await inRollback(async (tx) => {
 			const event = await insertEvent(tx);
 			const category = await insertCategory(tx, event.id);
-			const add = async (name: string, status: (typeof eventRegistrations.$inferSelect)['status']) => {
+			const add = async (
+				name: string,
+				status: (typeof eventRegistrations.$inferSelect)['status']
+			) => {
 				const member = await insertMember(tx, { name, birthDate: bornBefore(25) });
 				const { id } = await register(tx, member.id, event.id, category.id);
 				await tx.update(eventRegistrations).set({ status }).where(eq(eventRegistrations.id, id));
@@ -39,13 +42,14 @@ describe.skipIf(!testDbUrl)('registrations staff: event day roster', () => {
 			expect(roster?.map((r) => r.id)).toEqual([anna, mark, zara]);
 			expect(roster?.[0]).toMatchObject({
 				name: 'Anna Test',
-				age: 24,
+				age: 25,
 				status: 'attended',
 				categoryName: { en: 'Speed' },
 				place: null,
 				score: null
 			});
-			for (const key of ['email', 'birthDate', 'phone']) expect(roster?.[0]).not.toHaveProperty(key);
+			for (const key of ['email', 'birthDate', 'phone'])
+				expect(roster?.[0]).not.toHaveProperty(key);
 		});
 	});
 

@@ -32,10 +32,22 @@ export function registrationActions(
 			values (${user.id}, 'active', now() - interval '1 day', now() + interval '300 days')`;
 		return user as unknown as { id: string; email: string };
 	};
-	const registration = async (status: 'registered' | 'waitlist') =>
+	/* Started yesterday: the event day marks are open and it can be finished. */
+	const startedEvent = async () =>
+		(
+			await sql`
+				insert into events (slug, title, status, published_at, starts_at, ends_at)
+				values (${`e2e-audit-${crypto.randomUUID().slice(0, 8)}`}, ${sql.json({ en: 'Audit day' })},
+					'published', now() - interval '2 days', now() - interval '1 day',
+					now() - interval '20 hours')
+				returning id`
+		)[0].id as string;
+	let dayId: string | null = null;
+	const day = async () => (dayId ??= await startedEvent());
+	const registration = async (status: 'registered' | 'waitlist' | 'attended', eventId?: string) =>
 		(
 			await sql`insert into event_registrations (event_id, user_id, status)
-				values (${await event()}, ${(await member()).id}, ${status}) returning id`
+				values (${eventId ?? (await event())}, ${(await member()).id}, ${status}) returning id`
 		)[0].id as string;
 	const tab = async () => `/admin/registrations/${await event()}`;
 	return {
@@ -47,6 +59,21 @@ export function registrationActions(
 				comment: 'Audit check'
 			}),
 		'/admin/registrations/[id]?/add': async () =>
-			post(`${await tab()}?/add`, { member: (await member()).email, categoryId: '' })
+			post(`${await tab()}?/add`, { member: (await member()).email, categoryId: '' }),
+		'/admin/registrations/[id]/day?/mark': async () =>
+			post(`/admin/registrations/${await day()}/day?/mark`, {
+				registrationId: await registration('registered', await day()),
+				came: '1'
+			}),
+		'/admin/registrations/[id]/results?/save': async () => {
+			const id = await registration('attended', await day());
+			await post(`/admin/registrations/${await day()}/results?/save`, {
+				registrationId: id,
+				[`place.${id}`]: '1',
+				[`score.${id}`]: '9.5'
+			});
+		},
+		'/admin/registrations/[id]/results?/finish': async () =>
+			post(`/admin/registrations/${await startedEvent()}/results?/finish`)
 	};
 }

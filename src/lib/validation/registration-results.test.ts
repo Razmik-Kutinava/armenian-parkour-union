@@ -25,9 +25,9 @@ describe('registration results input', () => {
 	});
 
 	it('the registration id is a uuid; at most 2000 rows', () => {
-		expect(resultRowsSchema.safeParse([{ registrationId: 'x', place: '', score: '' }]).success).toBe(
-			false
-		);
+		expect(
+			resultRowsSchema.safeParse([{ registrationId: 'x', place: '', score: '' }]).success
+		).toBe(false);
 		const many = Array.from({ length: 2001 }, () => ({ registrationId: ID, place: '', score: '' }));
 		expect(resultRowsSchema.safeParse(many).success).toBe(false);
 	});

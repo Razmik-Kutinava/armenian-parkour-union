@@ -116,10 +116,14 @@
 	</p>
 {/if}
 
-<div class="mb-4 flex justify-end">
-	<a class="text-sm font-bold text-navy-700 underline" href={exportHref}
-		>{t('registrationsAdmin.export')}</a
+<div class="mb-4 flex flex-wrap justify-end gap-4 text-sm font-bold">
+	<a class="text-navy-700 underline" href="/admin/registrations/{event.id}/day"
+		>{t('registrationsAdmin.dayLink')}</a
 	>
+	<a class="text-navy-700 underline" href="/admin/registrations/{event.id}/results"
+		>{t('registrationsAdmin.resultsLink')}</a
+	>
+	<a class="text-navy-700 underline" href={exportHref}>{t('registrationsAdmin.export')}</a>
 </div>
 
 <FilterBar {filters} state={data.state} searchLabel={t('registrationsAdmin.search')} />

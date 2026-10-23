@@ -17,7 +17,11 @@ const staff = async (tx: Tx, role: 'moderator' | 'admin' | 'editor' = 'moderator
 	role
 });
 
-async function participant(tx: Tx, eventId: string, status: 'attended' | 'registered' = 'attended') {
+async function participant(
+	tx: Tx,
+	eventId: string,
+	status: 'attended' | 'registered' = 'attended'
+) {
 	const { id } = await register(tx, (await insertMember(tx)).id, eventId);
 	await tx
 		.update(eventRegistrations)

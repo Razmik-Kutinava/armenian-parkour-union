@@ -60,7 +60,10 @@ export const ADMIN_AUDIT = {
 	'/admin/consents/[id]?/reject': ['consent.reject'],
 	'/admin/registrations/[id]?/promote': ['registration.promote'],
 	'/admin/registrations/[id]?/cancel': ['registration.cancel'],
-	'/admin/registrations/[id]?/add': ['registration.add']
+	'/admin/registrations/[id]?/add': ['registration.add'],
+	'/admin/registrations/[id]/day?/mark': ['registration.attendance'],
+	'/admin/registrations/[id]/results?/save': ['registration.result'],
+	'/admin/registrations/[id]/results?/finish': ['event.update']
 } as const;
 
 export type AdminAction = keyof typeof ADMIN_AUDIT;

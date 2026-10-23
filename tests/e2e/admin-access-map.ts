@@ -53,7 +53,9 @@ export const ADMIN_READS = {
 	'/admin/consents/[id]': 'consents.review',
 	'/admin/registrations': 'registrations.read',
 	'/admin/registrations/[id]': 'registrations.read',
-	'GET /admin/registrations/[id]/export': 'registrations.read'
+	'GET /admin/registrations/[id]/export': 'registrations.read',
+	'/admin/registrations/[id]/day': 'registrations.read',
+	'/admin/registrations/[id]/results': 'registrations.read'
 } as const satisfies Record<string, Access>;
 
 export const ADMIN_WRITES = {
@@ -115,5 +117,8 @@ export const ADMIN_WRITES = {
 	'/admin/registrations/[id]?/promote': 'registrations.manage',
 	'/admin/registrations/[id]?/cancel': 'registrations.manage',
 	'/admin/registrations/[id]?/add': 'registrations.manage',
+	'/admin/registrations/[id]/day?/mark': 'registrations.manage',
+	'/admin/registrations/[id]/results?/save': 'registrations.manage',
+	'/admin/registrations/[id]/results?/finish': 'events.cancel',
 	'POST /admin/locale': 'staff'
 } as const satisfies Record<AdminAction | NotAuditedAction, Access>;

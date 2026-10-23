@@ -10,7 +10,10 @@ import { promoteRegistration, type PromoteResult } from './promote';
 /* docs/05 section 5, tab "Registrations": routes call these; letters go after the commit. */
 
 export { addRegistration, type AddRefusal, type AddResult } from './add';
+export { markAttendance, marksOpen, RESULTS_OPEN, type AttendanceResult } from './attendance';
 export { registrationsCsv } from './export';
+export { saveResults, type ResultsResult } from './results';
+export { eventRoster, type RosterRow } from './roster';
 export {
 	listRegistrations,
 	registrationCounts,

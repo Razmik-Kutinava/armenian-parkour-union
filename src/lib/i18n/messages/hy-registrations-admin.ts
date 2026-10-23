@@ -67,6 +67,39 @@ export const hyRegistrationsAdmin: Partial<Messages> = {
 	'registrationsAdmin.refused.parental_consent':
 		'18 տարեկանից ցածր՝ անհրաժեշտ է ծնողի հաստատված համաձայնություն։',
 	'registrationsAdmin.refused.age_mismatch': 'Տարիքը չի համապատասխանում կատեգորիային։',
+	'registrationsAdmin.dayLink': 'Միջոցառման օր',
+	'registrationsAdmin.resultsLink': 'Արդյունքներ',
+	'registrationsAdmin.toTab': 'Գրանցումներ',
+	'registrationsAdmin.day.title': 'Միջոցառման օր',
+	'registrationsAdmin.day.summary': 'Եկել են՝ {came}՝ {total}-ից։',
+	'registrationsAdmin.day.search': 'Գտնել մասնակցին',
+	'registrationsAdmin.day.came': 'Եկել է',
+	'registrationsAdmin.day.noShow': 'Չի եկել',
+	'registrationsAdmin.day.closed':
+		'Նշել կարելի է միջոցառման օրը, եթե այն հրապարակված է կամ ավարտված։',
+	'registrationsAdmin.day.hint':
+		'«Եկել է»-ն մասնակցության միավորները տալիս է մեկ անգամ։ «Չի եկել»-ը դրանք հետ չի վերցնում․ դա ուղղում է ադմինը միավորների մատյանում։',
+	'registrationsAdmin.day.empty': 'Նշելու մարդ չկա․ գրանցված մասնակիցներ չկան։',
+	'registrationsAdmin.day.noMatch': 'Որոնմամբ ոչ ոք չի գտնվել։',
+	'registrationsAdmin.results.title': 'Արդյունքներ',
+	'registrationsAdmin.results.hint':
+		'Միայն «եկել է» նշումով մասնակիցները։ Տարբեր կատեգորիաներում տեղերը կարող են կրկնվել։ 1–3 տեղը միավորներ է տալիս մեկ անգամ․ տեղի հետագա փոփոխությունն ուղղվում է ձեռքով միավորների մատյանում։',
+	'registrationsAdmin.results.empty': 'Դեռ ոչ ոք «եկել է» նշված չէ։',
+	'registrationsAdmin.results.save': 'Պահպանել արդյունքները',
+	'registrationsAdmin.results.unmarked': 'Առանց նշման՝ {count}։',
+	'registrationsAdmin.finish': 'Ավարտել միջոցառումը',
+	'registrationsAdmin.finishTitle': 'Ավարտե՞լ միջոցառումը',
+	'registrationsAdmin.finishText':
+		'Միջոցառումը արդյունքներով կանցնի արխիվ։ Առանց նշման մասնակիցները ({count}) մասնակցության միավորներ չեն ստանա։ Նշումներն ու արդյունքները հետո էլ կարելի է ուղղել։',
+	'registrationsAdmin.done.results': 'Արդյունքները պահպանված են։',
+	'registrationsAdmin.done.finished': 'Միջոցառումն ավարտված է։',
+	'registrationsAdmin.error.too_early': 'Նշել կարելի է միջոցառման օրվանից։',
+	'registrationsAdmin.error.invalid':
+		'Ստուգեք տեղերը (ամբողջ թվեր 1–999) և գնահատականները (0–9999.99)։',
+	'registrationsAdmin.error.results_closed':
+		'Նշումներն ու արդյունքները հասանելի են միայն հրապարակված կամ ավարտված միջոցառման համար։',
+	'registrationsAdmin.error.finish':
+		'Ավարտել կարելի է միայն հրապարակված և արդեն սկսված միջոցառումը։',
 	'events.registrationsCount': 'Գրանցումներ՝ {seats}՝ {capacity}-ից, հերթում՝ {waitlist}։',
 	'events.registrationsOpen': 'Բացել գրանցումները'
 };

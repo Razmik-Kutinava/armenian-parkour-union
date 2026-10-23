@@ -19,6 +19,7 @@ export async function lockRegistration(tx: LimitDb, ref: RegistrationRef) {
 			categoryId: eventRegistrations.categoryId,
 			status: eventRegistrations.status,
 			paymentId: eventRegistrations.paymentId,
+			place: eventRegistrations.place,
 			user: {
 				email: users.email,
 				locale: users.locale,

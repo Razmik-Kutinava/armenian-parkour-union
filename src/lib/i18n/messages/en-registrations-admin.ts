@@ -65,6 +65,38 @@ export const enRegistrationsAdmin = {
 	'registrationsAdmin.refused.parental_consent':
 		'Under 18: an approved parental consent is needed.',
 	'registrationsAdmin.refused.age_mismatch': 'The age does not fit the category.',
+	'registrationsAdmin.dayLink': 'Event day',
+	'registrationsAdmin.resultsLink': 'Results',
+	'registrationsAdmin.toTab': 'Registrations',
+	'registrationsAdmin.day.title': 'Event day',
+	'registrationsAdmin.day.summary': 'Came: {came} of {total}.',
+	'registrationsAdmin.day.search': 'Find a participant',
+	'registrationsAdmin.day.came': 'Came',
+	'registrationsAdmin.day.noShow': 'Did not come',
+	'registrationsAdmin.day.closed':
+		'Marks open on the event day, for a published or finished event.',
+	'registrationsAdmin.day.hint':
+		'"Came" adds the participation points once. "Did not come" does not take them back — an admin fixes that in the points log.',
+	'registrationsAdmin.day.empty': 'Nobody to mark: no registered participants.',
+	'registrationsAdmin.day.noMatch': 'Nobody matches the search.',
+	'registrationsAdmin.results.title': 'Results',
+	'registrationsAdmin.results.hint':
+		'Only participants marked "came". Places may repeat across categories. Place 1–3 adds its points once; a later change is fixed by hand in the points log.',
+	'registrationsAdmin.results.empty': 'Nobody is marked "came" yet.',
+	'registrationsAdmin.results.save': 'Save results',
+	'registrationsAdmin.results.unmarked': 'Without a mark: {count}.',
+	'registrationsAdmin.finish': 'Finish the event',
+	'registrationsAdmin.finishTitle': 'Finish the event?',
+	'registrationsAdmin.finishText':
+		'The event goes to the archive with its results. Participants without a mark ({count}) get no participation points. Marks and results can still be fixed later.',
+	'registrationsAdmin.done.results': 'Results saved.',
+	'registrationsAdmin.done.finished': 'The event is finished.',
+	'registrationsAdmin.error.too_early': 'Marks open on the event day.',
+	'registrationsAdmin.error.invalid':
+		'Check the places (whole numbers 1–999) and the scores (0–9999.99).',
+	'registrationsAdmin.error.results_closed':
+		'Marks and results are open only for a published or finished event.',
+	'registrationsAdmin.error.finish': 'Only a published event that has started can be finished.',
 	'events.registrationsCount': 'Registrations: {seats} of {capacity}, waitlist {waitlist}.',
 	'events.registrationsOpen': 'Open registrations'
 } as const;
