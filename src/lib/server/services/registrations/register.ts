@@ -29,7 +29,13 @@ export type RegisterDeps = { settings: RegistrationSettings; paymentsOn?: boolea
 const refuse = (reason: RegisterRefusal) => ({ ok: false, reason }) as const;
 
 /* An earlier payment is unlinked: the cancel already sent a paid one to review (settle-cancel.ts). */
-const CLEARED = { attendedAt: null, place: null, score: null, resultNote: null, paymentId: null };
+export const CLEARED = {
+	attendedAt: null,
+	place: null,
+	score: null,
+	resultNote: null,
+	paymentId: null
+};
 
 export async function registerForEvent(
 	db: LimitDb,

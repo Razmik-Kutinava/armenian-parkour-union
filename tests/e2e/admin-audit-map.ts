@@ -57,7 +57,10 @@ export const ADMIN_AUDIT = {
 	'/admin/donation-purposes/new?/default': ['donation_purpose.create'],
 	'/admin/donation-purposes/[id]?/update': ['donation_purpose.update'],
 	'/admin/consents/[id]?/approve': ['consent.approve'],
-	'/admin/consents/[id]?/reject': ['consent.reject']
+	'/admin/consents/[id]?/reject': ['consent.reject'],
+	'/admin/registrations/[id]?/promote': ['registration.promote'],
+	'/admin/registrations/[id]?/cancel': ['registration.cancel'],
+	'/admin/registrations/[id]?/add': ['registration.add']
 } as const;
 
 export type AdminAction = keyof typeof ADMIN_AUDIT;

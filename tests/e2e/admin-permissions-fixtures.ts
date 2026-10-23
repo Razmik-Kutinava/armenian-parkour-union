@@ -80,6 +80,7 @@ export const toPath = (key: string, ids: Ids) =>
 		.replace('/pages/[id]', `/pages/${ids.pageId}`)
 		.replace('/news/[id]', `/news/${ids.postId}`)
 		.replace('/events/[id]', `/events/${ids.eventId}`)
+		.replace('/registrations/[id]', `/registrations/${ids.eventId}`)
 		.replace('/hero/[id]', `/hero/${ids.heroId}`)
 		.replace('?/default', '');
 
@@ -200,7 +201,8 @@ export function permissionFixtures(sql: postgres.Sql) {
 		postRow: async (id: string) => (await sql`select * from posts where id = ${id}`)[0],
 		eventRows: async (id: string) => ({
 			event: (await sql`select * from events where id = ${id}`)[0],
-			categories: await sql`select * from event_categories where event_id = ${id} order by id`
+			categories: await sql`select * from event_categories where event_id = ${id} order by id`,
+			registrations: await sql`select * from event_registrations where event_id = ${id} order by id`
 		}),
 		/* Without the order: admin-audit.spec.ts reorders every current block in parallel. */
 		heroRow: async (id: string) =>

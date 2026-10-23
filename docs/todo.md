@@ -45,7 +45,7 @@
 
 - [x] SPEC
 - [x] RED — 6 файлов (`staff/{list,export,promote,cancel,add}.test.ts`, `points-staff.test.ts`) падают: модулей `staff/*` нет
-- [ ] GREEN
+- [x] GREEN — `services/registrations/staff/*`, `/admin/registrations` (+ `[id]`, `[id]/export`), число на `/admin/events` и карточке события, карты e2e; Vitest зоны 167/167, `check` 0, `lint` чистый
 - [ ] REGRESS
 - [ ] REVIEW — общим шагом в конце этапа 5
 

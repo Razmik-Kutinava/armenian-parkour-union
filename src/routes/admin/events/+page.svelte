@@ -79,7 +79,7 @@
 		{:else if column.key === 'place'}{[row.locationName, row.city].filter(Boolean).join(', ') ||
 				'—'}
 		{:else if column.key === 'status'}<EventStatusBadge status={row.status} />
-		{:else if column.key === 'registrations'}— / {row.capacity ?? t('events.noLimit')}
+		{:else if column.key === 'registrations'}{row.seats} / {row.capacity ?? t('events.noLimit')}
 		{:else if column.key === 'price'}{row.priceAmountMinor === 0
 				? t('events.free')
 				: formatPrice(row.priceAmountMinor, row.priceCurrency, currentLocale())}

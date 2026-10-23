@@ -40,7 +40,7 @@ export type AdmissionInput = {
 };
 
 /** Armenia keeps UTC+4 all year: the calendar day of the event in Yerevan. */
-const YEREVAN_OFFSET = 4 * 3_600_000;
+export const YEREVAN_OFFSET = 4 * 3_600_000;
 
 function categoryRefusal(i: AdmissionInput): Refusal | null {
 	if (i.categories.length > 0 && !i.categoryId) return 'category_required';
@@ -64,6 +64,16 @@ export function checkAdmission(i: AdmissionInput): Refusal | null {
 	if (i.existing && i.existing !== 'cancelled') return 'already_registered';
 	const window = registrationWindow(i.event, i.now).state;
 	if (window !== 'open') return window;
+	return memberRefusal(i);
+}
+
+/** Staff add a member by hand (docs/05 section 5): the registration window and the start do not apply. */
+export function checkStaffAdmission(i: AdmissionInput): Refusal | null {
+	if (i.existing && i.existing !== 'cancelled') return 'already_registered';
+	return memberRefusal(i);
+}
+
+function memberRefusal(i: AdmissionInput): Refusal | null {
 	if (i.user.status !== 'active') return 'blocked';
 	if (!i.user.emailVerified) return 'email_unverified';
 	if (!i.membershipActive) return 'no_membership';

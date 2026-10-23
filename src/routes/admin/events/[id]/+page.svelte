@@ -49,6 +49,18 @@
 		>
 	{/if}
 </div>
+<p class="mb-4 text-sm text-ink-700">
+	{t('events.registrationsCount', {
+		seats: data.registrations.seats,
+		capacity: event.capacity ?? t('events.noLimit'),
+		waitlist: data.registrations.waitlist
+	})}
+	{#if data.canRegistrations}
+		<a class="ml-2 text-navy-700 underline" href="/admin/registrations/{event.id}"
+			>{t('events.registrationsOpen')}</a
+		>
+	{/if}
+</p>
 
 <div class="mb-6 flex flex-wrap gap-2">
 	{#snippet button(action: string, label: string, field?: string)}

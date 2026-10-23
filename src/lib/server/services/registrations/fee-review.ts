@@ -9,6 +9,7 @@ export type FeeReview =
 	| 'registration_already_active'
 	| 'late_payment_no_seat'
 	| 'cancelled_by_member'
+	| 'cancelled_by_staff'
 	| 'event_cancelled';
 
 /** docs/07 section 8: the money is kept, an admin decides (list "Needs review"). */

@@ -6,6 +6,7 @@ import { reviewEventFee } from './fee-review';
 
 const FAILURE = {
 	cancelled_by_member: 'registration_cancelled',
+	cancelled_by_staff: 'registration_cancelled',
 	event_cancelled: 'event_cancelled'
 } as const;
 

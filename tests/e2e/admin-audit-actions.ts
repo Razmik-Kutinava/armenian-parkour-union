@@ -4,6 +4,7 @@ import { consentActions } from './admin-audit-consents';
 import type { AdminAction } from './admin-audit-map';
 import { moneyActions } from './admin-audit-money';
 import { pointsActions } from './admin-audit-points';
+import { registrationActions } from './admin-audit-registrations';
 import { paymentSettingsAction } from './payment-settings-form';
 
 const ORIGIN = { origin: 'http://localhost:4173' };
@@ -191,6 +192,7 @@ export async function adminActions(page: Page, sql: postgres.Sql, adminId: strin
 		...moneyActions(sql, post, postRedirect),
 		...pointsActions(sql, post, target),
 		...consentActions(sql, post, target),
+		...registrationActions(sql, post),
 		...paymentSettingsAction(page, post)
 	};
 	return perform;

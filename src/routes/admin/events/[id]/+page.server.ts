@@ -12,6 +12,7 @@ import {
 } from '#lib/server/services/events/edit.ts';
 import type { StatusAction } from '#lib/server/services/events/lifecycle.ts';
 import { getEvent } from '#lib/server/services/events/list.ts';
+import { registrationCounts } from '#lib/server/services/registrations/staff/index.ts';
 import { cancelReasonSchema } from '#lib/validation/events.ts';
 import { coverChoices, readEventForm, refused } from '../form';
 import { categoryCreate, categoryDelete, categoryUpdate } from './categories';
@@ -22,11 +23,14 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 	const user = requirePermission(locals.user, 'events.write');
 	const event = await getEvent(db, params.id);
 	if (!event) error(404, 'Not found');
-	const { id, slug, title, status, publishedAt, startsAt } = event;
+	const { id, slug, title, status, publishedAt, startsAt, capacity } = event;
+	const counts = await registrationCounts(db, [id]);
 	return {
 		...(await coverChoices()),
-		event: { id, slug, title, status, publishedAt, started: startsAt <= new Date() },
+		event: { id, slug, title, status, publishedAt, capacity, started: startsAt <= new Date() },
 		canCancel: can(user, 'events.cancel'),
+		registrations: counts.get(id) ?? { seats: 0, waitlist: 0 },
+		canRegistrations: can(user, 'registrations.read'),
 		categories: await listEventCategories(db, id),
 		values: formValues(event)
 	};

@@ -77,10 +77,10 @@ describe.skipIf(!testDbUrl)('registrations staff: the list', () => {
 		await inRollback(async (tx) => {
 			const mock = createMockProvider();
 			const event = await paidEvent(tx, { capacity: 2 });
-			const speed = await insertCategory(tx, event.id);
 			const paid = await payStarted(tx, mock, event.id);
 			await settleFee(tx, mock, paid.payment.id, 'paid', feeEffects());
 			const unpaid = await payStarted(tx, mock, event.id);
+			const speed = await insertCategory(tx, event.id);
 			const late = await insertMember(tx);
 			const queued = await register(tx, late.id, event.id, speed.id);
 			const admin = await staff(tx, 'admin');
@@ -92,7 +92,7 @@ describe.skipIf(!testDbUrl)('registrations staff: the list', () => {
 			expect(await ids({ category: speed.id })).toEqual([queued.id]);
 			expect(await ids({ paid: '1' })).toEqual([paid.registrationId]);
 			expect(await ids({ paid: '0' })).toEqual([unpaid.registrationId, queued.id]);
-			expect(await ids({ q: late.lastName })).toEqual([queued.id]);
+			expect(await ids({ q: late.tag })).toEqual([queued.id]);
 			expect(await ids({ status: 'bogus', category: 'nope' })).toHaveLength(3);
 		});
 	});
