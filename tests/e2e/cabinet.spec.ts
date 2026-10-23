@@ -47,7 +47,13 @@ async function logIn(browser: Browser, email: string): Promise<Page> {
 }
 
 test('guest: every cabinet page sends to log in and back', async ({ page }) => {
-	for (const path of ['/cabinet', '/cabinet/profile', '/cabinet/payments', '/cabinet/documents']) {
+	for (const path of [
+		'/cabinet',
+		'/cabinet/profile',
+		'/cabinet/events',
+		'/cabinet/payments',
+		'/cabinet/documents'
+	]) {
 		await page.goto(path);
 		await expect(page).toHaveURL(`/login?returnTo=${encodeURIComponent(path)}`);
 	}
