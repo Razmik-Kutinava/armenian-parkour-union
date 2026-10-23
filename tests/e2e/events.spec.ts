@@ -94,7 +94,7 @@ test('editor creates an event with a category, previews, publishes; guest finds 
 	await expect(guest.getByRole('heading', { level: 1, name: 'Autumn jam' })).toBeVisible();
 	await expect(guest.getByText('Bring water and good shoes')).toBeVisible();
 	await expect(guest.getByText('Speed, 12–14')).toBeVisible();
-	await expect(guest.getByRole('button', { name: 'Register' })).toBeDisabled();
+	await expect(guest.getByRole('link', { name: 'Log in to register' })).toBeVisible();
 	await expect(guest.getByRole('link', { name: 'Open on the map' })).toHaveAttribute(
 		'href',
 		/google\.com\/maps/

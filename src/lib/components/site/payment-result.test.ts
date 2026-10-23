@@ -54,6 +54,14 @@ describe('payment return page: message and link by status', () => {
 		);
 	});
 
+	it('an event fee is tried again on the page of its event', () => {
+		const payment = { kind: 'event_fee', status: 'failed', eventSlug: 'spring-jam' } as const;
+		expect(paymentOutcome(payment, 'success', false).link).toEqual(retry('/events/spring-jam'));
+		expect(
+			paymentOutcome({ ...payment, status: 'pending' }, 'cancel', false).link
+		).toEqual(retry('/events/spring-jam'));
+	});
+
 	it('failed and cancelled: try again; refunded: home', () => {
 		expect(paymentOutcome({ kind: 'membership', status: 'failed' }, 'success', false)).toEqual({
 			title: 'payment.failed.title',

@@ -109,4 +109,23 @@ describe.skipIf(!testDbUrl)('registrations: register — admission', () => {
 			).toEqual({ ok: false, reason: 'age_mismatch' });
 		});
 	});
+
+	it('online payment off: a paid event refuses (also the waitlist), a free one admits', async () => {
+		await inRollback(async (tx) => {
+			const off = { settings: SETTINGS, paymentsOn: false };
+			const paid = await insertEvent(tx, { priceAmountMinor: 5000 });
+			const full = await insertEvent(tx, { priceAmountMinor: 5000, capacity: 0 });
+			const free = await insertEvent(tx);
+			const member = await insertMember(tx);
+			for (const event of [paid, full]) {
+				expect(
+					await registerForEvent(tx, member.id, { eventId: event.id, categoryId: null }, off)
+				).toEqual({ ok: false, reason: 'payment_unavailable' });
+				expect(await registrationsOf(tx, event.id)).toHaveLength(0);
+			}
+			expect(
+				await registerForEvent(tx, member.id, { eventId: free.id, categoryId: null }, off)
+			).toMatchObject({ ok: true, status: 'registered' });
+		});
+	});
 });
