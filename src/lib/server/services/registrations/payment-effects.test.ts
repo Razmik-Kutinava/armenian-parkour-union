@@ -189,7 +189,7 @@ describe.skipIf(!testDbUrl)('registrations: event fee effects', () => {
 			const effects = feeEffects(box.send);
 			const event = await paidEvent(tx, { capacity: 1 });
 			const { registrationId, payment } = await payStarted(tx, mock, event.id);
-			await settleFee(tx, mock, payment.id, 'paid', effects);
+			await settleFee(tx, mock, payment.id, 'paid', feeEffects());
 			const queued = await insertMember(tx);
 			const waiting = await registerOk(tx, queued.id, event.id);
 			expect(waiting.status).toBe('waitlist');
