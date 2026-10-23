@@ -6,7 +6,7 @@
 1. Только файлы из todo «Файлы (ожидаемо)» + их тесты. Документы — только разделы из todo «Читать», через `offset`/`limit`; `05`, `06`, `08` целиком не читать.
 2. **RED:** падающий тест → коммит `test: … [RED]` → сразу GREEN (стоп — только если просили «только RED»).
 3. **GREEN:** реализация → тесты задачи зелёные → `npm run check`, `npm run lint` → коммит `feat: … [GREEN]`. Полный `npm run test` и весь e2e не гонять — это CI и `/review` этапа.
-4. **Закрытие:** статус прошлого CI (`gh run list -L 1 -w CI --json conclusion,headSha -q '.[0]'`; `failure` — сначала `ci-investigator` и фикс) → одна строка в «В работе» `PROGRESS.md` → `git push`, CI не ждать.
+4. **Закрытие:** статус прошлого CI (`gh run list -L 1 -w CI --json conclusion,headSha -q '.[0]'`; `failure` — сначала `ci-investigator` и фикс) → одна строка в «В работе» `PROGRESS.md` (межзадачные заметки — в раздел зоны `zone-notes.md`) → `git push`, CI не ждать.
 5. Длинный прогон — субагент `shell`; один тестовый файл — сам.
 
 ## Отчёт
