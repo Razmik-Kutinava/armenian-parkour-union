@@ -61,7 +61,10 @@ export const ADMIN_READS = {
 	'/admin/exams/[id]': 'exams.manage',
 	'/admin/certificates': 'certificates.read',
 	'/admin/certificates/new': 'certificates.issue',
-	'/admin/certificates/[id]': 'certificates.read'
+	'/admin/certificates/[id]': 'certificates.read',
+	/* docs/04 section 3: moderator and admin view; section 5.1 has no read code of its own. */
+	'/admin/staff': 'certificates.read',
+	'/admin/staff/[id]': 'certificates.read'
 } as const satisfies Record<string, Access>;
 
 export const ADMIN_WRITES = {
@@ -131,5 +134,6 @@ export const ADMIN_WRITES = {
 	'/admin/certificates/new?/default': 'certificates.issue',
 	'/admin/certificates/[id]?/pdf': 'certificates.issue',
 	'/admin/certificates/[id]?/revoke': 'certificates.revoke',
+	'/admin/staff/[id]?/update': 'staff_profiles.write',
 	'POST /admin/locale': 'staff'
 } as const satisfies Record<AdminAction | NotAuditedAction, Access>;

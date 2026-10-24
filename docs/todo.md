@@ -1,67 +1,61 @@
 # todo — текущая задача (SBR)
 
 > Один живой файл на текущую задачу. Ведётся по `.cursor/rules/sbr.mdc`. После REVIEW очищается до шаблона, итог — в `PROGRESS.md` («Сделано»).
-> Памятки: 3.13 (песочница VPOS, боевая проверка, чек-лист ревью) — `git show c0779a9:docs/todo.md`; 4.3 (решения сервиса баллов) — `git show 4de7a8d:docs/todo.md`; 4.4a — `git show f9184bd:docs/todo.md`; 4.4b (с ответами владельца) — `git show d9f7832:docs/todo.md`; 4.5 — `git show 1260f29:docs/todo.md`; 4.6 — `git show 18f968c:docs/todo.md`; фото профиля (долг 3.10, шаг 1) — `git show 587ca52:docs/todo.md`; язык письма гостю (долг 3.7, миграция 0010) — `git show 5775200:docs/todo.md`; 5.1 таблицы — `git show ce61380:docs/todo.md`; 5.2 согласия — `git show 5729ebd:docs/todo.md`; 5.3 сервис регистраций — `git show 5a1ee28:docs/todo.md`; 5.4 платное участие — `git show ce0b9b3:docs/todo.md`; 5.5 блок регистрации на странице события — `git show d7a9fd1:docs/todo.md`; 5.6 баллы за события — `git show 8e9cde1:docs/todo.md`; 5.7a / 5.7b / 5.7c админка регистраций — `git show 3c7dca9:docs/todo.md`; 5.8 «Мои события» — `git show f3f645f:docs/todo.md`; 5.9 письма — `git show c009e36:docs/todo.md`; 5.10 тесты гонок, возраста и согласий — `git show affc6fa:docs/todo.md`; 6.1 таблицы экзаменов — `git show d6ce569:docs/todo.md`; 6.2 сервис экзаменов — `git show 95a19c6:docs/todo.md`; 6.3 сервис сертификатов — `git show d3db9da:docs/todo.md`; 6.4 PDF сертификата — `git show f582544:docs/todo.md`; 6.5 публичная проверка — `git show 3f59199:docs/todo.md`; 6.6 профили тренеров и судей, `/federation/team` — `git show ab29f7d:docs/todo.md`; 6.7a админка экзаменов (решения и «для REVIEW») — `git show 7fe95db:docs/todo.md`.
+> Памятки: 3.13 (песочница VPOS, боевая проверка, чек-лист ревью) — `git show c0779a9:docs/todo.md`; 4.3 (решения сервиса баллов) — `git show 4de7a8d:docs/todo.md`; 4.4a — `git show f9184bd:docs/todo.md`; 4.4b (с ответами владельца) — `git show d9f7832:docs/todo.md`; 4.5 — `git show 1260f29:docs/todo.md`; 4.6 — `git show 18f968c:docs/todo.md`; фото профиля (долг 3.10, шаг 1) — `git show 587ca52:docs/todo.md`; язык письма гостю (долг 3.7, миграция 0010) — `git show 5775200:docs/todo.md`; 5.1 таблицы — `git show ce61380:docs/todo.md`; 5.2 согласия — `git show 5729ebd:docs/todo.md`; 5.3 сервис регистраций — `git show 5a1ee28:docs/todo.md`; 5.4 платное участие — `git show ce0b9b3:docs/todo.md`; 5.5 блок регистрации на странице события — `git show d7a9fd1:docs/todo.md`; 5.6 баллы за события — `git show 8e9cde1:docs/todo.md`; 5.7a / 5.7b / 5.7c админка регистраций — `git show 3c7dca9:docs/todo.md`; 5.8 «Мои события» — `git show f3f645f:docs/todo.md`; 5.9 письма — `git show c009e36:docs/todo.md`; 5.10 тесты гонок, возраста и согласий — `git show affc6fa:docs/todo.md`; 6.1 таблицы экзаменов — `git show d6ce569:docs/todo.md`; 6.2 сервис экзаменов — `git show 95a19c6:docs/todo.md`; 6.3 сервис сертификатов — `git show d3db9da:docs/todo.md`; 6.4 PDF сертификата — `git show f582544:docs/todo.md`; 6.5 публичная проверка — `git show 3f59199:docs/todo.md`; 6.6 профили тренеров и судей, `/federation/team` — `git show ab29f7d:docs/todo.md`; 6.7a админка экзаменов (решения и «для REVIEW») — `git show 7fe95db:docs/todo.md`; 6.7b админка сертификатов (решения и «для REVIEW») — `git show 93f3107:docs/todo.md`.
 
 ## Задача
 
 6.7 — админка экзаменов, сертификатов, тренеров и судей (`05` § 7–9). Без миграции. Три шага, REVIEW — общим в конце этапа 6:
 
 - 6.7a — «Экзамены» — GREEN `a89554d`.
-- **6.7b (текущий)** — «Сертификаты»: список, выдача, карточка (PDF: открыть, пересоздать; отзыв; ссылка проверки); «Выдать сертификат» на сданном экзамене. «ебашь» владельца — 2026-10-24.
-- 6.7c — «Тренеры и судьи».
+- 6.7b — «Сертификаты» — GREEN `4b80d65`.
+- **6.7c (текущий)** — «Тренеры и судьи»: список и карточка с формой правки профиля. «ебашь» владельца — 2026-10-24.
 
-### 6.7b — SPEC
+### 6.7c — SPEC
 
-Факты (`05` § 8, § 1 п. 7; `04` § 3–4): список — номер, участник, тип, уровень или категория, дата выдачи, срок, статус; фильтры — тип, статус, истекающие в 60 дней. Выдача (admin) — участник (поиск), тип, уровень / категория, экзамен (сданный или пусто с комментарием), дата выдачи и срок (по умолчанию из настроек), комментарий. После — степень и баллы одной транзакцией, затем PDF и письмо (всё в `issueCertificateNow`). Действия — открыть PDF, пересоздать PDF, отозвать (admin, причина, диалог подтверждения), скопировать ссылку проверки. Номер не редактируется. Права: просмотр — moderator, admin (`certificates.read`); выдача и пересоздание PDF — `certificates.issue`; отзыв — `certificates.revoke` (admin).
+Факты (`05` § 9; `03` § 5; `04` § 3, 5.1; `02` `staff_profiles`): список — участник, вид, категория, номер лицензии, сертификат, публичный, активен; фильтры — вид, активные, публичные. Форма (admin) — участник, вид, категория, номер лицензии, описание ×3 языка, фото, «показывать публично», «активен». Профиль создаётся выдачей сертификата и выключается отзывом / истечением (`syncStaffProfile`, 6.6); здесь — корректировка. Права: просмотр — moderator, admin; правка и скрытие — admin (`staff_profiles.write`). Фото — `users.avatar_key` (`questions.md`, предложено).
 
-Решения агента 6.7b (в рамках документов):
-- **Адреса**: `/admin/certificates` (список), `/admin/certificates/new` (выдача, только admin), `/admin/certificates/[id]` (карточка, `?/pdf`, `?/revoke`). Меню уже есть.
-- **Список**: фильтры `kind` (`level_advanced` / `level_pro` / `trainer` / `judge` — как названия сертификатов), `state` (`active` / `expired` / `revoked` — по `certificateState`: `active` с прошедшим `expires_at` — истёк, не дожидаясь 6.9), `expiring` (`60` — действует и истекает в 60 дней). Поиск — имя и номер, admin — и email. Сортировка — дата выдачи (новые сверху) и срок (без срока — в конце). Email в строках не отдаётся.
-- **PDF**: в карточке — пятиминутная подписанная ссылка на приватный бакет (как согласия, `presignGet(file_key, 'application/pdf')`), открывается в новой вкладке, браузер показывает и даёт скачать. Отдельного `+server.ts` нет. Нет бакета или файла — «PDF ещё не создан» и кнопка «Пересоздать PDF». `Content-Disposition: attachment` (заметка 6.4) не ставлю: файл делает наш сервер, без JS, и лежит на чужом домене R2 — расширять `PrivateStorage` ради имени файла не стал.
-- **Выдача**: участник — как в 6.7a (GET `?q=` → `?member=`; `examMember`, admin видит всех). `?exam=<id>` — сданный экзамен: участник, тип, уровень и экзамен подставляются. Экзамен — список сданных экзаменов участника без живого сертификата. Тип — `level` / `trainer` / `judge`; уровень — только у степени; категория и срок — только у тренера / судьи (с JS лишние поля скрыты; без JS сервер их отбрасывает по типу). Дата выдачи — день (пусто или сегодня — сейчас; прошлый день — полночь Еревана); срок — день (полночь Еревана), пусто — `staff_valid_months` (подсказка с числом). После выдачи — карточка с `?issued=<итог PDF>`: «Выдан» и почему нет PDF.
-- **Отзыв**: `ConfirmDialog` с обязательным комментарием (= причина), только у неотозванного и только admin. Степень и баллы не трогаются (сервис 6.3) — текст диалога это говорит.
-- **Ссылка проверки**: `PUBLIC_SITE_URL` (или адрес запроса) + `/certificate/{token}` — тот же адрес, что в QR; поле только для чтения и кнопка «Копировать».
-- **Карточка экзамена**: у сданного — живой сертификат (номер, ссылка) или admin-у «Выдать сертификат» (`/admin/certificates/new?exam=<id>`).
-- **Отказы** → сообщения у поля: `expiry_invalid` → срок, `comment_required` → комментарий, `exam_*` → экзамен; остальное — над формой. Пересоздание: `assets_missing`, `storage_missing`, `site_url_missing`, `revoked`; `not_found` → 404.
+Решения агента 6.7c (в рамках документов):
+- **Адреса**: `/admin/staff` (список), `/admin/staff/[id]` (карточка; у admin — форма `?/update`). Страницы создания нет: профиль без сертификата — не тренер (`02` § 1, `03` § 5 п. 1–2); пустой список подсказывает «появится при выдаче сертификата».
+- **Право просмотра**: в `04` § 5.1 нет кода `staff_profiles.read`, а по таблице § 3 смотрят moderator и admin — беру `certificates.read` (те же роли); пункт меню «Тренеры и судьи» — тоже на нём (сейчас `staff_profiles.write`, модератор раздела не видит). Документ не правлю — владельцу в отчёт.
+- **Список**: фильтры `kind` (`trainer` / `judge`), `active` и `public` (`yes` / `no`). Поиск — имя и номер лицензии, admin — и email. Сортировка — по имени (по умолчанию) и по дате изменения. Колонка «Сертификат» — номер живого сертификата того же вида (`liveCertificateOf`, последний выданный) со ссылкой на карточку, иначе «—». Удалённые участники не показываются. Email в строках не отдаётся.
+- **Карточка**: участник (ссылка на `/admin/users/[id]`), вид, фото участника (только показ — меняет сам участник в кабинете), живой сертификат (номер, срок) или «нет действующего». Модератор видит то же без формы.
+- **Форма**: категория (≤ 100, как у сертификата), номер лицензии (≤ 60), описание EN / HY / RU (обычный текст, ≤ 2000 каждое; всё пустое — `bio = null`; HY или RU без EN — ошибка у EN, `05` § 1 п. 4), «показывать публично», «активен». Участник и вид не меняются.
+- **«Активен»**: выключить — всегда; включить — только при живом сертификате того же вида (иначе отказ `no_live_certificate` у поля), проверка в той же транзакции под блокировкой строки `users` (как `syncStaffProfile` — без гонки с выдачей / отзывом). Выключенный руками профиль снова включится следующей выдачей сертификата этого вида (6.6).
+- **Журнал**: `staff_profile.update` (entity `staff_profile`), `before` / `after` — изменённые поля; ничего не изменилось — запись не пишется, ответ «Сохранено». Кеш `/federation/team` сбрасывается уже сейчас (раздел `staff` → все группы, `admin-groups.ts`) — не трогаю.
 
-## Файлы 6.7b (ожидаемо)
+## Файлы 6.7c (ожидаемо)
 
-- `src/lib/server/services/certificates/list.ts` (+ `list.test.ts`) — `certificateListOptions`, `listCertificates(db, viewer, state, now)`
-- `src/lib/server/services/certificates/card.ts` (+ `card.test.ts`) — `getCertificateCard`, `issuableExams`, `certificateOfExam`, `certificatePdfLink`
-- `src/lib/validation/admin-certificates.ts` (+ `.test.ts`), `certificate-enums.ts`
-- `src/routes/admin/certificates/` — список, `new/` (+ `IssueForm.svelte`), `[id]/` (+ действия), `outcome.ts`; `src/routes/admin/exams/[id]/` — ссылка выдачи
-- `src/lib/i18n/messages/{en,hy,ru}-certificates-admin.ts` + подключение
-- `tests/e2e/admin-access-map.ts`, `admin-audit-map.ts`, `admin-audit-actions.ts`, `admin-audit-certificates.ts` (новый), `admin-audit.spec.ts`, `admin-permissions.spec.ts`, `admin-permissions-certs.ts` (новый — `admin-permissions-fixtures.ts` уже 229 строк), `admin-certificates.spec.ts` (новый)
+- `src/lib/server/services/staff/admin-list.ts` (+ `admin-list.test.ts`) — `staffListOptions`, `listStaffProfiles(db, viewer, state, now)`
+- `src/lib/server/services/staff/admin-card.ts` (+ `admin-card.test.ts`) — `getStaffCard(db, id, now)`, `updateStaffProfile(db, actor, id, values, ip, now)`
+- `src/lib/validation/admin-staff.ts` (+ `.test.ts`), `staff-enums.ts`
+- `src/lib/server/admin/nav.ts` (+ тест меню, если есть) — пункт на `certificates.read`
+- `src/routes/admin/staff/` — список, `[id]/` (+ `StaffForm.svelte`, `BioField.svelte`)
+- `src/lib/i18n/messages/{en,hy,ru}-staff-admin.ts` + подключение
+- `tests/e2e/admin-access-map.ts`, `admin-audit-map.ts`, `admin-audit-certificates.ts` (действие профиля — сюда: `admin-audit-actions.ts` уже 203 строки), `admin-permissions.spec.ts` (200 строк — подстановку путей этапа 6 унести в `admin-permissions-certs.ts`), `admin-permissions-certs.ts`, `admin-staff.spec.ts` (новый)
 
-## Не ломать 6.7b
+## Не ломать 6.7c
 
-- Права: модератор видит список и карточку, но не выдаёт, не отзывает и не пересоздаёт PDF (403, данные не меняются); редактор и участник — ничего (K1).
-- Степень меняется только выдачей сертификата степени, без пропуска уровня; отзыв степень не трогает (K3, сервис 6.3 без изменений — `certificates/*.test.ts`).
-- Email и дата рождения участника не уходят в список и карточку (K4).
+- Права: модератор видит список и карточку, но не правит (403, профиль не меняется); редактор и участник — ничего (K1).
+- Профиль не включается без живого сертификата того же вида: на `/federation/team` не попадает тот, кто не тренер (K3 по смыслу `03` § 5).
+- Email, телефон и дата рождения участника не уходят в список и карточку (K4). Фото и описание несовершеннолетнего на сайте — по-прежнему только с `privacy` (`public.ts` не трогаю).
 
-## Проверка 6.7b
+## Проверка 6.7c
 
-- `npx vitest --run src/lib/server/services/certificates/list.test.ts src/lib/server/services/certificates/card.test.ts src/lib/validation/admin-certificates.test.ts src/routes/admin`
-- `npx playwright test tests/e2e/admin-certificates.spec.ts tests/e2e/admin-permissions.spec.ts tests/e2e/admin-audit.spec.ts`; `npm run check`, `npm run lint`
+- `npx vitest --run src/lib/server/services/staff src/lib/validation/admin-staff.test.ts src/lib/server/admin src/routes/admin`
+- `npx playwright test tests/e2e/admin-staff.spec.ts tests/e2e/admin-permissions.spec.ts tests/e2e/admin-audit.spec.ts`; `npm run check`, `npm run lint`
 
 ## Риск
 
-high (выдача и отзыв — степени и баллы, K3; права — K1). Сервис выдачи не меняется, поверх — формы.
+high (права — K1; включение профиля в обход сертификата). Сервисы 6.3 / 6.6 не меняются, поверх — список и форма.
 
 ## Читать
 
-- `05` § 1, 8. `04` § 3–4 (прочитаны). Сервисы 6.3–6.6 — `zone-notes.md` § «Экзамены и сертификаты».
+- `05` § 1, 9. `04` § 3, 5.1. `03` § 5. `02` `staff_profiles` (прочитаны). Сервисы 6.6 — `zone-notes.md` § «Экзамены и сертификаты».
 
-## Фазы 6.7b
+## Фазы 6.7c
 
 - [x] SPEC
-- [x] RED — `d8b7ad1` (нет модулей `certificates/{list,card}`, `validation/admin-certificates`; карты прав и журнала без страниц)
-- [x] GREEN — сервисы `certificates/list.ts`, `certificates/card.ts`; `validation/{admin-certificates,certificate-enums}.ts`; страницы `/admin/certificates`, `/new` (+ `IssueForm`), `/[id]` (+ `CertificateActions`, `VerifyLink`); ссылка на карточке экзамена; переводы `*-certificates-admin.ts`. Vitest зоны 45/45; e2e `admin-certificates` + `admin-permissions` + `admin-audit` 7/7; check 0, lint чистый
+- [ ] RED
+- [ ] GREEN
 - [ ] REVIEW — общим шагом в конце этапа
-
-Сверх SPEC / для REVIEW 6.7b:
-- В `admin-audit.spec` `certificate.pdf` исключён из ожидаемых кодов (как `media.upload`): без приватного бакета пересоздание отвечает 400 и журнал не пишет; запись покрыта `pdf-store.test.ts`. Если в `.env` появится `R2_PRIVATE_BUCKET` — пересоздание в e2e пройдёт и спека упадёт (лишний код), тогда поменять ожидание.
-- Тексты поиска участника на `/admin/certificates/new` — ключи `exams.new.*` (общий смысл; сам блок поиска продублирован из 6.7a, вынос в компонент — отдельным шагом).
-- `tests/e2e/admin-audit-actions.ts` — 203 строки (+2: импорт и подключение действий), `admin-permissions-fixtures.ts` — 229 (не трогал, фикстуры сертификата — в новом `admin-permissions-certs.ts`): нужен план сплита.
-- Экраны руками в браузере не смотрел: e2e проходит выдачу из экзамена, ссылку проверки, отзыв в диалоге и фильтр списка.

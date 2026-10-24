@@ -40,6 +40,7 @@ describe('adminNav', () => {
 			'/admin/users',
 			'/admin/exams',
 			'/admin/certificates',
+			'/admin/staff',
 			'/admin/consents',
 			'/admin/videos',
 			'/admin/registrations',

@@ -2,7 +2,7 @@ import { expect, type Page } from '@playwright/test';
 import type postgres from 'postgres';
 import type { AdminAction } from './admin-audit-map';
 
-type CertificateAction = Extract<AdminAction, `/admin/certificates${string}`>;
+type CertificateAction = Extract<AdminAction, `/admin/${'certificates' | 'staff'}${string}`>;
 type Post = (path: string, form?: Record<string, string>) => Promise<void>;
 
 const ORIGIN = { origin: 'http://localhost:4173' };
@@ -11,7 +11,8 @@ const ORIGIN = { origin: 'http://localhost:4173' };
  * Certificate actions for admin-audit.spec.ts: a novice written by SQL gets the "Advanced" level
  * without an exam (with a comment) — `certificate.issue` and `user.level`; a certificate written by
  * SQL is revoked. No private bucket in tests: the PDF remake is refused and logs nothing —
- * `certificate.pdf` is covered by services/certificates/pdf-store.test.ts.
+ * `certificate.pdf` is covered by services/certificates/pdf-store.test.ts. The judge profile of
+ * that certificate gets a new category (`staff_profile.update`).
  */
 export function certificateActions(
 	sql: postgres.Sql,
@@ -55,6 +56,16 @@ export function certificateActions(
 			expect(res.status()).toBe(400);
 		},
 		'/admin/certificates/[id]?/revoke': async () =>
-			post(`/admin/certificates/${await certificate()}?/revoke`, { comment: 'Audit check' })
+			post(`/admin/certificates/${await certificate()}?/revoke`, { comment: 'Audit check' }),
+		'/admin/staff/[id]?/update': async () => {
+			const [profile] = await sql`
+				insert into staff_profiles (user_id, kind)
+				select user_id, 'judge' from certificates where id = ${await certificate()}
+				returning id`;
+			await post(`/admin/staff/${profile.id}?/update`, {
+				category: 'Audit category',
+				isActive: 'on'
+			});
+		}
 	};
 }
