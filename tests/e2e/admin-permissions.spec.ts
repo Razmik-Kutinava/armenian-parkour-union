@@ -38,7 +38,9 @@ const {
 	pageRow,
 	postRow,
 	eventRows,
-	heroRow
+	heroRow,
+	insertExam,
+	examRows
 } = permissionFixtures(sql);
 
 /* Pending: approve and reject could really run on it. */
@@ -70,8 +72,10 @@ for (const role of ['member', 'editor', 'moderator'] as const) {
 			heroId: await insertHero(),
 			paymentId: await insertPayment(),
 			purposeId: await insertPurpose(),
-			ruleId: await insertRule()
+			ruleId: await insertRule(),
+			examId: await insertExam(target)
 		};
+		const examsBefore = await examRows(target);
 		const entryId = await insertPoints(target);
 		const pointsBefore = await pointsRows(target);
 		const ruleBefore = await ruleRow(ids.ruleId);
@@ -110,8 +114,9 @@ for (const role of ['member', 'editor', 'moderator'] as const) {
 		expect(await pointsRows(target)).toEqual(pointsBefore);
 		expect(await ruleRow(ids.ruleId)).toEqual(ruleBefore);
 		expect(await consentRow(consentId)).toEqual(consentBefore);
+		expect(await examRows(target)).toEqual(examsBefore);
 		expect(
-			await sql`select 1 from audit_log where entity_id in (${target}, ${ids.mediaId}, ${ids.pageId}, ${ids.postId}, ${ids.eventId}, ${ids.heroId}, ${ids.paymentId}, ${ids.purposeId}, ${ids.ruleId})`
+			await sql`select 1 from audit_log where entity_id in (${target}, ${ids.mediaId}, ${ids.pageId}, ${ids.postId}, ${ids.eventId}, ${ids.heroId}, ${ids.paymentId}, ${ids.purposeId}, ${ids.ruleId}, ${ids.examId})`
 		).toHaveLength(0);
 		/* Thresholds are a shared key that admin-audit.spec.ts changes in parallel: check the author. */
 		expect(
@@ -158,7 +163,8 @@ test('admin opens every admin page; audit pages take no writes and the entry sta
 		heroId: await insertHero(),
 		paymentId: await insertPayment(),
 		purposeId: await insertPurpose(),
-		ruleId: await insertRule()
+		ruleId: await insertRule(),
+		examId: await insertExam(target)
 	};
 	const consentId = await insertConsent(target);
 	for (const key of Object.keys(ADMIN_READS)) {

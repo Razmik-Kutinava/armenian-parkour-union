@@ -48,7 +48,10 @@ export const HOSTILE_FORM = (userId: string, heroId: string, entryId: string) =>
 	points: '999',
 	minAmount: '1',
 	burstCount: '2',
-	burstHours: '1'
+	burstHours: '1',
+	result: 'passed',
+	score: '99',
+	scheduledAt: '2099-01-01T10:00'
 });
 
 /* docs/04 section 5.4: member → 404 for all of /admin, staff without the permission → 403. */
@@ -66,6 +69,7 @@ export type Ids = {
 	paymentId: string;
 	purposeId: string;
 	ruleId: string;
+	examId: string;
 };
 export const toPath = (key: string, ids: Ids) =>
 	key
@@ -82,6 +86,7 @@ export const toPath = (key: string, ids: Ids) =>
 		.replace('/events/[id]', `/events/${ids.eventId}`)
 		.replace('/registrations/[id]', `/registrations/${ids.eventId}`)
 		.replace('/hero/[id]', `/hero/${ids.heroId}`)
+		.replace('/exams/[id]', `/exams/${ids.examId}`)
 		.replace('?/default', '');
 
 /* Takes the spec's connection: a worker may run several specs, each ends its own. */
@@ -173,6 +178,15 @@ export function permissionFixtures(sql: postgres.Sql) {
 				values (${`e2e-perm-${crypto.randomUUID()}`}, ${sql.json({ en: 'E2e perm rule' })}, 10, false)
 				returning id`
 			),
+		/* Held yesterday and undecided: a result could really be recorded on it. */
+		insertExam: async (userId: string) =>
+			idOf(
+				await sql`insert into exams (user_id, kind, scheduled_at)
+				values (${userId}, 'trainer', now() - interval '1 day') returning id`
+			),
+		examRows: async (userId: string) =>
+			await sql`select id, kind, result, score, examiner_id, notes, decided_at
+				from exams where user_id = ${userId} order by id`,
 		ruleRow: async (id: string) =>
 			(
 				await sql`select code, title, points, is_active, updated_by, updated_at

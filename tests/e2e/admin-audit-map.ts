@@ -63,7 +63,9 @@ export const ADMIN_AUDIT = {
 	'/admin/registrations/[id]?/add': ['registration.add'],
 	'/admin/registrations/[id]/day?/mark': ['registration.attendance'],
 	'/admin/registrations/[id]/results?/save': ['registration.result'],
-	'/admin/registrations/[id]/results?/finish': ['event.update']
+	'/admin/registrations/[id]/results?/finish': ['event.update'],
+	'/admin/exams/new?/default': ['exam.schedule'],
+	'/admin/exams/[id]?/result': ['exam.result']
 } as const;
 
 export type AdminAction = keyof typeof ADMIN_AUDIT;

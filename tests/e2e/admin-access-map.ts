@@ -55,7 +55,10 @@ export const ADMIN_READS = {
 	'/admin/registrations/[id]': 'registrations.read',
 	'GET /admin/registrations/[id]/export': 'registrations.read',
 	'/admin/registrations/[id]/day': 'registrations.read',
-	'/admin/registrations/[id]/results': 'registrations.read'
+	'/admin/registrations/[id]/results': 'registrations.read',
+	'/admin/exams': 'exams.manage',
+	'/admin/exams/new': 'exams.manage',
+	'/admin/exams/[id]': 'exams.manage'
 } as const satisfies Record<string, Access>;
 
 export const ADMIN_WRITES = {
@@ -120,5 +123,7 @@ export const ADMIN_WRITES = {
 	'/admin/registrations/[id]/day?/mark': 'registrations.manage',
 	'/admin/registrations/[id]/results?/save': 'registrations.manage',
 	'/admin/registrations/[id]/results?/finish': 'events.cancel',
+	'/admin/exams/new?/default': 'exams.manage',
+	'/admin/exams/[id]?/result': 'exams.manage',
 	'POST /admin/locale': 'staff'
 } as const satisfies Record<AdminAction | NotAuditedAction, Access>;
