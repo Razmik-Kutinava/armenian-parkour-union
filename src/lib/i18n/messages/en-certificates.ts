@@ -19,5 +19,8 @@ export const enCertificates = {
 	'certificates.verify.state.revoked': 'Revoked',
 	'certificates.mail.issued.subject': 'Your certificate {number}',
 	'certificates.mail.issued.text':
-		'Hello, {name}!\n\nYou have been issued a certificate: {title}, No. {number} of {date}. Congratulations!\n\nAnyone can check it by this link: {verify}\n\nYour certificates: {url}'
+		'Hello, {name}!\n\nYou have been issued a certificate: {title}, No. {number} of {date}. Congratulations!\n\nAnyone can check it by this link: {verify}\n\nYour certificates: {url}',
+	'certificates.mail.expiring.subject': 'Your certificate {number} expires on {date}',
+	'certificates.mail.expiring.text':
+		'Hello, {name}!\n\nYour certificate {title}, No. {number}, is valid until {date}. To renew it, contact the federation about re-certification.\n\nYour certificates: {url}'
 } as const;

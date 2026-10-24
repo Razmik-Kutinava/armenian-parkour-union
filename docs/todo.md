@@ -56,7 +56,12 @@ high (миграция, `+server.ts`, статус сертификатов и �
 ## Фазы 6.9
 
 - [x] SPEC
-- [ ] «go» на миграцию 0013
-- [ ] RED
-- [ ] GREEN
+- [x] «go» на миграцию 0013 («давай делай дальше» владельца, 2026-10-24); применена на `parkour_dev`
+- [x] RED — `d07d731` (нет модуля `certificates/daily`, нет `staffRemindDays`)
+- [x] GREEN — колонка `reminded_days` (0013 + откат), `staffRemindDays` (+ seed `staff_remind_days: [30, 7]`), `certificates/daily.ts`, `daily-reminders.ts`, `expiryLetter` в `mail.ts`, `certificateDailyNow`, `POST /api/cron/certificates` (сброс кеша `staff` при выключении), job `certificates` в `cron.yml`, переводы. Vitest 55/55 (daily, settings, seed, cron, i18n); e2e `cron-certificates` 3/3; check 0, lint чистый
 - [ ] REVIEW — общим шагом в конце этапа
+
+Сверх SPEC / для REVIEW 6.9:
+- e2e `tests/e2e/cron-certificates.spec.ts` (401 без токена, 200 со счётчиками, GET 405) добавлен в GREEN, по образцу `cron-memberships`; RED был на сервисе.
+- Задача видит всю таблицу: прогон e2e на `parkour_dev` переводит истёкшие тестовые сертификаты в `expired` и отмечает напоминания — это правильное поведение, не мусор.
+- Письма «истёк» нет; переаттестация — текстом «свяжитесь с федерацией» (заявки участника нет).

@@ -11,7 +11,11 @@ import type { CertificateSettings } from './settings';
 
 export { IP, daysFrom, insertCertificate, insertStaff, levelOf } from '../exams/test-support';
 
-export const SETTINGS: CertificateSettings = { staffValidMonths: 24, pdfRussian: true };
+export const SETTINGS: CertificateSettings = {
+	staffValidMonths: 24,
+	pdfRussian: true,
+	staffRemindDays: [30, 7]
+};
 
 const png = (base64: string) => new Uint8Array(Buffer.from(base64, 'base64'));
 

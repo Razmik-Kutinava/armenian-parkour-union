@@ -6,6 +6,7 @@ import {
 	jsonb,
 	numeric,
 	pgTable,
+	smallint,
 	text,
 	timestamp,
 	uniqueIndex,
@@ -99,6 +100,8 @@ export const certificates = pgTable(
 		fileKey: text('file_key'),
 		revokedAt: timestamp('revoked_at', { withTimezone: true }),
 		revokeReason: text('revoke_reason'),
+		/** The closest "N days before the end" letter already sent (6.9); empty — none yet. */
+		remindedDays: smallint('reminded_days'),
 		...timestamps
 	},
 	(t) => [

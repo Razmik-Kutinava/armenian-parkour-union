@@ -50,6 +50,32 @@ export function issuedLetter(
 	};
 }
 
+type Expiring = Pick<Issued, 'kind' | 'level' | 'number'> & { expiresAt: Date };
+
+/** A coach or judge certificate ends soon (6.9): re-certification goes through the federation. */
+export function expiryLetter(
+	to: RegistrationRecipient,
+	cert: Expiring,
+	siteUrl: string | undefined
+): Mail {
+	const locale = languageOf(to);
+	const params = {
+		name: to.firstName ?? to.name,
+		number: cert.number,
+		title: translate(locale, certificateTitleKey(cert)),
+		date: cert.expiresAt.toLocaleDateString(locale, {
+			dateStyle: 'long',
+			timeZone: 'Asia/Yerevan'
+		}),
+		url: `${siteUrl ?? ''}${localizePath('/cabinet/progress', locale)}`
+	};
+	return {
+		to: to.email,
+		subject: translate(locale, 'certificates.mail.expiring.subject', params),
+		text: translate(locale, 'certificates.mail.expiring.text', params)
+	};
+}
+
 export async function sendCertificateLetter(send: CertificateLetterDeps['send'], mail: Mail) {
 	await send(mail).catch((e) => console.warn(`certificate letter to ${mail.to} not sent`, e));
 }

@@ -3,6 +3,7 @@ import type { LimitDb } from '../../auth/rate-limit';
 import { sendMail } from '../../mail';
 import { r2Private } from '../../storage/r2';
 import type { Actor } from '../users/target';
+import { runCertificateDaily, type CertificateDailySummary } from './daily';
 import { issueCertificate, type IssueCertificateInput, type IssueCertificateResult } from './issue';
 import { loadCertificateImages } from './pdf-assets';
 import { regenerateCertificatePdf, type PdfDeps } from './pdf-store';
@@ -10,6 +11,7 @@ import { certificateSettings, type CertificateSettings } from './settings';
 
 /* docs/05 section 8: routes call these; settings come from `site_settings.certificates`. */
 
+export type { CertificateDailySummary } from './daily';
 export type { IssueCertificateInput, IssueCertificateResult, IssueRefusal } from './issue';
 export {
 	certificateOfExam,
@@ -56,4 +58,12 @@ export async function regenerateCertificatePdfNow(
 ) {
 	const deps = pdfDeps(await certificateSettings(db));
 	return regenerateCertificatePdf(db, actor, certificateId, deps, ip);
+}
+
+export async function certificateDailyNow(db: LimitDb): Promise<CertificateDailySummary> {
+	const { staffRemindDays } = await certificateSettings(db);
+	const deps = { send: sendMail, siteUrl: PUBLIC_SITE_URL, remindDays: staffRemindDays };
+	const summary = await runCertificateDaily(db, deps);
+	console.info('certificates daily:', JSON.stringify(summary));
+	return summary;
 }

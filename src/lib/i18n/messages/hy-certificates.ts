@@ -20,5 +20,8 @@ export const hyCertificates: Partial<Messages> = {
 	'certificates.verify.state.revoked': 'Չեղարկված է',
 	'certificates.mail.issued.subject': 'Ձեր հավաստագիրը՝ {number}',
 	'certificates.mail.issued.text':
-		'Բարև, {name}։\n\nՁեզ տրվել է հավաստագիր՝ {title}, № {number}, {date}։ Շնորհավորում ենք։\n\nԱյն կարող է ստուգել ցանկացած մեկը այս հղումով՝ {verify}\n\nՁեր հավաստագրերը՝ {url}'
+		'Բարև, {name}։\n\nՁեզ տրվել է հավաստագիր՝ {title}, № {number}, {date}։ Շնորհավորում ենք։\n\nԱյն կարող է ստուգել ցանկացած մեկը այս հղումով՝ {verify}\n\nՁեր հավաստագրերը՝ {url}',
+	'certificates.mail.expiring.subject': 'Ձեր {number} հավաստագրի ժամկետը լրանում է {date}',
+	'certificates.mail.expiring.text':
+		'Բարև, {name}։\n\nՁեր հավաստագիրը՝ {title}, № {number}, գործում է մինչև {date}։ Այն երկարաձգելու համար դիմեք ֆեդերացիային վերաատեստավորման համար։\n\nՁեր հավաստագրերը՝ {url}'
 };

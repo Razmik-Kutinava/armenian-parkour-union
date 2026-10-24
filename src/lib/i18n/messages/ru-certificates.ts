@@ -20,5 +20,8 @@ export const ruCertificates: Partial<Messages> = {
 	'certificates.verify.state.revoked': 'Отозван',
 	'certificates.mail.issued.subject': 'Ваш сертификат {number}',
 	'certificates.mail.issued.text':
-		'Здравствуйте, {name}!\n\nВам выдан сертификат: {title}, № {number} от {date}. Поздравляем!\n\nПроверить его может любой по ссылке: {verify}\n\nВаши сертификаты: {url}'
+		'Здравствуйте, {name}!\n\nВам выдан сертификат: {title}, № {number} от {date}. Поздравляем!\n\nПроверить его может любой по ссылке: {verify}\n\nВаши сертификаты: {url}',
+	'certificates.mail.expiring.subject': 'Срок сертификата {number} истекает {date}',
+	'certificates.mail.expiring.text':
+		'Здравствуйте, {name}!\n\nВаш сертификат {title}, № {number}, действует до {date}. Чтобы продлить его, свяжитесь с федерацией насчёт переаттестации.\n\nВаши сертификаты: {url}'
 };
