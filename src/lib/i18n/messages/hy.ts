@@ -8,6 +8,7 @@ import { hyConsents } from './hy-consents';
 import { hyDonate } from './hy-donate';
 import { hyEditor } from './hy-editor';
 import { hyEvents } from './hy-events';
+import { hyExamsAdmin } from './hy-exams-admin';
 import { hyFest } from './hy-fest';
 import { hyGoogle } from './hy-google';
 import { hyHero } from './hy-hero';
@@ -53,6 +54,7 @@ export const hy: Partial<Messages> = {
 	...hyRegistrationsAdmin,
 	...hyCertificates,
 	...hyTeam,
+	...hyExamsAdmin,
 	'site.description':
 		'Armenian Parkour Union՝ միջոցառումներ, նորություններ, անդամակցություն և ատեստավորում։',
 	'site.underConstruction': 'Կայքը մշակման փուլում է։',

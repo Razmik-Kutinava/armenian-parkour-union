@@ -35,7 +35,7 @@ test('moderator schedules over the level warning and records the result', async 
 	await page.getByLabel('Exam type').selectOption('level_pro');
 	await page.getByLabel('Date and time').fill(toYerevanInput(new Date(Date.now() - 3_600_000)));
 	await page.getByRole('button', { name: 'Schedule' }).click();
-	await expect(page.getByText(/level does not fit/)).toBeVisible();
+	await expect(page.getByText(/does not fit this exam/)).toBeVisible();
 	expect(await sql`select 1 from exams where user_id = ${member.id}`).toHaveLength(0);
 
 	await page.getByLabel('Schedule anyway').check();

@@ -8,6 +8,7 @@ import { ruConsents } from './ru-consents';
 import { ruDonate } from './ru-donate';
 import { ruEditor } from './ru-editor';
 import { ruEvents } from './ru-events';
+import { ruExamsAdmin } from './ru-exams-admin';
 import { ruFest } from './ru-fest';
 import { ruGoogle } from './ru-google';
 import { ruHero } from './ru-hero';
@@ -53,6 +54,7 @@ export const ru: Partial<Messages> = {
 	...ruRegistrationsAdmin,
 	...ruCertificates,
 	...ruTeam,
+	...ruExamsAdmin,
 	'site.description': 'Союз паркура Армении: события, новости, членство и аттестация.',
 	'site.underConstruction': 'Сайт в разработке.',
 	'common.close': 'Закрыть',

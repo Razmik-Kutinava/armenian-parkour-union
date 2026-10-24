@@ -65,18 +65,19 @@ describe.skipIf(!testDbUrl)('exams: card and form choices', () => {
 		});
 	});
 
-	it('events: not deleted, from 90 days back to a year ahead', async () => {
+	it('events: not deleted, from 90 days back to a year ahead, the closest first', async () => {
+		/* Far ahead: the shared dev database has many events around today. */
+		const at = new Date('2300-06-01T10:00:00Z');
 		await inRollback(async (tx) => {
-			const near = await insertEvent(tx, { startsAt: daysFrom(NOW, 20) });
-			const recent = await insertEvent(tx, { startsAt: daysFrom(NOW, -30) });
-			const old = await insertEvent(tx, { startsAt: daysFrom(NOW, -100) });
-			const far = await insertEvent(tx, { startsAt: daysFrom(NOW, 400) });
-			const gone = await insertEvent(tx, { startsAt: daysFrom(NOW, 10), deletedAt: NOW });
-			const ids = (await examEventOptions(tx, NOW)).map((e) => e.id);
-			expect(ids).toEqual(expect.arrayContaining([near.id, recent.id]));
-			for (const id of [old.id, far.id, gone.id]) expect(ids).not.toContain(id);
-			const option = (await examEventOptions(tx, NOW)).find((e) => e.id === near.id);
-			expect(option).toEqual({ id: near.id, title: near.title, startsAt: near.startsAt });
+			const near = await insertEvent(tx, { startsAt: daysFrom(at, 20) });
+			const recent = await insertEvent(tx, { startsAt: daysFrom(at, -30) });
+			const ahead = await insertEvent(tx, { startsAt: daysFrom(at, 300) });
+			await insertEvent(tx, { startsAt: daysFrom(at, -100) });
+			await insertEvent(tx, { startsAt: daysFrom(at, 400) });
+			await insertEvent(tx, { startsAt: daysFrom(at, 10), deletedAt: at });
+			const options = await examEventOptions(tx, at);
+			expect(options.map((e) => e.id)).toEqual([near.id, recent.id, ahead.id]);
+			expect(options[0]).toEqual({ id: near.id, title: near.title, startsAt: near.startsAt });
 		});
 	});
 

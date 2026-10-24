@@ -7,6 +7,7 @@ import { enConsents } from './en-consents';
 import { enDonate } from './en-donate';
 import { enEditor } from './en-editor';
 import { enEvents } from './en-events';
+import { enExamsAdmin } from './en-exams-admin';
 import { enFest } from './en-fest';
 import { enGoogle } from './en-google';
 import { enHero } from './en-hero';
@@ -53,6 +54,7 @@ export const en = {
 	...enRegistrationsAdmin,
 	...enCertificates,
 	...enTeam,
+	...enExamsAdmin,
 	'site.name': 'Armenian Parkour Union',
 	'site.description': 'Armenian Parkour Union: events, news, membership and certification.',
 	'site.underConstruction': 'Site under construction.',
