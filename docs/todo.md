@@ -5,21 +5,71 @@
 
 ## Задача
 
-Нет. Этап 6 прошёл общий REVIEW 2026-10-24; следующая задача — этап 7 через `/spec` (или деплой этапа 6 по апруву).
+**7.1** (`09` этап 7): таблица `videos`, форма в кабинете, проверка платформы и дублей, лимит в месяц.
+
+Граница с соседними задачами: модерация, скрытие и баллы `video_approved` — 7.2; полная видеоистория (причина отказа, пометка баллов, удаление до одобрения) — 7.7. В 7.1 на `/cabinet/videos` — форма и короткий список своих видео со статусом (чтобы видеть результат добавления).
+
+Факты из документов:
+- `02` § 6: `videos` — `id`, `user_id` FK, `url` not null, `platform` text (`youtube | instagram | tiktok | other`), `title`, `event_id` FK null, `status video_status` default `pending`, `reviewed_by`, `reviewed_at`, `reject_reason`, `created_at`; unique(`user_id`, `url`); индексы `user_id`, (`status`, `created_at`).
+- `03` § 8: только ссылки YouTube / Instagram (список настраивается, Vimeo не нужен); одна ссылка у пользователя — один раз; статус `pending`, баллов до одобрения нет. § 6.2.7, § 16: лимит — «не более N одобренных видео в месяц», по умолчанию 5, ключ `site_settings`.
+- `04` § 7: добавление видео — вход и активное членство.
+- `06` § 5.7: форма — ссылка, название, событие (необязательно); проверка платформы и дублей.
+- Разбор ссылок уже есть: `parseVideoUrl` (`components/site/hero/youtube.ts`, YouTube: watch / youtu.be / shorts / embed; Instagram: `/p/`, `/reel/`).
+
+## Решения (предложение, ждут владельца)
+
+1. **Скрытие (`03` § 17 п. 3, для 7.2):** поле `hidden_at timestamptz null` в той же миграции (статус остаётся `approved`, баллы и подсчёт лимита не трогаются; как `hero_blocks.archived_at`). Альтернатива из `questions.md` — значение `hidden` в `video_status`.
+2. **Лимит в месяц:** проверяется при добавлении — не больше N видео за календарный месяц по Еревану, считаются все добавленные (и отклонённые), удалённые участником — нет. Тогда и одобренных за месяц не больше N; в 7.2 отдельного лимита на баллы нет. Ключ `site_settings.videos` = `{ "monthly_limit": 5, "platforms": ["youtube", "instagram"] }`; нет или битый — значения по умолчанию (как `certificates`). Форма правки ключа в админке — в 7.2.
+3. **Дубли:** в `url` хранится нормализованная ссылка (`https://www.youtube.com/watch?v=<id>`, `https://www.instagram.com/p|reel/<id>/`), поэтому `youtu.be/X` и `youtube.com/watch?v=X` — один дубль; unique(`user_id`, `url`) ловит гонку двух отправок.
+4. **Активное членство** — обязательно (`04` § 7; `questions.md` — «предложено: да»).
+5. **Удаление до одобрения** (7.7) — жёсткое: на `pending` / `rejected` баллов и ссылок нет; `deleted_at` не нужен.
+6. **Событие в форме:** `published` или `finished`, уже начавшееся, не удалённое; список — последние 50.
+7. **`updated_at`** — по соглашениям `02` (таблица изменяемая), как `consents` в 0011.
+
+## Миграция 0014 (Migration Gate — ждёт «go»)
+
+`drizzle/0014_videos.sql`:
+- `CREATE TYPE video_status AS ENUM ('pending', 'approved', 'rejected')`.
+- `CREATE TABLE videos` — поля `02` § 6 + `hidden_at` (решение 1) + `updated_at`; `platform text not null` с check по списку `02`; FK на `users` (`user_id`, `reviewed_by`) и `events`.
+- unique(`user_id`, `url`); индексы `user_id`, (`status`, `created_at`).
+- check: `rejected` ⇔ непустая `reject_reason`; `hidden_at` только у `approved`; у `pending` нет `reviewed_at`.
+
+Откат — `scripts/rollback/0014_down.sql`: `DROP TABLE videos; DROP TYPE video_status;` (только по «go»; данные видео теряются — на проде таблица пуста до деплоя этапа 7), затем убрать строку 0014 из `drizzle.__drizzle_migrations` и из `drizzle/meta`. Применение на dev — `npm run db:migrate` под Node 24; прод — Deploy (`release_command`).
 
 ## Файлы (ожидаемо)
 
+- `src/lib/server/db/schema/videos.ts` (+ `enums.ts`, `index.ts`) — таблица и enum.
+- `drizzle/0014_videos.sql`, `scripts/rollback/0014_down.sql` — миграция и откат.
+- `src/lib/server/services/videos/submit.ts` (+ `submit.test.ts`) — `addVideo`: членство, платформа, нормализация, дубль, лимит, событие; одна транзакция с блокировкой `users` (гонка за лимит).
+- `src/lib/server/services/videos/settings.ts` — чтение `site_settings.videos` со значениями по умолчанию.
+- `src/routes/[[lang=lang]]/(site)/cabinet/videos/+page.server.ts`, `+page.svelte` — форма и список; пункт меню в `cabinet/+layout.svelte`; тексты — `messages/*`.
+- `tests/e2e/cabinet-videos.spec.ts` — добавление и отказ по дублю.
+
 ## Не ломать
+
+- Кабинет: гость на `/cabinet/videos` → `/login` с возвратом; чужие видео не видны.
+- Баллы: добавление видео не пишет в `points_ledger` (баллы — только 7.2).
+- Существующие миграции 0000–0013 и тесты схемы (`db/*-schema.test.ts`).
+- Hero: `parseVideoUrl` и его тесты не меняются.
 
 ## Проверка
 
+- `npx vitest run src/lib/server/services/videos src/lib/server/db` → PASS.
+- `npx playwright test tests/e2e/cabinet-videos.spec.ts` → PASS; `npm run check`, `npm run lint`.
+
 ## Риск
+
+`high` — миграция (`drizzle/*.sql`).
 
 ## Читать
 
+- `02` § 6 (выписано выше), `03` § 8, § 6.2 п. 7, § 16 (выписано), `04` § 7 (выписано), `06` § 5.7 (выписано).
+- `zone-notes.md` § «Кабинет», § «Баллы» (прочитаны).
+
 ## Фазы
 
-- [ ] SPEC
+- [x] SPEC
+- [ ] «go» на миграцию 0014 и решения 1–2
 - [ ] RED
 - [ ] GREEN
-- [ ] REVIEW
+- [ ] REVIEW (этапа)
