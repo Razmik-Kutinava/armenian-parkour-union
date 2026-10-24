@@ -16,6 +16,11 @@ async function retireLeftovers(url: string) {
 		await sql`
 			update hero_blocks set is_active = false, archived_at = now()
 			where title->>'en' like 'E2e %' and archived_at is null`;
+		/* CI migrates a fresh database without the seed: /federation needs the system page. */
+		await sql`
+			insert into pages (slug, title, status, is_system)
+			values ('about', ${sql.json({ en: 'About the federation' })}, 'published', true)
+			on conflict (slug) do nothing`;
 	} finally {
 		await sql.end();
 	}
