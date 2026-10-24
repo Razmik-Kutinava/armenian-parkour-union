@@ -122,7 +122,7 @@ export async function listOwnEvents(
 			place: r.place,
 			score: r.score,
 			points: points.get(r.id) ?? 0,
-			canPay: open && held,
+			canPay: open && held && r.startsAt > now,
 			cancelUntil: open && CANCELLABLE.includes(r.status) && now < deadline ? deadline : null
 		};
 	});

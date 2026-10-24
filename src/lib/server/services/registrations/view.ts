@@ -76,7 +76,9 @@ export async function registrationView(
 			state: 'mine',
 			status: own.status,
 			holdUntil: own.holdUntil,
-			expired: own.status === 'pending_payment' && (!own.holdUntil || own.holdUntil <= now),
+			expired:
+				own.status === 'pending_payment' &&
+				(!own.holdUntil || own.holdUntil <= now || event.startsAt <= now),
 			cancelUntil: cancellable ? deadline : null
 		};
 	}
