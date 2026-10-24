@@ -17,7 +17,7 @@ const RULES_TESTS = [
 /* An issue holds the certificate number lock until the test's rollback: in parallel these files
  * only queue on each other until the timeout. `certificates/points.test.ts` stays with the rules. */
 const ISSUE_TESTS = [
-	'src/lib/server/services/certificates/{issue,issue-level,issue-mail,revoke,number,pdf-store,daily}.test.ts',
+	'src/lib/server/services/certificates/{issue,issue-level,issue-mail,revoke,number,pdf-store,daily,race,race-level}.test.ts',
 	'src/lib/server/services/staff/profile.test.ts'
 ];
 
