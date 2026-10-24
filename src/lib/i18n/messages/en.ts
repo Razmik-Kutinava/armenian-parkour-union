@@ -2,6 +2,7 @@ import { enCabinet } from './en-cabinet';
 import { enCabinetAvatar } from './en-cabinet-avatar';
 import { enCabinetEvents } from './en-cabinet-events';
 import { enCabinetPoints } from './en-cabinet-points';
+import { enCabinetProgress } from './en-cabinet-progress';
 import { enCertificates } from './en-certificates';
 import { enCertificatesAdmin } from './en-certificates-admin';
 import { enConsents } from './en-consents';
@@ -49,6 +50,7 @@ export const en = {
 	...enPointRulesAdmin,
 	...enCabinet,
 	...enCabinetPoints,
+	...enCabinetProgress,
 	...enCabinetAvatar,
 	...enCabinetEvents,
 	...enConsents,

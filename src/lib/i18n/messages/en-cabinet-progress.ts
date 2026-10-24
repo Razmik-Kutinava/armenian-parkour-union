@@ -1,0 +1,35 @@
+/** Cabinet "Progress" (docs/06 section 5.5). Part of `en`; exam and certificate words — `en-exams-admin`, `en-certificates*`. */
+export const enCabinetProgress = {
+	'cabinet.nav.progress': 'Progress',
+	'cabinet.progress.title': 'Progress',
+	'cabinet.progress.levels': 'Levels',
+	'cabinet.progress.current': 'your level',
+	'cabinet.progress.noLevel': 'No level yet.',
+	'cabinet.progress.next.join': 'The "Novice" level comes with the first membership fee.',
+	'cabinet.progress.next.top': 'This is the highest level.',
+	'cabinet.progress.next.ready':
+		'Next exam: {exam}. Exams are scheduled by the federation — ask your coach or contact us.',
+	'cabinet.progress.next.blocked': 'The account is blocked.',
+	'cabinet.progress.next.no_membership': 'Next exam: {exam}. It needs an active membership.',
+	'cabinet.progress.next.already_scheduled': 'Next exam: {exam} — scheduled, see below.',
+	'cabinet.progress.next.awaiting_certificate':
+		'Next exam: {exam} — passed, the certificate is on its way.',
+	'cabinet.progress.next.retake_too_soon': 'Next exam: {exam} — a retake from {date}.',
+	'cabinet.progress.next.level_too_recent': 'Next exam: {exam} — from {date}.',
+	'cabinet.progress.membership': 'Membership',
+	'cabinet.progress.exams': 'Exams',
+	'cabinet.progress.examsEmpty': 'No exams yet.',
+	'cabinet.progress.certificates': 'Certificates',
+	'cabinet.progress.certificatesEmpty': 'No certificates yet.',
+	'cabinet.progress.pdf': 'Download PDF',
+	'cabinet.progress.pdfNone': 'The PDF is not ready yet.',
+	'cabinet.progress.check': 'Open the check page',
+	'cabinet.progress.qr': 'QR code',
+	'cabinet.progress.qrLabel': 'QR code of certificate {number}',
+	'cabinet.progress.staff': 'My coach and judge profile',
+	'cabinet.progress.staff.license': 'License number',
+	'cabinet.progress.staff.public': 'Shown on the site',
+	'cabinet.progress.staff.hidden': 'Not shown on the site',
+	'cabinet.progress.staff.hint': 'The federation decides whether the profile is shown on the site.',
+	'cabinet.progress.staff.team': 'Coaches and judges'
+} as const;

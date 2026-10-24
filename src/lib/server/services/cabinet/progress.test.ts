@@ -172,8 +172,14 @@ describe.skipIf(!testDbUrl)('cabinet: progress', () => {
 			});
 			const settings = { retakeDays: 30, minDaysOnLevel: 0 };
 			const next = async (id: string) => (await getOwnProgress(tx, id, settings, NOW))?.next;
-			expect(await next(lapsed.id)).toMatchObject({ kind: 'level_advanced', refusal: 'no_membership' });
-			expect(await next(waiting.id)).toMatchObject({ kind: 'level_pro', refusal: 'already_scheduled' });
+			expect(await next(lapsed.id)).toMatchObject({
+				kind: 'level_advanced',
+				refusal: 'no_membership'
+			});
+			expect(await next(waiting.id)).toMatchObject({
+				kind: 'level_pro',
+				refusal: 'already_scheduled'
+			});
 			expect(await next(retake.id)).toEqual({
 				step: 'exam',
 				kind: 'level_advanced',

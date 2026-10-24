@@ -40,7 +40,11 @@ async function certificate(userId: string, kind: string, extra: Record<string, u
 		...extra
 	};
 	const [cert] = await sql`insert into certificates ${sql(row)} returning id, number, public_token`;
-	return { id: cert.id as string, number: cert.number as string, token: cert.public_token as string };
+	return {
+		id: cert.id as string,
+		number: cert.number as string,
+		token: cert.public_token as string
+	};
 }
 
 test('guest: the progress page sends to log in and back', async ({ page }) => {
@@ -93,7 +97,7 @@ test('member: level scale, next step, exams, certificates with link and QR, coac
 	const scale = main.getByRole('list', { name: 'Levels' });
 	await expect(scale.getByRole('listitem')).toHaveCount(3);
 	await expect(scale.locator('[aria-current="step"]')).toContainText('Advanced');
-	await expect(main.getByText(/is scheduled/)).toBeVisible();
+	await expect(main.getByText(/Next exam: Level "Pro" — scheduled/)).toBeVisible();
 
 	const exams = main.getByRole('region', { name: 'Exams' });
 	await expect(exams.getByRole('row')).toHaveCount(3);
@@ -111,12 +115,17 @@ test('member: level scale, next step, exams, certificates with link and QR, coac
 		`/cabinet/progress/${level.id}/pdf`
 	);
 	await expect(certs.getByLabel('Verification link')).toHaveCount(2);
-	await expect(certs.getByLabel('Verification link').first()).toHaveValue(
+	const levelItem = certs.getByRole('listitem').filter({ hasText: level.number });
+	await expect(levelItem.getByLabel('Verification link')).toHaveValue(
 		new RegExp(`/certificate/${level.token}$`)
 	);
-	await certs.getByText('QR code').first().click();
-	await expect(certs.getByRole('img', { name: `QR code of certificate ${level.number}` })).toBeVisible();
-	await expect(certs.getByRole('img', { name: new RegExp(revoked.number) })).toHaveCount(0);
+	await levelItem.getByText('QR code', { exact: true }).click();
+	await expect(
+		levelItem.getByRole('img', { name: `QR code of certificate ${level.number}` })
+	).toBeVisible();
+	const revokedItem = certs.getByRole('listitem').filter({ hasText: revoked.number });
+	await expect(revokedItem).toContainText('Revoked');
+	await expect(revokedItem.getByText('QR code', { exact: true })).toHaveCount(0);
 
 	const staff = main.getByRole('region', { name: 'My coach and judge profile' });
 	await expect(staff).toContainText('LIC-E2E');
