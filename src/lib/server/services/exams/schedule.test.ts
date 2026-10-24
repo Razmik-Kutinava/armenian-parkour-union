@@ -101,6 +101,38 @@ describe.skipIf(!testDbUrl)('exams: schedule', () => {
 		});
 	});
 
+	it('a moderator reaches members only, like the member search (docs/04 section 6.5); an admin — any', async () => {
+		await inRollback(async (tx) => {
+			const moderator = await insertStaff(tx);
+			const admin = await insertStaff(tx, 'admin');
+			const staffMember = await insertMember(tx, { level: 'novice', role: 'editor' });
+
+			for (const role of ['editor', 'moderator', 'admin'] as const) {
+				const target = await insertMember(tx, { level: 'novice', role });
+				const byModerator = await scheduleExam(
+					tx,
+					moderator,
+					input(target.id),
+					{ settings: NO_LIMITS },
+					IP,
+					NOW
+				);
+				expect(byModerator.ok ? 'ok' : byModerator.reason, role).toBe('user_not_found');
+				expect(await examsOf(tx, target.id)).toEqual([]);
+			}
+
+			const byAdmin = await scheduleExam(
+				tx,
+				admin,
+				input(staffMember.id),
+				{ settings: NO_LIMITS },
+				IP,
+				NOW
+			);
+			expect(byAdmin.ok).toBe(true);
+		});
+	});
+
 	it('a level that does not fit only warns: scheduled after confirmation, the warning logged', async () => {
 		await inRollback(async (tx) => {
 			const member = await novice(tx);
