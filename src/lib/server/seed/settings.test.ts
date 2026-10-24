@@ -10,6 +10,7 @@ const KEYS = [
 	'contacts',
 	'donation_limits',
 	'event_registration',
+	'exams',
 	'feature_flags',
 	'footer',
 	'hero_max_active',
@@ -63,6 +64,10 @@ describe('seed: site_settings values', () => {
 			offer_hours: 48,
 			cancel_hours: 0
 		});
+	});
+
+	it('exams: no wait before a retake, no minimum time on a level (docs/03 section 16)', () => {
+		expect(SEED_SETTINGS.exams).toEqual({ retake_days: 0, min_days_on_level: 0 });
 	});
 
 	it('suspicious points: manual, |amount| ≥ 100, ≥ 5 entries in 24 h (decisions.md 2026-10-21)', () => {
