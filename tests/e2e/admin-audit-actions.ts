@@ -1,5 +1,6 @@
 import { expect, type Page } from '@playwright/test';
 import type postgres from 'postgres';
+import { certificateActions } from './admin-audit-certificates';
 import { consentActions } from './admin-audit-consents';
 import { examActions } from './admin-audit-exams';
 import type { AdminAction } from './admin-audit-map';
@@ -195,6 +196,7 @@ export async function adminActions(page: Page, sql: postgres.Sql, adminId: strin
 		...consentActions(sql, post, target),
 		...registrationActions(sql, post),
 		...examActions(sql, post),
+		...certificateActions(sql, post, page),
 		...paymentSettingsAction(page, post)
 	};
 	return perform;

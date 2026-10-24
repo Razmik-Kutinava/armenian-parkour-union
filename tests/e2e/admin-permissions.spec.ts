@@ -2,6 +2,7 @@ import { existsSync } from 'node:fs';
 import { expect, test } from '@playwright/test';
 import postgres from 'postgres';
 import { ADMIN_READS, ADMIN_WRITES } from './admin-access-map';
+import { certificateFixtures } from './admin-permissions-certs';
 import {
 	expectedStatus,
 	HOSTILE_FORM,
@@ -42,6 +43,7 @@ const {
 	insertExam,
 	examRows
 } = permissionFixtures(sql);
+const { insertCertificate, certificateRows } = certificateFixtures(sql);
 
 /* Pending: approve and reject could really run on it. */
 const insertConsent = async (userId: string) =>
@@ -54,8 +56,11 @@ const consentRow = async (id: string) =>
 	(
 		await sql`select status, reviewed_by, review_note, valid_until from consents where id = ${id}`
 	)[0];
-const pathOf = (key: string, ids: Parameters<typeof toPath>[1], consentId: string) =>
-	toPath(key, ids).replace('/consents/[id]', `/consents/${consentId}`);
+type Extra = { consentId: string; certificateId: string };
+const pathOf = (key: string, ids: Parameters<typeof toPath>[1], extra: Extra) =>
+	toPath(key, ids)
+		.replace('/consents/[id]', `/consents/${extra.consentId}`)
+		.replace('/certificates/[id]', `/certificates/${extra.certificateId}`);
 
 for (const role of ['member', 'editor', 'moderator'] as const) {
 	test(`${role}: every admin page and action answers by docs/04, data stays`, async ({ page }) => {
@@ -87,16 +92,18 @@ for (const role of ['member', 'editor', 'moderator'] as const) {
 		const heroBefore = await heroRow(ids.heroId);
 		const consentId = await insertConsent(target);
 		const consentBefore = await consentRow(consentId);
+		const extra = { consentId, certificateId: await insertCertificate(target) };
+		const certificatesBefore = await certificateRows(target);
 		await registerAs(page, role);
 
 		for (const [key, access] of Object.entries(ADMIN_READS)) {
-			const res = await page.request.get(pathOf(key, ids, consentId), { maxRedirects: 0 });
+			const res = await page.request.get(pathOf(key, ids, extra), { maxRedirects: 0 });
 			expect(res.status(), `GET ${key}`).toBe(expectedStatus(role, access));
 		}
 		for (const [key, access] of Object.entries(ADMIN_WRITES)) {
 			const expected = expectedStatus(role, access);
 			if (expected === 200) continue;
-			const res = await page.request.post(pathOf(key, ids, consentId), {
+			const res = await page.request.post(pathOf(key, ids, extra), {
 				form: HOSTILE_FORM(target, ids.heroId, entryId),
 				headers: ORIGIN,
 				maxRedirects: 0
@@ -115,8 +122,9 @@ for (const role of ['member', 'editor', 'moderator'] as const) {
 		expect(await ruleRow(ids.ruleId)).toEqual(ruleBefore);
 		expect(await consentRow(consentId)).toEqual(consentBefore);
 		expect(await examRows(target)).toEqual(examsBefore);
+		expect(await certificateRows(target)).toEqual(certificatesBefore);
 		expect(
-			await sql`select 1 from audit_log where entity_id in (${target}, ${ids.mediaId}, ${ids.pageId}, ${ids.postId}, ${ids.eventId}, ${ids.heroId}, ${ids.paymentId}, ${ids.purposeId}, ${ids.ruleId}, ${ids.examId})`
+			await sql`select 1 from audit_log where entity_id in (${target}, ${ids.mediaId}, ${ids.pageId}, ${ids.postId}, ${ids.eventId}, ${ids.heroId}, ${ids.paymentId}, ${ids.purposeId}, ${ids.ruleId}, ${ids.examId}, ${extra.certificateId})`
 		).toHaveLength(0);
 		/* Thresholds are a shared key that admin-audit.spec.ts changes in parallel: check the author. */
 		expect(
@@ -166,9 +174,9 @@ test('admin opens every admin page; audit pages take no writes and the entry sta
 		ruleId: await insertRule(),
 		examId: await insertExam(target)
 	};
-	const consentId = await insertConsent(target);
+	const extra = { consentId: await insertConsent(target), certificateId: await insertCertificate(target) };
 	for (const key of Object.keys(ADMIN_READS)) {
-		const res = await page.request.get(pathOf(key, ids, consentId), { maxRedirects: 0 });
+		const res = await page.request.get(pathOf(key, ids, extra), { maxRedirects: 0 });
 		expect(res.status(), `GET ${key}`).toBe(200);
 	}
 	for (const path of ['/admin/audit', `/admin/audit/${entry.id}`, '/admin/audit/export']) {

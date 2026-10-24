@@ -41,7 +41,7 @@ test('every admin action leaves an audit entry with author and IP', async ({ pag
 	const userCodes = rows.map((r) => r.action as string).filter((a) => a !== 'settings.update');
 	const expected = Object.values(ADMIN_AUDIT)
 		.flat()
-		.filter((a) => a !== 'settings.update' && a !== 'media.upload');
+		.filter((a) => !['settings.update', 'media.upload', 'certificate.pdf'].includes(a));
 	expect(userCodes.sort()).toEqual(expected.sort());
 	expect(rows.some((r) => r.action === 'settings.update')).toBe(true);
 });
