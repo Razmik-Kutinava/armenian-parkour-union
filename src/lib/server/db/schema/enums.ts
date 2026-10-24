@@ -46,6 +46,11 @@ export const registrationStatus = pgEnum('registration_status', [
 	'attended',
 	'no_show'
 ]);
+export const staffKind = pgEnum('staff_kind', ['trainer', 'judge']);
+export const certificateKind = pgEnum('certificate_kind', ['level', 'trainer', 'judge']);
+export const certificateStatus = pgEnum('certificate_status', ['active', 'expired', 'revoked']);
+export const examKind = pgEnum('exam_kind', ['level_advanced', 'level_pro', 'trainer', 'judge']);
+export const examResult = pgEnum('exam_result', ['scheduled', 'passed', 'failed', 'cancelled']);
 export const consentKind = pgEnum('consent_kind', ['parental', 'medical', 'privacy']);
 export const consentStatus = pgEnum('consent_status', [
 	'pending',

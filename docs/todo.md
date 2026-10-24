@@ -44,6 +44,6 @@ high (степени, баллы через сертификат, миграци
 ## Фазы
 
 - [x] SPEC
-- [ ] RED
-- [ ] GREEN
+- [x] RED — `8cb0390`
+- [x] GREEN — миграция 0012 на `parkour_dev`, тесты `src/lib/server/db` 28/28, check и lint PASS
 - [ ] REVIEW — общим шагом в конце этапа

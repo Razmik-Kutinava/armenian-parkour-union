@@ -10,3 +10,4 @@ export * from './payments';
 export * from './points';
 export * from './registrations';
 export * from './consents';
+export * from './certification';
