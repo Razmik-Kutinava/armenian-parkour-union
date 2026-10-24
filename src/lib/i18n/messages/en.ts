@@ -3,6 +3,7 @@ import { enCabinetAvatar } from './en-cabinet-avatar';
 import { enCabinetEvents } from './en-cabinet-events';
 import { enCabinetPoints } from './en-cabinet-points';
 import { enCertificates } from './en-certificates';
+import { enCertificatesAdmin } from './en-certificates-admin';
 import { enConsents } from './en-consents';
 import { enDonate } from './en-donate';
 import { enEditor } from './en-editor';
@@ -55,6 +56,7 @@ export const en = {
 	...enCertificates,
 	...enTeam,
 	...enExamsAdmin,
+	...enCertificatesAdmin,
 	'site.name': 'Armenian Parkour Union',
 	'site.description': 'Armenian Parkour Union: events, news, membership and certification.',
 	'site.underConstruction': 'Site under construction.',

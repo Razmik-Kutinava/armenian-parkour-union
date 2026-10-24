@@ -56,6 +56,12 @@ high (выдача и отзыв — степени и баллы, K3; прав�
 ## Фазы 6.7b
 
 - [x] SPEC
-- [ ] RED
-- [ ] GREEN
+- [x] RED — `d8b7ad1` (нет модулей `certificates/{list,card}`, `validation/admin-certificates`; карты прав и журнала без страниц)
+- [x] GREEN — сервисы `certificates/list.ts`, `certificates/card.ts`; `validation/{admin-certificates,certificate-enums}.ts`; страницы `/admin/certificates`, `/new` (+ `IssueForm`), `/[id]` (+ `CertificateActions`, `VerifyLink`); ссылка на карточке экзамена; переводы `*-certificates-admin.ts`. Vitest зоны 45/45; e2e `admin-certificates` + `admin-permissions` + `admin-audit` 7/7; check 0, lint чистый
 - [ ] REVIEW — общим шагом в конце этапа
+
+Сверх SPEC / для REVIEW 6.7b:
+- В `admin-audit.spec` `certificate.pdf` исключён из ожидаемых кодов (как `media.upload`): без приватного бакета пересоздание отвечает 400 и журнал не пишет; запись покрыта `pdf-store.test.ts`. Если в `.env` появится `R2_PRIVATE_BUCKET` — пересоздание в e2e пройдёт и спека упадёт (лишний код), тогда поменять ожидание.
+- Тексты поиска участника на `/admin/certificates/new` — ключи `exams.new.*` (общий смысл; сам блок поиска продублирован из 6.7a, вынос в компонент — отдельным шагом).
+- `tests/e2e/admin-audit-actions.ts` — 203 строки (+2: импорт и подключение действий), `admin-permissions-fixtures.ts` — 229 (не трогал, фикстуры сертификата — в новом `admin-permissions-certs.ts`): нужен план сплита.
+- Экраны руками в браузере не смотрел: e2e проходит выдачу из экзамена, ссылку проверки, отзыв в диалоге и фильтр списка.

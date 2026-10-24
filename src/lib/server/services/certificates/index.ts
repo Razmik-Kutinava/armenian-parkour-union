@@ -11,6 +11,14 @@ import { certificateSettings, type CertificateSettings } from './settings';
 /* docs/05 section 8: routes call these; settings come from `site_settings.certificates`. */
 
 export type { IssueCertificateInput, IssueCertificateResult, IssueRefusal } from './issue';
+export {
+	certificateOfExam,
+	certificatePdfLink,
+	getCertificateCard,
+	issuableExams,
+	type CertificateCard
+} from './card';
+export { certificateListOptions, listCertificates, type CertificateListRow } from './list';
 export { CERTIFICATE_CATEGORY_MAX, CERTIFICATE_COMMENT_MAX } from './issue-input';
 export { certificateTitleKey } from './mail';
 export { certificatePdfKey, type PdfOutcome } from './pdf-store';

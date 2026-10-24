@@ -1,7 +1,9 @@
 import { error, fail } from '@sveltejs/kit';
 import type { MessageKey } from '#lib/i18n/translate.ts';
+import { roleCan } from '#lib/server/auth/permissions.ts';
 import { requirePermission } from '#lib/server/auth/guard.ts';
 import { db } from '#lib/server/db/index.ts';
+import { certificateOfExam } from '#lib/server/services/certificates/index.ts';
 import { getExamCard, recordExamResult } from '#lib/server/services/exams/index.ts';
 import { resultSchema } from '#lib/validation/admin-exams.ts';
 import { fieldErrors, keepValues } from '#lib/validation/form.ts';
@@ -10,12 +12,14 @@ import type { Actions, PageServerLoad } from './$types';
 
 const FIELDS = ['result', 'score', 'comment'] as const;
 
-/* docs/05 section 7: the card and the result; moderator and admin. */
+/* docs/05 sections 7–8: the card and the result; moderator and admin. A passed exam shows its
+ * certificate, or to an admin the way to issue it. */
 export const load: PageServerLoad = async ({ locals, params }) => {
-	requirePermission(locals.user, 'exams.manage');
+	const viewer = requirePermission(locals.user, 'exams.manage');
 	const card = await getExamCard(db, params.id);
 	if (!card) error(404, 'Not found');
-	return { card };
+	const certificate = card.result === 'passed' ? await certificateOfExam(db, card.id) : null;
+	return { card, certificate, canIssue: roleCan(viewer.role, 'certificates.issue') };
 };
 
 export const actions: Actions = {

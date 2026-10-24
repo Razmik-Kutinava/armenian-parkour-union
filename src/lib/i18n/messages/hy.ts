@@ -4,6 +4,7 @@ import { hyCabinetAvatar } from './hy-cabinet-avatar';
 import { hyCabinetEvents } from './hy-cabinet-events';
 import { hyCabinetPoints } from './hy-cabinet-points';
 import { hyCertificates } from './hy-certificates';
+import { hyCertificatesAdmin } from './hy-certificates-admin';
 import { hyConsents } from './hy-consents';
 import { hyDonate } from './hy-donate';
 import { hyEditor } from './hy-editor';
@@ -55,6 +56,7 @@ export const hy: Partial<Messages> = {
 	...hyCertificates,
 	...hyTeam,
 	...hyExamsAdmin,
+	...hyCertificatesAdmin,
 	'site.description':
 		'Armenian Parkour Union՝ միջոցառումներ, նորություններ, անդամակցություն և ատեստավորում։',
 	'site.underConstruction': 'Կայքը մշակման փուլում է։',

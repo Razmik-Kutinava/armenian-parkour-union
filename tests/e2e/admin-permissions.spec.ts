@@ -174,7 +174,10 @@ test('admin opens every admin page; audit pages take no writes and the entry sta
 		ruleId: await insertRule(),
 		examId: await insertExam(target)
 	};
-	const extra = { consentId: await insertConsent(target), certificateId: await insertCertificate(target) };
+	const extra = {
+		consentId: await insertConsent(target),
+		certificateId: await insertCertificate(target)
+	};
 	for (const key of Object.keys(ADMIN_READS)) {
 		const res = await page.request.get(pathOf(key, ids, extra), { maxRedirects: 0 });
 		expect(res.status(), `GET ${key}`).toBe(200);

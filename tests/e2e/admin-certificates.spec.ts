@@ -65,7 +65,11 @@ test('admin issues a certificate from a passed exam and revokes it', async ({ pa
 	await expect(page.getByText('Revoked', { exact: true })).toBeVisible();
 	const [after] = await sql`select c.status, c.revoke_reason, u.level from certificates c
 		join users u on u.id = c.user_id where c.id = ${cert.id}`;
-	expect(after).toEqual({ status: 'revoked', revoke_reason: 'Issued by mistake', level: 'advanced' });
+	expect(after).toEqual({
+		status: 'revoked',
+		revoke_reason: 'Issued by mistake',
+		level: 'advanced'
+	});
 	await expect(page.getByRole('button', { name: 'Revoke' })).toHaveCount(0);
 
 	await page.goto(`/admin/certificates?q=${last}&state=revoked`);
