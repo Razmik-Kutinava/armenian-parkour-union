@@ -11,6 +11,12 @@ export const enCertificates = {
 	'certificates.pdf.category': 'Category',
 	'certificates.pdf.signature': 'Signature',
 	'certificates.pdf.verify': 'Verify',
+	'certificates.verify.title': 'Certificate check',
+	'certificates.verify.holder': 'Holder',
+	'certificates.verify.kind': 'Certificate',
+	'certificates.verify.state.active': 'Valid',
+	'certificates.verify.state.expired': 'Expired',
+	'certificates.verify.state.revoked': 'Revoked',
 	'certificates.mail.issued.subject': 'Your certificate {number}',
 	'certificates.mail.issued.text':
 		'Hello, {name}!\n\nYou have been issued a certificate: {title}, No. {number} of {date}. Congratulations!\n\nAnyone can check it by this link: {verify}\n\nYour certificates: {url}'

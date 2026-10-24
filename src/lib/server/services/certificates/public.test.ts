@@ -69,9 +69,9 @@ describe.skipIf(!testDbUrl)('certificates: public check', () => {
 				expiresAt: cert.expiresAt,
 				state: 'expired'
 			});
-			expect(await findPublicCertificate(tx, cert.publicToken, daysFrom(NOW, -100))).toMatchObject(
-				{ state: 'active' }
-			);
+			expect(await findPublicCertificate(tx, cert.publicToken, daysFrom(NOW, -100))).toMatchObject({
+				state: 'active'
+			});
 		});
 	});
 

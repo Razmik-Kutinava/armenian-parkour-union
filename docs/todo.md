@@ -43,7 +43,9 @@ normal (публичная страница с личными данными —
 
 ## Фазы
 
-- [x] SPEC
-- [ ] RED
-- [ ] GREEN
+- [x] SPEC — `8a486ff`
+- [x] RED — `1138ca9`
+- [x] GREEN — `public.test` + `pdf-content.test` 12/12, e2e `certificate.spec` 4/4, check и lint PASS
 - [ ] REVIEW — общим шагом в конце этапа
+
+Сверх SPEC: `certificateTitleKey` считается в `load` (страница — клиентский код, серверный `mail.ts` в неё не импортируется); маршрут импортирует `public.ts` напрямую, не `index.ts` — в бандл страницы не тянутся PDF-библиотеки и приватное хранилище.

@@ -12,6 +12,12 @@ export const ruCertificates: Partial<Messages> = {
 	'certificates.pdf.category': 'Категория',
 	'certificates.pdf.signature': 'Подпись',
 	'certificates.pdf.verify': 'Проверить',
+	'certificates.verify.title': 'Проверка сертификата',
+	'certificates.verify.holder': 'Владелец',
+	'certificates.verify.kind': 'Сертификат',
+	'certificates.verify.state.active': 'Действителен',
+	'certificates.verify.state.expired': 'Истёк',
+	'certificates.verify.state.revoked': 'Отозван',
 	'certificates.mail.issued.subject': 'Ваш сертификат {number}',
 	'certificates.mail.issued.text':
 		'Здравствуйте, {name}!\n\nВам выдан сертификат: {title}, № {number} от {date}. Поздравляем!\n\nПроверить его может любой по ссылке: {verify}\n\nВаши сертификаты: {url}'

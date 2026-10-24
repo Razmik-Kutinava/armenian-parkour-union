@@ -47,6 +47,12 @@ export const yerevanDate = (d: Date) =>
 		timeZone: 'Asia/Yerevan'
 	});
 
+/** First and last name; the account name when both are empty (docs/06 section 4.10). */
+export function holderName(holder: PdfHolder): string {
+	const fullName = [holder.firstName, holder.lastName].map((x) => x?.trim()).filter(Boolean);
+	return fullName.length ? fullName.join(' ') : holder.name;
+}
+
 const multilingual = ([main, ...rest]: string[]): Multilingual => ({
 	main,
 	rest: rest.filter((x, i) => x !== main && rest.indexOf(x) === i)
@@ -60,12 +66,11 @@ export function certificateContent(
 	const each = (key: MessageKey) => languages.map((l) => translate(l, key));
 	const label = (key: MessageKey) => each(key).join(' / ');
 	const field = (key: MessageKey, value: string) => ({ label: label(key), value });
-	const fullName = [holder.firstName, holder.lastName].map((x) => x?.trim()).filter(Boolean);
 	return {
 		number: cert.number,
 		union: multilingual(unionNames),
 		title: multilingual(each('certificates.pdf.title')),
-		holder: fullName.length ? fullName.join(' ') : holder.name,
+		holder: holderName(holder),
 		kind: multilingual(
 			each(
 				certificateTitleKey({ kind: cert.kind, level: cert.level === 'novice' ? null : cert.level })
