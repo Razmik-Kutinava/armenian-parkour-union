@@ -14,6 +14,13 @@ const RULES_TESTS = [
 	'src/lib/server/seed/points-rules.test.ts'
 ];
 
+/* An issue holds the certificate number lock until the test's rollback: in parallel these files
+ * only queue on each other until the timeout. `certificates/points.test.ts` stays with the rules. */
+const ISSUE_TESTS = [
+	'src/lib/server/services/certificates/{issue,issue-level,issue-mail,revoke,number,pdf-store}.test.ts',
+	'src/lib/server/services/staff/profile.test.ts'
+];
+
 export default defineConfig({
 	plugins: [
 		tailwindcss(),
@@ -42,8 +49,19 @@ export default defineConfig({
 					exclude: [
 						'src/**/*.svelte.{test,spec}.{js,ts}',
 						'src/lib/server/services/hero/**',
-						...RULES_TESTS
+						...RULES_TESTS,
+						...ISSUE_TESTS
 					]
+				}
+			},
+			{
+				extends: './vite.config.ts',
+				test: {
+					name: 'server-certificates',
+					environment: 'node',
+					testTimeout: 20_000,
+					fileParallelism: false,
+					include: ISSUE_TESTS
 				}
 			},
 			{

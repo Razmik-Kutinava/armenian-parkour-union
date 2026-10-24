@@ -61,7 +61,10 @@ describe.skipIf(!testDbUrl)('staff profiles follow certificates', () => {
 			expect(await profileOf(tx, member.id, 'judge')).toBeUndefined();
 			const [entry] = await auditFor(tx, 'certificate', id);
 			expect(entry.after).toMatchObject({ staffProfile: 'created' });
-			const [user] = await tx.select({ role: users.role }).from(users).where(eq(users.id, member.id));
+			const [user] = await tx
+				.select({ role: users.role })
+				.from(users)
+				.where(eq(users.id, member.id));
 			expect(user.role).toBe('member');
 		});
 	});

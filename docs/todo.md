@@ -51,7 +51,9 @@ high (степени и сертификаты: транзакция выдач�
 
 ## Фазы
 
-- [x] SPEC
-- [ ] RED
-- [ ] GREEN
+- [x] SPEC — `6634949`
+- [x] RED — `d48b0bd`
+- [x] GREEN — Vitest зоны (`staff`, `certificates`, `cache`, `seo`) 96/96, e2e `team.spec` + `certificate.spec` 6/6, check и lint PASS
 - [ ] REVIEW — общим шагом в конце этапа
+
+Сверх SPEC: тесты выдачи (`certificates/{issue,issue-level,issue-mail,revoke,number,pdf-store}`, `staff/profile`) вынесены в последовательный проект Vitest `server-certificates` (`vite.config.ts`) — параллельно 7 из них упирались в таймаут 20 с, ожидая advisory-замок номера чужих тестовых транзакций; до 6.6 те же файлы проходили впритык. Последовательно и в новом проекте — 96/96.

@@ -6,6 +6,7 @@ import { users } from '../../db/schema/users';
 import type { Mail } from '../../mail/resend';
 import { lockExamMember } from '../exams/facts';
 import { recipientOf } from '../registrations/recipient';
+import { syncStaffProfile } from '../staff/profile';
 import type { Actor } from '../users/target';
 import { logIssue, logLevelChange } from './issue-audit';
 import { checkExam, liveCertificateExists } from './issue-facts';
@@ -21,7 +22,8 @@ import { issuedLetter, sendCertificateLetter } from './mail';
 import { newPublicToken, nextCertificateNumber } from './number';
 import { pdfAfterIssue } from './pdf-store';
 
-/* docs/03 section 4.3: one transaction — certificate, level, points, audit; after the commit the
+/* docs/03 sections 4.3, 5: one transaction — certificate, level, points, coach or judge profile,
+ * audit; after the commit the
  * PDF (6.4), then the letter (section 14). Locks: member row → exam row → number. docs/04
  * section 8: admin only. */
 
@@ -78,8 +80,10 @@ export async function issueCertificate(
 				await logLevelChange(tx, context, v.userId, member.level, levelAfter);
 			}
 			const points = await awardCertificatePoints(tx, v, row.id);
+			const staffProfile =
+				v.kind === 'level' ? null : await syncStaffProfile(tx, v.userId, v.kind, now, v.category);
 			const facts = { number: row.number, levelBefore: member.level, levelAfter, points };
-			await logIssue(tx, context, v, facts);
+			await logIssue(tx, context, v, { ...facts, staffProfile });
 			const to = deps.send ? await recipientOf(tx, v.userId) : null;
 			if (to)
 				letters.push(issuedLetter(to, { ...row, kind: v.kind, level: v.level }, deps.siteUrl));

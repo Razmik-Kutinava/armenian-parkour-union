@@ -23,6 +23,7 @@ import { ruPointsAdmin } from './ru-points-admin';
 import { ruRegistrations } from './ru-registrations';
 import { ruRegistrationsAdmin } from './ru-registrations-admin';
 import { ruSystem } from './ru-system';
+import { ruTeam } from './ru-team';
 import { ruUsers } from './ru-users';
 
 export const ru: Partial<Messages> = {
@@ -51,6 +52,7 @@ export const ru: Partial<Messages> = {
 	...ruRegistrations,
 	...ruRegistrationsAdmin,
 	...ruCertificates,
+	...ruTeam,
 	'site.description': 'Союз паркура Армении: события, новости, членство и аттестация.',
 	'site.underConstruction': 'Сайт в разработке.',
 	'common.close': 'Закрыть',

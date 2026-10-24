@@ -1,4 +1,4 @@
-export type CacheGroup = 'settings' | 'pages' | 'posts' | 'events' | 'hero';
+export type CacheGroup = 'settings' | 'pages' | 'posts' | 'events' | 'hero' | 'staff';
 
 type Entry = { groups: readonly CacheGroup[]; expires: number; value: Promise<unknown> };
 

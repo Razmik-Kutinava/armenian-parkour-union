@@ -22,6 +22,7 @@ import { enPointsAdmin } from './en-points-admin';
 import { enRegistrations } from './en-registrations';
 import { enRegistrationsAdmin } from './en-registrations-admin';
 import { enSystem } from './en-system';
+import { enTeam } from './en-team';
 import { enUsers } from './en-users';
 
 /** Source of truth for UI text keys. hy and ru may omit keys: English is shown instead. */
@@ -51,6 +52,7 @@ export const en = {
 	...enRegistrations,
 	...enRegistrationsAdmin,
 	...enCertificates,
+	...enTeam,
 	'site.name': 'Armenian Parkour Union',
 	'site.description': 'Armenian Parkour Union: events, news, membership and certification.',
 	'site.underConstruction': 'Site under construction.',

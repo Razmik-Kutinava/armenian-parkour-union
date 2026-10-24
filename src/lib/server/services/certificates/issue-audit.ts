@@ -1,6 +1,7 @@
 import type { LimitDb } from '../../auth/rate-limit';
 import type { users } from '../../db/schema/users';
 import { writeAudit } from '../audit';
+import type { StaffChange } from '../staff/profile';
 import type { Actor } from '../users/target';
 import type { IssueValues } from './issue-input';
 import type { CertificatePoints } from './issue-points';
@@ -32,7 +33,14 @@ export async function logIssue(
 	tx: LimitDb,
 	c: Context,
 	v: IssueValues,
-	facts: { number: string; levelBefore: Level; levelAfter: Level; points: CertificatePoints }
+	facts: {
+		number: string;
+		levelBefore: Level;
+		levelAfter: Level;
+		points: CertificatePoints;
+		/** Coach and judge only. */
+		staffProfile: StaffChange | null;
+	}
 ) {
 	await writeAudit(tx, {
 		actorId: c.actor.id,
@@ -51,7 +59,8 @@ export async function logIssue(
 			comment: v.comment,
 			levelBefore: facts.levelBefore,
 			levelAfter: facts.levelAfter,
-			points: facts.points.awarded ?? facts.points.skipped
+			points: facts.points.awarded ?? facts.points.skipped,
+			...(facts.staffProfile && { staffProfile: facts.staffProfile })
 		},
 		ip: c.ip
 	});

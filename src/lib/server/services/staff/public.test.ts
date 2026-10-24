@@ -119,7 +119,13 @@ describe.skipIf(!testDbUrl)('listPublicStaff', () => {
 			const card = find(team.trainers, coach.name)!;
 			expect(Object.keys(card).sort()).toEqual(['avatarKey', 'bio', 'category', 'name']);
 			const json = JSON.stringify(team);
-			for (const secret of [coach.email, coach.id, '+37499000555', '1990-01-01', `LIC-${coach.tag}`])
+			for (const secret of [
+				coach.email,
+				coach.id,
+				'+37499000555',
+				'1990-01-01',
+				`LIC-${coach.tag}`
+			])
 				expect(json).not.toContain(secret);
 		});
 	});

@@ -10,7 +10,7 @@ import { visible } from '../posts/public';
 
 /* docs/06 section 7.2: what a guest can open, under the same conditions as the public pages. */
 
-const LISTS = ['/', '/events', '/events/archive', '/news', '/donate'];
+const LISTS = ['/', '/events', '/events/archive', '/news', '/donate', '/federation/team'];
 
 export async function listSitemapEntries(db: LimitDb): Promise<SitemapEntry[]> {
 	const columns = (table: typeof pages | typeof posts | typeof events) => ({

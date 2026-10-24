@@ -1,6 +1,6 @@
 import type { CacheGroup } from './memory';
 
-export const ALL_GROUPS: CacheGroup[] = ['settings', 'pages', 'posts', 'events', 'hero'];
+export const ALL_GROUPS: CacheGroup[] = ['settings', 'pages', 'posts', 'events', 'hero', 'staff'];
 
 /* Media: alt texts and covers show up everywhere. A section not listed resets everything. */
 const BY_SECTION: Record<string, CacheGroup[]> = {
@@ -9,7 +9,8 @@ const BY_SECTION: Record<string, CacheGroup[]> = {
 	events: ['events'],
 	hero: ['hero'],
 	settings: ['settings'],
-	users: ['hero'],
+	/* names and blocks: a hero person, a coach or judge card */
+	users: ['hero', 'staff'],
 	/* /donate: purposes and the recent donations list */
 	'donation-purposes': ['settings'],
 	payments: ['settings'],
