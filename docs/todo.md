@@ -5,21 +5,45 @@
 
 ## Задача
 
-—
+6.1 Таблицы `exams`, `certificates`, `staff_profiles` (миграция 0012). «go» владельца — 2026-10-24 («ебашь», без REVIEW на задаче).
+
+Миграция 0012 (только `CREATE`): enum `staff_kind`, `certificate_kind`, `certificate_status`, `exam_kind`, `exam_result`; таблицы по `02` разд. 1–2. Сверх списка полей `02` — по «Общим соглашениям» `02`: `created_at` / `updated_at` у всех трёх (изменяемые). Ограничения (защита степени и баллов, `03` разд. 3–4):
+- `certificates`: `level` есть ⇔ `kind = 'level'`, и только `advanced` / `pro`; у `level` нет `expires_at` (бессрочные, `03` 4.6); `revoked` ⇔ `revoked_at` и непустая `revoke_reason` (`03` 4.7); unique(`exam_id`) среди неотозванных (один сертификат на экзамен — от двойной выдачи); unique(`user_id`, `level`) среди действующих сертификатов уровня (повторная степень = повторные баллы).
+- `exams`: `score` numeric(5,2); индексы `user_id`, (`result`, `scheduled_at`).
+- `staff_profiles`: unique(`user_id`, `kind`), `is_public` false, `is_active` true.
+- FK без каскада: пользователя, экзамен, событие с записями не удалить.
+
+Откат: `DROP TABLE certificates, exams, staff_profiles; DROP TYPE staff_kind, certificate_kind, certificate_status, exam_kind, exam_result;` + удалить запись 0012 из `drizzle.__drizzle_migrations` и файлы `drizzle/0012_*`, `drizzle/meta/0012_snapshot.json`, строку журнала. Данных в новых таблицах до 6.2 нет — откат без потерь.
 
 ## Файлы (ожидаемо)
 
+- `src/lib/server/db/schema/enums.ts`, `schema/certification.ts` (новый), `schema/index.ts`
+- `drizzle/0012_*.sql`, `drizzle/meta/*`
+- `src/lib/server/db/certification-schema.test.ts` (новый)
+
 ## Не ломать
+
+- Миграции 0000–0011 и их тесты схемы (`*-schema.test.ts`).
+- `users` / `events`: удаление со ссылками — по-прежнему запрещено FK.
+- `npm run check` (типы схемы во всех сервисах).
 
 ## Проверка
 
+- `npx vitest --run src/lib/server/db/certification-schema.test.ts`
+- `npm run check`, `npm run lint`
+
 ## Риск
+
+high (степени, баллы через сертификат, миграция).
 
 ## Читать
 
+- `02` Общие соглашения, Enum-типы, разд. 1 `staff_profiles`, разд. 2 `exams`, `certificates`, Карта связей.
+- `03` разд. 3–5.
+
 ## Фазы
 
-- [ ] SPEC
+- [x] SPEC
 - [ ] RED
 - [ ] GREEN
 - [ ] REVIEW — общим шагом в конце этапа
