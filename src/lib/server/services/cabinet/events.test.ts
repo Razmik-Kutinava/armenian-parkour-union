@@ -137,9 +137,15 @@ describe.skipIf(!testDbUrl)('cabinet: my events', () => {
 			const mine = await insertEvent(tx);
 			const called = await insertEvent(tx, { status: 'cancelled' });
 			const started = await insertEvent(tx, { startsAt: at(-0.1), endsAt: at(0.1) });
+			const startedPaid = await insertEvent(tx, {
+				priceAmountMinor: 5000,
+				startsAt: at(-0.1),
+				endsAt: at(0.1)
+			});
 			await registration(tx, me.id, mine.id, 'cancelled');
 			await registration(tx, me.id, called.id, 'cancelled');
 			await registration(tx, me.id, started.id, 'registered');
+			await registration(tx, me.id, startedPaid.id, 'pending_payment', { holdUntil: at(0.01) });
 
 			const rows = (await listOwnEvents(tx, me.id, 'en', SETTINGS)).upcoming;
 			for (const row of rows) expect(row).toMatchObject({ canPay: false, cancelUntil: null });
