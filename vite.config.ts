@@ -10,6 +10,7 @@ const RULES_TESTS = [
 	'src/lib/server/services/points/{award,reverse,invariants,rules-admin}.test.ts',
 	'src/lib/server/services/registrations/points*.test.ts',
 	'src/lib/server/services/cabinet/points.test.ts',
+	'src/lib/server/services/certificates/points.test.ts',
 	'src/lib/server/seed/points-rules.test.ts'
 ];
 

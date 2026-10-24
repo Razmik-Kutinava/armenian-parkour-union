@@ -7,6 +7,7 @@ import { SEED_SETTINGS, seedSettings } from './settings';
 
 /* docs/02 section 10: keys of site_settings created by the seed script. */
 const KEYS = [
+	'certificates',
 	'contacts',
 	'donation_limits',
 	'event_registration',
@@ -68,6 +69,10 @@ describe('seed: site_settings values', () => {
 
 	it('exams: no wait before a retake, no minimum time on a level (docs/03 section 16)', () => {
 		expect(SEED_SETTINGS.exams).toEqual({ retake_days: 0, min_days_on_level: 0 });
+	});
+
+	it('certificates: coach and judge valid 24 months (docs/03 section 4.6, 16)', () => {
+		expect(SEED_SETTINGS.certificates).toEqual({ staff_valid_months: 24 });
 	});
 
 	it('suspicious points: manual, |amount| ≥ 100, ≥ 5 entries in 24 h (decisions.md 2026-10-21)', () => {
