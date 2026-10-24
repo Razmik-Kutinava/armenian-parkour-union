@@ -168,6 +168,16 @@ describe.skipIf(!testDbUrl)('registrations: the event page block', () => {
 				.set({ holdUntil: new Date(Date.now() - 1000) })
 				.where(eq(eventRegistrations.eventId, paid.id));
 			expect(await registrationView(tx, a.id, paid.id, deps)).toMatchObject({ expired: true });
+
+			await tx
+				.update(eventRegistrations)
+				.set({ holdUntil: new Date(startsAt.getTime() + 2 * DAY) })
+				.where(eq(eventRegistrations.eventId, paid.id));
+			const later = new Date(startsAt.getTime() + HOUR);
+			expect(await registrationView(tx, a.id, paid.id, deps, later)).toMatchObject({
+				status: 'pending_payment',
+				expired: true
+			});
 		});
 	});
 
