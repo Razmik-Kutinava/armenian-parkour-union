@@ -23,7 +23,7 @@
 - `src/lib/server/services/exams/admission.ts` (+ `.test.ts`) — чистая проверка допуска
 - `src/lib/server/services/exams/settings.ts` (+ `.test.ts`)
 - `src/lib/server/services/exams/facts.ts` — чтения для допуска
-- `src/lib/server/services/exams/schedule.ts` (+ `.test.ts`), `result.ts` (+ `.test.ts`), `index.ts`, `test-support.ts`
+- `src/lib/server/services/exams/schedule.ts` (+ `.test.ts`, `schedule-history.test.ts`), `result.ts` (+ `.test.ts`), `index.ts`, `test-support.ts`
 - `src/lib/server/seed/settings.ts` (+ `.test.ts`) — ключ `exams`
 
 ## Не ломать
@@ -48,6 +48,6 @@ high (степени — допуск к экзамену на степень, �
 ## Фазы
 
 - [x] SPEC
-- [ ] RED
-- [ ] GREEN
+- [x] RED — `6164319`
+- [x] GREEN — тесты задачи 30/30, check и lint PASS
 - [ ] REVIEW — общим шагом в конце этапа

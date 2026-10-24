@@ -22,6 +22,8 @@ export const SEED_SETTINGS = {
 	donation_limits: { currency: 'AMD', min_minor: 1000, max_minor: 1_000_000 },
 	/** Event seat hold, time to pay after the waitlist, cancel deadline (docs/03 section 16, 5.3). */
 	event_registration: { hold_minutes: 30, offer_hours: 48, cancel_hours: 0 },
+	/** Wait before a retake, minimum time on a level before its exam; 0 — no limit (docs/03 section 16, 6.2). */
+	exams: { retake_days: 0, min_days_on_level: 0 },
 	/** "Suspicious" in the points ledger (docs/03 section 6.4, decisions.md 2026-10-21). */
 	points_suspicious: { manual: true, min_amount: 100, burst_count: 5, burst_hours: 24 }
 };

@@ -3,20 +3,10 @@ import { insertUser, testDb, testDbUrl } from '../../db/test-db';
 import { auditFor } from '../memberships/test-support';
 import { insertEvent, insertMember } from '../registrations/test-support';
 import { scheduleExam, type ScheduleExamInput } from './schedule';
-import {
-	IP,
-	NO_LIMITS,
-	daysFrom,
-	examRow,
-	examsOf,
-	insertCertificate,
-	insertExam,
-	insertStaff,
-	levelOf
-} from './test-support';
+import { IP, NO_LIMITS, daysFrom, examRow, examsOf, insertStaff, levelOf } from './test-support';
 
-/* docs/03 section 3.3, 4.1–4.2; docs/04 sections 2, 5.1; docs/05 section 7: a moderator or an
- * admin schedules an exam for a member with an active membership; a retake is a new row. */
+/* docs/03 section 3.3, 4.1; docs/04 sections 2, 5.1; docs/05 section 7: a moderator or an admin
+ * schedules an exam for a member with an active membership. Earlier exams — schedule-history.test. */
 
 type Tx = Parameters<typeof insertUser>[0];
 const NOW = new Date();
@@ -137,115 +127,6 @@ describe.skipIf(!testDbUrl)('exams: schedule', () => {
 			const [entry] = await auditFor(tx, 'exam', result.id);
 			expect(entry.after).toMatchObject({ kind: 'level_pro', warnings: ['level_mismatch'] });
 			expect(await levelOf(tx, member.id)).toBe('novice');
-		});
-	});
-
-	it('one scheduled exam of a kind at a time; another kind is fine', async () => {
-		await inRollback(async (tx) => {
-			const member = await novice(tx);
-			const moderator = await insertStaff(tx);
-			const run = (kind: ScheduleExamInput['kind']) =>
-				scheduleExam(tx, moderator, input(member.id, { kind }), { settings: NO_LIMITS }, IP, NOW);
-			expect((await run('level_advanced')).ok).toBe(true);
-			expect(await run('level_advanced')).toMatchObject({ ok: false, reason: 'already_scheduled' });
-			expect((await run('trainer')).ok).toBe(true);
-			expect(await examsOf(tx, member.id)).toHaveLength(2);
-		});
-	});
-
-	it('a retake is a new row, not earlier than `retake_days` after the failure', async () => {
-		await inRollback(async (tx) => {
-			const member = await novice(tx);
-			const moderator = await insertStaff(tx);
-			await insertExam(tx, {
-				userId: member.id,
-				kind: 'level_advanced',
-				result: 'failed',
-				decidedAt: daysFrom(NOW, -10)
-			});
-			const settings = { retakeDays: 30, minDaysOnLevel: 0 };
-			const run = (days: number) =>
-				scheduleExam(
-					tx,
-					moderator,
-					input(member.id, { scheduledAt: daysFrom(NOW, days) }),
-					{ settings },
-					IP,
-					NOW
-				);
-
-			expect(await run(7)).toMatchObject({ ok: false, reason: 'retake_too_soon' });
-			expect((await run(25)).ok).toBe(true);
-			expect((await examsOf(tx, member.id)).map((e) => e.result).sort()).toEqual([
-				'failed',
-				'scheduled'
-			]);
-		});
-	});
-
-	it('a pass waits for its certificate; with a certificate a new exam of the kind is allowed', async () => {
-		await inRollback(async (tx) => {
-			const member = await novice(tx);
-			const admin = await insertStaff(tx, 'admin');
-			const passed = await insertExam(tx, {
-				userId: member.id,
-				kind: 'trainer',
-				result: 'passed',
-				decidedAt: daysFrom(NOW, -1)
-			});
-			const run = () =>
-				scheduleExam(
-					tx,
-					admin,
-					input(member.id, { kind: 'trainer' }),
-					{ settings: NO_LIMITS },
-					IP,
-					NOW
-				);
-
-			expect(await run()).toMatchObject({ ok: false, reason: 'awaiting_certificate' });
-			await insertCertificate(tx, {
-				userId: member.id,
-				kind: 'trainer',
-				examId: passed.id,
-				issuedBy: admin.id
-			});
-			expect((await run()).ok).toBe(true);
-			const rows = await examsOf(tx, member.id);
-			expect(rows.filter((e) => e.result === 'scheduled')).toHaveLength(1);
-		});
-	});
-
-	it('`min_days_on_level`: a novice from the first membership, higher — from the certificate', async () => {
-		await inRollback(async (tx) => {
-			const admin = await insertStaff(tx, 'admin');
-			const member = await novice(tx); // membership started 30 days ago
-			const run = (userId: string, kind: ScheduleExamInput['kind'], minDaysOnLevel: number) =>
-				scheduleExam(
-					tx,
-					admin,
-					input(userId, { kind }),
-					{ settings: { retakeDays: 0, minDaysOnLevel } },
-					IP,
-					NOW
-				);
-			expect(await run(member.id, 'level_advanced', 60)).toMatchObject({
-				reason: 'level_too_recent'
-			});
-			expect((await run(member.id, 'level_advanced', 30)).ok).toBe(true);
-
-			const advanced = await insertMember(tx, { level: 'advanced' });
-			await insertCertificate(tx, {
-				userId: advanced.id,
-				kind: 'level',
-				level: 'advanced',
-				issuedBy: admin.id,
-				issuedAt: daysFrom(NOW, -10)
-			});
-			expect(await run(advanced.id, 'level_pro', 30)).toMatchObject({
-				reason: 'level_too_recent'
-			});
-			expect((await run(advanced.id, 'level_pro', 17)).ok).toBe(true);
 		});
 	});
 });
