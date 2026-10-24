@@ -11,7 +11,19 @@ import type { CertificateSettings } from './settings';
 
 export { IP, daysFrom, insertCertificate, insertStaff, levelOf } from '../exams/test-support';
 
-export const SETTINGS: CertificateSettings = { staffValidMonths: 24 };
+export const SETTINGS: CertificateSettings = { staffValidMonths: 24, pdfRussian: true };
+
+const png = (base64: string) => new Uint8Array(Buffer.from(base64, 'base64'));
+
+/** Two different 1 × 1 PNGs standing in for the seal and the signature (the real ones stay private). */
+export const TEST_IMAGES = {
+	seal: png(
+		'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=='
+	),
+	signature: png(
+		'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII='
+	)
+};
 
 export async function passedExam(
 	tx: LimitDb,
