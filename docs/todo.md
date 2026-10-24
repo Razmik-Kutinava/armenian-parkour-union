@@ -16,7 +16,7 @@
 - `06` § 5.7: форма — ссылка, название, событие (необязательно); проверка платформы и дублей.
 - Разбор ссылок уже есть: `parseVideoUrl` (`components/site/hero/youtube.ts`, YouTube: watch / youtu.be / shorts / embed; Instagram: `/p/`, `/reel/`).
 
-## Решения (предложение, ждут владельца)
+## Решения (приняты владельцем 2026-10-24, все — как предложено)
 
 1. **Скрытие (`03` § 17 п. 3, для 7.2):** поле `hidden_at timestamptz null` в той же миграции (статус остаётся `approved`, баллы и подсчёт лимита не трогаются; как `hero_blocks.archived_at`). Альтернатива из `questions.md` — значение `hidden` в `video_status`.
 2. **Лимит в месяц:** проверяется при добавлении — не больше N видео за календарный месяц по Еревану, считаются все добавленные (и отклонённые), удалённые участником — нет. Тогда и одобренных за месяц не больше N; в 7.2 отдельного лимита на баллы нет. Ключ `site_settings.videos` = `{ "monthly_limit": 5, "platforms": ["youtube", "instagram"] }`; нет или битый — значения по умолчанию (как `certificates`). Форма правки ключа в админке — в 7.2.
@@ -26,7 +26,7 @@
 6. **Событие в форме:** `published` или `finished`, уже начавшееся, не удалённое; список — последние 50.
 7. **`updated_at`** — по соглашениям `02` (таблица изменяемая), как `consents` в 0011.
 
-## Миграция 0014 (Migration Gate — ждёт «go»)
+## Миграция 0014 («go» 2026-10-24, применена на dev)
 
 `drizzle/0014_videos.sql`:
 - `CREATE TYPE video_status AS ENUM ('pending', 'approved', 'rejected')`.
@@ -68,8 +68,14 @@
 
 ## Фазы
 
-- [x] SPEC
-- [ ] «go» на миграцию 0014 и решения 1–2
-- [ ] RED
-- [ ] GREEN
+- [x] SPEC (`fa4b61f`)
+- [x] «go» на миграцию 0014 и решения 1–7
+- [x] RED (`b58fc94`)
+- [x] GREEN — Vitest задачи 95/95 (`src/lib/server/db`, `i18n`, `services/videos`, `validation/videos`), e2e `cabinet-videos` 2/2, `check`, `lint`
 - [ ] REVIEW (этапа)
+
+## Для REVIEW
+
+- Блокировка строки `users` в `addVideo` — лимит и дубль под одновременными отправками; гонки отдельным тестом — в 7.8.
+- `created_at` пишется временем сервиса (`now`), не `now()` базы: месяц лимита считается от того же времени.
+- Сервер импортирует `parseVideoUrl` из `components/site/hero/youtube.ts` (как `services/hero/public.ts`).

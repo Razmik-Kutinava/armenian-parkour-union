@@ -49,10 +49,7 @@ describe.skipIf(!testDbUrl)('videos: addVideo', () => {
 				eventId: null,
 				status: 'pending'
 			});
-			const points = await tx
-				.select()
-				.from(pointsLedger)
-				.where(eq(pointsLedger.userId, member.id));
+			const points = await tx.select().from(pointsLedger).where(eq(pointsLedger.userId, member.id));
 			expect(points).toEqual([]);
 		});
 	});
@@ -87,7 +84,13 @@ describe.skipIf(!testDbUrl)('videos: addVideo', () => {
 	it('another platform or a switched-off one: refused, nothing written', async () => {
 		await inRollback(async (tx) => {
 			const member = await insertMember(tx);
-			const vimeo = await addVideo(tx, member.id, input('https://vimeo.com/1'), VIDEO_DEFAULTS, NOW);
+			const vimeo = await addVideo(
+				tx,
+				member.id,
+				input('https://vimeo.com/1'),
+				VIDEO_DEFAULTS,
+				NOW
+			);
 			expect(vimeo).toEqual({ ok: false, reason: 'platform' });
 			const off = { ...VIDEO_DEFAULTS, platforms: ['instagram' as const] };
 			expect(await addVideo(tx, member.id, input(), off, NOW)).toMatchObject({

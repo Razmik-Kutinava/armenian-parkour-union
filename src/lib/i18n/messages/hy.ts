@@ -4,6 +4,7 @@ import { hyCabinetAvatar } from './hy-cabinet-avatar';
 import { hyCabinetEvents } from './hy-cabinet-events';
 import { hyCabinetPoints } from './hy-cabinet-points';
 import { hyCabinetProgress } from './hy-cabinet-progress';
+import { hyCabinetVideos } from './hy-cabinet-videos';
 import { hyCertificates } from './hy-certificates';
 import { hyCertificatesAdmin } from './hy-certificates-admin';
 import { hyConsents } from './hy-consents';
@@ -53,6 +54,7 @@ export const hy: Partial<Messages> = {
 	...hyCabinetProgress,
 	...hyCabinetAvatar,
 	...hyCabinetEvents,
+	...hyCabinetVideos,
 	...hyConsents,
 	...hyRegistrations,
 	...hyRegistrationsAdmin,

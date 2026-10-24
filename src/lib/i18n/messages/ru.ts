@@ -4,6 +4,7 @@ import { ruCabinetAvatar } from './ru-cabinet-avatar';
 import { ruCabinetEvents } from './ru-cabinet-events';
 import { ruCabinetPoints } from './ru-cabinet-points';
 import { ruCabinetProgress } from './ru-cabinet-progress';
+import { ruCabinetVideos } from './ru-cabinet-videos';
 import { ruCertificates } from './ru-certificates';
 import { ruCertificatesAdmin } from './ru-certificates-admin';
 import { ruConsents } from './ru-consents';
@@ -53,6 +54,7 @@ export const ru: Partial<Messages> = {
 	...ruCabinetProgress,
 	...ruCabinetAvatar,
 	...ruCabinetEvents,
+	...ruCabinetVideos,
 	...ruConsents,
 	...ruRegistrations,
 	...ruRegistrationsAdmin,
