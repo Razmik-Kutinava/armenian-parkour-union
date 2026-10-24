@@ -132,7 +132,10 @@ describe.skipIf(!testDbUrl)('staff: admin card and update', () => {
 				expect(await audit(tx, profile.id)).toHaveLength(0);
 				const hidden = { ...VALUES, isActive: false };
 				expect(await updateStaffProfile(tx, admin, profile.id, hidden, IP, NOW)).toBe('ok');
-				expect(await row(tx, profile.id)).toMatchObject({ isActive: false, category: 'Category A' });
+				expect(await row(tx, profile.id)).toMatchObject({
+					isActive: false,
+					category: 'Category A'
+				});
 			});
 		}
 	});

@@ -57,7 +57,8 @@ const sections: [MessageKey, Section[]][] = [
 			section('users', 'users', 'users.read_limited'),
 			section('exams', 'exams', 'exams.manage'),
 			section('certificates', 'certificates', 'certificates.read'),
-			section('staff', 'staff', 'staff_profiles.write'),
+			/* docs/04 section 3: moderator and admin view; section 5.1 has no read code of its own. */
+			section('staff', 'staff', 'certificates.read'),
 			section('consents', 'consents', 'consents.review')
 		]
 	],
