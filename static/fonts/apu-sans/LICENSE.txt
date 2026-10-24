@@ -8,4 +8,5 @@ Modified fonts must not use the words "Arian", "AMU" or "Tarumian" in their name
 that they derive from the Arian AMU fonts. The fonts are provided "as is", without warranty.
 
 Changes: subset to Latin, Latin Extended, Cyrillic, Armenian and common punctuation; converted
-to WOFF2; renamed to "APU Sans" as the license requires for modified fonts.
+to WOFF2; renamed to "APU Sans" as the license requires for modified fonts. The .ttf files are the
+same subsets unpacked from the WOFF2 (fontTools, glyphs unchanged) for embedding in certificate PDFs.

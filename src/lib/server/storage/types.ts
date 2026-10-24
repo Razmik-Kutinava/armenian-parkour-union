@@ -10,6 +10,10 @@ export interface Storage {
 /** A bucket with no public address: its files open only by a short-lived signed link. */
 export interface PrivateStorage extends Storage {
 	presignGet(key: string, mime: string): Promise<string>;
+	/** The server writes a file it made itself (certificate PDF); an existing object is replaced. */
+	put(key: string, body: Uint8Array, mime: string): Promise<void>;
+	/** The whole object; null when there is none. */
+	read(key: string): Promise<Uint8Array | null>;
 }
 
 export class StorageNotConfigured extends Error {}

@@ -7,7 +7,14 @@ import { auditFor } from '../memberships/test-support';
 import { insertMember } from '../registrations/test-support';
 import { issueCertificate } from './issue';
 import { certificatePdfKey, regenerateCertificatePdf, storeCertificatePdf } from './pdf-store';
-import { SETTINGS, TEST_IMAGES, certRow, insertCertificate, insertStaff, passedExam } from './test-support';
+import {
+	SETTINGS,
+	TEST_IMAGES,
+	certRow,
+	insertCertificate,
+	insertStaff,
+	passedExam
+} from './test-support';
 
 /* docs/03 section 4 p. 5, docs/05 section 8: the PDF is made on the server after the issue, kept in
  * the private bucket (`file_key`), made again on request; a revoked certificate is not remade. */
@@ -26,14 +33,19 @@ describe.skipIf(!testDbUrl)('certificates: PDF storage', () => {
 	const { inRollback, close } = testDb();
 	afterAll(close);
 
-	async function certificate(tx: Parameters<Parameters<typeof inRollback>[0]>[0], status = 'active') {
+	async function certificate(
+		tx: Parameters<Parameters<typeof inRollback>[0]>[0],
+		status = 'active'
+	) {
 		const member = await insertMember(tx, { firstName: 'Արամ', lastName: 'Պետրոսյան' });
 		const admin = await insertStaff(tx, 'admin');
 		const cert = await insertCertificate(tx, {
 			userId: member.id,
 			kind: 'judge',
 			issuedBy: admin.id,
-			status: status as 'active' | 'revoked'
+			...(status === 'revoked'
+				? { status: 'revoked' as const, revokedAt: new Date(), revokeReason: 'Mistake' }
+				: {})
 		});
 		return { member, admin, cert };
 	}
@@ -140,7 +152,10 @@ describe.skipIf(!testDbUrl)('certificates: PDF storage', () => {
 			expect((await certRow(tx, judge.id)).fileKey).toBeNull();
 			expect(letters).toHaveLength(2);
 
-			const broken = { ...deps(), images: async () => ({ ...TEST_IMAGES, seal: new Uint8Array(3) }) };
+			const broken = {
+				...deps(),
+				images: async () => ({ ...TEST_IMAGES, seal: new Uint8Array(3) })
+			};
 			const trainer = await issueCertificate(
 				tx,
 				admin,

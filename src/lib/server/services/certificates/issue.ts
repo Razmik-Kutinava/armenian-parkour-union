@@ -19,9 +19,11 @@ import type {
 } from './issue-types';
 import { issuedLetter, sendCertificateLetter } from './mail';
 import { newPublicToken, nextCertificateNumber } from './number';
+import { pdfAfterIssue } from './pdf-store';
 
-/* docs/03 section 4.3: one transaction — certificate, level, points, audit; the letter after the
- * commit (section 14). Locks: member row → exam row → number. docs/04 section 8: admin only. */
+/* docs/03 section 4.3: one transaction — certificate, level, points, audit; after the commit the
+ * PDF (6.4), then the letter (section 14). Locks: member row → exam row → number. docs/04
+ * section 8: admin only. */
 
 export type * from './issue-types';
 
@@ -88,11 +90,14 @@ export async function issueCertificate(
 				number,
 				publicToken,
 				levelChanged: step === 'up',
-				points: points.awarded
+				points: points.awarded,
+				pdf: null
 			};
 		});
+		if (!result.ok) return result;
+		const pdf = deps.pdf ? await pdfAfterIssue(db, deps.pdf, result.id) : null;
 		if (deps.send) for (const mail of letters) await sendCertificateLetter(deps.send, mail);
-		return result;
+		return { ...result, pdf };
 	} catch (e) {
 		if (isDoubleIssue(e)) return refuse('already_issued');
 		throw e;

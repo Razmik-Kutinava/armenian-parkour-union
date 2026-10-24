@@ -35,7 +35,10 @@ describe('certificates: PDF content', () => {
 		});
 		expect(c.kind).toEqual({
 			main: translate('hy', 'certificates.kind.level_pro'),
-			rest: [translate('en', 'certificates.kind.level_pro'), translate('ru', 'certificates.kind.level_pro')]
+			rest: [
+				translate('en', 'certificates.kind.level_pro'),
+				translate('ru', 'certificates.kind.level_pro')
+			]
 		});
 		expect(c.union).toEqual({
 			main: 'Հայաստանի պարկուրի միություն',

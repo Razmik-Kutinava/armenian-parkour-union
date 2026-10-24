@@ -75,6 +75,22 @@ function bucketStorage(bucketName: () => string | undefined): PrivateStorage {
 			);
 			return (await res.Body?.transformToByteArray()) ?? new Uint8Array();
 		},
+		async put(key, body, mime) {
+			const { client, bucket } = s3();
+			await client.send(
+				new PutObjectCommand({ Bucket: bucket, Key: key, Body: body, ContentType: mime })
+			);
+		},
+		async read(key) {
+			const { client, bucket } = s3();
+			try {
+				const res = await client.send(new GetObjectCommand({ Bucket: bucket, Key: key }));
+				return (await res.Body?.transformToByteArray()) ?? new Uint8Array();
+			} catch (e) {
+				if (isMissing(e)) return null;
+				throw e;
+			}
+		},
 		async remove(key) {
 			const { client, bucket } = s3();
 			await client.send(new DeleteObjectCommand({ Bucket: bucket, Key: key }));
@@ -85,7 +101,7 @@ function bucketStorage(bucketName: () => string | undefined): PrivateStorage {
 /** The media bucket behind `R2_PUBLIC_URL`: everything in it is public. */
 export const r2: Storage = bucketStorage(() => R2_BUCKET);
 
-/** Personal documents (consents): no public address, viewed only by a signed link. */
+/** Personal documents (consents, certificate PDFs, seal and signature): no public address. */
 export const r2Private: PrivateStorage = bucketStorage(() => R2_PRIVATE_BUCKET);
 
 /** Public address of a stored file, or null until the bucket is connected. */

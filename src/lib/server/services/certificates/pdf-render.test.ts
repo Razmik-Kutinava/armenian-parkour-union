@@ -1,4 +1,4 @@
-import { PDFDocument } from 'pdf-lib';
+import { PDFArray, PDFDict, PDFDocument, PDFName } from 'pdf-lib';
 import { describe, expect, it } from 'vitest';
 import { certificateContent, pdfLanguages } from './pdf-content';
 import { renderCertificatePdf } from './pdf-render';
@@ -37,8 +37,16 @@ describe('certificates: PDF render', () => {
 		expect(Math.round(width)).toBe(842);
 		expect(Math.round(height)).toBe(595);
 		expect(doc.getTitle()).toBe('APU-2026-0001');
-		expect(latin1(bytes).match(/\/Subtype\s*\/Image/g)).toHaveLength(2);
-		expect(latin1(bytes)).toMatch(/\/FontFile2|\/FontFile3/);
+		const resources = doc.getPage(0).node.Resources();
+		expect(resources?.lookup(PDFName.of('XObject'), PDFDict).keys()).toHaveLength(2);
+		const fonts = resources?.lookup(PDFName.of('Font'), PDFDict);
+		expect(new Set(fonts?.values().map(String))).toHaveProperty('size', 2);
+		for (const name of fonts?.keys() ?? []) {
+			const font = fonts?.lookup(name, PDFDict);
+			const cid = font?.lookup(PDFName.of('DescendantFonts'), PDFArray).lookup(0, PDFDict);
+			const descriptor = cid?.lookup(PDFName.of('FontDescriptor'), PDFDict);
+			expect(descriptor?.has(PDFName.of('FontFile2'))).toBe(true);
+		}
 	});
 
 	it('long names, Cyrillic and a judge with category and expiry render', async () => {

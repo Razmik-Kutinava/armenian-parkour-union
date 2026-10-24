@@ -18,6 +18,12 @@ export function fakeStorage(): PrivateStorage & { objects: Map<string, Uint8Arra
 		async readStart(key, length) {
 			return (objects.get(key) ?? new Uint8Array()).slice(0, length);
 		},
+		async put(key, body) {
+			objects.set(key, body);
+		},
+		async read(key) {
+			return objects.get(key) ?? null;
+		},
 		async remove(key) {
 			objects.delete(key);
 		}

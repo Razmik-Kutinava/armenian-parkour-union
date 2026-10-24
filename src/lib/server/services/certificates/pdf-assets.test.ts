@@ -24,14 +24,17 @@ describe('certificates: seal and signature', () => {
 	};
 
 	it('the folder: both PNG files', async () => {
-		const d = await folder({ 'seal.png': TEST_IMAGES.seal, 'signature.png': TEST_IMAGES.signature });
+		const d = await folder({
+			'seal.png': TEST_IMAGES.seal,
+			'signature.png': TEST_IMAGES.signature
+		});
 		expect(await loadCertificateImages({ dir: d })).toEqual(TEST_IMAGES);
 	});
 
 	it('the folder: a missing or non-PNG file — nothing', async () => {
-		expect(await loadCertificateImages({ dir: await folder({ 'seal.png': TEST_IMAGES.seal }) })).toBe(
-			null
-		);
+		expect(
+			await loadCertificateImages({ dir: await folder({ 'seal.png': TEST_IMAGES.seal }) })
+		).toBe(null);
 		const notPng = await folder({
 			'seal.png': new TextEncoder().encode('GIF89a'),
 			'signature.png': TEST_IMAGES.signature

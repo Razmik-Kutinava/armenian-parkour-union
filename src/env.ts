@@ -17,6 +17,7 @@ export const variables = defineEnvVars({
 	R2_BUCKET: { schema: optional },
 	R2_PUBLIC_URL: { schema: optional },
 	R2_PRIVATE_BUCKET: { schema: optional },
+	CERTIFICATE_ASSETS_DIR: { schema: optional },
 	CACHE_TTL_SECONDS: { schema: optional },
 	PAYMENT_PROVIDER: { schema: optional },
 	PAYMENT_VPOS_API_TOKEN: { schema: optional },
