@@ -3,6 +3,7 @@ import { ruCabinet } from './ru-cabinet';
 import { ruCabinetAvatar } from './ru-cabinet-avatar';
 import { ruCabinetEvents } from './ru-cabinet-events';
 import { ruCabinetPoints } from './ru-cabinet-points';
+import { ruCertificates } from './ru-certificates';
 import { ruConsents } from './ru-consents';
 import { ruDonate } from './ru-donate';
 import { ruEditor } from './ru-editor';
@@ -49,6 +50,7 @@ export const ru: Partial<Messages> = {
 	...ruConsents,
 	...ruRegistrations,
 	...ruRegistrationsAdmin,
+	...ruCertificates,
 	'site.description': 'Союз паркура Армении: события, новости, членство и аттестация.',
 	'site.underConstruction': 'Сайт в разработке.',
 	'common.close': 'Закрыть',

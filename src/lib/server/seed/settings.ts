@@ -24,6 +24,8 @@ export const SEED_SETTINGS = {
 	event_registration: { hold_minutes: 30, offer_hours: 48, cancel_hours: 0 },
 	/** Wait before a retake, minimum time on a level before its exam; 0 — no limit (docs/03 section 16, 6.2). */
 	exams: { retake_days: 0, min_days_on_level: 0 },
+	/** Coach and judge certificates valid by default (docs/03 section 4.6, 16; 6.3). */
+	certificates: { staff_valid_months: 24 },
 	/** "Suspicious" in the points ledger (docs/03 section 6.4, decisions.md 2026-10-21). */
 	points_suspicious: { manual: true, min_amount: 100, burst_count: 5, burst_hours: 24 }
 };

@@ -10,7 +10,11 @@ const NOW = new Date('2026-10-24T12:00:00Z');
 const USER = '00000000-0000-4000-8000-000000000001';
 const EXAM = '00000000-0000-4000-8000-000000000002';
 const parse = (extra: Partial<IssueCertificateInput>) =>
-	parseIssueInput({ userId: USER, kind: 'level', level: 'advanced', examId: EXAM, ...extra }, SETTINGS, NOW);
+	parseIssueInput(
+		{ userId: USER, kind: 'level', level: 'advanced', examId: EXAM, ...extra },
+		SETTINGS,
+		NOW
+	);
 
 describe('certificates: issue input', () => {
 	it('a level certificate by an exam: issued now, no end date, no category', () => {
@@ -32,10 +36,23 @@ describe('certificates: issue input', () => {
 	it('coach and judge: the end date defaults to the settings, a category is kept', () => {
 		const issuedAt = new Date('2026-09-01T08:00:00Z');
 		expect(
-			parse({ kind: 'trainer', level: null, category: '  B  ', examId: null, comment: 'Old', issuedAt })
+			parse({
+				kind: 'trainer',
+				level: null,
+				category: '  B  ',
+				examId: null,
+				comment: 'Old',
+				issuedAt
+			})
 		).toMatchObject({
 			ok: true,
-			value: { level: null, category: 'B', examId: null, issuedAt, expiresAt: new Date('2028-09-01T08:00:00Z') }
+			value: {
+				level: null,
+				category: 'B',
+				examId: null,
+				issuedAt,
+				expiresAt: new Date('2028-09-01T08:00:00Z')
+			}
 		});
 		const expiresAt = new Date('2027-01-01T00:00:00Z');
 		expect(parse({ kind: 'judge', level: null, expiresAt })).toMatchObject({
@@ -46,7 +63,10 @@ describe('certificates: issue input', () => {
 
 	it('without an exam the comment is required (docs/03 section 4.8)', () => {
 		expect(parse({ examId: null })).toEqual({ ok: false, reason: 'comment_required' });
-		expect(parse({ examId: null, comment: '   ' })).toEqual({ ok: false, reason: 'comment_required' });
+		expect(parse({ examId: null, comment: '   ' })).toEqual({
+			ok: false,
+			reason: 'comment_required'
+		});
 		expect(parse({ examId: null, comment: 'Transfer of 2019 records' }).ok).toBe(true);
 	});
 

@@ -79,7 +79,9 @@ describe.skipIf(!testDbUrl)('certificates: revoke', () => {
 	it('after a revoke the same exam can get a new certificate', async () => {
 		await inRollback(async (tx) => {
 			const { member, admin, exam, id } = await issued(tx);
-			expect(await revokeCertificate(tx, admin, { certificateId: id, reason: 'Typo' }, IP)).toBe('ok');
+			expect(await revokeCertificate(tx, admin, { certificateId: id, reason: 'Typo' }, IP)).toBe(
+				'ok'
+			);
 			const again = await issuer(tx)(admin, {
 				userId: member.id,
 				kind: 'level',

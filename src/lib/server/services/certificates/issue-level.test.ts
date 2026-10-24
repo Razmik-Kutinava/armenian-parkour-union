@@ -47,9 +47,9 @@ describe.skipIf(!testDbUrl)('certificates: no level skipped', () => {
 			);
 			expect(passed).toBe('ok');
 
-			expect(await issuer(tx)(admin, { userId: member.id, ...level('pro'), examId: scheduled.id })).toEqual(
-				{ ok: false, reason: 'level_skip' }
-			);
+			expect(
+				await issuer(tx)(admin, { userId: member.id, ...level('pro'), examId: scheduled.id })
+			).toEqual({ ok: false, reason: 'level_skip' });
 			expect(await levelOf(tx, member.id)).toBe('novice');
 			expect(await certsOf(tx, member.id)).toEqual([]);
 		});
@@ -81,9 +81,9 @@ describe.skipIf(!testDbUrl)('certificates: no level skipped', () => {
 			const pro = await insertMember(tx, { level: 'pro' });
 			const admin = await insertStaff(tx, 'admin');
 			const exam = await passedExam(tx, pro.id);
-			expect(await issuer(tx)(admin, { userId: pro.id, ...level('advanced'), examId: exam.id })).toEqual(
-				{ ok: false, reason: 'level_below' }
-			);
+			expect(
+				await issuer(tx)(admin, { userId: pro.id, ...level('advanced'), examId: exam.id })
+			).toEqual({ ok: false, reason: 'level_below' });
 			expect(await levelOf(tx, pro.id)).toBe('pro');
 		});
 	});
@@ -100,9 +100,13 @@ describe.skipIf(!testDbUrl)('certificates: no level skipped', () => {
 				ok: false,
 				reason: 'level_skip'
 			});
-			expect((await issue(admin, { userId: member.id, ...level('advanced'), examId: advanced.id })).ok).toBe(true);
+			expect(
+				(await issue(admin, { userId: member.id, ...level('advanced'), examId: advanced.id })).ok
+			).toBe(true);
 			expect(await levelOf(tx, member.id)).toBe('advanced');
-			expect((await issue(admin, { userId: member.id, ...level('pro'), examId: pro.id })).ok).toBe(true);
+			expect((await issue(admin, { userId: member.id, ...level('pro'), examId: pro.id })).ok).toBe(
+				true
+			);
 			expect(await levelOf(tx, member.id)).toBe('pro');
 		});
 	});

@@ -1,12 +1,10 @@
 import { eq } from 'drizzle-orm';
 import { afterAll, describe, expect, it } from 'vitest';
-import { translate } from '#lib/i18n/translate.ts';
 import { exams } from '../../db/schema/certification';
-import { insertUser, testDb, testDbUrl } from '../../db/test-db';
-import type { Mail } from '../../mail/resend';
+import { testDb, testDbUrl } from '../../db/test-db';
 import { auditFor } from '../memberships/test-support';
 import { insertMember } from '../registrations/test-support';
-import { issueCertificate, type IssueCertificateInput } from './issue';
+import type { IssueCertificateInput } from './issue';
 import {
 	SETTINGS,
 	certRow,
@@ -18,7 +16,7 @@ import {
 } from './test-support';
 
 /* docs/03 section 4.3: an admin issues by a passed exam in one transaction — certificate, level,
- * audit; the letter after the commit (section 14). docs/04 section 8: a moderator cannot issue. */
+ * audit. docs/04 section 8: a moderator cannot issue. The letter — issue-mail.test. */
 
 const NUMBER = /^APU-\d{4}-\d{4,}$/;
 
@@ -94,7 +92,13 @@ describe.skipIf(!testDbUrl)('certificates: issue', () => {
 			});
 			if (!result.ok) throw new Error(result.reason);
 			const row = await certRow(tx, result.id);
-			expect(row).toMatchObject({ kind: 'trainer', level: null, category: 'B', examId: null, issuedAt });
+			expect(row).toMatchObject({
+				kind: 'trainer',
+				level: null,
+				category: 'B',
+				examId: null,
+				issuedAt
+			});
 			const expected = new Date(issuedAt);
 			expected.setUTCMonth(expected.getUTCMonth() + SETTINGS.staffValidMonths);
 			expect(row.expiresAt?.getTime()).toBe(expected.getTime());
@@ -174,57 +178,6 @@ describe.skipIf(!testDbUrl)('certificates: issue', () => {
 				reason: 'already_issued'
 			});
 			expect(await certsOf(tx, member.id)).toHaveLength(1);
-		});
-	});
-
-	it('the letter goes after the commit, in the member language, with number and links', async () => {
-		await inRollback(async (tx) => {
-			const member = await insertMember(tx, { level: 'novice', locale: 'ru', firstName: 'Арам' });
-			const exam = await passedExam(tx, member.id);
-			const admin = await insertStaff(tx, 'admin');
-			const letters: Mail[] = [];
-
-			const result = await issuer(tx, letters)(admin, {
-				userId: member.id,
-				kind: 'level',
-				level: 'advanced',
-				examId: exam.id
-			});
-			if (!result.ok) throw new Error(result.reason);
-			expect(letters).toHaveLength(1);
-			const [mail] = letters;
-			expect(mail.to).toBe(member.email);
-			expect(mail.subject).toBe(
-				translate('ru', 'certificates.mail.issued.subject', { number: result.number })
-			);
-			expect(mail.text).toContain('Арам');
-			expect(mail.text).toContain(result.number);
-			expect(mail.text).toContain(translate('ru', 'certificates.kind.level_advanced'));
-			expect(mail.text).toContain(`https://parkour.test/ru/certificate/${result.publicToken}`);
-			expect(mail.text).toContain('https://parkour.test/ru/cabinet/progress');
-		});
-	});
-
-	it('a failed send does not undo the issue; no letter on a refusal; without `send` none', async () => {
-		await inRollback(async (tx) => {
-			const member = await insertMember(tx, { level: 'novice' });
-			const admin = await insertStaff(tx, 'admin');
-			const deps = {
-				settings: SETTINGS,
-				send: async () => {
-					throw new Error('mail down');
-				},
-				siteUrl: undefined
-			};
-			const input = { userId: member.id, kind: 'judge' as const, comment: 'Transfer' };
-			const result = await issueCertificate(tx, admin, input, deps, null);
-			expect(result.ok).toBe(true);
-			expect(await certsOf(tx, member.id)).toHaveLength(1);
-
-			const letters: Mail[] = [];
-			const nobody = await insertUser(tx);
-			expect((await issuer(tx, letters)(admin, { ...input, userId: nobody.id, examId: crypto.randomUUID() })).ok).toBe(false);
-			expect(letters).toEqual([]);
 		});
 	});
 });

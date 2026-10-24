@@ -25,9 +25,9 @@ describe('certificates: state', () => {
 
 	it('revoked stays revoked, with or without an end date', () => {
 		expect(certificateState({ status: 'revoked', expiresAt: null }, NOW)).toBe('revoked');
-		expect(certificateState({ status: 'revoked', expiresAt: at('2020-01-01T00:00:00Z') }, NOW)).toBe(
-			'revoked'
-		);
+		expect(
+			certificateState({ status: 'revoked', expiresAt: at('2020-01-01T00:00:00Z') }, NOW)
+		).toBe('revoked');
 	});
 });
 

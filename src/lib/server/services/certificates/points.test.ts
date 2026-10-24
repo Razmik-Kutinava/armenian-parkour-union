@@ -97,9 +97,9 @@ describe.skipIf(!testDbUrl)('certificates: points', () => {
 			expect(reversed.ok).toBe(true);
 			expect(await balanceOf(tx, member.id)).toBe(0);
 			if (!second.ok) throw new Error(second.reason);
-			expect(await revokeCertificate(tx, admin, { certificateId: second.id, reason: 'Again' }, IP)).toBe(
-				'ok'
-			);
+			expect(
+				await revokeCertificate(tx, admin, { certificateId: second.id, reason: 'Again' }, IP)
+			).toBe('ok');
 			expect(await advanced(tx, admin, member.id)).toMatchObject({ ok: true, points: 100 });
 			expect(await balanceOf(tx, member.id)).toBe(100);
 		});
