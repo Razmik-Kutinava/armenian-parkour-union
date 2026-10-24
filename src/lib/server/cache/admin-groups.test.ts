@@ -25,7 +25,13 @@ describe('groupsToInvalidate (2.10: admin writes reset the public cache)', () =>
 		expect(staffWrite('/admin/events/1')).toEqual(['events']);
 		expect(staffWrite('/admin/hero')).toEqual(['hero']);
 		expect(staffWrite('/admin/settings')).toEqual(['settings']);
-		expect(staffWrite('/admin/users/1')).toEqual(['hero']);
+		expect(staffWrite('/admin/users/1')).toEqual(['hero', 'staff']);
+	});
+
+	it('coaches and judges (6.6): certificates and staff sections reset the team page', () => {
+		expect(staffWrite('/admin/certificates/1')).toContain('staff');
+		expect(staffWrite('/admin/staff/1')).toContain('staff');
+		expect(ALL_GROUPS).toContain('staff');
 	});
 
 	it('donation purposes and payments reset /donate (settings group: purposes, recent donations)', () => {
