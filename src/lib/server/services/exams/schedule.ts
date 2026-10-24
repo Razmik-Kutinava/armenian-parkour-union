@@ -67,7 +67,9 @@ export async function scheduleExam(
 	const examinerId = input.examinerId || null;
 	return db.transaction(async (tx) => {
 		const member = await lockExamMember(tx, input.userId);
-		if (!member) return refuse('user_not_found');
+		/* docs/04 section 6.5: a moderator reaches members only, like `examMember`. */
+		if (!member || (actor.role !== 'admin' && member.role !== 'member'))
+			return refuse('user_not_found');
 		if (eventId && !(await eventExists(tx, eventId))) return refuse('event_not_found');
 		if (examinerId && !(await examinerValid(tx, examinerId))) return refuse('examiner_invalid');
 		const facts = await readExamFacts(

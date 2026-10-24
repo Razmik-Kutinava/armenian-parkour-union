@@ -41,7 +41,7 @@ export async function examinerValid(tx: LimitDb, id: string) {
 export async function lockExamMember(tx: LimitDb, userId: string) {
 	if (!isUuid(userId)) return null;
 	const [row] = await tx
-		.select({ status: users.status, level: users.level })
+		.select({ role: users.role, status: users.status, level: users.level })
 		.from(users)
 		.where(and(eq(users.id, userId), isNull(users.deletedAt)))
 		.for('update');
