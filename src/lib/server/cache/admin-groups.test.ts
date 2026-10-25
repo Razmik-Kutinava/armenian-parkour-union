@@ -46,7 +46,8 @@ describe('groupsToInvalidate (2.10: admin writes reset the public cache)', () =>
 	});
 
 	it('sections that show nothing on the site reset nothing', () => {
-		for (const path of ['/admin/audit', '/admin/roles', '/admin/locale']) {
+		/* 7.2: no video is shown on the site yet. */
+		for (const path of ['/admin/audit', '/admin/roles', '/admin/locale', '/admin/videos']) {
 			expect(staffWrite(path)).toEqual([]);
 		}
 	});

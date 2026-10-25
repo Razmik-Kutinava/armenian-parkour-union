@@ -51,7 +51,8 @@ test('member: no form without membership; adds a link, a duplicate and Vimeo are
 		values (${id}, 'active', now() - interval '30 days', now() + interval '300 days')`;
 	await page.reload();
 	await hydrated(page);
-	await expect(main.getByText('YouTube, Instagram; up to 5 videos a month.')).toBeVisible();
+	/* admin-audit.spec.ts changes the limit for a moment and puts it back. */
+	await expect(main.getByText(/^YouTube, Instagram; up to \d+ videos a month\.$/)).toBeVisible();
 
 	await main.getByLabel('Link').fill('https://youtu.be/dQw4w9WgXcQ');
 	await main.getByLabel('Title').fill('E2e wall run');

@@ -7,6 +7,7 @@ import type { AdminAction } from './admin-audit-map';
 import { moneyActions } from './admin-audit-money';
 import { pointsActions } from './admin-audit-points';
 import { registrationActions } from './admin-audit-registrations';
+import { videoActions } from './admin-audit-videos';
 import { paymentSettingsAction } from './payment-settings-form';
 
 const ORIGIN = { origin: 'http://localhost:4173' };
@@ -197,7 +198,8 @@ export async function adminActions(page: Page, sql: postgres.Sql, adminId: strin
 		...registrationActions(sql, post),
 		...examActions(sql, post),
 		...certificateActions(sql, post, page),
-		...paymentSettingsAction(page, post)
+		...paymentSettingsAction(page, post),
+		...videoActions(sql, post, page, target)
 	};
 	return perform;
 }

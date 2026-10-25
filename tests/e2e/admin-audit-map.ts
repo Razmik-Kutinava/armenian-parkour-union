@@ -15,6 +15,7 @@ export const ADMIN_AUDIT = {
 	'/admin/roles?/revoke': ['user.role_change'],
 	'/admin/settings?/default': ['settings.update'],
 	'/admin/settings/payments?/default': ['settings.update'],
+	'/admin/settings/videos?/default': ['settings.update'],
 	'/admin/media?/complete': ['media.upload'],
 	'/admin/media/[id]?/alt': ['media.update'],
 	'/admin/media/[id]?/delete': ['media.delete'],
@@ -69,7 +70,10 @@ export const ADMIN_AUDIT = {
 	'/admin/certificates/new?/default': ['certificate.issue', 'user.level'],
 	'/admin/certificates/[id]?/pdf': ['certificate.pdf'],
 	'/admin/certificates/[id]?/revoke': ['certificate.revoke'],
-	'/admin/staff/[id]?/update': ['staff_profile.update']
+	'/admin/staff/[id]?/update': ['staff_profile.update'],
+	'/admin/videos?/approve': ['video.approve'],
+	'/admin/videos?/reject': ['video.reject'],
+	'/admin/videos?/hide': ['video.hide']
 } as const;
 
 export type AdminAction = keyof typeof ADMIN_AUDIT;

@@ -19,6 +19,7 @@ export const ADMIN_READS = {
 	'GET /admin/audit/export': 'audit.read',
 	'/admin/settings': 'settings.write',
 	'/admin/settings/payments': 'settings.write',
+	'/admin/settings/videos': 'settings.write',
 	'/admin/media': 'media.write',
 	'/admin/media/[id]': 'media.write',
 	'/admin/pages': 'pages.write',
@@ -64,7 +65,8 @@ export const ADMIN_READS = {
 	'/admin/certificates/[id]': 'certificates.read',
 	/* docs/04 section 3: moderator and admin view; section 5.1 has no read code of its own. */
 	'/admin/staff': 'certificates.read',
-	'/admin/staff/[id]': 'certificates.read'
+	'/admin/staff/[id]': 'certificates.read',
+	'/admin/videos': 'videos.moderate'
 } as const satisfies Record<string, Access>;
 
 export const ADMIN_WRITES = {
@@ -79,6 +81,7 @@ export const ADMIN_WRITES = {
 	'/admin/roles?/revoke': 'users.set_role',
 	'/admin/settings?/default': 'settings.write',
 	'/admin/settings/payments?/default': 'settings.write',
+	'/admin/settings/videos?/default': 'settings.write',
 	'/admin/media?/sign': 'media.write',
 	'/admin/media?/complete': 'media.write',
 	'/admin/media/[id]?/alt': 'media.write',
@@ -135,5 +138,8 @@ export const ADMIN_WRITES = {
 	'/admin/certificates/[id]?/pdf': 'certificates.issue',
 	'/admin/certificates/[id]?/revoke': 'certificates.revoke',
 	'/admin/staff/[id]?/update': 'staff_profiles.write',
+	'/admin/videos?/approve': 'videos.moderate',
+	'/admin/videos?/reject': 'videos.moderate',
+	'/admin/videos?/hide': 'videos.moderate',
 	'POST /admin/locale': 'staff'
 } as const satisfies Record<AdminAction | NotAuditedAction, Access>;
