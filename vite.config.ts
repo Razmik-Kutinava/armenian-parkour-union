@@ -24,7 +24,7 @@ const ISSUE_TESTS = [
 
 /* Same for an order: it holds the order number lock until the test's rollback. */
 const ORDER_TESTS = [
-	'src/lib/server/services/shop/{checkout,checkout-refusals,order-cancel}.test.ts'
+	'src/lib/server/services/shop/{checkout,checkout-refusals,order-cancel,order-cancel-own}.test.ts'
 ];
 
 export default defineConfig({
