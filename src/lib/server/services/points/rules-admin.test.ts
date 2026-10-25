@@ -93,12 +93,14 @@ describe.skipIf(!testDbUrl)('points: rules in the admin', () => {
 			const user = await insertUser(tx);
 			const award = () =>
 				awardPoints(tx, { rule: 'video_approved', userId: user.id, sourceId: crypto.randomUUID() });
-			await award();
+			expect(await award()).toMatchObject({ status: 'awarded', points: 10 });
 			expect(await updateRule(tx, admin, rule.id, values({ points: 25 }), IP)).toBe('ok');
-			await award();
+			expect(await award()).toMatchObject({ status: 'awarded', points: 25 });
 			expect(await updateRule(tx, admin, rule.id, values({ points: 0 }), IP)).toBe('ok');
 			expect(await award()).toMatchObject({ status: 'skipped', reason: 'no_points' });
-			expect((await ledgerOf(tx, user.id)).map((e) => e.delta)).toEqual([10, 25]);
+			// One transaction — one `created_at`: the ledger order of these two rows is not fixed.
+			const deltas = (await ledgerOf(tx, user.id)).map((e) => e.delta);
+			expect(deltas.sort((a, b) => a - b)).toEqual([10, 25]);
 		});
 	});
 
