@@ -19,8 +19,20 @@ export const scrubEmails = (text: string) => text.replace(EMAIL, '[email]');
 
 const scrubArgument = (value: unknown) => scrubEmails(String(value));
 
+/* A console line arrives as a nameless synthetic exception, and Sentry titles a synthetic one by
+ * its function (`POST`): give it a type and drop the flag, so the title is the logged text. */
+function nameConsoleCapture(event: ErrorEvent) {
+	if (event.logger !== 'console') return;
+	for (const exception of event.exception?.values ?? []) {
+		if (!exception.mechanism?.synthetic) continue;
+		exception.mechanism.synthetic = false;
+		exception.type = event.level === 'warning' ? 'Warning' : 'Error';
+	}
+}
+
 /** Log lines name letter recipients (`certificate letter to a@b.c not sent`). */
 export function scrubEvent(event: ErrorEvent): ErrorEvent {
+	nameConsoleCapture(event);
 	if (event.message) event.message = scrubEmails(event.message);
 	for (const exception of event.exception?.values ?? []) {
 		if (exception.value) exception.value = scrubEmails(exception.value);

@@ -33,6 +33,28 @@ describe('scrubEvent', () => {
 		expect(out.extra?.arguments).toEqual(['order 7: letter to [email]', 'Error: to [email]']);
 	});
 
+	it('names a synthetic console capture by its level, not by the route', () => {
+		const consoleEvent = (level: 'warning' | 'error', exception: object) =>
+			({
+				type: undefined,
+				logger: 'console',
+				level,
+				exception: { values: [exception] }
+			}) as ErrorEvent;
+		const synthetic = () => ({
+			value: 'refund refused',
+			mechanism: { type: 'x', synthetic: true }
+		});
+
+		const warning = scrubEvent(consoleEvent('warning', synthetic())).exception?.values?.[0];
+		const error = scrubEvent(consoleEvent('error', synthetic())).exception?.values?.[0];
+		const logged = scrubEvent(consoleEvent('error', { type: 'TypeError', value: 'y' }));
+
+		expect(warning).toMatchObject({ type: 'Warning', mechanism: { synthetic: false } });
+		expect(error?.type).toBe('Error');
+		expect(logged.exception?.values?.[0].type).toBe('TypeError');
+	});
+
 	it('accepts an event without optional parts', () => {
 		expect(scrubEvent({ type: undefined } as ErrorEvent)).toEqual({ type: undefined });
 	});
