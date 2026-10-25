@@ -11,6 +11,7 @@ import { needsProfile, profileGateRedirect } from '#lib/server/auth/profile-gate
 import { toLocalsUser } from '#lib/server/auth/session.ts';
 import { groupsToInvalidate, publicCache } from '#lib/server/cache/index.ts';
 import { db } from '#lib/server/db/index.ts';
+import { withSecurityHeaders } from '#lib/server/http/security-headers.ts';
 import { startReconcileTimer } from '#lib/server/services/payments/index.ts';
 
 export const init: ServerInit = () => {
@@ -63,4 +64,6 @@ const app: Handle = async ({ event, resolve }) => {
 	}
 };
 
-export const handle = sequence(Sentry.sentryHandle(), app);
+const security: Handle = async ({ event, resolve }) => withSecurityHeaders(await resolve(event));
+
+export const handle = sequence(Sentry.sentryHandle(), security, app);

@@ -72,5 +72,5 @@ normal (вёрстка и загрузка ресурсов, i18n на всех 
 Чек-лист `04` § 8 → тесты: чужие платежи / сертификаты / заказы по `id` — `cabinet/payments.test`, `cabinet/progress.test` («PDF key: own»), `cabinet/orders.test`; редактор и модератор на всех страницах и action админки — `e2e/admin-permissions.spec` + `auth/permissions.test`; модератор без баллов и сертификатов — `points/adjust.test`, `certificates/issue.test`, `e2e/admin-points`, `e2e/admin-certificates`; последний админ — `users/account.test`; блокировка сразу — `e2e/admin-users`, `e2e/admin-block`, `auth/session.test`; вебхук без подписи — `payments/webhook.test`, `providers/vpos-webhook.test`, `providers/mock.test`.
 
 - [x] SPEC
-- [ ] RED
-- [ ] GREEN
+- [x] RED `dd6df7e`
+- [x] GREEN
