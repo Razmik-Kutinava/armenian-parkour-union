@@ -1,6 +1,14 @@
 import type { CacheGroup } from './memory';
 
-export const ALL_GROUPS: CacheGroup[] = ['settings', 'pages', 'posts', 'events', 'hero', 'staff'];
+export const ALL_GROUPS: CacheGroup[] = [
+	'settings',
+	'pages',
+	'posts',
+	'events',
+	'hero',
+	'staff',
+	'shop'
+];
 
 /* Media: alt texts and covers show up everywhere. A section not listed resets everything. */
 const BY_SECTION: Record<string, CacheGroup[]> = {
@@ -17,9 +25,9 @@ const BY_SECTION: Record<string, CacheGroup[]> = {
 	'point-rules': [],
 	/* no video is shown on the site yet (7.2) */
 	videos: [],
-	/* no shop catalog on the site yet (7.4); the catalog (7.5) gets its group */
-	products: [],
-	orders: [],
+	products: ['shop'],
+	/* a cancel returns stock (7.6) */
+	orders: ['shop'],
 	media: ALL_GROUPS,
 	audit: [],
 	roles: [],

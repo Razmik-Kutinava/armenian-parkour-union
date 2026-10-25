@@ -26,7 +26,7 @@
 ## Файлы (ожидаемо)
 
 - `src/lib/server/services/shop/public.ts` (+ `public.test.ts`) — `listShopItems`, `getShopItem`.
-- `src/lib/server/services/shop/order-button.ts` (+ `order-button.test.ts`) — `orderButton`.
+- `src/lib/server/services/shop/order-button.ts` (+ `order-button.test.ts`) — `orderButton`; `view.ts` — адреса картинок, SEO.
 - `src/lib/server/cache/memory.ts`, `admin-groups.ts` (+ тест) — группа `shop`.
 - `src/lib/server/services/seo/sitemap.ts` (+ тест).
 - `src/routes/[[lang=lang]]/(site)/shop/` — `+page.server.ts`, `+page.svelte`, `[slug]/+page.server.ts`, `+page.svelte`, `ItemGallery.svelte`, `OrderBox.svelte`; `src/lib/components/site/ShopCard.svelte`.
@@ -56,6 +56,6 @@
 ## Фазы
 
 - [x] SPEC
-- [ ] RED
-- [ ] GREEN
+- [x] RED `0a61459`
+- [x] GREEN (коммит ниже)
 - [ ] REVIEW (этапа)

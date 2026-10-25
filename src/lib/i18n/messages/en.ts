@@ -29,6 +29,7 @@ import { enStaffAdmin } from './en-staff-admin';
 import { enSystem } from './en-system';
 import { enTeam } from './en-team';
 import { enUsers } from './en-users';
+import { enShop } from './en-shop';
 import { enShopAdmin } from './en-shop-admin';
 import { enVideosAdmin } from './en-videos-admin';
 
@@ -59,6 +60,7 @@ export const en = {
 	...enCabinetVideos,
 	...enVideosAdmin,
 	...enShopAdmin,
+	...enShop,
 	...enConsents,
 	...enRegistrations,
 	...enRegistrationsAdmin,

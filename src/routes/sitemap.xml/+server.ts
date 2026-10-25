@@ -6,7 +6,12 @@ import { renderSitemap } from '#lib/seo/sitemap.ts';
 import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = async ({ url }) => {
-	const entries = await cached(['pages', 'posts', 'events'], 'sitemap', listSitemapEntries, db);
+	const entries = await cached(
+		['pages', 'posts', 'events', 'shop'],
+		'sitemap',
+		listSitemapEntries,
+		db
+	);
 	return new Response(renderSitemap(siteUrl(url), entries), {
 		headers: { 'content-type': 'application/xml; charset=utf-8', 'cache-control': 'max-age=3600' }
 	});

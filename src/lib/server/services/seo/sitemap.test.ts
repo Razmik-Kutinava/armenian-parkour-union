@@ -127,9 +127,7 @@ describe.skipIf(!testDbUrl)('seo: sitemap addresses from the database', () => {
 			const paths = entries.map((e) => e.path);
 			expect(paths).toContain('/shop');
 			expect(paths).toContain(`/shop/${soldOut.slug}`);
-			expect(entries.find((e) => e.path === `/shop/${item.slug}`)?.lastmod).toEqual(
-				item.updatedAt
-			);
+			expect(entries.find((e) => e.path === `/shop/${item.slug}`)?.lastmod).toEqual(item.updatedAt);
 			for (const h of hidden) expect(paths).not.toContain(`/shop/${h.slug}`);
 		});
 	});

@@ -10,7 +10,11 @@ if (!process.env.DATABASE_URL && existsSync('.env')) process.loadEnvFile('.env')
 const sql = postgres(process.env.DATABASE_URL ?? '', { max: 1, onnotice: () => {} });
 
 const TAG = crypto.randomUUID().slice(0, 8);
-const slugs = { tee: `e2e-shop-tee-${TAG}`, cap: `e2e-shop-cap-${TAG}`, draft: `e2e-shop-dr-${TAG}` };
+const slugs = {
+	tee: `e2e-shop-tee-${TAG}`,
+	cap: `e2e-shop-cap-${TAG}`,
+	draft: `e2e-shop-dr-${TAG}`
+};
 
 test.beforeAll(async () => {
 	const item = (slug: string, title: string, stock: number | null, status = 'published') =>
