@@ -6,8 +6,8 @@
 	import { newsDate } from '#lib/components/site/news-date.ts';
 	import EmptyState from '#lib/components/ui/EmptyState.svelte';
 	import { currentLocale, t } from '#lib/i18n/index.svelte.ts';
-	import { lineText } from './lines';
-	import OrderStatusBadge from './OrderStatusBadge.svelte';
+	import OrderStatusBadge from '#lib/components/shop/OrderStatusBadge.svelte';
+	import { lineText } from '#lib/components/shop/order-lines.ts';
 	import type { PageProps } from './$types';
 
 	/* docs/05 section 15: number, member, items, total, status, date; filters — status, period. */

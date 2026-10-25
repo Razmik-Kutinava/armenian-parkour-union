@@ -2,6 +2,7 @@ import type { Messages } from '../translate';
 import { hyCabinet } from './hy-cabinet';
 import { hyCabinetAvatar } from './hy-cabinet-avatar';
 import { hyCabinetEvents } from './hy-cabinet-events';
+import { hyCabinetOrders } from './hy-cabinet-orders';
 import { hyCabinetPoints } from './hy-cabinet-points';
 import { hyCabinetProgress } from './hy-cabinet-progress';
 import { hyCabinetVideos } from './hy-cabinet-videos';
@@ -58,6 +59,7 @@ export const hy: Partial<Messages> = {
 	...hyCabinetAvatar,
 	...hyCabinetEvents,
 	...hyCabinetVideos,
+	...hyCabinetOrders,
 	...hyVideosAdmin,
 	...hyShopAdmin,
 	...hyShop,

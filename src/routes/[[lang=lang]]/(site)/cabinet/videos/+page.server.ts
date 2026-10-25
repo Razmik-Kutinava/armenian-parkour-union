@@ -5,14 +5,15 @@ import { requireUser } from '#lib/server/auth/guard.ts';
 import { db } from '#lib/server/db/index.ts';
 import { getMembershipOverview } from '#lib/server/services/memberships/overview.ts';
 import { videoEventOptions } from '#lib/server/services/videos/events.ts';
-import { ownVideos } from '#lib/server/services/videos/own.ts';
+import { deleteOwnVideo, ownVideos } from '#lib/server/services/videos/own.ts';
 import { videoSettings } from '#lib/server/services/videos/settings.ts';
 import { addVideo, type AddVideoRefusal } from '#lib/server/services/videos/submit.ts';
 import { fieldErrors, keepValues } from '#lib/validation/form.ts';
 import { videoFormSchema } from '#lib/validation/videos.ts';
 import type { Actions, PageServerLoad } from './$types';
 
-/* docs/06 section 5.7, docs/04 section 7: own videos only, adding needs an active membership. */
+/* docs/06 section 5.7, docs/04 section 7: own videos only, adding needs an active membership;
+ * delete until approved (docs/todo.md 7.7, decision 2). */
 
 const FIELDS = ['url', 'title', 'eventId'] as const;
 
@@ -58,5 +59,17 @@ export const actions: Actions = {
 			return fail(400, { add: { errors: { [field]: message }, values } });
 		}
 		return { add: { added: true } };
+	},
+
+	delete: async ({ locals, request }) => {
+		const user = requireUser(locals.user);
+		const id = String((await request.formData()).get('id') ?? '');
+		const result = await deleteOwnVideo(db, user.id, id);
+		if (result === 'ok') {
+			return { removed: { message: 'cabinet.videos.deleted' as MessageKey, error: false } };
+		}
+		const message: MessageKey =
+			result === 'not_allowed' ? 'cabinet.videos.cannotDelete' : 'cabinet.videos.gone';
+		return fail(400, { removed: { message, error: true } });
 	}
 };

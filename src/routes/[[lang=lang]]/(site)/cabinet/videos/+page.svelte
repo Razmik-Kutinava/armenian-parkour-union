@@ -4,8 +4,9 @@
 	import OwnVideoList from './OwnVideoList.svelte';
 	import type { PageProps } from './$types';
 
-	/* docs/06 section 5.7. Reject reasons, points and delete come with 7.7. */
+	/* docs/06 section 5.7: the form and the history (reject reason, points, delete). */
 	let { data, form }: PageProps = $props();
+	const removed = $derived(form && 'removed' in form ? form.removed : null);
 </script>
 
 <svelte:head>
@@ -27,6 +28,16 @@
 			>
 				{t('cabinet.videos.toMembership')}
 			</a>
+		</p>
+	{/if}
+	{#if removed}
+		<p
+			role={removed.error ? 'alert' : 'status'}
+			class="rounded-md p-3 text-sm {removed.error
+				? 'bg-error-bg text-error-fg'
+				: 'bg-success-bg text-success-fg'}"
+		>
+			{t(removed.message)}
 		</p>
 	{/if}
 	<OwnVideoList videos={data.videos} />

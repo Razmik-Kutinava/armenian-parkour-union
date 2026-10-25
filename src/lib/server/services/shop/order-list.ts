@@ -81,7 +81,7 @@ const rowColumns = {
 	createdAt: shopOrders.createdAt
 };
 
-async function linesOf(db: LimitDb, orderIds: string[]): Promise<Map<string, OrderLine[]>> {
+export async function linesOf(db: LimitDb, orderIds: string[]): Promise<Map<string, OrderLine[]>> {
 	const byOrder = new Map<string, OrderLine[]>();
 	if (orderIds.length === 0) return byOrder;
 	const rows = await db

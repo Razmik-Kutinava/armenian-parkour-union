@@ -5,8 +5,7 @@
 
 	let { children }: LayoutProps = $props();
 
-	/* docs/06 section 5: only the sections that exist; orders come with stage 7.
-	 * On a phone the menu scrolls sideways above the page. */
+	/* docs/06 section 5. On a phone the menu scrolls sideways above the page. */
 	const sections: [MessageKey, string][] = [
 		['cabinet.nav.overview', '/cabinet'],
 		['cabinet.nav.profile', '/cabinet/profile'],
@@ -15,6 +14,7 @@
 		['cabinet.nav.progress', '/cabinet/progress'],
 		['cabinet.nav.points', '/cabinet/points'],
 		['cabinet.nav.videos', '/cabinet/videos'],
+		['cabinet.nav.orders', '/cabinet/orders'],
 		['cabinet.nav.payments', '/cabinet/payments'],
 		['cabinet.nav.documents', '/cabinet/documents']
 	];

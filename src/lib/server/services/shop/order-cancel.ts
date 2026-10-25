@@ -10,15 +10,25 @@ import { orderStatusLetter } from './order-mail';
 import { lockOrder, type OrderDeps } from './orders';
 
 /* docs/03 section 9 item 5, docs/05 section 15, docs/04 section 3.2; decisions — docs/todo.md
- * 7.6 (5, 6, 8). Locks: order → member (`appendEntry`) → items, as in checkout.ts. */
+ * 7.6 (5, 6, 8), the member's own cancel — 7.7 (4). Locks: order → member (`appendEntry`) → items,
+ * as in checkout.ts. */
 
 type Outcome = 'ok' | 'bad_status' | 'not_found' | 'not_allowed';
 type Order = typeof shopOrders.$inferSelect;
+type Canceller = {
+	actorId: string;
+	/** `null` — a system entry, like the write-off: the member's own cancel is not a manual one. */
+	refundBy: string | null;
+	statuses: readonly string[];
+	/** Set — only this member's order; another one is not found. */
+	ownerId?: string;
+};
 
-const CANCELLABLE: readonly string[] = ['new', 'confirmed'];
+const BY_STAFF: readonly string[] = ['new', 'confirmed'];
+const BY_MEMBER: readonly string[] = ['new'];
 
 /** The write-off entry back with the opposite sign; none, or a deleted account — nothing back. */
-async function refund(tx: LimitDb, order: Order, actorId: string) {
+async function refund(tx: LimitDb, order: Order, actorId: string | null) {
 	if (!order.ledgerId) return { points: 0, entryId: null };
 	const [spent] = await tx
 		.select({ delta: pointsLedger.delta })
@@ -52,25 +62,19 @@ async function restoreStock(tx: LimitDb, orderId: string) {
 	}
 }
 
-/** Admin only, before `shipped`: points and stock back, the order `cancelled`, a letter. */
-export async function cancelOrder(
-	db: LimitDb,
-	actor: Actor,
-	id: string,
-	deps: OrderDeps
-): Promise<Outcome> {
-	if (!roleCan(actor.role, 'shop.orders_cancel')) return 'not_allowed';
+/** Points and stock back, the order `cancelled`, the audit entry, a letter after commit. */
+async function cancel(db: LimitDb, id: string, by: Canceller, deps: OrderDeps): Promise<Outcome> {
 	if (!isUuid(id)) return 'not_found';
 	const outcome = await db.transaction(async (tx) => {
 		const row = await lockOrder(tx, id);
-		if (!row) return 'not_found' as const;
+		if (!row || (by.ownerId && row.order.userId !== by.ownerId)) return 'not_found' as const;
 		const { order, user } = row;
-		if (!CANCELLABLE.includes(order.status)) return 'bad_status' as const;
-		const back = await refund(tx, order, actor.id);
+		if (!by.statuses.includes(order.status)) return 'bad_status' as const;
+		const back = await refund(tx, order, by.refundBy);
 		await restoreStock(tx, id);
 		await tx.update(shopOrders).set({ status: 'cancelled' }).where(eq(shopOrders.id, id));
 		await writeAudit(tx, {
-			actorId: actor.id,
+			actorId: by.actorId,
 			action: 'shop_order.cancel',
 			entityType: 'shop_order',
 			entityId: id,
@@ -92,3 +96,25 @@ export async function cancelOrder(
 	}
 	return 'ok';
 }
+
+/** Admin only, before `shipped`; the refund entry is signed by the admin. */
+export async function cancelOrder(
+	db: LimitDb,
+	actor: Actor,
+	id: string,
+	deps: OrderDeps
+): Promise<Outcome> {
+	if (!roleCan(actor.role, 'shop.orders_cancel')) return 'not_allowed';
+	return cancel(db, id, { actorId: actor.id, refundBy: actor.id, statuses: BY_STAFF }, deps);
+}
+
+/** The member's own order while it is `new` (question 108, decisions.md 2026-10-25). */
+export const cancelOwnOrder = (db: LimitDb, userId: string, id: string, deps: OrderDeps) =>
+	isUuid(userId)
+		? cancel(
+				db,
+				id,
+				{ actorId: userId, refundBy: null, statuses: BY_MEMBER, ownerId: userId },
+				deps
+			)
+		: Promise.resolve<Outcome>('not_found');

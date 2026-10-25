@@ -7,8 +7,8 @@
 	import { currentLocale, t } from '#lib/i18n/index.svelte.ts';
 	import { pickLocalized } from '#lib/i18n/localized.ts';
 	import { TRACKING_NOTE_MAX } from '#lib/validation/shop-limits.ts';
-	import { optionsText } from '../lines';
-	import OrderStatusBadge from '../OrderStatusBadge.svelte';
+	import OrderStatusBadge from '#lib/components/shop/OrderStatusBadge.svelte';
+	import { optionsText } from '#lib/components/shop/order-lines.ts';
 	import type { PageProps } from './$types';
 
 	/* docs/05 section 15: lines with options, delivery data, the member comment; a status forward

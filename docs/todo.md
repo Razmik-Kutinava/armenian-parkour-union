@@ -30,7 +30,8 @@
 - `src/lib/server/services/cabinet/orders.ts` (+ `orders.test.ts`); `services/shop/order-list.ts` (экспорт `linesOf`).
 - `src/lib/server/services/shop/order-cancel.ts` (+ новый `order-cancel-own.test.ts` → `ORDER_TESTS` в `vite.config.ts`), `orders-now.ts`.
 - `src/routes/[[lang=lang]]/(site)/cabinet/videos/` — `+page.server.ts`, `+page.svelte`, `OwnVideoList.svelte`.
-- `src/routes/[[lang=lang]]/(site)/cabinet/orders/` — `+page.server.ts`, `+page.svelte`, `[id]/+page.server.ts`, `[id]/+page.svelte`, `OrderLines.svelte`; `cabinet/+layout.svelte` (меню).
+- `src/routes/[[lang=lang]]/(site)/cabinet/orders/` — `+page.server.ts`, `+page.svelte`, `[id]/+page.server.ts`, `[id]/+page.svelte`; `cabinet/+layout.svelte` (меню).
+- `OrderStatusBadge.svelte` и `lines.ts` из `routes/admin/orders/` → `src/lib/components/shop/` (`order-lines.ts`): общие для админки и кабинета, импорты админки поправлены.
 - `src/lib/i18n/messages/{en,hy,ru}-cabinet-videos.ts`, новые `{en,hy,ru}-cabinet-orders.ts` (+ `en.ts`, `hy.ts`, `ru.ts`).
 - `tests/e2e/cabinet-videos.spec.ts`, новый `tests/e2e/cabinet-orders.spec.ts`.
 
@@ -58,6 +59,14 @@
 ## Фазы
 
 - [x] SPEC
-- [ ] RED
-- [ ] GREEN
+- [x] RED `4e5ba02`
+- [x] GREEN (коммит ниже): Vitest задачи 61/61 (`own`, `cabinet/orders`, весь `services/shop` с `order-cancel-own`), e2e `cabinet-videos` + `cabinet-orders` + `shop-order` 7/7, `check`, `lint`.
 - [ ] REVIEW (этапа)
+
+## Для REVIEW
+
+- Отмена участником пишет `shop_order.cancel` с `actor_id` = участник: в `/admin/audit` это видно как действие участника (не сотрудника). Возврат — `created_by = null`.
+- `lockOrder` берёт блокировку заказа до проверки владельца: чужой участник на миг блокирует чужой заказ (ничего не пишет, отвечает 404).
+- Удаление видео без журнала действий; лимит месяца после удаления освобождает место (решение 2026-10-24).
+- Пометка баллов — сумма записей журнала по видео; одобренное без записи (правило `video_approved` выключено или 0) — без пометки.
+- `/admin/orders` после переноса бейджа и `lines.ts` e2e не перепрогонялся (сборка и `check` прошли) — в общем e2e REVIEW.

@@ -18,6 +18,12 @@ export const hyCabinetVideos: Partial<Messages> = {
 	'cabinet.videos.needMembership':
 		'Տեսանյութեր ավելացնելու համար անհրաժեշտ է ակտիվ անդամակցություն։',
 	'cabinet.videos.toMembership': 'Անդամակցություն',
+	'cabinet.videos.reason': 'Պատճառ՝ {reason}',
+	'cabinet.videos.points': '+{points} միավոր',
+	'cabinet.videos.delete': 'Ջնջել',
+	'cabinet.videos.deleted': 'Տեսանյութը ջնջված է։',
+	'cabinet.videos.cannotDelete': 'Հաստատված տեսանյութը հնարավոր չէ ջնջել։',
+	'cabinet.videos.gone': 'Այս տեսանյութն այլևս ցանկում չէ։ Թարմացրեք էջը։',
 	'videos.status.pending': 'Ստուգման մեջ',
 	'videos.status.approved': 'Հաստատված է',
 	'videos.status.rejected': 'Մերժված է',
