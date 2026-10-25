@@ -12,3 +12,4 @@ export * from './registrations';
 export * from './consents';
 export * from './certification';
 export * from './videos';
+export * from './shop';

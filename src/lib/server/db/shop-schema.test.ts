@@ -45,7 +45,11 @@ describe.skipIf(!url)('shop schema (migration 0015)', () => {
 			price_points: 50,
 			...values
 		});
-	const order = (tx: postgres.TransactionSql, userId: string, values: Record<string, unknown> = {}) =>
+	const order = (
+		tx: postgres.TransactionSql,
+		userId: string,
+		values: Record<string, unknown> = {}
+	) =>
 		insert(tx, 'shop_orders', {
 			user_id: userId,
 			number: `ORD-2026-${uid().slice(0, 8)}`,

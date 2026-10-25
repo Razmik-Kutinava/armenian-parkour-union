@@ -65,8 +65,12 @@
 
 ## Фазы
 
-- [x] SPEC
-- [ ] «go» на миграцию 0015, решения 1–7 и формат номера
-- [ ] RED
-- [ ] GREEN
+- [x] SPEC (`3a5b10b`)
+- [x] «go» на миграцию 0015, решения 1–7; формат номера — `ORD-2026-0001` (2026-10-25)
+- [x] RED (`a23dc0e`)
+- [x] GREEN — 0015 применена на dev; `src/lib/server/db` 39/39; `check`, `lint`
 - [ ] REVIEW (этапа)
+
+## Для REVIEW
+
+- `points-schema.test.ts`: `truncate points_ledger` → `truncate points_ledger cascade` — FK `shop_orders.ledger_id` теперь отказывает в `TRUNCATE` раньше триггера (`0A000`); с `cascade` проверяется сам триггер (`23001`).

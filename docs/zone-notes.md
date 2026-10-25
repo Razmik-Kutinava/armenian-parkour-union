@@ -6,9 +6,9 @@
 
 ## Оглавление
 
-Видео (этап 7) · Экзамены и сертификаты (этап 6) · Регистрации и события (этап 5) · Согласия и приватные файлы · Баллы · Платежи · Кабинет · Контент и админка · Деплой и прод
+Видео и магазин (этап 7) · Экзамены и сертификаты (этап 6) · Регистрации и события (этап 5) · Согласия и приватные файлы · Баллы · Платежи · Кабинет · Контент и админка · Деплой и прод
 
-## Видео (этап 7)
+## Видео и магазин (этап 7)
 
 - 7.1 (решения — `decisions.md` 2026-10-24): схема `db/schema/videos.ts`, миграция 0014 (откат `scripts/rollback/0014_down.sql`, только по «go»). Добавление — только `services/videos/submit.ts` `addVideo` (блокирует строку `users`; членство, платформа, нормализация, дубль, лимит, событие); ссылка — `normalizeVideoUrl` (`link.ts`, поверх `parseVideoUrl` hero); настройки — `videoSettings` (`site_settings.videos`, нет ключа — 5 в месяц, YouTube и Instagram); события для формы — `startedShownEvent` / `videoEventOptions` (`events.ts`); свой список — `ownVideos` (`own.ts`). Кабинет — `/cabinet/videos` (форма и короткий список).
 - Для 7.2: баллы — `awardPoints(tx, { rule: 'video_approved', userId, sourceId: video.id })` в транзакции одобрения (повтор тихо пропускается); отдельного лимита на баллы нет — его даёт лимит добавления. Скрыть — `hidden_at = now()` только у `approved` (check в базе), баллы не трогать. Отказ — `status = 'rejected'` + непустая `reject_reason` + `reviewed_at` (check). Форма ключа `site_settings.videos` в админке — в 7.2 (`writeSettings` пишет журнал); новое действие — в карты `admin-audit-map.ts` / `admin-access-map.ts`.
@@ -16,6 +16,7 @@
 - Для 7.8: двойное одобрение держит блокировка строки видео + статус `pending` + unique источника в `points_ledger`; гонку проверять двумя сессиями (`raceDb`).
 - Для 7.7: причина отказа, пометка баллов, жёсткое удаление своего видео в статусе `pending` / `rejected`. Публичный показ видео несовершеннолетних — только с согласием `privacy` (`03` § 8 п. 6).
 - Владельцу / документы: `02` § 6 (+ `hidden_at`, `updated_at`) и `03` § 17 п. 3 поправить по просьбе.
+- Магазин 7.3 (решения — `decisions.md` 2026-10-25): схема `db/schema/shop.ts` (`shopItems`, `shopOrders`, `shopOrderItems`, enum `orderStatus`), миграция 0015 на dev (откат `scripts/rollback/0015_down.sql`, только по «go»; прод — Deploy этапа 7 вместе с 0014). Для 7.6: номер `shop_orders.number` = `ORD-{год по Еревану}-{0001}` — как `services/certificates/number.ts` (advisory lock своим ключом, max за год), отменённые номера не переиспользуются; списание — запись `shop_order`, возврат — `shop_refund`, у обеих `source_type = 'shop_order'`, `source_id` = id заказа (повтор режет `points_ledger_source_once_key`), `ledger_id` — id списания (unique); заказ, позиции, `stock` и запись журнала — одна транзакция. Данные доставки — NOT NULL, `comment` / `tracking_note` — null. Для 7.4: `image_keys` — свой поиск в `services/media/usage.ts`; новые страницы — в карты `admin-audit-map.ts` / `admin-access-map.ts` и `cache/admin-groups.ts`. `TRUNCATE points_ledger` теперь режет и FK (тесты — с `cascade`). `02` § 7 и `05` § 26 п. 4 поправить по просьбе.
 
 ## Экзамены и сертификаты (этап 6)
 

@@ -60,7 +60,7 @@ describe.skipIf(!url)('points schema (migration 0009)', () => {
 			for (const query of [
 				() => tx`update points_ledger set delta = 99 where id = ${entry.id}`,
 				() => tx`delete from points_ledger where id = ${entry.id}`,
-				() => tx`truncate points_ledger`
+				() => tx`truncate points_ledger cascade`
 			]) {
 				const error = await expectError(tx, query);
 				expect(error.code).toBe('23001');
