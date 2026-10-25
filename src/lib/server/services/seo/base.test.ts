@@ -13,13 +13,15 @@ describe.skipIf(!testDbUrl)('seo: site name and description from settings', () =
 			await tx.delete(siteSettings);
 			await tx.insert(siteSettings).values([
 				{ key: 'site_name', value: { en: 'APU', ru: 'Союз паркура' } },
-				{ key: 'seo_description', value: { en: 'Parkour in Armenia' } }
+				{ key: 'seo_description', value: { en: 'Parkour in Armenia' } },
+				{ key: 'locales', value: { enabled: ['en', 'ru'] } }
 			]);
 			expect(await getSeoBase(tx, 'ru', 'https://parkour.am')).toEqual({
 				siteUrl: 'https://parkour.am',
 				siteName: 'Союз паркура',
 				locale: 'ru',
-				description: 'Parkour in Armenia'
+				description: 'Parkour in Armenia',
+				locales: ['en', 'ru']
 			});
 		});
 	});
@@ -33,6 +35,7 @@ describe.skipIf(!testDbUrl)('seo: site name and description from settings', () =
 			expect(base.description).toBe(
 				'Armenian Parkour Union: events, news, membership and certification.'
 			);
+			expect(base.locales).toEqual(['en', 'hy', 'ru']);
 		});
 	});
 });

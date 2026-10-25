@@ -35,6 +35,13 @@ describe('seo: sitemap.xml (docs/06 section 7.2)', () => {
 		]);
 	});
 
+	it('a switched-off language has no addresses and no hreflang links', () => {
+		const out = renderSitemap('https://parkour.am', [{ path: '/news/jam' }], ['en', 'ru']);
+		expect(out).not.toContain('/hy');
+		expect(out).not.toContain('hreflang="hy"');
+		expect(out).toContain('<loc>https://parkour.am/ru/news/jam</loc>');
+	});
+
 	it('lastmod only where the date is known', () => {
 		expect(urls[0]).not.toContain('<lastmod>');
 		expect(urls[3]).toContain('<lastmod>2026-10-08T08:30:00.000Z</lastmod>');

@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { defaultLocaleRedirect, isLocale, localeFromPath, localizePath } from './locales';
+import {
+	defaultLocaleRedirect,
+	disabledLocaleRedirect,
+	isLocale,
+	localeFromPath,
+	localizePath
+} from './locales';
 
 describe('localeFromPath', () => {
 	it.each([
@@ -50,6 +56,21 @@ describe('defaultLocaleRedirect', () => {
 		expect(defaultLocaleRedirect('/')).toBeNull();
 		expect(defaultLocaleRedirect('/english')).toBeNull();
 		expect(defaultLocaleRedirect('/hy/en')).toBeNull();
+	});
+});
+
+describe('disabledLocaleRedirect', () => {
+	it('a switched-off language goes to the same page in English, with its query', () => {
+		expect(disabledLocaleRedirect('/hy/events', '?city=Gyumri', ['en', 'ru'])).toBe(
+			'/events?city=Gyumri'
+		);
+		expect(disabledLocaleRedirect('/hy', '', ['en'])).toBe('/');
+	});
+
+	it('an enabled language or an English page stays', () => {
+		expect(disabledLocaleRedirect('/ru/news', '', ['en', 'ru'])).toBeNull();
+		expect(disabledLocaleRedirect('/events', '', ['en'])).toBeNull();
+		expect(disabledLocaleRedirect('/', '', ['en'])).toBeNull();
 	});
 });
 

@@ -171,6 +171,14 @@ describe('seo: page meta (docs/06 section 7)', () => {
 		]);
 	});
 
+	it('hreflang and og:locale:alternate only for enabled languages (docs/06 section 7.4)', () => {
+		const meta = buildSeo({ ...base, path: '/ru/events', locales: ['en', 'ru'] });
+		expect(meta.alternates.map((a) => a.hreflang)).toEqual(['en', 'ru', 'x-default']);
+		expect(meta.tags.filter((t) => t.property === 'og:locale:alternate')).toEqual([
+			{ property: 'og:locale:alternate', content: 'en_US' }
+		]);
+	});
+
 	it('home: the title is the site name alone, Organization markup with socials', () => {
 		const meta = buildSeo({
 			...base,
