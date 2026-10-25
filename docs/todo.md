@@ -51,3 +51,26 @@ normal (вёрстка и загрузка ресурсов, i18n на всех 
 - [ ] RED
 - [ ] GREEN
 - [ ] REVIEW
+
+---
+
+## Параллельно: 8.6 Безопасность (заголовки, `form-action`, чек-лист `04` § 8)
+
+Уже есть (не трогаем): лимиты (`auth/rate-limit.ts`), CSP (`csp.config.ts`), проверка загрузок (media / avatar / consents), права на сервере и тесты `04` § 8 — сверка ниже.
+
+Решения (агент):
+1. Заголовки на каждый ответ хуков (страницы, `+server.ts`, редирект `www`): `Strict-Transport-Security: max-age=31536000` (без `includeSubDomains` и `preload` — поддомены не проверены), `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy: strict-origin-when-cross-origin`, `Cross-Origin-Opener-Policy: same-origin` (Google и оплата — переходом, не окном), `Permissions-Policy` — камера, микрофон, геолокация, оплата, USB, `browsing-topics` выключены. Заданный маршрутом заголовок не перезаписывается.
+2. `form-action 'self' https://accounts.google.com https://checkout.vpos.am`: кнопка Google — обычная форма, оплата без JS — тоже (с JS — `location.href`, `form-action` не действует). Chrome проверяет и редиректы после формы.
+3. Не делается: заголовки на файлах `static/` и `/_app/immutable/` (`adapter-node` отдаёт их до хуков); отчёты о нарушениях CSP в Sentry (`report-uri` из `SENTRY_DSN`) — отдельным шагом по просьбе.
+
+Файлы: `src/lib/server/http/security-headers.ts` (+ `.test.ts`), `src/hooks.server.ts`, `csp.config.ts`, `tests/e2e/csp.spec.ts`.
+Не ломать: вход через Google (форма → `accounts.google.com`); оплата и донат (редирект на `checkout.vpos.am`, mock — на себя); видео YouTube в iframe; PDF сертификата (редирект на подписанную ссылку R2).
+Проверка: `npx vitest --run src/lib/server/http`; e2e `csp.spec` — CI (параллельный чат 8.4 держит порт 4173).
+Риск: high (`hooks.server.ts`, `*.config.ts`).
+Читать: `04` § 5–6, § 8 (прочитано).
+
+Чек-лист `04` § 8 → тесты: чужие платежи / сертификаты / заказы по `id` — `cabinet/payments.test`, `cabinet/progress.test` («PDF key: own»), `cabinet/orders.test`; редактор и модератор на всех страницах и action админки — `e2e/admin-permissions.spec` + `auth/permissions.test`; модератор без баллов и сертификатов — `points/adjust.test`, `certificates/issue.test`, `e2e/admin-points`, `e2e/admin-certificates`; последний админ — `users/account.test`; блокировка сразу — `e2e/admin-users`, `e2e/admin-block`, `auth/session.test`; вебхук без подписи — `payments/webhook.test`, `providers/vpos-webhook.test`, `providers/mock.test`.
+
+- [x] SPEC
+- [ ] RED
+- [ ] GREEN

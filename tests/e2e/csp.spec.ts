@@ -16,6 +16,20 @@ test('pages carry a nonce-based CSP that forbids framing', async ({ request }) =
 	expect(header).toMatch(/script-src 'self' 'nonce-[\w+/=]+'/);
 	expect(header).toContain("frame-ancestors 'none'");
 	expect(header).toContain("object-src 'none'");
+	expect(header).toContain(
+		"form-action 'self' https://accounts.google.com https://checkout.vpos.am"
+	);
+});
+
+test('pages and redirects carry security headers', async ({ request }) => {
+	for (const path of ['/', '/login', '/admin']) {
+		const headers = (await request.get(path, { maxRedirects: 0 })).headers();
+		expect(headers['x-content-type-options'], path).toBe('nosniff');
+		expect(headers['x-frame-options'], path).toBe('DENY');
+		expect(headers['strict-transport-security'], path).toBe('max-age=31536000');
+		expect(headers['referrer-policy'], path).toBe('strict-origin-when-cross-origin');
+		expect(headers['permissions-policy'], path).toContain('camera=()');
+	}
 });
 
 test('public pages hydrate and play video without CSP violations', async ({ page }) => {
