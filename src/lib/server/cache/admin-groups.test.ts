@@ -46,10 +46,15 @@ describe('groupsToInvalidate (2.10: admin writes reset the public cache)', () =>
 	});
 
 	it('sections that show nothing on the site reset nothing', () => {
-		/* 7.2: no video is shown on the site yet; 7.4: no shop catalog yet (7.5). */
-		const paths = ['/admin/audit', '/admin/roles', '/admin/locale', '/admin/videos'];
-		for (const path of [...paths, '/admin/products/1', '/admin/orders/1']) {
+		/* 7.2: no video is shown on the site yet. */
+		for (const path of ['/admin/audit', '/admin/roles', '/admin/locale', '/admin/videos']) {
 			expect(staffWrite(path)).toEqual([]);
 		}
+	});
+
+	it('shop (7.5): products and orders (a cancel returns stock) reset the catalog', () => {
+		expect(staffWrite('/admin/products/1')).toEqual(['shop']);
+		expect(staffWrite('/admin/orders/1')).toEqual(['shop']);
+		expect(ALL_GROUPS).toContain('shop');
 	});
 });

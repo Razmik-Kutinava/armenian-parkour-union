@@ -3,6 +3,7 @@ import { afterAll, describe, expect, it } from 'vitest';
 import type { LimitDb } from '../../auth/rate-limit';
 import { pages, posts } from '../../db/schema/content';
 import { events } from '../../db/schema/events';
+import { shopItems } from '../../db/schema/shop';
 import { testDb, testDbUrl } from '../../db/test-db';
 import { listSitemapEntries } from './sitemap';
 
@@ -97,6 +98,39 @@ describe.skipIf(!testDbUrl)('seo: sitemap addresses from the database', () => {
 			];
 			const paths = (await listSitemapEntries(tx)).map((e) => e.path);
 			for (const p of hidden) expect(paths).not.toContain(p);
+		});
+	});
+
+	it('the shop (docs/06 section 7 item 2): the catalog and published items only', async () => {
+		await inRollback(async (tx) => {
+			const addItem = async (values: Partial<typeof shopItems.$inferInsert> = {}) =>
+				(
+					await tx
+						.insert(shopItems)
+						.values({
+							slug: slug(),
+							title: { en: 'Tee' },
+							pricePoints: 10,
+							status: 'published',
+							...values
+						})
+						.returning()
+				)[0];
+			const item = await addItem();
+			const soldOut = await addItem({ stock: 0 });
+			const hidden = [
+				await addItem({ status: 'draft' }),
+				await addItem({ status: 'archived' }),
+				await addItem({ deletedAt: new Date() })
+			];
+			const entries = await listSitemapEntries(tx);
+			const paths = entries.map((e) => e.path);
+			expect(paths).toContain('/shop');
+			expect(paths).toContain(`/shop/${soldOut.slug}`);
+			expect(entries.find((e) => e.path === `/shop/${item.slug}`)?.lastmod).toEqual(
+				item.updatedAt
+			);
+			for (const h of hidden) expect(paths).not.toContain(`/shop/${h.slug}`);
 		});
 	});
 
