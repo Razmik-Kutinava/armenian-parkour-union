@@ -7,6 +7,7 @@ import type { AdminAction } from './admin-audit-map';
 import { moneyActions } from './admin-audit-money';
 import { pointsActions } from './admin-audit-points';
 import { registrationActions } from './admin-audit-registrations';
+import { shopActions } from './admin-audit-shop';
 import { videoActions } from './admin-audit-videos';
 import { paymentSettingsAction } from './payment-settings-form';
 
@@ -199,7 +200,8 @@ export async function adminActions(page: Page, sql: postgres.Sql, adminId: strin
 		...examActions(sql, post),
 		...certificateActions(sql, post, page),
 		...paymentSettingsAction(page, post),
-		...videoActions(sql, post, page, target)
+		...videoActions(sql, post, page, target),
+		...shopActions(sql, post, postRedirect, target)
 	};
 	return perform;
 }

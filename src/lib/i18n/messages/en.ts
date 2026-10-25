@@ -29,6 +29,7 @@ import { enStaffAdmin } from './en-staff-admin';
 import { enSystem } from './en-system';
 import { enTeam } from './en-team';
 import { enUsers } from './en-users';
+import { enShopAdmin } from './en-shop-admin';
 import { enVideosAdmin } from './en-videos-admin';
 
 /** Source of truth for UI text keys. hy and ru may omit keys: English is shown instead. */
@@ -57,6 +58,7 @@ export const en = {
 	...enCabinetEvents,
 	...enCabinetVideos,
 	...enVideosAdmin,
+	...enShopAdmin,
 	...enConsents,
 	...enRegistrations,
 	...enRegistrationsAdmin,

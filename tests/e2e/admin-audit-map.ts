@@ -73,7 +73,13 @@ export const ADMIN_AUDIT = {
 	'/admin/staff/[id]?/update': ['staff_profile.update'],
 	'/admin/videos?/approve': ['video.approve'],
 	'/admin/videos?/reject': ['video.reject'],
-	'/admin/videos?/hide': ['video.hide']
+	'/admin/videos?/hide': ['video.hide'],
+	'/admin/products/new?/default': ['shop_item.create'],
+	'/admin/products/[id]?/update': ['shop_item.update'],
+	'/admin/products/[id]?/status': ['shop_item.update'],
+	'/admin/products/[id]?/duplicate': ['shop_item.create'],
+	'/admin/orders/[id]?/status': ['shop_order.status'],
+	'/admin/orders/[id]?/tracking': ['shop_order.tracking']
 } as const;
 
 export type AdminAction = keyof typeof ADMIN_AUDIT;

@@ -30,6 +30,7 @@ import { ruStaffAdmin } from './ru-staff-admin';
 import { ruSystem } from './ru-system';
 import { ruTeam } from './ru-team';
 import { ruUsers } from './ru-users';
+import { ruShopAdmin } from './ru-shop-admin';
 import { ruVideosAdmin } from './ru-videos-admin';
 
 export const ru: Partial<Messages> = {
@@ -57,6 +58,7 @@ export const ru: Partial<Messages> = {
 	...ruCabinetEvents,
 	...ruCabinetVideos,
 	...ruVideosAdmin,
+	...ruShopAdmin,
 	...ruConsents,
 	...ruRegistrations,
 	...ruRegistrationsAdmin,

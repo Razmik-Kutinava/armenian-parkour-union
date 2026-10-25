@@ -3,6 +3,7 @@ import type { LimitDb } from '../../auth/rate-limit';
 import { pages, posts } from '../../db/schema/content';
 import { events } from '../../db/schema/events';
 import { heroBlocks } from '../../db/schema/hero';
+import { shopItems } from '../../db/schema/shop';
 import { users } from '../../db/schema/users';
 
 /*
@@ -10,7 +11,10 @@ import { users } from '../../db/schema/users';
  * here (events, hero blocks, products — with their tasks), and the code that starts
  * using a file locks its media row FOR SHARE in the same transaction, so a delete cannot slip in.
  */
-export type MediaUsage = { kind: 'user_avatar' | 'page' | 'post' | 'event' | 'hero'; id: string };
+export type MediaUsage = {
+	kind: 'user_avatar' | 'page' | 'post' | 'event' | 'hero' | 'shop_item';
+	id: string;
+};
 
 type Finder = (db: LimitDb, key: string) => Promise<MediaUsage[]>;
 
@@ -68,12 +72,30 @@ const heroBackgrounds: Finder = async (db, key) => {
 	return rows.map((r) => ({ kind: 'hero' as const, id: r.id }));
 };
 
+/** Archived items too: they can be restored with their photos. */
+const itemPhotosAndDescriptions: Finder = async (db, key) => {
+	const rows = await db
+		.select({ id: shopItems.id })
+		.from(shopItems)
+		.where(
+			and(
+				or(
+					sql`${shopItems.imageKeys} ? ${key}`,
+					sql`strpos(${shopItems.description}::text, ${inText(key)}) > 0`
+				),
+				isNull(shopItems.deletedAt)
+			)
+		);
+	return rows.map((r) => ({ kind: 'shop_item' as const, id: r.id }));
+};
+
 const finders: Finder[] = [
 	avatars,
 	pageBodies,
 	postCoversAndBodies,
 	eventCoversAndDescriptions,
-	heroBackgrounds
+	heroBackgrounds,
+	itemPhotosAndDescriptions
 ];
 
 export async function findUsages(db: LimitDb, key: string): Promise<MediaUsage[]> {

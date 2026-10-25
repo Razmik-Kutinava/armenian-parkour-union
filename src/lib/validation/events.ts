@@ -20,7 +20,7 @@ const optional = <T extends z.ZodType>(schema: T) =>
 const text = (max: number) => optional(z.string().trim().max(max, { error: 'auth.error.tooLong' }));
 
 /** Whole number typed in a field, within limits. */
-const intField = (min: number, max: number, error: MessageKey) =>
+export const intField = (min: number, max: number, error: MessageKey) =>
 	z
 		.union([
 			z.number(),

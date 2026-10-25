@@ -66,7 +66,12 @@ export const ADMIN_READS = {
 	/* docs/04 section 3: moderator and admin view; section 5.1 has no read code of its own. */
 	'/admin/staff': 'certificates.read',
 	'/admin/staff/[id]': 'certificates.read',
-	'/admin/videos': 'videos.moderate'
+	'/admin/videos': 'videos.moderate',
+	'/admin/products': 'shop.items_write',
+	'/admin/products/new': 'shop.items_write',
+	'/admin/products/[id]': 'shop.items_write',
+	'/admin/orders': 'shop.orders_manage',
+	'/admin/orders/[id]': 'shop.orders_manage'
 } as const satisfies Record<string, Access>;
 
 export const ADMIN_WRITES = {
@@ -141,5 +146,11 @@ export const ADMIN_WRITES = {
 	'/admin/videos?/approve': 'videos.moderate',
 	'/admin/videos?/reject': 'videos.moderate',
 	'/admin/videos?/hide': 'videos.moderate',
+	'/admin/products/new?/default': 'shop.items_write',
+	'/admin/products/[id]?/update': 'shop.items_write',
+	'/admin/products/[id]?/status': 'shop.items_write',
+	'/admin/products/[id]?/duplicate': 'shop.items_write',
+	'/admin/orders/[id]?/status': 'shop.orders_manage',
+	'/admin/orders/[id]?/tracking': 'shop.orders_manage',
 	'POST /admin/locale': 'staff'
 } as const satisfies Record<AdminAction | NotAuditedAction, Access>;

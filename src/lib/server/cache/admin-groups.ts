@@ -17,6 +17,9 @@ const BY_SECTION: Record<string, CacheGroup[]> = {
 	'point-rules': [],
 	/* no video is shown on the site yet (7.2) */
 	videos: [],
+	/* no shop catalog on the site yet (7.4); the catalog (7.5) gets its group */
+	products: [],
+	orders: [],
 	media: ALL_GROUPS,
 	audit: [],
 	roles: [],

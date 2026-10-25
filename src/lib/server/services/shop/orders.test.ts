@@ -247,20 +247,22 @@ describe.skipIf(!testDbUrl)('shop: orders in the admin', () => {
 			});
 			expect(card?.memberName).toContain('Test');
 			expect(card?.lines).toHaveLength(2);
-			expect(card?.lines).toEqual(expect.arrayContaining([
-				expect.objectContaining({
-					title: { en: 'Cap' },
-					quantity: 1,
-					pricePointsSnapshot: 40,
-					selectedOptions: null
-				}),
-				expect.objectContaining({
-					title: { en: 'Tee' },
-					quantity: 2,
-					pricePointsSnapshot: 40,
-					selectedOptions: { Size: 'M' }
-				})
-			]));
+			expect(card?.lines).toEqual(
+				expect.arrayContaining([
+					expect.objectContaining({
+						title: { en: 'Cap' },
+						quantity: 1,
+						pricePointsSnapshot: 40,
+						selectedOptions: null
+					}),
+					expect.objectContaining({
+						title: { en: 'Tee' },
+						quantity: 2,
+						pricePointsSnapshot: 40,
+						selectedOptions: { Size: 'M' }
+					})
+				])
+			);
 		});
 	});
 
@@ -274,15 +276,16 @@ describe.skipIf(!testDbUrl)('shop: orders in the admin', () => {
 				status: 'shipped',
 				createdAt: new Date('2026-10-20T10:00:00+04:00')
 			});
+			const name = String(member.lastName);
 			const ids = async (q: string, filters: Record<string, string> = {}) =>
 				(await listOrders(tx, { ...LIST, q, filters })).rows.map((r) => r.id);
-			expect(await ids(member.lastName)).toEqual([newer.id, older.id]);
-			expect(await ids(member.lastName, { status: 'shipped' })).toEqual([newer.id]);
-			expect(await ids(member.lastName, { status: 'bogus' })).toEqual([newer.id, older.id]);
-			expect(await ids(member.lastName, { from: '2026-10-01' })).toEqual([newer.id]);
-			expect(await ids(member.lastName, { to: '2026-09-10' })).toEqual([older.id]);
+			expect(await ids(name)).toEqual([newer.id, older.id]);
+			expect(await ids(name, { status: 'shipped' })).toEqual([newer.id]);
+			expect(await ids(name, { status: 'bogus' })).toEqual([newer.id, older.id]);
+			expect(await ids(name, { from: '2026-10-01' })).toEqual([newer.id]);
+			expect(await ids(name, { to: '2026-09-10' })).toEqual([older.id]);
 			expect(await ids(older.number)).toEqual([older.id]);
-			const { rows, total } = await listOrders(tx, { ...LIST, q: member.lastName, filters: {} });
+			const { rows, total } = await listOrders(tx, { ...LIST, q: name, filters: {} });
 			expect(total).toBe(2);
 			expect(rows[0]).toMatchObject({
 				number: newer.number,

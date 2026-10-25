@@ -4,7 +4,12 @@ import { formToObject } from './site-settings-form';
 
 const BASE = 'https://media.parkour.am';
 const schema = itemFormSchema(BASE);
-const valid = { slug: 'apu-t-shirt', title: { en: 'T-shirt' }, pricePoints: '150', status: 'draft' };
+const valid = {
+	slug: 'apu-t-shirt',
+	title: { en: 'T-shirt' },
+	pricePoints: '150',
+	status: 'draft'
+};
 const errorOf = (input: Record<string, unknown>) =>
 	schema.safeParse({ ...valid, ...input }).error?.issues[0];
 

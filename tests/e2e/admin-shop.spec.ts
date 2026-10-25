@@ -128,8 +128,9 @@ test('a moderator moves an order forward with a shipping note; no cancel', async
 	await page.getByRole('button', { name: 'Mark as shipped' }).click();
 	await expect(page.getByRole('button', { name: 'Mark as delivered' })).toBeVisible();
 	await expect(page.getByRole('button', { name: 'Mark as confirmed' })).toHaveCount(0);
-	expect((await sql`select status, tracking_note from shop_orders where id = ${order.id}`)[0])
-		.toEqual({ status: 'shipped', tracking_note: 'RR123456789AM' });
+	expect(
+		(await sql`select status, tracking_note from shop_orders where id = ${order.id}`)[0]
+	).toEqual({ status: 'shipped', tracking_note: 'RR123456789AM' });
 
 	const back = await page.request.post(`/admin/orders/${order.id}?/status`, {
 		form: { status: 'cancelled' },
