@@ -1,0 +1,28 @@
+# Доступность сайта (8.7): раз в ~10 минут GET главной. Упал — запуск красный, и GitHub шлёт письмо
+# о проваленном плановом запуске тому, кто последним менял расписание (настройки уведомлений GitHub:
+# Actions → «Send notifications for failed workflows only»). Ошибки внутри сайта — в Sentry.
+# GitHub запускает расписание с задержкой и отключает его после 60 дней без коммитов в репозитории.
+name: Uptime
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: uptime
+  cancel-in-progress: true
+
+permissions: {}
+
+jobs:
+  home:
+    name: parkour.am answers
+    runs-on: ubuntu-24.04
+    if: github.ref == 'refs/heads/master'
+    timeout-minutes: 5
+    steps:
+      # Спящая машина Fly просыпается несколько секунд: повторы отсекают ложную тревогу.
+      - run: |
+          curl -fsS -o /dev/null -w "%{http_code} in %{time_total}s\n" \
+            --retry 3 --retry-delay 20 --retry-all-errors --max-time 30 https://parkour.am/
