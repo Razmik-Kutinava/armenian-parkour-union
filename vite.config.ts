@@ -11,7 +11,7 @@ const RULES_TESTS = [
 	'src/lib/server/services/registrations/points*.test.ts',
 	'src/lib/server/services/cabinet/points.test.ts',
 	'src/lib/server/services/certificates/points.test.ts',
-	'src/lib/server/services/videos/review.test.ts',
+	'src/lib/server/services/videos/{review,race}.test.ts',
 	'src/lib/server/seed/points-rules.test.ts'
 ];
 
@@ -24,7 +24,7 @@ const ISSUE_TESTS = [
 
 /* Same for an order: it holds the order number lock until the test's rollback. */
 const ORDER_TESTS = [
-	'src/lib/server/services/shop/{checkout,checkout-refusals,order-cancel,order-cancel-own}.test.ts'
+	'src/lib/server/services/shop/{checkout,checkout-refusals,order-cancel,order-cancel-own,race,race-cancel}.test.ts'
 ];
 
 export default defineConfig({
