@@ -35,6 +35,12 @@ export const hySystem: Partial<Messages> = {
 	'settings.tabs': 'Կարգավորումների բաժիններ',
 	'settings.tab.site': 'Կայք',
 	'settings.tab.payments': 'Անդամակցություն և վճարումներ',
+	'settings.tab.languages': 'Լեզուներ',
+	'languages.settings.section': 'Կայքի լեզուները',
+	'languages.settings.sectionHint':
+		'Անջատված լեզուն անհետանում է լեզվի ընտրիչից և որոնողական համակարգերից, իսկ դրա էջերը բացվում են անգլերենով։ Միացրեք լեզուն, երբ դրա տեքստերը սրբագրված են։',
+	'languages.settings.englishAlways':
+		'Անգլերենը միշտ միացված է․ այն հիմնական և պահուստային լեզուն է։',
 	'settings.fee': 'Անդամավճար',
 	'settings.feeHint':
 		'0՝ անդամավճար չի գանձվում, և վճարման կոճակը թաքցված է։ Արդեն սկսված վճարումները պահպանում են իրենց գումարը։',

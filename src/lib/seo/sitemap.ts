@@ -1,6 +1,7 @@
+import { locales, type Locale } from '#lib/i18n/locales.ts';
 import { alternateLinks } from './alternates';
 
-/* docs/06 section 7.2: sitemaps.org format, each address in every language with hreflang links. */
+/* docs/06 section 7.2: sitemaps.org format, each address in every enabled language with hreflang links. */
 
 /** `path` is the English (unprefixed) address. */
 export type SitemapEntry = { path: string; lastmod?: Date };
@@ -8,9 +9,13 @@ export type SitemapEntry = { path: string; lastmod?: Date };
 const escapeXml = (text: string) =>
 	text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
-export function renderSitemap(siteUrl: string, entries: SitemapEntry[]): string {
+export function renderSitemap(
+	siteUrl: string,
+	entries: SitemapEntry[],
+	enabled: readonly Locale[] = locales
+): string {
 	const urls = entries.flatMap(({ path, lastmod }) => {
-		const links = alternateLinks(siteUrl, path);
+		const links = alternateLinks(siteUrl, path, enabled);
 		const xhtml = links
 			.map(
 				(l) => `<xhtml:link rel="alternate" hreflang="${l.hreflang}" href="${escapeXml(l.href)}"/>`

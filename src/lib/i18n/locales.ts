@@ -29,6 +29,16 @@ export function localizePath(pathname: string, locale: Locale): string {
 	return bare === '/' ? `/${locale}` : `/${locale}${bare}`;
 }
 
+/** A switched-off language (site settings) shows the same page in English, or null. */
+export function disabledLocaleRedirect(
+	pathname: string,
+	search: string,
+	enabled: readonly Locale[]
+): string | null {
+	if (enabled.includes(localeFromPath(pathname))) return null;
+	return localizePath(pathname, defaultLocale) + search;
+}
+
 /** '/en/...' duplicates the unprefixed English page: returns the canonical path, or null. */
 export function defaultLocaleRedirect(pathname: string): string | null {
 	const prefix = `/${defaultLocale}`;

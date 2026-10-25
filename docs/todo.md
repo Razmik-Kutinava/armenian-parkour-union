@@ -46,6 +46,6 @@ normal (настройка сайта и SEO; без прав, денег и с�
 ## Фазы
 
 - [x] SPEC
-- [ ] RED
-- [ ] GREEN
+- [x] RED `a9f1dd8`
+- [x] GREEN — Vitest задачи 85/85, `access-coverage` / `audit-coverage` 4/4, e2e `admin-access` + `admin-audit` 7/7, check 0, lint чистый
 - [ ] REVIEW

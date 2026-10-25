@@ -96,6 +96,15 @@ export async function adminActions(page: Page, sql: postgres.Sql, adminId: strin
 			const phone = `+374 10 ${String(Math.floor(Math.random() * 1e6)).padStart(6, '0')}`;
 			await post('/admin/settings', { ...form, [name]: phone });
 		},
+		/* The same languages again: switching one off would hide it from e2e running in parallel.
+		   The entry of a real change is covered by services/site-locales.test.ts. */
+		'/admin/settings/languages?/default': async () => {
+			const [row] = await sql`select value from site_settings where key = 'locales'`;
+			const form = new FormData();
+			for (const l of row?.value?.enabled ?? ['en', 'hy', 'ru']) form.append('locales', l);
+			const res = await page.request.post('/admin/settings/languages', { form, headers: ORIGIN });
+			expect(res.ok(), 'settings/languages').toBe(true);
+		},
 		/* No bucket in tests: the object is never there, so complete is refused and logs nothing.
 		   media.upload with a stored object is covered by services/media/upload.test.ts. */
 		'/admin/media?/complete': async () => {

@@ -18,6 +18,8 @@ export type SeoInput = {
 	event?: SeoEvent;
 	/** Home page only. */
 	organization?: SeoOrganization;
+	/** Enabled languages (site settings); all by default. */
+	locales?: readonly Locale[];
 };
 export type SeoEvent = {
 	startsAt: Date;
@@ -70,14 +72,14 @@ export function buildSeo(input: SeoInput): Seo {
 	const origin = input.siteUrl.replace(/\/+$/, '');
 	const canonical = `${origin}${input.path}`;
 	const description = shorten(input.description);
-	const { image, article } = input;
+	const { image, article, locales: enabled = locales } = input;
 	const tags: MetaTag[] = [
 		{ property: 'og:title', content: input.title },
 		{ property: 'og:description', content: description },
 		{ property: 'og:url', content: canonical },
 		{ property: 'og:site_name', content: input.siteName },
 		{ property: 'og:locale', content: OG_LOCALE[input.locale] },
-		...locales
+		...enabled
 			.filter((locale) => locale !== input.locale)
 			.map((locale) => ({ property: 'og:locale:alternate', content: OG_LOCALE[locale] })),
 		{ property: 'og:type', content: article ? 'article' : 'website' },
@@ -119,7 +121,7 @@ export function buildSeo(input: SeoInput): Seo {
 		title: input.title === input.siteName ? input.title : `${input.title} — ${input.siteName}`,
 		description,
 		canonical,
-		alternates: alternateLinks(origin, input.path),
+		alternates: alternateLinks(origin, input.path, enabled),
 		tags,
 		jsonLd
 	};

@@ -36,6 +36,11 @@ export const ruSystem: Record<keyof typeof enSystem, string> = {
 	'settings.tabs': 'Разделы настроек',
 	'settings.tab.site': 'Сайт',
 	'settings.tab.payments': 'Членство и оплата',
+	'settings.tab.languages': 'Языки',
+	'languages.settings.section': 'Языки сайта',
+	'languages.settings.sectionHint':
+		'Выключенный язык пропадает из переключателя и поисковиков, его страницы открываются по-английски. Включайте язык, когда тексты вычитаны.',
+	'languages.settings.englishAlways': 'Английский включён всегда: это основной и запасной язык.',
 	'settings.fee': 'Членский взнос',
 	'settings.feeHint':
 		'0 — взнос не принимается, кнопки оплаты нет. Уже начатые платежи сохраняют свою сумму.',

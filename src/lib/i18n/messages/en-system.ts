@@ -34,6 +34,12 @@ export const enSystem = {
 	'settings.tabs': 'Settings sections',
 	'settings.tab.site': 'Site',
 	'settings.tab.payments': 'Membership and payments',
+	'settings.tab.languages': 'Languages',
+	'languages.settings.section': 'Site languages',
+	'languages.settings.sectionHint':
+		'A switched-off language disappears from the switcher and search engines; its pages open in English. Switch a language on once its texts are proofread.',
+	'languages.settings.englishAlways':
+		'English is always on: it is the main language and the fallback.',
 	'settings.fee': 'Membership fee',
 	'settings.feeHint':
 		'0 — the fee is not taken and the pay button is hidden. Payments already started keep their amount.',
