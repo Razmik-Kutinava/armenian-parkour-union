@@ -31,7 +31,7 @@
 			{#if data.page > 1}
 				<a class={link} href={pageHref(data.page - 1)}>← {t('shop.prev')}</a>
 			{:else}<span></span>{/if}
-			<span class="text-ink-500">{t('table.pageOf', { page: data.page, pages: data.pages })}</span>
+			<span class="text-ink-700">{t('table.pageOf', { page: data.page, pages: data.pages })}</span>
 			{#if data.page < data.pages}
 				<a class={link} href={pageHref(data.page + 1)}>{t('shop.next')} →</a>
 			{:else}<span></span>{/if}

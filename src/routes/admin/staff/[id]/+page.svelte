@@ -43,7 +43,7 @@
 		<dt class="font-bold">{t('staff.card.photo')}</dt>
 		<dd class="flex items-center gap-3">
 			<Avatar name={card.memberName} url={data.photoUrl} alt={card.memberName} />
-			<span class="text-sm text-ink-500">{t('staff.card.photoHint')}</span>
+			<span class="text-sm text-ink-700">{t('staff.card.photoHint')}</span>
 		</dd>
 		<dt class="font-bold">{t('staff.card.certificate')}</dt>
 		<dd>

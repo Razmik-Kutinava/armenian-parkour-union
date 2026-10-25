@@ -41,7 +41,7 @@
 		<a class="truncate font-bold text-navy-700 hover:underline" href="/admin/hero/{row.id}"
 			>{pickLocalized(row.title, locale)}</a
 		>
-		<div class="flex flex-wrap items-center gap-2 text-sm text-ink-500">
+		<div class="flex flex-wrap items-center gap-2 text-sm text-ink-700">
 			<Badge>{t(`hero.type.${row.type}`)}</Badge>
 			{#if row.archivedAt}<Badge>{t('hero.archived')}</Badge>
 			{:else if row.isActive}<Badge tone="success">{t('hero.active.yes')}</Badge>

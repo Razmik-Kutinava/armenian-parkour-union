@@ -49,7 +49,7 @@
 			{/if}
 		</div>
 	</div>
-	<p class="text-sm text-ink-500">{hint ?? t('news.coverHint')}</p>
+	<p class="text-sm text-ink-700">{hint ?? t('news.coverHint')}</p>
 	{#if error}<p class="text-sm text-error-fg">{error}</p>{/if}
 </div>
 

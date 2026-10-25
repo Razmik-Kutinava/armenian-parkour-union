@@ -20,7 +20,7 @@
 				class="size-full object-cover"
 			/>
 		{:else}
-			<span class="text-ink-500">{t('shop.noPhoto')}</span>
+			<span class="text-ink-700">{t('shop.noPhoto')}</span>
 		{/if}
 	</div>
 	{#if images.length > 1}

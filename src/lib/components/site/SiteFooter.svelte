@@ -87,6 +87,6 @@
 		class="mx-auto flex max-w-6xl flex-col gap-4 border-t border-navy-800 px-4 py-6 sm:flex-row sm:items-center sm:justify-between"
 	>
 		<p class="text-sm whitespace-pre-line">{footer.text ?? footer.siteName ?? t('site.name')}</p>
-		<LanguageSwitcher />
+		<LanguageSwitcher landmark={false} />
 	</div>
 </footer>

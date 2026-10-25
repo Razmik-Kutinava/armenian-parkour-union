@@ -42,7 +42,7 @@
 			{#if data.page > 1}
 				<a class={link} href={pageHref(data.page - 1)}>← {t('news.newer')}</a>
 			{:else}<span></span>{/if}
-			<span class="text-ink-500">{t('table.pageOf', { page: data.page, pages: data.pages })}</span>
+			<span class="text-ink-700">{t('table.pageOf', { page: data.page, pages: data.pages })}</span>
 			{#if data.page < data.pages}
 				<a class={link} href={pageHref(data.page + 1)}>{t('news.older')} →</a>
 			{:else}<span></span>{/if}

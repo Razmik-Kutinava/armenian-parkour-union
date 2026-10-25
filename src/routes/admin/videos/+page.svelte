@@ -123,7 +123,7 @@
 				class="text-navy-700 underline underline-offset-2 hover:text-navy-600"
 				>{row.title ?? t('videos.admin.untitled')}</a
 			>
-			{#if row.rejectReason}<p class="text-xs text-ink-500">{row.rejectReason}</p>{/if}
+			{#if row.rejectReason}<p class="text-xs text-ink-700">{row.rejectReason}</p>{/if}
 		{:else if column.key === 'platform'}{t(`videos.platform.${row.platform}`)}
 		{:else if column.key === 'event'}{row.eventTitle
 				? pickLocalized(row.eventTitle, currentLocale())

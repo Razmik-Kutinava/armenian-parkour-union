@@ -30,7 +30,7 @@
 				<li class="flex flex-wrap items-start justify-between gap-3 p-4">
 					<div class="flex min-w-0 flex-col gap-1">
 						<a class={link} href={href(`/cabinet/orders/${order.id}`)}>{order.number}</a>
-						<span class="text-sm text-ink-500">{newsDate(order.createdAt, currentLocale())}</span>
+						<span class="text-sm text-ink-700">{newsDate(order.createdAt, currentLocale())}</span>
 						{#each order.lines as line, i (i)}
 							<span class="text-sm break-words text-ink-700">
 								{lineText(line, currentLocale())}

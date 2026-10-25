@@ -29,7 +29,7 @@
 	<label for={id} class="text-sm font-bold text-ink-900">{label}</label>
 	{@render control({ id, describedBy, invalid: !!error })}
 	{#if hint}
-		<p id={hintId} class="text-sm text-ink-500">{hint}</p>
+		<p id={hintId} class="text-sm text-ink-700">{hint}</p>
 	{/if}
 	{#if error}
 		<p id={errorId} class="flex items-center gap-1 text-sm text-error-fg">

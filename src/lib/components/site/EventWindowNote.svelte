@@ -7,7 +7,7 @@
 	let { window }: { window: RegistrationWindow } = $props();
 </script>
 
-<span class={window.state === 'open' ? 'text-success-fg' : 'text-ink-500'}>
+<span class={window.state === 'open' ? 'text-success-fg' : 'text-ink-700'}>
 	{#if window.state === 'open'}{t('events.window.open')}
 	{:else if window.state === 'not_open'}{t('events.window.notOpen', {
 			date: eventMoment(window.opensAt, currentLocale())

@@ -76,7 +76,7 @@
 	<div class="flex flex-col gap-1">
 		<p class="text-sm font-bold text-ink-900">{t('cabinet.profile.birthDate')}</p>
 		<p class="text-ink-900">{birth}</p>
-		<p class="text-sm text-ink-500">{t('cabinet.profile.birthDateHint')}</p>
+		<p class="text-sm text-ink-700">{t('cabinet.profile.birthDateHint')}</p>
 	</div>
 	<div class="grid gap-4 sm:grid-cols-2">
 		<Input

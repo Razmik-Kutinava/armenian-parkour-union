@@ -53,7 +53,7 @@
 			</p>
 		{/if}
 		{#if event.cancelUntil}
-			<p class="text-sm text-ink-500">
+			<p class="text-sm text-ink-700">
 				{t('registrations.cancelUntil', { date: eventMoment(event.cancelUntil, locale) })}
 			</p>
 		{/if}

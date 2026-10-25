@@ -97,7 +97,7 @@
 
 	<FormSection title={t('shop.order.statusTitle')}>
 		{#if open}
-			<p class="text-sm text-ink-500">{t('shop.order.statusHint')}</p>
+			<p class="text-sm text-ink-700">{t('shop.order.statusHint')}</p>
 			<div class="flex flex-wrap gap-2">
 				{#each next as status (status)}
 					<form method="POST" action="?/status">
@@ -131,7 +131,7 @@
 
 	{#if cancellable}
 		<FormSection title={t('shop.order.cancelTitle')}>
-			<p class="text-sm text-ink-500">{t('shop.order.cancelHint')}</p>
+			<p class="text-sm text-ink-700">{t('shop.order.cancelHint')}</p>
 			<div>
 				<Button variant="danger" size="sm" onclick={() => (cancelOpen = true)}
 					>{t('shop.order.cancel')}</Button

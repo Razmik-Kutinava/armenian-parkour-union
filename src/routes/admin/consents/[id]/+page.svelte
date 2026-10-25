@@ -82,7 +82,7 @@
 					target="_blank"
 					rel="noopener noreferrer">{t('consents.view')}</a
 				>
-				<span class="text-sm text-ink-500">{t('consents.card.fileHint')}</span>
+				<span class="text-sm text-ink-700">{t('consents.card.fileHint')}</span>
 			</p>
 		{:else}
 			<p class="text-sm text-ink-700">{t('consents.card.noFile')}</p>

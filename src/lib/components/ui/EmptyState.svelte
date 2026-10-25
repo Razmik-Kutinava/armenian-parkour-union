@@ -21,7 +21,7 @@
 	<div class="flex size-12 items-center justify-center rounded-full bg-navy-100 text-navy-700">
 		<Icon class="size-6" aria-hidden="true" />
 	</div>
-	<h3 class="text-xl font-bold text-ink-900">{title}</h3>
+	<h2 class="text-xl font-bold text-ink-900">{title}</h2>
 	{#if text}
 		<p class="max-w-md text-base text-ink-700">{text}</p>
 	{/if}

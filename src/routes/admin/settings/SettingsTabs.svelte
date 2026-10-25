@@ -19,7 +19,7 @@
 			class="-mb-px inline-flex min-h-11 items-center border-b-2 px-3 font-bold whitespace-nowrap focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy-600 sm:min-h-10 {tab.id ===
 			current
 				? 'border-navy-700 text-navy-700'
-				: 'border-transparent text-ink-500 hover:text-navy-700'}"
+				: 'border-transparent text-ink-700 hover:text-navy-700'}"
 		>
 			{t(tab.label)}
 		</a>

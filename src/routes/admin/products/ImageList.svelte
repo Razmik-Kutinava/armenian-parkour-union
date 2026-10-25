@@ -66,7 +66,7 @@
 			>
 		</div>
 	{/if}
-	<p class="text-sm text-ink-500">{t('shop.item.photosHint')}</p>
+	<p class="text-sm text-ink-700">{t('shop.item.photosHint')}</p>
 	{#if error}<p class="text-sm text-error-fg">{error}</p>{/if}
 </div>
 

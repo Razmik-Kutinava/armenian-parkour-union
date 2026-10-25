@@ -20,7 +20,7 @@
 	const rows = $derived(Math.min(ITEM_OPTIONS_MAX, Math.max(filled + 1, 1) + added));
 </script>
 
-<p class="text-sm text-ink-500">{t('shop.item.optionsHint')}</p>
+<p class="text-sm text-ink-700">{t('shop.item.optionsHint')}</p>
 {#each Array.from({ length: rows }, (_, i) => i) as i (i)}
 	<div class="grid gap-4 sm:grid-cols-[1fr_2fr]">
 		<Input

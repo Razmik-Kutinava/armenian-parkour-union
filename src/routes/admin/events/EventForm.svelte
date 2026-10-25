@@ -58,7 +58,7 @@
 			<Input label={t('events.latitude')} inputmode="decimal" {...field('latitude')} />
 			<Input label={t('events.longitude')} inputmode="decimal" {...field('longitude')} />
 		</div>
-		<p class="-mt-2 text-sm text-ink-500">{t('events.coordsHint')}</p>
+		<p class="-mt-2 text-sm text-ink-700">{t('events.coordsHint')}</p>
 	</FormSection>
 	<FormSection title={t('events.section.price')}>
 		<div class="grid gap-4 sm:grid-cols-2">

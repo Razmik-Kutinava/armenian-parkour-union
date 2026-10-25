@@ -14,7 +14,7 @@
 	const href = (path: string) => localizePath(path, currentLocale());
 	const primary =
 		'rounded-md bg-accent-500 px-4 py-2 text-center font-bold text-navy-950 hover:bg-accent-600';
-	const inactive = 'rounded-md bg-navy-100 px-4 py-2 text-center font-bold text-ink-500';
+	const inactive = 'rounded-md bg-navy-100 px-4 py-2 text-center font-bold text-ink-700';
 </script>
 
 {#if button.state !== 'none'}

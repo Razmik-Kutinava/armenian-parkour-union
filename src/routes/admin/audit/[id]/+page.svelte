@@ -23,7 +23,7 @@
 
 <dl class="mb-6 grid grid-cols-[auto_1fr] gap-x-6 gap-y-2 text-sm">
 	{#each facts as [label, value] (label)}
-		<dt class="text-ink-500">{label}</dt>
+		<dt class="text-ink-700">{label}</dt>
 		<dd class="break-all text-ink-900">{value}</dd>
 	{/each}
 </dl>

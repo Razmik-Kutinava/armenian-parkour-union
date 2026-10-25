@@ -43,6 +43,6 @@
 			checked={values.isActive === 'on'}
 			error={shown.isActive}
 		/>
-		<p class="text-sm text-ink-500">{t('staff.form.activeHint')}</p>
+		<p class="text-sm text-ink-700">{t('staff.form.activeHint')}</p>
 	</FormSection>
 </FormLayout>

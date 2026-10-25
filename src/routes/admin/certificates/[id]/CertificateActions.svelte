@@ -21,7 +21,7 @@
 			target="_blank"
 			rel="noopener noreferrer">{t('certificates.card.pdfOpen')}</a
 		>
-		<p class="text-sm text-ink-500">{t('certificates.card.pdfHint')}</p>
+		<p class="text-sm text-ink-700">{t('certificates.card.pdfHint')}</p>
 	{:else}
 		<p class="text-ink-700">{t('certificates.card.pdfNone')}</p>
 	{/if}

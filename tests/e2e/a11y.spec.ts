@@ -72,7 +72,9 @@ test('cabinet (email not confirmed yet): contrast, landmarks, the banner inside 
 }) => {
 	test.slow();
 	await registerAdmin(page);
-	await expect(page.locator('main').getByText(/confirm your email/i)).toBeVisible();
+	await expect(
+		page.locator('main').getByText('Confirm your email to pay the fee and register for events.')
+	).toBeVisible();
 	await expectAccessible(page, CABINET);
 });
 

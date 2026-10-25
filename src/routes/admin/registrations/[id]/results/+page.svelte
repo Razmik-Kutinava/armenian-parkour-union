@@ -107,7 +107,7 @@
 	</form>
 {/if}
 
-<p class="mt-4 text-sm text-ink-500">{t('registrationsAdmin.results.hint')}</p>
+<p class="mt-4 text-sm text-ink-700">{t('registrationsAdmin.results.hint')}</p>
 
 {#if data.canFinish}
 	<section class="mt-8 rounded-md border border-line bg-surface p-4">

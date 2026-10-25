@@ -17,10 +17,10 @@
 
 <div class="flex min-h-screen flex-col bg-bg">
 	<SiteHeader viewer={data.viewer} siteName={data.footer.siteName} />
-	{#if data.viewer}
-		<StatusBanner emailVerified={data.viewer.emailVerified} reminder={data.viewer.reminder} />
-	{/if}
 	<main id="content" class="flex-1" tabindex="-1">
+		{#if data.viewer}
+			<StatusBanner emailVerified={data.viewer.emailVerified} reminder={data.viewer.reminder} />
+		{/if}
 		{@render children()}
 	</main>
 	<SiteFooter footer={data.footer} />

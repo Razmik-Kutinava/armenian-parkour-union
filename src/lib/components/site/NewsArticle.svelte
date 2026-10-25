@@ -21,7 +21,7 @@
 	<header class="flex flex-col gap-3">
 		<h1 class="text-3xl font-bold text-ink-900 sm:text-4xl">{post.title}</h1>
 		{#if post.publishedAt}
-			<time class="text-ink-500" datetime={post.publishedAt.toISOString()}
+			<time class="text-ink-700" datetime={post.publishedAt.toISOString()}
 				>{newsDate(post.publishedAt, currentLocale())}</time
 			>
 		{/if}

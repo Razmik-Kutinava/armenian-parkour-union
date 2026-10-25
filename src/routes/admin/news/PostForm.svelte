@@ -36,7 +36,7 @@
 		/>
 		<LocalizedInput name="title" label={t('news.title')} {values} errors={shown} required />
 		<LocalizedInput name="excerpt" label={t('news.excerpt')} {values} errors={shown} />
-		<p class="-mt-2 text-sm text-ink-500">{t('news.excerptHint')}</p>
+		<p class="-mt-2 text-sm text-ink-700">{t('news.excerptHint')}</p>
 	</FormSection>
 	<FormSection title={t('news.body')}>
 		<LocalizedRichText name="body" label={t('news.body')} {values} errors={shown} />

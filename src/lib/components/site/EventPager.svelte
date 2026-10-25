@@ -11,7 +11,7 @@
 		{#if page > 1}
 			<a class={link} href={href(page - 1)}>← {t('events.earlier')}</a>
 		{:else}<span></span>{/if}
-		<span class="text-ink-500">{t('table.pageOf', { page, pages })}</span>
+		<span class="text-ink-700">{t('table.pageOf', { page, pages })}</span>
 		{#if page < pages}
 			<a class={link} href={href(page + 1)}>{t('events.later')} →</a>
 		{:else}<span></span>{/if}

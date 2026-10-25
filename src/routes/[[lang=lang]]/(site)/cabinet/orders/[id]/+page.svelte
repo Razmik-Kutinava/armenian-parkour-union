@@ -43,7 +43,7 @@
 			</h1>
 			<OrderStatusBadge status={order.status} />
 		</div>
-		<p class="text-sm text-ink-500">
+		<p class="text-sm text-ink-700">
 			{t('shop.order.placed', { date: newsDate(order.createdAt, currentLocale()) })}
 		</p>
 	</div>

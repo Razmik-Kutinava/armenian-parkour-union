@@ -9,7 +9,10 @@
 		type Locale
 	} from '#lib/i18n/index.svelte.ts';
 
-	let { surface = 'dark' }: { surface?: 'light' | 'dark' } = $props();
+	/* landmark: false — a repeat of the header switcher (footer): a labelled group, not a second
+	 * "Language" navigation landmark for screen readers. */
+	let { surface = 'dark', landmark = true }: { surface?: 'light' | 'dark'; landmark?: boolean } =
+		$props();
 
 	/* Enabled languages from the site layout (site settings); all three where it did not load. */
 	const shown = $derived<readonly Locale[]>(page.data.locales ?? locales);
@@ -22,7 +25,11 @@
 </script>
 
 {#if shown.length > 1}
-	<nav aria-label={t('nav.language')}>
+	<svelte:element
+		this={landmark ? 'nav' : 'div'}
+		role={landmark ? undefined : 'group'}
+		aria-label={t('nav.language')}
+	>
 		<ul class="flex gap-1">
 			{#each shown as locale (locale)}
 				<li>
@@ -38,5 +45,5 @@
 				</li>
 			{/each}
 		</ul>
-	</nav>
+	</svelte:element>
 {/if}

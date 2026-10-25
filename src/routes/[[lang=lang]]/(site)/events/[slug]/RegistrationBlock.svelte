@@ -66,7 +66,7 @@
 		<p class="text-sm text-ink-700">{t('registrations.full')}</p>
 	{/if}
 	{#if paid}
-		<p class="text-sm text-ink-500">{t('registrations.paidNote')}</p>
+		<p class="text-sm text-ink-700">{t('registrations.paidNote')}</p>
 	{/if}
 	<RegisterForm full={view.full} options={view.categories} />
 {:else if view.state === 'mine'}
@@ -88,13 +88,13 @@
 		<PayFeeForm label="registrations.pay" error={payError} />
 	{/if}
 	{#if view.cancelUntil}
-		<p class="text-sm text-ink-500">
+		<p class="text-sm text-ink-700">
 			{t('registrations.cancelUntil', { date: moment(view.cancelUntil) })}
 		</p>
 		<CancelForm
 			label={view.status === 'waitlist' ? 'registrations.leaveWaitlist' : 'registrations.cancel'}
 		/>
 	{:else if view.status !== 'attended' && view.status !== 'no_show'}
-		<p class="text-sm text-ink-500">{t('registrations.cancelLate')}</p>
+		<p class="text-sm text-ink-700">{t('registrations.cancelLate')}</p>
 	{/if}
 {/if}

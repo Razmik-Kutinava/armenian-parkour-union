@@ -45,7 +45,7 @@
 						>
 							{video.title || video.url}
 						</a>
-						<span class="text-sm text-ink-500">{day(video.createdAt)}</span>
+						<span class="text-sm text-ink-700">{day(video.createdAt)}</span>
 						{#if video.status === 'rejected' && video.rejectReason}
 							<span class="text-sm break-words text-ink-700">
 								{t('cabinet.videos.reason', { reason: video.rejectReason })}

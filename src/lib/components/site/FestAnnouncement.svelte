@@ -33,7 +33,7 @@
 		class="absolute inset-0 -z-10 bg-gradient-to-r from-navy-950/95 via-navy-950/70 to-transparent"
 	></div>
 	<div class="mx-auto flex max-w-6xl flex-col gap-5 px-6 py-20 md:py-28">
-		<LanguageSwitcher surface="dark" />
+		<LanguageSwitcher surface="dark" landmark={false} />
 		<p class="text-sm font-bold tracking-widest text-accent-500 uppercase">{t('fest.kicker')}</p>
 		<h2 class="md:text-6xl max-w-xl text-4xl font-bold">{t('fest.title')}</h2>
 		<p class="text-xl md:text-2xl">{t('fest.subtitle')}</p>

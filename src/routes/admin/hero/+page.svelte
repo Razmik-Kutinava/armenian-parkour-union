@@ -49,7 +49,7 @@
 
 <section class="mb-8 flex flex-col gap-3">
 	<h2 class="text-xl font-bold">{t('hero.now')}</h2>
-	<p class="text-sm text-ink-500">{t('hero.nowHint', { max: data.max })}</p>
+	<p class="text-sm text-ink-700">{t('hero.nowHint', { max: data.max })}</p>
 	<div class="overflow-hidden rounded-lg"><HeroSlider slides={data.slides} level={2} /></div>
 </section>
 
@@ -60,7 +60,7 @@
 			aria-current={data.filter.archived === archive ? 'page' : undefined}
 			class="-mb-px border-b-2 px-1 pb-2 font-bold {data.filter.archived === archive
 				? 'border-navy-700 text-navy-700'
-				: 'border-transparent text-ink-500'}"
+				: 'border-transparent text-ink-700'}"
 			>{archive ? t('hero.view.archive') : t('hero.view.current')}</a
 		>
 	{/each}
@@ -96,7 +96,7 @@
 		title={data.filter.archived ? t('hero.emptyArchive') : t('hero.empty')}
 	/>
 {:else}
-	{#if sortable}<p class="mb-2 text-sm text-ink-500">{t('hero.orderHint')}</p>{/if}
+	{#if sortable}<p class="mb-2 text-sm text-ink-700">{t('hero.orderHint')}</p>{/if}
 	<form method="POST" action="?/reorder" bind:this={orderForm} hidden>
 		<input type="hidden" name="order" bind:this={orderInput} />
 	</form>

@@ -17,7 +17,7 @@
 		<p class="text-ink-700">
 			{t(data.consents.minor ? 'consents.hint.minor' : 'consents.hint.adult')}
 		</p>
-		<p class="text-sm text-ink-500">{t('consents.intro')}</p>
+		<p class="text-sm text-ink-700">{t('consents.intro')}</p>
 	</div>
 	{#each data.consents.items as item (item.kind)}
 		<ConsentItem {item} />

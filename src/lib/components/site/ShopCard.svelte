@@ -19,7 +19,7 @@
 				class="size-full object-cover"
 			/>
 		{:else}
-			<span class="text-sm text-ink-500">{t('shop.noPhoto')}</span>
+			<span class="text-sm text-ink-700">{t('shop.noPhoto')}</span>
 		{/if}
 	</div>
 	<div class="flex flex-1 flex-col gap-2 p-4">

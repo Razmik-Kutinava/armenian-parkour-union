@@ -84,7 +84,7 @@ test('member: email not confirmed, then online payment off — clear messages', 
 	await page.goto('/join');
 	const main = page.locator('main');
 	await main.getByRole('button', { name: 'Pay the fee' }).click();
-	await expect(main.getByText(/Confirm your email/)).toBeVisible();
+	await expect(main.getByText(/Confirm your email first/)).toBeVisible();
 
 	await sql`update users set email_verified = true where id = ${userId}`;
 	await page.goto('/cabinet/membership');

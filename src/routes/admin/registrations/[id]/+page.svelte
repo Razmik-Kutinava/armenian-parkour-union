@@ -132,14 +132,14 @@
 	{#snippet cell(row, column)}
 		{#if column.key === 'member'}
 			<span class="font-bold">{row.name}</span>
-			{#if row.email}<span class="block text-xs text-ink-500">{row.email}</span>{/if}
+			{#if row.email}<span class="block text-xs text-ink-700">{row.email}</span>{/if}
 		{:else if column.key === 'age'}{row.age ?? '—'}
 		{:else if column.key === 'category'}{row.categoryName
 				? pickLocalized(row.categoryName, currentLocale())
 				: '—'}
 		{:else if column.key === 'status'}
 			{t(`registrationsAdmin.status.${row.status}`)}
-			{#if row.holdUntil}<span class="block text-xs text-ink-500"
+			{#if row.holdUntil}<span class="block text-xs text-ink-700"
 					>{t('registrationsAdmin.heldUntil', { time: moment(row.holdUntil) })}</span
 				>{/if}
 		{:else if column.key === 'paid'}

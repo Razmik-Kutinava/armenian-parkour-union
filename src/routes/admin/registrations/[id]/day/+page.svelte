@@ -117,4 +117,4 @@
 	</ul>
 {/if}
 
-<p class="mt-6 text-sm text-ink-500">{t('registrationsAdmin.day.hint')}</p>
+<p class="mt-6 text-sm text-ink-700">{t('registrationsAdmin.day.hint')}</p>

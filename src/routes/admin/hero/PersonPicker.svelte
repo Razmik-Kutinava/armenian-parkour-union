@@ -37,7 +37,7 @@
 	{#if chosen}
 		<p class="font-bold text-ink-900">{t('hero.form.personChosen', { name: chosen.name })}</p>
 	{/if}
-	{#if found && found.length === 0}<p class="text-sm text-ink-500">
+	{#if found && found.length === 0}<p class="text-sm text-ink-700">
 			{t('hero.form.personNone')}
 		</p>{/if}
 	{#if found?.length}

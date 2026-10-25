@@ -56,7 +56,7 @@
 		{#if data.member}
 			<p class="text-ink-900">
 				<span class="font-bold">{data.member.name ?? data.member.email}</span>
-				<span class="text-ink-500">({data.member.email})</span>
+				<span class="text-ink-700">({data.member.email})</span>
 			</p>
 			<p class="font-bold">{t('points.new.balance', { balance: String(data.member.balance) })}</p>
 		{/if}

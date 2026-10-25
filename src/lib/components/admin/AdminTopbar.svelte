@@ -44,7 +44,7 @@
 		<div
 			class="absolute top-full right-0 z-40 mt-2 flex w-60 flex-col gap-2 rounded-md bg-surface p-2 shadow-lg"
 		>
-			<p class="px-3 pt-1 text-xs text-ink-500">{t(`role.${staff.role}`)}</p>
+			<p class="px-3 pt-1 text-xs text-ink-700">{t(`role.${staff.role}`)}</p>
 			<form
 				method="POST"
 				action="/admin/locale"

@@ -37,7 +37,7 @@
 					disabled={locale === defaultLocale}
 				/>
 			{/each}
-			<p class="text-sm text-ink-500">{t('languages.settings.englishAlways')}</p>
+			<p class="text-sm text-ink-700">{t('languages.settings.englishAlways')}</p>
 		</fieldset>
 	</FormSection>
 </FormLayout>

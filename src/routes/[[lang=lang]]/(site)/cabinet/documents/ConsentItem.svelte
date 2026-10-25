@@ -111,7 +111,7 @@
 				required
 				class="text-sm"
 			/>
-			<p id="{titleId}-file-hint" class="text-sm text-ink-500">{t('consents.form.fileHint')}</p>
+			<p id="{titleId}-file-hint" class="text-sm text-ink-700">{t('consents.form.fileHint')}</p>
 		</div>
 		<Button type="submit" loading={uploading} class="w-fit">{t('consents.form.submit')}</Button>
 		{#if message}

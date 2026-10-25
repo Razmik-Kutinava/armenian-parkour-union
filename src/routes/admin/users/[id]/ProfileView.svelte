@@ -26,7 +26,7 @@
 <FormSection title={t('users.section.main')}>
 	<dl class="grid grid-cols-[auto_1fr] gap-x-6 gap-y-2 text-sm">
 		{#each rows as [label, value] (label)}
-			<dt class="text-ink-500">{t(label)}</dt>
+			<dt class="text-ink-700">{t(label)}</dt>
 			<dd class="text-ink-900">{value}</dd>
 		{/each}
 	</dl>

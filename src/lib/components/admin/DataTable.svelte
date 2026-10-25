@@ -122,7 +122,7 @@
 				{/if}
 				<dl class="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm">
 					{#each columns as c (c.key)}
-						<dt class="text-ink-500">{c.label}</dt>
+						<dt class="text-ink-700">{c.label}</dt>
 						<dd class="min-w-0 text-ink-900">{@render cell(row, c)}</dd>
 					{/each}
 				</dl>
