@@ -97,7 +97,8 @@ describe.skipIf(!url)('shop schema (migration 0015)', () => {
 	it('an order starts new; number unique; delivery data and total required', async () => {
 		await inRollback(async (tx) => {
 			const user = await newUser(tx);
-			const row = await order(tx, user.id, { number: 'ORD-2026-0001' });
+			const number = `ORD-2026-T${uid().slice(0, 8)}`;
+			const row = await order(tx, user.id, { number });
 			expect(row).toMatchObject({
 				status: 'new',
 				ledger_id: null,
@@ -105,7 +106,7 @@ describe.skipIf(!url)('shop schema (migration 0015)', () => {
 				tracking_note: null
 			});
 			for (const key of ['created_at', 'updated_at']) expect(row[key]).toBeInstanceOf(Date);
-			await expectCode(tx, '23505', () => order(tx, user.id, { number: 'ORD-2026-0001' }));
+			await expectCode(tx, '23505', () => order(tx, user.id, { number }));
 			await expectCode(tx, '23502', () => order(tx, user.id, { number: null }));
 			for (const key of ['recipient_name', 'phone', 'city', 'address', 'user_id']) {
 				await expectCode(tx, '23502', () => order(tx, user.id, { [key]: null }));

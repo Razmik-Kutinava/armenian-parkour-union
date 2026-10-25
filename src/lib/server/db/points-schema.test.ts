@@ -29,6 +29,20 @@ describe.skipIf(!url)('points schema (migration 0009)', () => {
 		return error as postgres.PostgresError;
 	}
 
+	/* The cascade reaches shop_orders (migration 0015): waiting for its lock next to parallel shop
+	 * tests deadlocks, so every lock is taken without waiting and retried. */
+	async function truncateError(tx: postgres.TransactionSql) {
+		for (let attempt = 1; ; attempt++) {
+			const error = await expectError(tx, async () => {
+				await tx`lock table points_ledger, shop_orders, shop_order_items
+					in access exclusive mode nowait`;
+				await tx`truncate points_ledger cascade`;
+			});
+			if (error.code !== '55P03' || attempt === 50) return error;
+			await new Promise((resolve) => setTimeout(resolve, 200));
+		}
+	}
+
 	const newUser = (tx: postgres.TransactionSql) =>
 		tx`insert into users (email, name) values (${`t-${crypto.randomUUID()}@example.com`}, 'Test')
 			returning *`.then((r) => r[0]);
@@ -57,12 +71,11 @@ describe.skipIf(!url)('points schema (migration 0009)', () => {
 		await inRollback(async (tx) => {
 			const user = await newUser(tx);
 			const entry = await addEntry(tx, { user_id: user.id });
-			for (const query of [
-				() => tx`update points_ledger set delta = 99 where id = ${entry.id}`,
-				() => tx`delete from points_ledger where id = ${entry.id}`,
-				() => tx`truncate points_ledger cascade`
+			for (const error of [
+				await expectError(tx, () => tx`update points_ledger set delta = 99 where id = ${entry.id}`),
+				await expectError(tx, () => tx`delete from points_ledger where id = ${entry.id}`),
+				await truncateError(tx)
 			]) {
-				const error = await expectError(tx, query);
 				expect(error.code).toBe('23001');
 				expect(error.message).toContain('append-only');
 			}
