@@ -2,7 +2,20 @@ import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'vitest/config';
 import adapter from '@sveltejs/adapter-node';
 import { sveltekit } from '@sveltejs/kit/vite';
+import { sentrySvelteKit } from '@sentry/sveltekit/vite';
 import { csp } from './csp.config.ts';
+
+/* Source maps go up only from the Deploy build (Docker build secret); a Sentry outage never fails it. */
+const sentry = () =>
+	sentrySvelteKit({
+		org: 'llc-manageengine',
+		project: 'parkour-am',
+		authToken: process.env.SENTRY_AUTH_TOKEN,
+		autoUploadSourceMaps: Boolean(process.env.SENTRY_AUTH_TOKEN),
+		release: { name: process.env.SENTRY_RELEASE || undefined },
+		telemetry: false,
+		errorHandler: (error) => console.warn('sentry: source maps not uploaded', error)
+	});
 
 /* Tests that change `points_rules` (`setRules`) hold its table lock until their rollback: a new
  * such file goes here, or it queues on the others until the timeout. */
@@ -30,6 +43,7 @@ const ORDER_TESTS = [
 export default defineConfig({
 	plugins: [
 		tailwindcss(),
+		process.env.VITEST ? [] : sentry(),
 		sveltekit({
 			compilerOptions: {
 				// Force runes mode for the project, except for libraries. Can be removed in svelte 6.
@@ -37,7 +51,8 @@ export default defineConfig({
 					filename.split(/[/\\]/).includes('node_modules') ? undefined : true
 			},
 			adapter: adapter(),
-			csp
+			csp,
+			tracing: { server: true }
 		})
 	],
 	test: {

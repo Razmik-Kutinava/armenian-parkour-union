@@ -22,6 +22,13 @@ jobs:
 
       - uses: superfly/flyctl-actions/setup-flyctl@master
 
-      - run: flyctl deploy --remote-only
+      # SENTRY_AUTH_TOKEN is optional: without it the build skips the source map upload.
+      - run: |
+          args=(--remote-only --build-arg "SENTRY_RELEASE=$GITHUB_SHA")
+          if [ -n "$SENTRY_AUTH_TOKEN" ]; then
+            args+=(--build-secret "SENTRY_AUTH_TOKEN=$SENTRY_AUTH_TOKEN")
+          fi
+          flyctl deploy "${args[@]}"
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}

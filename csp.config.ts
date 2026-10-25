@@ -15,8 +15,8 @@ export const csp: Config['csp'] = {
 		'img-src': ['self', 'data:', 'blob:', MEDIA, 'https://i.ytimg.com'],
 		'font-src': ['self'],
 		'media-src': ['self', MEDIA],
-		/* Uploads go straight to R2 by a signed link (storage/r2.ts). */
-		'connect-src': ['self', 'https://*.r2.cloudflarestorage.com'],
+		/* Uploads go straight to R2 by a signed link (storage/r2.ts); browser errors go to Sentry (EU). */
+		'connect-src': ['self', 'https://*.r2.cloudflarestorage.com', 'https://*.ingest.de.sentry.io'],
 		'frame-src': ['https://www.youtube-nocookie.com'],
 		'object-src': ['none'],
 		'base-uri': ['self'],

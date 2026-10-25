@@ -6,7 +6,10 @@ WORKDIR /app
 COPY package.json package-lock.json .npmrc ./
 RUN npm ci
 COPY . .
-RUN npm run build
+# Deploy passes the release (commit) and, if set, the Sentry token as a build secret (not in the image).
+ARG SENTRY_RELEASE
+RUN --mount=type=secret,id=SENTRY_AUTH_TOKEN \
+    SENTRY_AUTH_TOKEN="$(cat /run/secrets/SENTRY_AUTH_TOKEN 2>/dev/null)" npm run build
 
 FROM node:${NODE_VERSION}-slim
 WORKDIR /app

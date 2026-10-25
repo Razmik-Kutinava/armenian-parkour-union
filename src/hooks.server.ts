@@ -1,5 +1,6 @@
+import * as Sentry from '@sentry/sveltekit';
 import { redirect } from '@sveltejs/kit';
-import type { Handle, ServerInit } from '@sveltejs/kit/hooks';
+import { sequence, type Handle, type ServerInit } from '@sveltejs/kit/hooks';
 import { building } from '$app/env';
 import { getSessionCookie } from 'better-auth/cookies';
 import { defaultLocaleRedirect, localeFromPath } from '#lib/i18n/locales.ts';
@@ -18,7 +19,9 @@ export const init: ServerInit = () => {
 
 const isAdminPath = (pathname: string) => pathname === '/admin' || pathname.startsWith('/admin/');
 
-export const handle: Handle = async ({ event, resolve }) => {
+export const handleError = Sentry.handleErrorWithSentry();
+
+const app: Handle = async ({ event, resolve }) => {
 	/* Another host for SvelteKit: `redirect()` would refuse it with a 500. */
 	const host = canonicalHostRedirect(event.url);
 	if (host) return new Response(null, { status: 301, headers: { location: host } });
@@ -59,3 +62,5 @@ export const handle: Handle = async ({ event, resolve }) => {
 		publicCache.invalidate(groupsToInvalidate(method, event.url.pathname, isStaff(user)));
 	}
 };
+
+export const handle = sequence(Sentry.sentryHandle(), app);
