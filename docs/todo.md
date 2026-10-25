@@ -5,47 +5,49 @@
 
 ## Задача
 
-8.3 Мультиязычность: перевод интерфейса на армянский и русский, включение языков, `hreflang`.
+8.4 Скорость: проверка на мобильных (Lighthouse), оптимизация изображений, кеш, подгрузка тяжёлых библиотек по требованию.
 
-Уже есть (этапы 1–2): три языка, английский без префикса, `/hy` и `/ru`; переключатель; `hreflang` и `og:locale:alternate`; sitemap с `xhtml:link`; словари `hy` и `ru` покрывают все ключи (`translate.test`); контент из базы без перевода — английский (тесты событий, новостей, страниц, главной, пожертвований, магазина, тренеров, кабинета).
+Замер до (Lighthouse 12, мобильный, прод Fly v22, 2026-10-25): главная **83** (LCP 3,7 с — заглушка hero 1600 px, 130 КБ; 1 МБ всего), `/events` 98, `/news` 99, `/shop` 99 (списки пустые). Потери главной: фон фестиваля JPG 297 КБ грузится сразу, хотя ниже первого экрана; постер PNG 190 КБ; превью YouTube `maxresdefault` 130 КБ; у шрифтов, логотипа и картинок из `static/` нет срока кеша (`adapter-node` отдаёт `static/` без `Cache-Control`, только `/_app/immutable/` — на год). JS: словари всех трёх языков (с текстами админки и кабинета) — один чанк 340 КБ / 80 КБ gzip на каждой странице. TipTap (400 КБ) уже только на страницах редактора админки.
 
 Решения (агент):
-1. Включение языков (`06` § 1: «армянский и русский включаются по мере готовности переводов»; § 7.4 «`hreflang` для включённых языков») — ключ `site_settings.locales` = `{ enabled: [...] }`. Нет ключа или он сломан — включены все три (на проде ничего не меняется). Английский выключить нельзя. Порядок — как в `locales`.
-2. Вкладка «Языки» в `/admin/settings` (только admin, `settings.write`); сохранение — через `writeSettings` (`settings.update` в журнал). Кеш: `/admin/settings/*` сбрасывает группу `settings`.
-3. Выключенный язык: его адреса — `302` на ту же страницу по-английски (временно: язык могут включить), из `(site)/+layout.server.ts` (`hooks.server.ts` не трогаем). Пропадает из переключателя, `hreflang`, `og:locale:alternate`, sitemap. `/admin` — по языку профиля, как раньше.
-4. Не делается: выбор языка в профиле и язык писем — по-прежнему все три (письмо со ссылкой `/hy/...` при выключенном армянском ведёт на английскую страницу). Вычитка переводов — носителем языка (владелец).
+1. Свои картинки и шрифты — через Vite (`src/lib/assets/`): имя с хешем → `/_app/immutable/`, кеш на год без своего сервера. В `static/` остаётся только то, чему нужен постоянный адрес: `favicon.svg`, `og-default.png`, `logo-square.svg` (PDF), фон фестиваля JPG (`og:image` главной).
+2. Заглушки — WebP 800 и 1600 px, `srcset` + `sizes`; фон фестиваля — WebP 800 / 1280, лениво; постеры — WebP; логотип в шапке — `svgo` (точность 1 знак, 92 → 47 КБ). Конвертация — разово (Pillow, `npx svgo`), библиотек в проект не добавляется.
+3. Шрифты (`woff2`, `ttf` для PDF, `LICENSE.txt`) → `src/lib/assets/fonts/apu-sans/`; `preload` — 400 и 700 (`08` § 4.2: текст и заголовок).
+4. Превью видео фестиваля — `srcset` `hqdefault` / `sddefault` / `maxresdefault`.
+5. Словари `hy` / `ru` в браузере грузятся по требованию (`loadLocale` в `+layout.ts` корня и админки), английский — всегда (запасной); на сервере — все сразу (письма и cron без запроса страницы).
+6. Не делается: несколько размеров и WebP для **загружаемых** картинок (R2) — нужен выбор владельца (вопрос), кеш-заголовки `media.parkour.am` — правило кеша Cloudflare (владелец); HTML по-прежнему без `Cache-Control` (`decisions.md` 2026-10-18).
 
 ## Файлы (ожидаемо)
 
-- `src/lib/server/services/site-locales.ts` (+ `.test.ts`) — `parseSiteLocales`, `siteLocales`, `saveSiteLocales`
-- `src/lib/i18n/locales.ts` (+ `locales.test.ts`) — `disabledLocaleRedirect`
-- `src/lib/seo/alternates.ts`, `meta.ts`, `sitemap.ts` (+ тесты) — список включённых языков
-- `src/lib/server/services/seo/base.ts` (+ тест) — `locales` в `SeoBase`
-- `src/routes/[[lang=lang]]/(site)/+layout.server.ts`, `src/routes/sitemap.xml/+server.ts`, `LanguageSwitcher.svelte`
-- `src/routes/admin/settings/languages/*`, `SettingsTabs.svelte`, `i18n/messages/*-system.ts`
+- `src/lib/assets/{placeholders,fest,brand,fonts/apu-sans}/*` (из `static/`)
+- `src/lib/components/site/placeholder-photo.ts` (+ `.test.ts`), `EventCard`, `NewsCard`, `hero/HeroBlock`, `FestAnnouncement`, `ParkourVideo`, `SiteHeader`
+- `src/app.css`, `src/routes/+layout.svelte`, `services/certificates/pdf-draw.ts` (пути шрифтов)
+- `src/lib/i18n/translate.ts`, `dictionaries.ts` (+ тест), `src/routes/+layout.ts`, `src/routes/admin/+layout.ts`
+- `tests/e2e/speed.spec.ts`
 
 ## Не ломать
 
-- Без ключа `locales` всё как сейчас: три языка в переключателе, `hreflang`, sitemap.
-- `/en/...` → `/...` (308) и английские адреса без префикса.
-- Сохранить настройку может только admin; изменение — в `audit_log`.
+- Тексты на `hy` / `ru` на сервере и после гидратации (переключатель языка, админка на языке профиля); письма на языке участника.
+- PDF сертификата со шрифтом и логотипом; `og:image` главной.
+- Карточки и hero без своей обложки — заглушка; со своей — она.
 
 ## Проверка
 
-- `npx vitest --run src/lib/server/services/site-locales src/lib/i18n src/lib/seo src/lib/server/services/seo`
+- `npx vitest --run src/lib/i18n src/lib/components/site src/lib/server/services/certificates/pdf`
+- `npx playwright test tests/e2e/speed.spec.ts` + Lighthouse главной локально до / после
 
 ## Риск
 
-normal (настройка сайта и SEO; без прав, денег и схемы)
+normal (вёрстка и загрузка ресурсов, i18n на всех страницах; без прав, денег и схемы)
 
 ## Читать
 
-- `06` § 1 п. 2, § 7.4 (прочитано: языки включаются по готовности; `hreflang` для включённых)
-- `03` § 12 п. 3 (прочитано: нет перевода — английский)
+- `06` § 7 п. 5, § 8 (прочитано: WebP / AVIF, несколько размеров, размеры заранее, лениво кроме первого экрана; тяжёлое — по требованию)
+- `08` § 4.2, § 13 (прочитано: свой домен, `preload` текста и заголовка; hero — современный формат, без «прыжков»)
 
 ## Фазы
 
 - [x] SPEC
-- [x] RED `a9f1dd8`
-- [x] GREEN — Vitest задачи 85/85, `access-coverage` / `audit-coverage` 4/4, e2e `admin-access` + `admin-audit` 7/7, check 0, lint чистый
+- [ ] RED
+- [ ] GREEN
 - [ ] REVIEW
