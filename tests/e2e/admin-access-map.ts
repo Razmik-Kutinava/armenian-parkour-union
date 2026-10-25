@@ -152,5 +152,6 @@ export const ADMIN_WRITES = {
 	'/admin/products/[id]?/duplicate': 'shop.items_write',
 	'/admin/orders/[id]?/status': 'shop.orders_manage',
 	'/admin/orders/[id]?/tracking': 'shop.orders_manage',
+	'/admin/orders/[id]?/cancel': 'shop.orders_cancel',
 	'POST /admin/locale': 'staff'
 } as const satisfies Record<AdminAction | NotAuditedAction, Access>;

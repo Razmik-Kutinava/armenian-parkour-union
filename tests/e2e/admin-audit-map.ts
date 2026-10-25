@@ -79,7 +79,8 @@ export const ADMIN_AUDIT = {
 	'/admin/products/[id]?/status': ['shop_item.update'],
 	'/admin/products/[id]?/duplicate': ['shop_item.create'],
 	'/admin/orders/[id]?/status': ['shop_order.status'],
-	'/admin/orders/[id]?/tracking': ['shop_order.tracking']
+	'/admin/orders/[id]?/tracking': ['shop_order.tracking'],
+	'/admin/orders/[id]?/cancel': ['shop_order.cancel']
 } as const;
 
 export type AdminAction = keyof typeof ADMIN_AUDIT;
