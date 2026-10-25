@@ -36,6 +36,7 @@ test('an editor creates a product with an option, publishes and duplicates it', 
 	test.setTimeout(90_000);
 	const editor = await registerAs(page, 'editor');
 	const slug = `e2e-shop-${crypto.randomUUID().slice(0, 8)}`;
+	const title = `E2e hoodie ${slug}`;
 
 	await page.goto('/admin');
 	await page
@@ -47,7 +48,7 @@ test('an editor creates a product with an option, publishes and duplicates it', 
 	await expect(page).toHaveURL('/admin/products/new');
 	await hydrated(page);
 	await page.getByLabel('Page address').fill(slug);
-	await page.getByLabel('Title (English)').fill('E2e hoodie');
+	await page.getByLabel('Title (English)').fill(title);
 	await page.getByLabel('Price in points').fill('0');
 	await page.getByLabel('Stock').fill('3');
 	await page.getByLabel('Option 1', { exact: true }).fill('Size');
@@ -79,8 +80,8 @@ test('an editor creates a product with an option, publishes and duplicates it', 
 	const [copy] = await sql`select status from shop_items where slug = ${`${slug}-copy`}`;
 	expect(copy.status).toBe('draft');
 
-	await page.goto(`/admin/products?q=${encodeURIComponent('E2e hoodie')}&status=published`);
-	await expect(page.getByRole('table').getByRole('link', { name: 'E2e hoodie' })).toHaveCount(1);
+	await page.goto(`/admin/products?q=${encodeURIComponent(title)}&status=published`);
+	await expect(page.getByRole('table').getByRole('link', { name: title })).toHaveCount(1);
 
 	const log = await sql`select action from audit_log where actor_id = ${editor}
 		order by created_at, action`;
