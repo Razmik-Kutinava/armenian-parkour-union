@@ -65,7 +65,10 @@ test('a moderator approves, rejects with a reason, hides, and approves a batch',
 	const moderator = await registerAs(page, 'moderator');
 
 	await page.goto('/admin');
-	await page.getByRole('navigation').getByRole('link', { name: 'Videos' }).click();
+	await page
+		.getByRole('navigation', { name: 'Admin sections' })
+		.getByRole('link', { name: 'Videos' })
+		.click();
 	await expect(page).toHaveURL('/admin/videos');
 	await page.goto(`/admin/videos?q=${tag}`);
 	await hydrated(page);
@@ -149,7 +152,7 @@ test('admin: the video settings tab checks the values; a moderator has no access
 	await expect(limit).not.toHaveValue('');
 	await limit.fill('0');
 	await page.getByRole('button', { name: 'Save' }).click();
-	await expect(page.getByText('From 1 to 100.')).toBeVisible();
+	await expect(page.getByText('From 1 to 100.', { exact: true })).toBeVisible();
 	expect(
 		await sql`select 1 from audit_log where actor_id = ${admin} and action = 'settings.update'`
 	).toHaveLength(0);

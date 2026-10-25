@@ -103,7 +103,7 @@ describe.skipIf(!testDbUrl)('videos: admin list', () => {
 			expect(row).toMatchObject({
 				id: video.id,
 				userId: user.id,
-				memberName: user.name,
+				memberName: `Test ${user.tag}`,
 				url: video.url,
 				platform: 'youtube',
 				title: video.title,

@@ -30,6 +30,7 @@ import { hyStaffAdmin } from './hy-staff-admin';
 import { hySystem } from './hy-system';
 import { hyTeam } from './hy-team';
 import { hyUsers } from './hy-users';
+import { hyVideosAdmin } from './hy-videos-admin';
 
 export const hy: Partial<Messages> = {
 	...hyUsers,
@@ -55,6 +56,7 @@ export const hy: Partial<Messages> = {
 	...hyCabinetAvatar,
 	...hyCabinetEvents,
 	...hyCabinetVideos,
+	...hyVideosAdmin,
 	...hyConsents,
 	...hyRegistrations,
 	...hyRegistrationsAdmin,

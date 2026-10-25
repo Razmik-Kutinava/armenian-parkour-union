@@ -37,6 +37,7 @@
 - `src/routes/admin/videos/+page.server.ts`, `+page.svelte` (+ компонент действий) — очередь; `src/routes/admin/settings/videos/+page.server.ts`, `+page.svelte`, `SettingsTabs.svelte`.
 - `src/lib/i18n/messages/{en,hy,ru}-videos-admin.ts` (+ подключение); `cache/admin-groups.ts`; `vite.config.ts` (`RULES_TESTS`).
 - e2e: `tests/e2e/admin-videos.spec.ts`; карты `admin-audit-map.ts`, `admin-access-map.ts`, исполнитель `admin-audit-videos.ts` + `admin-audit-actions.ts`.
+- Сверх плана: `services/videos/moderate-now.ts` (почта для маршрута), `routes/admin/videos/VideoActions.svelte`, `VideoStatus.svelte`.
 
 ## Не ломать
 
@@ -61,7 +62,14 @@
 
 ## Фазы
 
-- [x] SPEC
-- [ ] RED
-- [ ] GREEN
+- [x] SPEC (`96ce607`)
+- [x] RED (`0bdc51f`)
+- [x] GREEN — Vitest задачи: `review` 11/11 (`server-points`), `services/videos`, `validation/videos`, `cache`, `i18n`, `routes/admin` зелёные; e2e `admin-videos` 2/2, `cabinet-videos` 2/2; `check`, `lint`
 - [ ] REVIEW (этапа)
+
+## Для REVIEW
+
+- `audit-coverage.test.ts` один раз упал по таймауту 20 с в общем прогоне (отдельно — 15,6 с, зелёный): импортирует все `+page.server.ts`, с каждым разделом ближе к пределу — поднять таймаут этого теста отдельным шагом.
+- Пакет — по транзакции на видео: при сбое посередине часть уже решена (так задумано, итог `{ done, skipped }`); письма — по одному после каждого коммита.
+- `cabinet-videos.spec.ts`: подсказка лимита — регулярка (`admin-audit.spec` меняет лимит на миг и возвращает).
+- Модерация не проверяет согласие `privacy` у несовершеннолетних — это условие публичного показа (`03` § 8 п. 6), не одобрения.

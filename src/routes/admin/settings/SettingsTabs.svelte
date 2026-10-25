@@ -1,11 +1,12 @@
 <script lang="ts">
 	import { t } from '#lib/i18n/index.svelte.ts';
 
-	/* Two pages of "Site settings" (docs/05 section 21); the admin menu keeps one entry. */
-	let { current }: { current: 'site' | 'payments' } = $props();
+	/* Pages of "Site settings" (docs/05 section 21); the admin menu keeps one entry. */
+	let { current }: { current: 'site' | 'payments' | 'videos' } = $props();
 	const tabs = [
 		{ id: 'site', href: '/admin/settings', label: 'settings.tab.site' },
-		{ id: 'payments', href: '/admin/settings/payments', label: 'settings.tab.payments' }
+		{ id: 'payments', href: '/admin/settings/payments', label: 'settings.tab.payments' },
+		{ id: 'videos', href: '/admin/settings/videos', label: 'settings.tab.videos' }
 	] as const;
 </script>
 

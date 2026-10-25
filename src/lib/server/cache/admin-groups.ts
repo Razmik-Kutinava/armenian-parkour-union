@@ -15,6 +15,8 @@ const BY_SECTION: Record<string, CacheGroup[]> = {
 	'donation-purposes': ['settings'],
 	payments: ['settings'],
 	'point-rules': [],
+	/* no video is shown on the site yet (7.2) */
+	videos: [],
 	media: ALL_GROUPS,
 	audit: [],
 	roles: [],

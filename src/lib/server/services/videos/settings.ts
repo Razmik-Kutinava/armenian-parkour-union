@@ -1,6 +1,8 @@
 import { eq } from 'drizzle-orm';
 import type { LimitDb } from '../../auth/rate-limit';
 import { siteSettings } from '../../db/schema/service';
+import { writeSettings } from '../site-settings';
+import type { Actor } from '../users/target';
 import type { VideoPlatform } from './link';
 
 /* docs/03 section 6.2 p. 7, 8 p. 1, 16: `site_settings.videos`; decisions.md 2026-10-24 (7.1). */
@@ -40,4 +42,17 @@ export async function videoSettings(db: LimitDb): Promise<VideoSettings> {
 		.from(siteSettings)
 		.where(eq(siteSettings.key, 'videos'));
 	return parseVideoSettings(row?.value);
+}
+
+/** Admin only (docs/04: settings.write); `writeSettings` logs `settings.update` with before / after. */
+export async function saveVideoSettings(
+	db: LimitDb,
+	actor: Actor,
+	values: VideoSettings,
+	ip: string | null
+): Promise<'ok' | 'not_admin'> {
+	if (actor.role !== 'admin') return 'not_admin';
+	const stored = { monthly_limit: values.monthlyLimit, platforms: [...new Set(values.platforms)] };
+	await writeSettings(db, actor, { videos: stored }, ip);
+	return 'ok';
 }
