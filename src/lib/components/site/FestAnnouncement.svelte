@@ -1,15 +1,16 @@
 <script lang="ts">
+	import backLarge from '#lib/assets/fest/yerevan-parkour-fest-2027-1280.webp';
+	import backSmall from '#lib/assets/fest/yerevan-parkour-fest-2027-800.webp';
+	import posterEn from '#lib/assets/fest/yerevan-parkour-fest-2027-poster-en.webp';
+	import posterHy from '#lib/assets/fest/yerevan-parkour-fest-2027-poster-hy.webp';
+	import posterRu from '#lib/assets/fest/yerevan-parkour-fest-2027-poster.webp';
 	import { currentLocale, t, type Locale, type MessageKey } from '#lib/i18n/index.svelte.ts';
 	import LanguageSwitcher from './LanguageSwitcher.svelte';
 	import ParkourVideo from './ParkourVideo.svelte';
 
 	const phone = '+374 77 253039';
 	const email = 'info@parkour.am';
-	const posters: Record<Locale, string> = {
-		en: '/fest/yerevan-parkour-fest-2027-poster-en.png',
-		hy: '/fest/yerevan-parkour-fest-2027-poster-hy.png',
-		ru: '/fest/yerevan-parkour-fest-2027-poster.png'
-	};
+	const posters: Record<Locale, string> = { en: posterEn, hy: posterHy, ru: posterRu };
 	const poster = $derived(posters[currentLocale()]);
 	const lists: { title: MessageKey; items: MessageKey[] }[] = [
 		{ title: 'fest.goalsTitle', items: ['fest.goal1', 'fest.goal2', 'fest.goal3', 'fest.goal4'] },
@@ -19,8 +20,13 @@
 
 <section class="relative isolate overflow-hidden bg-navy-950 text-surface">
 	<img
-		src="/fest/yerevan-parkour-fest-2027.jpg"
+		src={backLarge}
+		srcset="{backSmall} 800w, {backLarge} 1280w"
+		sizes="100vw"
 		alt={t('fest.imageAlt')}
+		width="1280"
+		height="720"
+		loading="lazy"
 		class="absolute inset-0 -z-10 h-full w-full object-cover object-right"
 	/>
 	<div

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Menu from '@lucide/svelte/icons/menu';
+	import logo from '#lib/assets/brand/logo-square-light.svg';
 	import { currentLocale, localizePath, t, type MessageKey } from '#lib/i18n/index.svelte.ts';
 	import AccountLinks, { type Viewer } from './AccountLinks.svelte';
 	import Disclosure from './Disclosure.svelte';
@@ -52,7 +53,7 @@
 			href={href('/')}
 			class="mr-auto flex items-center gap-3 rounded-sm py-1 text-lg font-bold whitespace-nowrap focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-500 lg:mr-4"
 		>
-			<img src="/brand/logo-square-light.svg" alt="" width="44" height="44" class="size-11" />
+			<img src={logo} alt="" width="44" height="44" class="size-11" />
 			{siteName ?? t('site.name')}
 		</a>
 

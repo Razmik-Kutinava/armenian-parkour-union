@@ -3,7 +3,7 @@
 	import { localizePath } from '#lib/i18n/locales.ts';
 	import type { HeroSlideView } from '#lib/server/services/hero/view.ts';
 	import { eventDates } from '../event-date';
-	import { placeholderPhoto } from '../placeholder-photo';
+	import { coverOrPlaceholder } from '../placeholder-photo';
 	import HeroVideo from './HeroVideo.svelte';
 
 	/*
@@ -27,11 +27,14 @@
 	const href = (url: string) => (external(url) ? url : localizePath(url, locale));
 	const youtube = $derived(slide.video?.kind === 'youtube' ? slide.video.id : null);
 	const instagram = $derived(slide.video?.kind === 'instagram' ? slide.video.url : null);
+	const photo = $derived(coverOrPlaceholder(slide.mediaUrl, slide.id ?? title));
 </script>
 
 <div class="relative isolate flex h-full items-center overflow-hidden bg-navy-950 text-surface">
 	<img
-		src={slide.mediaUrl ?? placeholderPhoto(slide.id ?? title)}
+		src={photo.src}
+		srcset={photo.srcset}
+		sizes="100vw"
 		alt=""
 		width="1600"
 		height="900"

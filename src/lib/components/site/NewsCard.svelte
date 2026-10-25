@@ -3,7 +3,7 @@
 	import { localizePath } from '#lib/i18n/locales.ts';
 	import type { CardView } from '#lib/server/services/posts/view.ts';
 	import { newsDate } from './news-date';
-	import { placeholderPhoto } from './placeholder-photo';
+	import { CARD_SIZES, coverOrPlaceholder } from './placeholder-photo';
 
 	/* docs/06 section 4.4: cover, title, short text, date, tags. */
 	let {
@@ -12,12 +12,15 @@
 		level = 2
 	}: { post: CardView; eager?: boolean; level?: 2 | 3 } = $props();
 	const href = (path: string) => localizePath(path, currentLocale());
+	const photo = $derived(coverOrPlaceholder(post.coverUrl, post.slug));
 </script>
 
 <article class="flex flex-col overflow-hidden rounded-lg border border-line bg-surface">
 	<div class="aspect-[1.91/1] bg-navy-100">
 		<img
-			src={post.coverUrl ?? placeholderPhoto(post.slug)}
+			src={photo.src}
+			srcset={photo.srcset}
+			sizes={CARD_SIZES}
 			alt={post.coverUrl ? post.coverAlt : ''}
 			loading={eager ? 'eager' : 'lazy'}
 			width="1200"

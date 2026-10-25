@@ -1,5 +1,7 @@
 <script lang="ts">
 	import '../app.css';
+	import bold from '#lib/assets/fonts/apu-sans/apu-sans-700.woff2';
+	import regular from '#lib/assets/fonts/apu-sans/apu-sans-400.woff2';
 	import { currentLocale } from '#lib/i18n/index.svelte.ts';
 	import type { LayoutProps } from './$types';
 
@@ -17,13 +19,10 @@
 
 <svelte:head>
 	<link rel="icon" href="/brand/favicon.svg" type="image/svg+xml" />
-	<link
-		rel="preload"
-		href="/fonts/apu-sans/apu-sans-400.woff2"
-		as="font"
-		type="font/woff2"
-		crossorigin="anonymous"
-	/>
+	<!-- docs/08 § 4.2: body text and headings; the same hashed files as in app.css. -->
+	{#each [regular, bold] as font (font)}
+		<link rel="preload" href={font} as="font" type="font/woff2" crossorigin="anonymous" />
+	{/each}
 </svelte:head>
 
 {@render children()}

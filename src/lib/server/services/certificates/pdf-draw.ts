@@ -2,8 +2,8 @@ import fontkit from '@pdf-lib/fontkit';
 import { rgb, type Color, type PDFDocument, type PDFFont, type PDFPage } from 'pdf-lib';
 import QRCode from 'qrcode';
 import logoSvg from '../../../../../static/brand/logo-square.svg?raw';
-import regularFont from '../../../../../static/fonts/apu-sans/apu-sans-400.ttf?inline';
-import boldFont from '../../../../../static/fonts/apu-sans/apu-sans-700.ttf?inline';
+import regularFont from '#lib/assets/fonts/apu-sans/apu-sans-400.ttf?inline';
+import boldFont from '#lib/assets/fonts/apu-sans/apu-sans-700.ttf?inline';
 
 /* docs/08 sections 2, 4, 10: the site's own font (Armenian, Cyrillic, Latin) embedded, the logo as
  * vectors, the QR as squares — nothing raster except the seal and the signature. */

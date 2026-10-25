@@ -1,18 +1,19 @@
 @import 'tailwindcss';
 
-/* APU Sans = Arian AMU subset (static/fonts/apu-sans/LICENSE.txt). Only 400 and 700 exist. */
+/* APU Sans = Arian AMU subset (lib/assets/fonts/apu-sans/LICENSE.txt). Only 400 and 700 exist.
+ * Relative URLs: Vite hashes the files into /_app/immutable/ (cached for a year). */
 @font-face {
 	font-family: 'APU Sans';
 	font-weight: 400;
 	font-display: swap;
-	src: url('/fonts/apu-sans/apu-sans-400.woff2') format('woff2');
+	src: url('./lib/assets/fonts/apu-sans/apu-sans-400.woff2') format('woff2');
 }
 
 @font-face {
 	font-family: 'APU Sans';
 	font-weight: 700;
 	font-display: swap;
-	src: url('/fonts/apu-sans/apu-sans-700.woff2') format('woff2');
+	src: url('./lib/assets/fonts/apu-sans/apu-sans-700.woff2') format('woff2');
 }
 
 /* Tokens: docs/08-DESIGN.md, sections 3–5 and 7. Components use tokens only. */

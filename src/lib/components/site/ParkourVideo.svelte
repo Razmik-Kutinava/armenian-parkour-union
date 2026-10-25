@@ -2,6 +2,7 @@
 	import { t } from '#lib/i18n/index.svelte.ts';
 
 	const videoId = 'kMpYHcuipuY';
+	const thumbs = `https://i.ytimg.com/vi_webp/${videoId}`;
 	let playing = $state(false);
 </script>
 
@@ -29,8 +30,12 @@
 					onclick={() => (playing = true)}
 				>
 					<img
-						src="https://i.ytimg.com/vi/{videoId}/maxresdefault.jpg"
+						src="{thumbs}/maxresdefault.webp"
+						srcset="{thumbs}/hqdefault.webp 480w, {thumbs}/sddefault.webp 640w, {thumbs}/maxresdefault.webp 1280w"
+						sizes="(min-width: 64rem) 61rem, 100vw"
 						alt=""
+						width="1280"
+						height="720"
 						loading="lazy"
 						class="h-full w-full object-cover transition duration-300 group-hover:scale-105"
 					/>
