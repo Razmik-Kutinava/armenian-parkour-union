@@ -87,6 +87,13 @@ export const hyShopAdmin: Partial<Messages> = {
 	'shop.order.mark.shipped': 'Նշել ուղարկված',
 	'shop.order.mark.delivered': 'Նշել առաքված',
 	'shop.order.closed': 'Պատվերը փակված է, կարգավիճակն այլևս չի փոխվում։',
+	'shop.order.cancelTitle': 'Պատվերի չեղարկում',
+	'shop.order.cancelHint':
+		'Միայն մինչև ուղարկելը՝ միավորները կվերադառնան մասնակցին, ապրանքը՝ մնացորդին, մասնակիցը նամակ կստանա։',
+	'shop.order.cancel': 'Չեղարկել պատվերը',
+	'shop.order.cancelText':
+		'{number} պատվերը կչեղարկվի՝ {points} միավորը կվերադառնա մասնակցին, մնացորդը կվերականգնվի։ Սա հետ շրջել հնարավոր չէ։',
+	'shop.order.cancelConfirm': 'Չեղարկել և վերադարձնել',
 	'shop.error.price': '1-ից 1 000 000 միավոր։',
 	'shop.error.stock': 'Ամբողջ թիվ 0-ից 1 000 000, կամ դատարկ՝ առանց սահմանափակման։',
 	'shop.error.sortOrder': 'Ամբողջ թիվ 0-ից 9999։',

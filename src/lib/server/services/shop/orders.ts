@@ -10,7 +10,8 @@ import type { OrderStatus } from './order-list';
 import { orderStatusLetter } from './order-mail';
 
 /* docs/05 section 15, docs/04 sections 3.2 and 7 item 6; decisions — docs/todo.md 7.4 (1–4).
- * A status only moves forward; `cancelled` is never set here — the cancel with a refund is 7.6. */
+ * A status only moves forward; `cancelled` is never set here — the cancel with a refund is
+ * order-cancel.ts. */
 
 export type OrderDeps = {
 	send: (mail: Mail) => Promise<void>;
@@ -22,7 +23,7 @@ type Outcome = 'ok' | 'bad_status' | 'not_found' | 'not_allowed';
 const FLOW: OrderStatus[] = ['new', 'confirmed', 'shipped', 'delivered'];
 const TARGETS: readonly string[] = FLOW.slice(1);
 
-async function lockOrder(tx: LimitDb, id: string) {
+export async function lockOrder(tx: LimitDb, id: string) {
 	const [row] = await tx
 		.select({
 			order: shopOrders,

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import ConfirmDialog from '#lib/components/admin/ConfirmDialog.svelte';
 	import FormSection from '#lib/components/admin/FormSection.svelte';
 	import { newsDate } from '#lib/components/site/news-date.ts';
 	import Button from '#lib/components/ui/Button.svelte';
@@ -11,9 +12,13 @@
 	import type { PageProps } from './$types';
 
 	/* docs/05 section 15: lines with options, delivery data, the member comment; a status forward
-	 * (each sends a letter) and the shipping note. */
+	 * (each sends a letter), the shipping note, the cancel with a refund (admin, before shipping). */
 	let { data, form }: PageProps = $props();
 	const order = $derived(data.order);
+	let cancelOpen = $state(false);
+	const cancellable = $derived(
+		data.canCancel && (order.status === 'new' || order.status === 'confirmed')
+	);
 	const flow = ['new', 'confirmed', 'shipped', 'delivered'] as const;
 	const forward = flow.slice(1) as Exclude<(typeof flow)[number], 'new'>[];
 	const next = $derived(forward.slice(flow.indexOf(order.status as (typeof flow)[number])));
@@ -123,4 +128,24 @@
 			</form>
 		</FormSection>
 	{/if}
+
+	{#if cancellable}
+		<FormSection title={t('shop.order.cancelTitle')}>
+			<p class="text-sm text-ink-500">{t('shop.order.cancelHint')}</p>
+			<div>
+				<Button variant="danger" size="sm" onclick={() => (cancelOpen = true)}
+					>{t('shop.order.cancel')}</Button
+				>
+			</div>
+		</FormSection>
+	{/if}
 </div>
+
+<ConfirmDialog
+	bind:open={cancelOpen}
+	title={t('shop.order.cancelTitle')}
+	text={t('shop.order.cancelText', { number: order.number, points: order.totalPoints })}
+	action="?/cancel"
+	confirmLabel={t('shop.order.cancelConfirm')}
+	danger
+/>

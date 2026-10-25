@@ -15,5 +15,24 @@ export const enShop = {
 	'shop.button.short': 'Not enough: {points} points',
 	'shop.button.emailUnverified': 'Confirm your email to order',
 	'shop.button.emailLink': 'Go to your account',
-	'shop.button.order': 'Order for {points} points'
+	'shop.button.order': 'Order for {points} points',
+	'shop.checkout.title': 'Checkout',
+	'shop.checkout.delivery': 'Delivery',
+	'shop.checkout.comment': 'Comment (optional)',
+	'shop.checkout.continue': 'Continue',
+	'shop.checkout.check': 'Check your order',
+	'shop.checkout.product': 'Product',
+	'shop.checkout.options': 'Options',
+	'shop.checkout.price': 'Price',
+	'shop.checkout.balanceAfter': 'Balance after the order: {points} points',
+	'shop.checkout.confirm': 'Confirm order for {points} points',
+	'shop.checkout.edit': 'Change details',
+	'shop.checkout.placed': 'Order {number} is placed',
+	'shop.checkout.placedText':
+		'{points} points were written off. We will email you when the order status changes.',
+	'shop.checkout.myOrders': 'My orders',
+	'shop.checkout.unavailable': 'This product cannot be ordered right now.',
+	'shop.checkout.error.options': 'Choose all options.',
+	'shop.checkout.error.changed':
+		'The product or your balance has changed. Check the order and try again.'
 } as const;

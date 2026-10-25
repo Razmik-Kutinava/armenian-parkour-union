@@ -87,6 +87,13 @@ export const ruShopAdmin: Partial<Messages> = {
 	'shop.order.mark.shipped': 'Отметить отправленным',
 	'shop.order.mark.delivered': 'Отметить доставленным',
 	'shop.order.closed': 'Заказ закрыт, статус больше не меняется.',
+	'shop.order.cancelTitle': 'Отмена заказа',
+	'shop.order.cancelHint':
+		'Только до отправки: баллы вернутся участнику, товар — на остаток, участник получит письмо.',
+	'shop.order.cancel': 'Отменить заказ',
+	'shop.order.cancelText':
+		'Заказ {number} будет отменён: {points} баллов вернутся участнику, остаток восстановится. Отменить это нельзя.',
+	'shop.order.cancelConfirm': 'Отменить и вернуть баллы',
 	'shop.error.price': 'От 1 до 1 000 000 баллов.',
 	'shop.error.stock': 'Целое число от 0 до 1 000 000 или пусто — без ограничения.',
 	'shop.error.sortOrder': 'Целое число от 0 до 9999.',

@@ -86,6 +86,13 @@ export const enShopAdmin = {
 	'shop.order.mark.shipped': 'Mark as shipped',
 	'shop.order.mark.delivered': 'Mark as delivered',
 	'shop.order.closed': 'The order is closed; its status no longer changes.',
+	'shop.order.cancelTitle': 'Cancel order',
+	'shop.order.cancelHint':
+		'Only before shipping: the points go back to the member, the item back to stock, and the member gets a letter.',
+	'shop.order.cancel': 'Cancel order',
+	'shop.order.cancelText':
+		'Order {number} will be cancelled: {points} points go back to the member and the stock is restored. This cannot be undone.',
+	'shop.order.cancelConfirm': 'Cancel and refund',
 	'shop.error.price': 'From 1 to 1 000 000 points.',
 	'shop.error.stock': 'A whole number from 0 to 1 000 000, or empty for no limit.',
 	'shop.error.sortOrder': 'A whole number from 0 to 9999.',

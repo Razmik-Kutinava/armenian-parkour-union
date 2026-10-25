@@ -87,7 +87,9 @@ test('a guest is sent to log in; a member fills delivery, confirms and the order
 	expect((await itemRow()).stock).toBe(2);
 
 	await main.getByRole('button', { name: 'Confirm order for 100 points' }).click();
-	await expect(main.getByRole('heading', { name: /^Order ORD-\d{4}-\d{4,} is placed$/ })).toBeVisible();
+	await expect(
+		main.getByRole('heading', { name: /^Order ORD-\d{4}-\d{4,} is placed$/ })
+	).toBeVisible();
 
 	const [order] = await sql`select o.status, o.total_points, o.city, o.comment, u.points_balance
 		from shop_orders o join users u on u.id = o.user_id where u.email = ${buyerEmail}`;

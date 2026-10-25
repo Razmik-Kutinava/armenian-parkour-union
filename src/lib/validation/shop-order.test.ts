@@ -25,9 +25,7 @@ describe('delivery form', () => {
 			address: 'Rizhkov 5, apt. 3',
 			comment: null
 		});
-		expect(deliverySchema.parse({ ...valid, comment: ' Call first ' }).comment).toBe(
-			'Call first'
-		);
+		expect(deliverySchema.parse({ ...valid, comment: ' Call first ' }).comment).toBe('Call first');
 	});
 
 	it('recipient, phone, city and address are required; the phone is checked', () => {

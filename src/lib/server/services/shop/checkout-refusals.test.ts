@@ -55,7 +55,7 @@ describe.skipIf(!testDbUrl)('shop: an order is refused', () => {
 		await inRollback(async (tx) => {
 			const item = await addItem(tx, { options: { Size: ['S', 'M'], Color: ['Red'] } });
 			const id = await buyer(tx);
-			const bad = [
+			const bad: Record<string, string>[] = [
 				{ Size: 'M' },
 				{ Size: 'XL', Color: 'Red' },
 				{ Size: 'M', Color: 'Red', Fit: 'Slim' },

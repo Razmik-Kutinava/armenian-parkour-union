@@ -22,6 +22,11 @@ const ISSUE_TESTS = [
 	'src/lib/server/services/staff/profile.test.ts'
 ];
 
+/* Same for an order: it holds the order number lock until the test's rollback. */
+const ORDER_TESTS = [
+	'src/lib/server/services/shop/{checkout,checkout-refusals,order-cancel}.test.ts'
+];
+
 export default defineConfig({
 	plugins: [
 		tailwindcss(),
@@ -51,8 +56,19 @@ export default defineConfig({
 						'src/**/*.svelte.{test,spec}.{js,ts}',
 						'src/lib/server/services/hero/**',
 						...RULES_TESTS,
-						...ISSUE_TESTS
+						...ISSUE_TESTS,
+						...ORDER_TESTS
 					]
+				}
+			},
+			{
+				extends: './vite.config.ts',
+				test: {
+					name: 'server-orders',
+					environment: 'node',
+					testTimeout: 20_000,
+					fileParallelism: false,
+					include: ORDER_TESTS
 				}
 			},
 			{

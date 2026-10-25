@@ -1,19 +1,20 @@
 import { error, fail, type RequestEvent } from '@sveltejs/kit';
+import { can } from '#lib/server/auth/permissions.ts';
 import { requirePermission } from '#lib/server/auth/guard.ts';
 import { db } from '#lib/server/db/index.ts';
 import { getOrder } from '#lib/server/services/shop/order-list.ts';
 import { setTrackingNote } from '#lib/server/services/shop/orders.ts';
-import { changeOrderStatusNow } from '#lib/server/services/shop/orders-now.ts';
+import { cancelOrderNow, changeOrderStatusNow } from '#lib/server/services/shop/orders-now.ts';
 import { trackingNoteSchema } from '#lib/validation/shop.ts';
 import type { Actions, PageServerLoad } from './$types';
 
-/* docs/05 section 15: the card, a status forward with a letter, the shipping note. The cancel with a
- * refund (admin) comes with the order service, 7.6. */
+/* docs/05 section 15: the card, a status forward with a letter, the shipping note; the cancel with
+ * a refund — admin only (docs/04 section 3.2). */
 export const load: PageServerLoad = async ({ locals, params }) => {
-	requirePermission(locals.user, 'shop.orders_manage');
+	const staff = requirePermission(locals.user, 'shop.orders_manage');
 	const order = await getOrder(db, params.id);
 	if (!order) error(404, 'Not found');
-	return { order };
+	return { order, canCancel: can(staff, 'shop.orders_cancel') };
 };
 
 function answer(result: 'ok' | 'bad_status' | 'not_found' | 'not_allowed') {
@@ -39,5 +40,10 @@ export const actions: Actions = {
 		if (!note.success) return fail(400, { badNote: true as const });
 		const ip = event.getClientAddress();
 		return answer(await setTrackingNote(db, staff, event.params.id, note.data, ip));
+	},
+	cancel: async (event) => {
+		const admin = requirePermission(event.locals.user, 'shop.orders_cancel');
+		const ip = event.getClientAddress();
+		return answer(await cancelOrderNow(db, admin, event.params.id, ip));
 	}
 };

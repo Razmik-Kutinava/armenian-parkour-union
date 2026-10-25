@@ -34,7 +34,7 @@ describe.skipIf(!testDbUrl)('shop: placing an order', () => {
 			const mail = mailbox();
 			const input = orderInput(item.id);
 			const result = await placeOrder(tx, id, input, mail, NOW);
-			expect(result).toMatchObject({ ok: true, id: input.orderId, repeated: false });
+			expect(result).toMatchObject({ ok: true, id: input.orderId, points: 100, repeated: false });
 			if (!result.ok) return;
 			expect(result.number).toMatch(/^ORD-2026-\d{4,}$/);
 
@@ -136,7 +136,7 @@ describe.skipIf(!testDbUrl)('shop: placing an order', () => {
 			const first = await placeOrder(tx, id, input, mail, NOW);
 			const again = await placeOrder(tx, id, input, mail, NOW);
 			expect(first).toMatchObject({ ok: true, repeated: false });
-			expect(again).toMatchObject({ ok: true, repeated: true, id: input.orderId });
+			expect(again).toMatchObject({ ok: true, repeated: true, id: input.orderId, points: 100 });
 			if (!first.ok || !again.ok) return;
 			expect(again.number).toBe(first.number);
 			expect(await ordersOf(tx, id)).toHaveLength(1);
