@@ -8,6 +8,7 @@ import { enCabinetVideos } from './en-cabinet-videos';
 import { enCertificates } from './en-certificates';
 import { enCertificatesAdmin } from './en-certificates-admin';
 import { enConsents } from './en-consents';
+import { enDashboard } from './en-dashboard';
 import { enDonate } from './en-donate';
 import { enEditor } from './en-editor';
 import { enEvents } from './en-events';
@@ -61,6 +62,7 @@ export const en = {
 	...enCabinetVideos,
 	...enCabinetOrders,
 	...enVideosAdmin,
+	...enDashboard,
 	...enShopAdmin,
 	...enShop,
 	...enConsents,

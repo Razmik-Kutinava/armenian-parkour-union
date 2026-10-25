@@ -49,6 +49,6 @@ normal (чтение по правам, без записи; данные — т
 ## Фазы
 
 - [x] SPEC
-- [ ] RED
-- [ ] GREEN
+- [x] RED `afafa90`
+- [x] GREEN — Vitest зоны 11/11, e2e `admin-dashboard` + `admin-shell` 10/10, check 0, lint чистый
 - [ ] REVIEW

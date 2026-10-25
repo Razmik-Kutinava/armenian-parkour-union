@@ -1,0 +1,27 @@
+import type { Messages } from '../translate';
+
+export const hyDashboard: Partial<Messages> = {
+	'dashboard.attention': 'Պահանջում է գործողություն',
+	'dashboard.attention.none': 'Սպասող ոչինչ չկա։',
+	'dashboard.attention.videos': 'Ստուգման տեսանյութեր',
+	'dashboard.attention.consents': 'Ստուգման համաձայնություններ',
+	'dashboard.attention.orders': 'Նոր պատվերներ',
+	'dashboard.attention.payments': 'Ստուգման վճարումներ',
+	'dashboard.attention.waitlist': 'Սպասման ցուցակներում',
+	'dashboard.upcoming': 'Մոտակա միջոցառումներ',
+	'dashboard.upcoming.none': 'Մոտակա միջոցառումներ չկան։',
+	'dashboard.upcoming.seats': 'Գրանցված՝ {seats} / {limit}',
+	'dashboard.upcoming.waitlist': 'Սպասման ցուցակ՝ {count}',
+	'dashboard.hero': 'Գլխավոր էջը հիմա',
+	'dashboard.hero.none': 'Բլոկներ չկան․ գլխավոր էջում մոտակա միջոցառումն է։',
+	'dashboard.hero.manage': 'Կառավարել գլխավոր էջը',
+	'dashboard.recent': 'Վերջին գրանցումները',
+	'dashboard.suspicious': 'Կասկածելի միավորներ',
+	'dashboard.suspicious.count': 'Վերջին 7 օրում՝ {count}',
+	'dashboard.suspicious.open': 'Բացել մատյանում',
+	'dashboard.stats': 'Կարճ վիճակագրություն',
+	'dashboard.stats.users': 'Օգտատերեր',
+	'dashboard.stats.members': 'Ակտիվ անդամություններ',
+	'dashboard.stats.month': 'Վճարված այս ամիս',
+	'dashboard.stats.none': 'Այս ամիս վճարումներ չկան։'
+};

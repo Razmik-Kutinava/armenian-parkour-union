@@ -9,6 +9,7 @@ import { hyCabinetVideos } from './hy-cabinet-videos';
 import { hyCertificates } from './hy-certificates';
 import { hyCertificatesAdmin } from './hy-certificates-admin';
 import { hyConsents } from './hy-consents';
+import { hyDashboard } from './hy-dashboard';
 import { hyDonate } from './hy-donate';
 import { hyEditor } from './hy-editor';
 import { hyEvents } from './hy-events';
@@ -61,6 +62,7 @@ export const hy: Partial<Messages> = {
 	...hyCabinetVideos,
 	...hyCabinetOrders,
 	...hyVideosAdmin,
+	...hyDashboard,
 	...hyShopAdmin,
 	...hyShop,
 	...hyConsents,

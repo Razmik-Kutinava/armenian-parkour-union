@@ -1,0 +1,26 @@
+/** Admin dashboard (docs/05 section 3). Part of `en`. */
+export const enDashboard = {
+	'dashboard.attention': 'Needs action',
+	'dashboard.attention.none': 'Nothing is waiting.',
+	'dashboard.attention.videos': 'Videos to review',
+	'dashboard.attention.consents': 'Consents to review',
+	'dashboard.attention.orders': 'New orders',
+	'dashboard.attention.payments': 'Payments to check',
+	'dashboard.attention.waitlist': 'On waitlists',
+	'dashboard.upcoming': 'Upcoming events',
+	'dashboard.upcoming.none': 'No upcoming events.',
+	'dashboard.upcoming.seats': 'Registered: {seats} / {limit}',
+	'dashboard.upcoming.waitlist': 'Waitlist: {count}',
+	'dashboard.hero': 'Home page now',
+	'dashboard.hero.none': 'No blocks are shown: the home page shows the nearest event.',
+	'dashboard.hero.manage': 'Manage the home page',
+	'dashboard.recent': 'Latest sign-ups',
+	'dashboard.suspicious': 'Suspicious points',
+	'dashboard.suspicious.count': 'In the last 7 days: {count}',
+	'dashboard.suspicious.open': 'Open in the ledger',
+	'dashboard.stats': 'Short statistics',
+	'dashboard.stats.users': 'Users',
+	'dashboard.stats.members': 'Active memberships',
+	'dashboard.stats.month': 'Paid this month',
+	'dashboard.stats.none': 'No payments this month.'
+};

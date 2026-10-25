@@ -1,0 +1,27 @@
+import type { Messages } from '../translate';
+
+export const ruDashboard: Partial<Messages> = {
+	'dashboard.attention': 'Требует действия',
+	'dashboard.attention.none': 'Ничего не ждёт.',
+	'dashboard.attention.videos': 'Видео на проверке',
+	'dashboard.attention.consents': 'Согласия на проверке',
+	'dashboard.attention.orders': 'Новые заказы',
+	'dashboard.attention.payments': 'Платежи на проверку',
+	'dashboard.attention.waitlist': 'В очередях ожидания',
+	'dashboard.upcoming': 'Ближайшие события',
+	'dashboard.upcoming.none': 'Ближайших событий нет.',
+	'dashboard.upcoming.seats': 'Зарегистрировано: {seats} / {limit}',
+	'dashboard.upcoming.waitlist': 'Очередь: {count}',
+	'dashboard.hero': 'Главная сейчас',
+	'dashboard.hero.none': 'Блоков нет: на главной ближайшее событие.',
+	'dashboard.hero.manage': 'Управлять главной',
+	'dashboard.recent': 'Последние регистрации',
+	'dashboard.suspicious': 'Подозрительные баллы',
+	'dashboard.suspicious.count': 'За 7 дней: {count}',
+	'dashboard.suspicious.open': 'Открыть в журнале',
+	'dashboard.stats': 'Короткая статистика',
+	'dashboard.stats.users': 'Пользователей',
+	'dashboard.stats.members': 'Активных членств',
+	'dashboard.stats.month': 'Оплачено в этом месяце',
+	'dashboard.stats.none': 'В этом месяце платежей нет.'
+};

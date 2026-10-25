@@ -9,6 +9,7 @@ import { ruCabinetVideos } from './ru-cabinet-videos';
 import { ruCertificates } from './ru-certificates';
 import { ruCertificatesAdmin } from './ru-certificates-admin';
 import { ruConsents } from './ru-consents';
+import { ruDashboard } from './ru-dashboard';
 import { ruDonate } from './ru-donate';
 import { ruEditor } from './ru-editor';
 import { ruEvents } from './ru-events';
@@ -61,6 +62,7 @@ export const ru: Partial<Messages> = {
 	...ruCabinetVideos,
 	...ruCabinetOrders,
 	...ruVideosAdmin,
+	...ruDashboard,
 	...ruShopAdmin,
 	...ruShop,
 	...ruConsents,
