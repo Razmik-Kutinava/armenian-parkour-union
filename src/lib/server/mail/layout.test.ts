@@ -35,7 +35,10 @@ describe('letterHtml (task 8.2, one branded template)', () => {
 	});
 
 	it('addresses become links; a trailing dot or bracket is not part of the address', () => {
-		const html = letterHtml(mail('Open https://x.am/verify?token=a1&b=2. (see https://x.am/p)'), SITE);
+		const html = letterHtml(
+			mail('Open https://x.am/verify?token=a1&b=2. (see https://x.am/p)'),
+			SITE
+		);
 		expect(html).toContain('<a href="https://x.am/verify?token=a1&amp;b=2"');
 		expect(html).toContain('>https://x.am/verify?token=a1&amp;b=2</a>.');
 		expect(html).toContain('<a href="https://x.am/p"');

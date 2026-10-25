@@ -15,7 +15,10 @@ function setup(options: { apiKey?: string; from?: string; dev?: boolean; replies
 		const reply = replies.length > 1 ? replies.shift()! : replies[0];
 		if (reply instanceof Error) throw reply;
 		if (typeof reply === 'number') return new Response('{}', { status: reply });
-		return new Response('{}', { status: reply.status, headers: { 'retry-after': reply.retryAfter } });
+		return new Response('{}', {
+			status: reply.status,
+			headers: { 'retry-after': reply.retryAfter }
+		});
 	});
 	const log = { info: vi.fn(), error: vi.fn() };
 	const sleep = vi.fn(async () => {});
@@ -118,7 +121,10 @@ describe('createMailer (task 8.2, template and retries)', () => {
 	});
 
 	it('network failure is tried 3 times, logged once and does not throw', async () => {
-		const { send, fetch, log, sleep, logged } = setup({ ...keyed, replies: [new Error('offline')] });
+		const { send, fetch, log, sleep, logged } = setup({
+			...keyed,
+			replies: [new Error('offline')]
+		});
 		await expect(send(mail)).resolves.toBeUndefined();
 		expect(fetch).toHaveBeenCalledTimes(3);
 		expect(sleep.mock.calls).toEqual([[1000], [3000]]);

@@ -43,6 +43,6 @@ normal (почта; без прав, денег и схемы)
 ## Фазы
 
 - [x] SPEC
-- [ ] RED
-- [ ] GREEN
+- [x] RED `f8870ac`
+- [x] GREEN — Vitest `mail` 16/16, check 0, ESLint `mail` чистый, пример письма отрисован (RU / HY)
 - [ ] REVIEW
