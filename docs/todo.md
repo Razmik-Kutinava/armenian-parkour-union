@@ -1,104 +1,25 @@
 ﻿# todo — текущая задача (SBR)
 
 > Один живой файл на текущую задачу. Ведётся по `.cursor/rules/sbr.mdc`. После REVIEW очищается до шаблона, итог — в `PROGRESS.md` («Сделано»).
-> Памятки: 3.13 (песочница VPOS, боевая проверка, чек-лист ревью) — `git show c0779a9:docs/todo.md`; 4.3 (решения сервиса баллов) — `git show 4de7a8d:docs/todo.md`; 4.4a — `git show f9184bd:docs/todo.md`; 4.4b (с ответами владельца) — `git show d9f7832:docs/todo.md`; 4.5 — `git show 1260f29:docs/todo.md`; 4.6 — `git show 18f968c:docs/todo.md`; фото профиля (долг 3.10, шаг 1) — `git show 587ca52:docs/todo.md`; язык письма гостю (долг 3.7, миграция 0010) — `git show 5775200:docs/todo.md`; 5.1 таблицы — `git show ce61380:docs/todo.md`; 5.2 согласия — `git show 5729ebd:docs/todo.md`; 5.3 сервис регистраций — `git show 5a1ee28:docs/todo.md`; 5.4 платное участие — `git show ce0b9b3:docs/todo.md`; 5.5 блок регистрации на странице события — `git show d7a9fd1:docs/todo.md`; 5.6 баллы за события — `git show 8e9cde1:docs/todo.md`; 5.7a / 5.7b / 5.7c админка регистраций — `git show 3c7dca9:docs/todo.md`; 5.8 «Мои события» — `git show f3f645f:docs/todo.md`; 5.9 письма — `git show c009e36:docs/todo.md`; 5.10 тесты гонок, возраста и согласий — `git show affc6fa:docs/todo.md`; 6.1 таблицы экзаменов — `git show d6ce569:docs/todo.md`; 6.2 сервис экзаменов — `git show 95a19c6:docs/todo.md`; 6.3 сервис сертификатов — `git show d3db9da:docs/todo.md`; 6.4 PDF сертификата — `git show f582544:docs/todo.md`; 6.5 публичная проверка — `git show 3f59199:docs/todo.md`; 6.6 профили тренеров и судей, `/federation/team` — `git show ab29f7d:docs/todo.md`; 6.7a админка экзаменов (решения и «для REVIEW») — `git show 7fe95db:docs/todo.md`; 6.7b админка сертификатов (решения и «для REVIEW») — `git show 93f3107:docs/todo.md`; 6.7c админка тренеров и судей (решения и «для REVIEW») — `git show ba7fd1a:docs/todo.md`; 6.8 кабинет `/cabinet/progress` (решения и «для REVIEW») — `git show 9b82a38:docs/todo.md`; 6.9 ежедневная задача сертификатов (решения, миграция 0013, «для REVIEW») — `git show f3ffcb4:docs/todo.md`; 6.10 тесты этапа 6 (охрана `users.level`, гонки) — `git show 2e15b67:docs/todo.md`; 7.1 таблица `videos`, форма в кабинете (решения, миграция 0014, «для REVIEW») — `git show 1dddb1d:docs/todo.md`; 7.2 модерация видео, настройки видео (решения, «для REVIEW») — `git show 55fee41:docs/todo.md`; 7.3 таблицы магазина (решения, миграция 0015, «для REVIEW») — `git show b8dc376:docs/todo.md`; 7.4 админка товаров и заказов (решения, «для REVIEW») — `git show e58c3bd:docs/todo.md`; 7.5 витрина и кнопка заказа (решения) — `git show 2a2a362:docs/todo.md`; 7.6 заказ одной транзакцией, отмена в админке (решения, «для REVIEW») — `git show ccc2a1c:docs/todo.md`; 7.7 кабинет — видеоистория и заказы (решения, «для REVIEW») — ниже, до REVIEW этапа.
+> Памятки: 3.13 (песочница VPOS, боевая проверка, чек-лист ревью) — `git show c0779a9:docs/todo.md`; 4.3 (решения сервиса баллов) — `git show 4de7a8d:docs/todo.md`; 4.4a — `git show f9184bd:docs/todo.md`; 4.4b (с ответами владельца) — `git show d9f7832:docs/todo.md`; 4.5 — `git show 1260f29:docs/todo.md`; 4.6 — `git show 18f968c:docs/todo.md`; фото профиля (долг 3.10, шаг 1) — `git show 587ca52:docs/todo.md`; язык письма гостю (долг 3.7, миграция 0010) — `git show 5775200:docs/todo.md`; 5.1 таблицы — `git show ce61380:docs/todo.md`; 5.2 согласия — `git show 5729ebd:docs/todo.md`; 5.3 сервис регистраций — `git show 5a1ee28:docs/todo.md`; 5.4 платное участие — `git show ce0b9b3:docs/todo.md`; 5.5 блок регистрации на странице события — `git show d7a9fd1:docs/todo.md`; 5.6 баллы за события — `git show 8e9cde1:docs/todo.md`; 5.7a / 5.7b / 5.7c админка регистраций — `git show 3c7dca9:docs/todo.md`; 5.8 «Мои события» — `git show f3f645f:docs/todo.md`; 5.9 письма — `git show c009e36:docs/todo.md`; 5.10 тесты гонок, возраста и согласий — `git show affc6fa:docs/todo.md`; 6.1 таблицы экзаменов — `git show d6ce569:docs/todo.md`; 6.2 сервис экзаменов — `git show 95a19c6:docs/todo.md`; 6.3 сервис сертификатов — `git show d3db9da:docs/todo.md`; 6.4 PDF сертификата — `git show f582544:docs/todo.md`; 6.5 публичная проверка — `git show 3f59199:docs/todo.md`; 6.6 профили тренеров и судей, `/federation/team` — `git show ab29f7d:docs/todo.md`; 6.7a админка экзаменов (решения и «для REVIEW») — `git show 7fe95db:docs/todo.md`; 6.7b админка сертификатов (решения и «для REVIEW») — `git show 93f3107:docs/todo.md`; 6.7c админка тренеров и судей (решения и «для REVIEW») — `git show ba7fd1a:docs/todo.md`; 6.8 кабинет `/cabinet/progress` (решения и «для REVIEW») — `git show 9b82a38:docs/todo.md`; 6.9 ежедневная задача сертификатов (решения, миграция 0013, «для REVIEW») — `git show f3ffcb4:docs/todo.md`; 6.10 тесты этапа 6 (охрана `users.level`, гонки) — `git show 2e15b67:docs/todo.md`; 7.1 таблица `videos`, форма в кабинете (решения, миграция 0014, «для REVIEW») — `git show 1dddb1d:docs/todo.md`; 7.2 модерация видео, настройки видео (решения, «для REVIEW») — `git show 55fee41:docs/todo.md`; 7.3 таблицы магазина (решения, миграция 0015, «для REVIEW») — `git show b8dc376:docs/todo.md`; 7.4 админка товаров и заказов (решения, «для REVIEW») — `git show e58c3bd:docs/todo.md`; 7.5 витрина и кнопка заказа (решения) — `git show 2a2a362:docs/todo.md`; 7.6 заказ одной транзакцией, отмена в админке (решения, «для REVIEW») — `git show ccc2a1c:docs/todo.md`; 7.7 кабинет — видеоистория и заказы (решения, «для REVIEW») и 7.8 тесты гонок этапа 7 — `git show 619eab6:docs/todo.md`.
 
-## Задача 7.8
+## Задача
 
-**7.8** (`09` этап 7): тесты гонок — последний товар, возврат баллов, повторное одобрение видео. «ебашь» владельца — 2026-10-25. Только тесты (как 5.10, 6.10): падающий тест — баг, чинится в GREEN. Без миграции.
-
-Факты: `03` § 9 п. 3 (заказ — одна транзакция: остаток, баланс, списание), п. 5 (отмена — возврат `shop_refund` один раз, остаток назад); § 6.2 п. 2 (один источник — одно начисление); § 8 (баллы за видео — при одобрении). Вопрос 108: участник отменяет только `new`.
-
-Уже покрыто последовательно (7.2–7.7, не дублировать): повтор того же `orderId`, отказы по порядку, отмена дважды подряд (`checkout*.test`, `order-cancel*.test`); повторное одобрение подряд — пропуск (`review.test`); удаление одобренного — `not_allowed` (`own.test`). Дыра — одновременные нажатия (две сессии БД).
-
-Файлы 7.8:
-- `src/lib/server/services/shop/race-support.ts` (новый) — поверх `raceDb`: покупатель с балансом через `appendEntry` (`manual`, баланс = журнал), товар; уборка — заказы тестов (позиции каскадом) и товары удаляются, журнал баллов и `audit_log` остаются (append-only). Без уборки заказы и видео удалённых `t-*` всплыли бы в `/admin/orders` и очереди `/admin/videos` (списки удалённых не фильтруют).
-- `shop/race.test.ts` — последний товар двумя участниками; двойное нажатие тем же `orderId`; баланса на один заказ — два товара разом.
-- `shop/race-cancel.test.ts` — отмена админом и участником разом (оба порядка); участник отменяет, админ подтверждает разом (оба порядка); отмена возвращает последнюю штуку, пока другой заказывает (оба порядка).
-- `videos/race.test.ts` — два модератора одобряют разом; одобрение против отказа; удаление участником против одобрения (оба порядка). Видео тестов удаляются в уборке.
-- `vite.config.ts` — `race`, `race-cancel` в `ORDER_TESTS`; `videos/race` в `RULES_TESTS` (вставляет правило `video_approved`, если его нет — ждёт блокировку `setRules`).
-
-Не ломать 7.8: правила баллов в коммите не менять — только вставить недостающее (`ON CONFLICT DO NOTHING`), ожидание — по фактическому правилу. Тесты 7.2–7.7 и `registrations/race-support.ts` не трогать. Код заказа, отмены и модерации не менять, если тесты зелёные (K2 / K3).
-
-Проверка 7.8: `npx vitest run --project server-orders src/lib/server/services/shop/race*.test.ts` и `npx vitest run --project server-points src/lib/server/services/videos/race.test.ts`; `npm run check`, `npm run lint`.
-
-Риск 7.8: `high` (баллы, остаток, `vite.config.ts`). Читать: `03` § 6.2, 8, 9 (выписано); `zone-notes.md` § «Видео и магазин» (прочитан).
-
-Фазы 7.8:
-- [x] SPEC
-- [x] RED / прогон новых тестов — 14/14 зелёные с первого прогона (магазин 3 + 6, видео 5): блокировки 7.2–7.7 гонки держат, багов не найдено. Проверка, что ловят поломку: без `FOR UPDATE` в `lockItemOnSale`, `lockOrder` и выборке `decideOne` падают 11 из 14 (двойной возврат `refund duplicate`, остаток −1, двойное одобрение, нарушение check `videos_reject_reason`, «второй не ждал»); три оставшихся держит блокировка участника или своя блокировка удаления. Код возвращён
-- [x] GREEN — реализация не менялась; `check` 0, `lint` чистый
-- [ ] REVIEW (этапа)
-
-Для REVIEW 7.8:
-- Каждый прогон оставляет в `parkour_dev` мягко удалённых `t-*@example.com`, их журнал баллов (`manual` «Race test balance», `shop_order`, `shop_refund`, `video`) и `audit_log`; заказы, товары и видео тестов удаляются.
-- e2e на одновременные нажатия нет — гонки на уровне сервиса (две сессии БД), как 5.10 / 6.10.
-- `videos/race.test.ts` — 122 строки (норма ≤ 120): четыре сценария в цикле по порядку, делить не стал.
-
-## Задача 7.7
-
-**7.7** (`09` этап 7): кабинет — видеоистория `/cabinet/videos` (причина отказа, пометка баллов, удаление до одобрения) и заказы `/cabinet/orders` (список, карточка, отмена участником). Миграции нет.
-
-Граница: гонки «последний товар», двойной возврат, повторное одобрение видео — 7.8.
-
-Факты из документов:
-- `06` § 5.7: список видео со статусом (на проверке, одобрено, отклонено с причиной) и пометкой начисленных баллов; удалить можно, пока не одобрено. Решение 2026-10-24: удаление жёсткое (без `deleted_at`); лимит в месяц удалённые не считает.
-- `06` § 5.8: список — номер, состав, сумма, статус, дата; карточка — данные доставки, трек-заметка; «Отменить», пока не отправлен. `03` § 9 п. 5: отмена — возврат записью `shop_refund`, остаток восстанавливается.
-- `04` § 3.1 / 5.3: участник видит только своё, id — из сессии; чужое — 404. `04` § 3.2: отмена заказа сотрудником — только admin (`shop.orders_cancel`).
-- **Вопрос 108 решён владельцем 2026-10-25:** участник сам отменяет только заказ в статусе `new`; после `confirmed` — только admin.
-
-## Решения (агент; по документам и образцам 5.8 / 7.6)
-
-1. **Пометка баллов видео** — сумма `delta` записей `points_ledger` участника с `source_type = 'video'`, `source_id` = id видео (обратная запись 4.4 копирует источник — после отмены сумма 0). Нет записей — пометки нет. Скрытое (`hidden_at`) участнику показывается как «Одобрено» (в `06` § 5.7 статуса «скрыто» нет).
-2. **Удаление видео** — `deleteOwnVideo(db, userId, id)` (`services/videos/own.ts`): блокировка строки, только своё и `pending` / `rejected`; одобренное → `not_allowed`, чужое / нет / кривой id → `not_found`. Журнала действий нет (баллов у таких видео нет; как добавление 7.1). Гонка с одобрением — обе стороны блокируют строку видео: одобрение после удаления видео не находит (пропуск).
-3. **Список заказов** — `listOwnOrders(db, userId)` (`services/cabinet/orders.ts`), новые сверху, до 100 (как платежи 5.x), позиции — `linesOf` из `order-list.ts` (экспортировать). Карточка — `getOwnOrder(db, userId, id)`: чужой → `null` → 404. Без имени участника и email.
-4. **Отмена участником** — `cancelOwnOrder(db, userId, id, deps)` (`order-cancel.ts`, общая часть с `cancelOrder`): чужой → `not_found`; не `new` → `bad_status`. Возврат = −`delta` списания, `shop_refund` **без автора** (`created_by = null`, как списание — не попадает в фильтр «ручные»). Остаток назад. Журнал `shop_order.cancel` с `actor_id` = участник (баллы — опасное действие, `main.mdc` арх. 4). Письмо «отменён» — как у админа. Маршрут — `cancelOwnOrderNow` (`orders-now.ts`): почта + `publicCache.invalidate(['shop'])` (отмена не из админки — хук кеш не сбросит).
-5. **Страницы** — `/cabinet/orders` (список: номер-ссылка, состав с вариантами, сумма, статус, дата), `/cabinet/orders/[id]` (позиции, доставка, трек-заметка, кнопка «Отменить заказ» при `new` → `?/cancel`, после — сообщение и статус «Отменён»). Пункт меню «Заказы» после «Видео». Экран «заказ оформлен» 7.6 оставляем (ссылка «Мои заказы» теперь живая).
-6. **Видео в кабинете** — `?/delete` (поле `id`) на `/cabinet/videos`; у `pending` / `rejected` кнопка «Удалить», у отклонённого — причина, у одобренного с баллами — «+N баллов».
+Нет. Этап 7 прошёл общий REVIEW 2026-10-25; дальше — деплой этапа 7 по апруву, затем этап 8 через `/spec`.
 
 ## Файлы (ожидаемо)
 
-- `src/lib/server/services/videos/own.ts` (+ новый `own.test.ts`).
-- `src/lib/server/services/cabinet/orders.ts` (+ `orders.test.ts`); `services/shop/order-list.ts` (экспорт `linesOf`).
-- `src/lib/server/services/shop/order-cancel.ts` (+ новый `order-cancel-own.test.ts` → `ORDER_TESTS` в `vite.config.ts`), `orders-now.ts`.
-- `src/routes/[[lang=lang]]/(site)/cabinet/videos/` — `+page.server.ts`, `+page.svelte`, `OwnVideoList.svelte`.
-- `src/routes/[[lang=lang]]/(site)/cabinet/orders/` — `+page.server.ts`, `+page.svelte`, `[id]/+page.server.ts`, `[id]/+page.svelte`; `cabinet/+layout.svelte` (меню).
-- `OrderStatusBadge.svelte` и `lines.ts` из `routes/admin/orders/` → `src/lib/components/shop/` (`order-lines.ts`): общие для админки и кабинета, импорты админки поправлены.
-- `src/lib/i18n/messages/{en,hy,ru}-cabinet-videos.ts`, новые `{en,hy,ru}-cabinet-orders.ts` (+ `en.ts`, `hy.ts`, `ru.ts`).
-- `tests/e2e/cabinet-videos.spec.ts`, новый `tests/e2e/cabinet-orders.spec.ts`.
-
 ## Не ломать
-
-- Баланс ≥ 0, журнал баллов только через `appendEntry`; возврат — один раз на заказ (`points_ledger_source_once_key`); отмена участником `confirmed` / `shipped` / чужого заказа ничего не пишет.
-- Отмена админом 7.6 (`new` / `confirmed`, автор возврата — админ) и смена статуса 7.4 работают как раньше.
-- Добавление видео 7.1 (лимит, дубль, членство) и модерация 7.2; одобренное видео не удаляется.
-- Участник не видит чужие видео и заказы (404).
 
 ## Проверка
 
-- `npx vitest run src/lib/server/services/videos/own.test.ts src/lib/server/services/cabinet/orders.test.ts src/lib/server/services/shop` → PASS.
-- `npx playwright test tests/e2e/cabinet-videos.spec.ts tests/e2e/cabinet-orders.spec.ts tests/e2e/shop-order.spec.ts` → PASS; `npm run check`, `npm run lint`.
-
 ## Риск
-
-`high` — баллы (возврат при отмене участником), права (только своё).
 
 ## Читать
 
-- `06` § 5.7, 5.8; `03` § 8, § 9 п. 5; `04` § 3.1–3.2 (выписано).
-- `zone-notes.md` § «Видео и магазин», § «Кабинет» (прочитаны).
-
 ## Фазы
 
-- [x] SPEC
-- [x] RED `4e5ba02`
-- [x] GREEN (коммит ниже): Vitest задачи 61/61 (`own`, `cabinet/orders`, весь `services/shop` с `order-cancel-own`), e2e `cabinet-videos` + `cabinet-orders` + `shop-order` 7/7, `check`, `lint`.
-- [ ] REVIEW (этапа)
-
-## Для REVIEW
-
-- Отмена участником пишет `shop_order.cancel` с `actor_id` = участник: в `/admin/audit` это видно как действие участника (не сотрудника). Возврат — `created_by = null`.
-- `lockOrder` берёт блокировку заказа до проверки владельца: чужой участник на миг блокирует чужой заказ (ничего не пишет, отвечает 404).
-- Удаление видео без журнала действий; лимит месяца после удаления освобождает место (решение 2026-10-24).
-- Пометка баллов — сумма записей журнала по видео; одобренное без записи (правило `video_approved` выключено или 0) — без пометки.
-- `/admin/orders` после переноса бейджа и `lines.ts` e2e не перепрогонялся (сборка и `check` прошли) — в общем e2e REVIEW.
+- [ ] SPEC
+- [ ] RED
+- [ ] GREEN
+- [ ] REVIEW
