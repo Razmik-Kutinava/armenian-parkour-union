@@ -100,40 +100,62 @@ describe.skipIf(!testDbUrl)('registrations: the waitlist', () => {
 		});
 	});
 
-	it('the line skips members who would not be admitted now; they keep their place', async () => {
+	/** One seat taken, then `members` in line; frees the seat and returns the line's statuses. */
+	async function freeSeatFor(
+		tx: Parameters<typeof insertEvent>[0],
+		members: { id: string }[],
+		change: () => Promise<unknown>
+	) {
+		const event = await insertEvent(tx, { capacity: 1 });
+		const holder = await insertMember(tx);
+		await register(tx, holder.id, event.id);
+		const queued = [];
+		for (const m of members) queued.push(await register(tx, m.id, event.id));
+		await change();
+		const box = mailbox();
+		expect(await cancelRegistration(tx, holder.id, event.id, deps(box))).toBe('ok');
+		const statuses: string[] = [];
+		for (const row of queued) statuses.push((await registrationOf(tx, row.id)).status);
+		return { statuses, sent: box.sent.map((m) => m.to) };
+	}
+
+	it('the line skips a minor whose consent expired and a lapsed member; they keep their place', async () => {
 		await inRollback(async (tx) => {
-			const event = await insertEvent(tx, { capacity: 1 });
-			const holder = await insertMember(tx);
-			await register(tx, holder.id, event.id);
 			const minor = await insertMember(tx, { birthDate: bornBefore(15) });
 			const consent = await insertConsent(tx, minor.id, {
 				status: 'approved',
 				validUntil: daysFromNow(30)
 			});
-			const [blocked, lapsed, deleted, next] = [
-				await insertMember(tx),
+			const [lapsed, next] = [await insertMember(tx), await insertMember(tx)];
+			const result = await freeSeatFor(tx, [minor, lapsed, next], async () => {
+				await tx.update(consents).set({ status: 'expired' }).where(eq(consents.id, consent.id));
+				await tx
+					.update(memberships)
+					.set({ endsAt: new Date(Date.now() - HOUR) })
+					.where(eq(memberships.userId, lapsed.id));
+			});
+			expect(result).toEqual({
+				statuses: ['waitlist', 'waitlist', 'registered'],
+				sent: [next.email]
+			});
+		});
+	});
+
+	it('the line skips a blocked and a deleted member; they keep their place', async () => {
+		await inRollback(async (tx) => {
+			const [blocked, deleted, next] = [
 				await insertMember(tx),
 				await insertMember(tx),
 				await insertMember(tx)
 			];
-			const queued = [];
-			for (const m of [minor, blocked, lapsed, deleted, next]) {
-				queued.push(await register(tx, m.id, event.id));
-			}
-			await tx.update(consents).set({ status: 'expired' }).where(eq(consents.id, consent.id));
-			await tx.update(users).set({ status: 'blocked' }).where(eq(users.id, blocked.id));
-			await tx.update(users).set({ deletedAt: new Date() }).where(eq(users.id, deleted.id));
-			await tx
-				.update(memberships)
-				.set({ endsAt: new Date(Date.now() - HOUR) })
-				.where(eq(memberships.userId, lapsed.id));
-			const box = mailbox();
-
-			expect(await cancelRegistration(tx, holder.id, event.id, deps(box))).toBe('ok');
-			const statuses: string[] = [];
-			for (const row of queued) statuses.push((await registrationOf(tx, row.id)).status);
-			expect(statuses).toEqual(['waitlist', 'waitlist', 'waitlist', 'waitlist', 'registered']);
-			expect(box.sent.map((m) => m.to)).toEqual([next.email]);
+			const result = await freeSeatFor(tx, [blocked, deleted, next], async () => {
+				await tx.update(users).set({ status: 'blocked' }).where(eq(users.id, blocked.id));
+				await tx.update(users).set({ deletedAt: new Date() }).where(eq(users.id, deleted.id));
+			});
+			expect(result).toEqual({
+				statuses: ['waitlist', 'waitlist', 'registered'],
+				sent: [next.email]
+			});
 		});
 	});
 

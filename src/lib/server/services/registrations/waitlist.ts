@@ -8,10 +8,12 @@ import { promotedLetter } from './mail';
 import { awardRegistration } from './points';
 import { hasSeat, readSeats, takeSeat } from './seats';
 import type { RegistrationSettings } from './settings';
+import { promotionRefusal } from './waitlist-admission';
 
 /* docs/03 section 7.3: when a seat frees up, the first in line takes it; a paid event gives them
- * `offer_hours` to pay. Members whose category is still full keep their place in line. A free
- * seat counts at once and earns the registration points (section 6.2 p. 5). */
+ * `offer_hours` to pay. Members whose category is still full, or who would not be admitted now,
+ * keep their place in line. A free seat counts at once and earns the registration points
+ * (section 6.2 p. 5). */
 
 export type WaitlistDeps = { settings: RegistrationSettings; siteUrl: string | undefined };
 
@@ -56,6 +58,7 @@ export async function fillFromWaitlist(
 	for (const row of queue) {
 		if (!hasSeat(seats, null)) break;
 		if (!hasSeat(seats, row.categoryId)) continue;
+		if (await promotionRefusal(tx, event, row, now)) continue;
 		takeSeat(seats, row.categoryId);
 		await tx
 			.update(eventRegistrations)

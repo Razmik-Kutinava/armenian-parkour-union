@@ -4,19 +4,29 @@ import type { LimitDb } from '../../../auth/rate-limit';
 import { eventRegistrations } from '../../../db/schema/registrations';
 import { writeAudit } from '../../audit';
 import type { Actor } from '../../users/target';
+import type { Refusal } from '../admission';
 import type { CancelDeps } from '../cancel';
 import { promotedLetter } from '../mail';
 import { awardRegistration } from '../points';
 import { hasSeat, readSeats } from '../seats';
 import { sendLetters } from '../waitlist';
+import { promotionRefusal } from '../waitlist-admission';
 import { lockRegistration, type RegistrationRef } from './lock';
 
 /* docs/05 section 5, docs/04 section 3: staff move a registration from the waitlist by hand. Only
- * onto a free seat (the limit is raised first); otherwise like the automatic move (docs/03 7.3):
- * a paid event holds the seat for `offer_hours`, a free one earns the registration points. */
+ * onto a free seat (the limit is raised first) and only a member who would be admitted now
+ * (docs/03 section 15); otherwise like the automatic move (docs/03 7.3): a paid event holds the
+ * seat for `offer_hours`, a free one earns the registration points. */
 
 export type PromoteResult =
-	'ok' | 'not_found' | 'not_allowed' | 'wrong_status' | 'event_closed' | 'full';
+	| 'ok'
+	| 'not_found'
+	| 'not_allowed'
+	| 'wrong_status'
+	| 'event_closed'
+	| 'full'
+	| 'user_not_found'
+	| Refusal;
 
 export async function promoteRegistration(
 	db: LimitDb,
@@ -33,6 +43,8 @@ export async function promoteRegistration(
 		const { event, row } = locked;
 		if (event.status !== 'published') return 'event_closed' as const;
 		if (row.status !== 'waitlist') return 'wrong_status' as const;
+		const refusal = await promotionRefusal(tx, event, row, now);
+		if (refusal) return refusal;
 		const seats = await readSeats(tx, event.id, event.capacity);
 		if (!hasSeat(seats, row.categoryId)) return 'full' as const;
 		const paid = event.priceAmountMinor > 0;

@@ -41,6 +41,6 @@ high (допуск несовершеннолетних, `03` § 13, 15)
 ## Фазы
 
 - [x] SPEC
-- [ ] RED
-- [ ] GREEN
+- [x] RED `1ebcfc8`
+- [x] GREEN — Vitest задачи 11/11 (`waitlist` 6, `promote` 5) + `release`, `cancel` зелёные; check 0, eslint и prettier чистые. Тест очереди разделён на два (6 участников в одном не укладывались в 20 с на медленной Neon)
 - [ ] REVIEW (этапа)
