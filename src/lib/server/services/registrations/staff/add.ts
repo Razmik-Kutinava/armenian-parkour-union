@@ -8,12 +8,16 @@ import { lockEvent } from '../../events/checks';
 import { isUuid, type Actor } from '../../users/target';
 import { checkStaffAdmission, type Refusal } from '../admission';
 import { readAdmission } from '../admission-data';
+import { registeredLetter, type LetterDeps } from '../mail';
+import { RECIPIENT } from '../recipient';
 import { CLEARED } from '../register';
 import { hasSeat, readSeats } from '../seats';
+import { sendLetters } from '../waitlist';
 
 /* docs/05 section 5: staff add a member by hand — on a published event, past the registration
  * window and the start ("event day"); the member conditions of docs/03 section 7.2 still hold.
- * No payment and no registration points (section 6.2 p. 5: only a registration made on the site). */
+ * No payment and no registration points (section 6.2 p. 5: only a registration made on the site).
+ * The member gets the "you are registered" letter after the commit (owner's answer 2026-10-26). */
 
 export type AddInput = { eventId: string; member: string; categoryId: string | null };
 export type AddRefusal =
@@ -30,7 +34,8 @@ async function findMember(tx: LimitDb, member: string) {
 			id: users.id,
 			status: users.status,
 			emailVerified: users.emailVerified,
-			birthDate: users.birthDate
+			birthDate: users.birthDate,
+			...RECIPIENT
 		})
 		.from(users)
 		.where(
@@ -47,12 +52,13 @@ export async function addRegistration(
 	actor: Actor,
 	input: AddInput,
 	ip: string | null,
+	mail: LetterDeps | null = null,
 	now = new Date()
 ): Promise<AddResult> {
 	if (!roleCan(actor.role, 'registrations.manage')) return refuse('not_allowed');
 	if (!isUuid(input.eventId)) return refuse('not_found');
 	if (input.categoryId !== null && !isUuid(input.categoryId)) return refuse('category_invalid');
-	return db.transaction(async (tx) => {
+	const outcome = await db.transaction(async (tx) => {
 		const event = await lockEvent(tx, input.eventId);
 		if (!event) return refuse('not_found');
 		if (event.status !== 'published') return refuse('event_closed');
@@ -88,6 +94,12 @@ export async function addRegistration(
 			after: { eventId: event.id, userId: user.id, categoryId, status: 'registered' },
 			ip
 		});
-		return { ok: true as const, id: row.id };
+		return { ok: true as const, id: row.id, to: user, event };
 	});
+	if (!outcome.ok) return outcome;
+	if (mail) {
+		const letter = registeredLetter(outcome.to, outcome.event, 'registered', mail.siteUrl);
+		await sendLetters(mail.send, [letter]);
+	}
+	return { ok: true, id: outcome.id };
 }

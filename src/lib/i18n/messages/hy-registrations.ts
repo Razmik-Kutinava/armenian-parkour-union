@@ -73,5 +73,11 @@ export const hyRegistrations: Partial<Messages> = {
 	'registrations.mail.eventCancelled.text':
 		'Բարև, {name}։\n\nՑավոք, «{event}» միջոցառումը ({date}) չեղարկվել է, և ձեր գրանցումը չեղարկվել է դրա հետ։{refund}\n\nԻմ միջոցառումները՝ {url}',
 	'registrations.mail.eventCancelled.refund':
-		'Դուք վճարել եք մասնակցության համար․ վճարի վերադարձի հարցով ֆեդերացիան կկապվի ձեզ հետ։'
+		'Դուք վճարել եք մասնակցության համար․ վճարի վերադարձի հարցով ֆեդերացիան կկապվի ձեզ հետ։',
+	'registrations.mail.staffCancelled.subject': 'Գրանցումը չեղարկված է՝ {event}',
+	'registrations.mail.staffCancelled.text':
+		'Բարև, {name}։\n\nՖեդերացիան չեղարկել է ձեր գրանցումը «{event}» միջոցառմանը ({date})։ Եթե կարծում եք, որ սա սխալ է, կապվեք ֆեդերացիայի հետ։{refund}\n\nԻմ միջոցառումները՝ {url}',
+	'registrations.mail.holdExpired.subject': 'Վճարման ժամանակը սպառվել է՝ {event}',
+	'registrations.mail.holdExpired.text':
+		'Բարև, {name}։\n\n«{event}» միջոցառմանը ({date}) մասնակցության վճարման ժամանակը սպառվել է, ուստի գրանցումը չեղարկվել է, և տեղն ազատվել է։ Եթե դեռ տեղեր կան, կարող եք կրկին գրանցվել միջոցառման էջում։\n\nՄիջոցառման էջը՝ {url}'
 };

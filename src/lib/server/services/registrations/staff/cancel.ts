@@ -6,6 +6,7 @@ import { eventRegistrations } from '../../../db/schema/registrations';
 import { writeAudit } from '../../audit';
 import type { Actor } from '../../users/target';
 import { CANCELLABLE, type CancelDeps } from '../cancel';
+import { staffCancelledLetter } from '../cancel-mail';
 import { takeBackRegistration } from '../points';
 import { holdsSeat } from '../seats';
 import { settleCancelledPayment } from '../settle-cancel';
@@ -14,7 +15,8 @@ import { lockRegistration, type RegistrationRef } from './lock';
 
 /* docs/05 section 5: staff cancel a registration with a reason, without the member's deadline.
  * The rest as on the member's own cancel: points back before the start (docs/03 6.2 p. 6), the
- * seat to the waitlist, the payment settled after the commit (a paid one — the admin's review). */
+ * seat to the waitlist, the payment settled after the commit (a paid one — the admin's review).
+ * The member is told too (owner's answer 2026-10-26), without the staff reason. */
 
 export type StaffCancelResult =
 	'ok' | 'not_found' | 'not_allowed' | 'no_reason' | 'wrong_status' | 'event_closed';
@@ -53,7 +55,10 @@ export async function cancelRegistrationByStaff(
 			after: { status: 'cancelled', reason: reason.data, eventId: event.id, userId: row.userId },
 			ip
 		});
-		const letters = seat ? await fillFromWaitlist(tx, event.id, deps, now) : [];
+		const paid = row.status === 'registered' && row.paymentId !== null;
+		const own = staffCancelledLetter(row.user, event, paid, deps.siteUrl);
+		const queue = seat ? await fillFromWaitlist(tx, event.id, deps, now) : [];
+		const letters = [own, ...queue];
 		return { letters, paymentId: seat ? row.paymentId : null, id: row.id, eventId: event.id };
 	});
 	if (typeof outcome === 'string') return outcome;

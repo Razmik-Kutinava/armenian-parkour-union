@@ -40,7 +40,8 @@ describe.skipIf(!testDbUrl)('registrations staff: cancel a registration', () => 
 	it('the seat goes to the first in line with a letter, past the member deadline; logged', async () => {
 		await inRollback(async (tx) => {
 			const event = await insertEvent(tx, { capacity: 1 });
-			const active = await register(tx, (await insertMember(tx)).id, event.id);
+			const member = await insertMember(tx);
+			const active = await register(tx, member.id, event.id);
 			const next = await insertMember(tx);
 			const queued = await register(tx, next.id, event.id);
 			const box = mailbox();
@@ -57,7 +58,7 @@ describe.skipIf(!testDbUrl)('registrations staff: cancel a registration', () => 
 			expect(result).toBe('ok');
 			expect(await registrationOf(tx, active.id)).toMatchObject({ status: 'cancelled' });
 			expect((await registrationOf(tx, queued.id)).status).toBe('registered');
-			expect(box.sent.map((m) => m.to)).toEqual([next.email]);
+			expect(box.sent.map((m) => m.to)).toEqual([member.email, next.email]);
 			const [entry] = await auditFor(tx, 'registration', active.id);
 			expect(entry).toMatchObject({
 				action: 'registration.cancel',

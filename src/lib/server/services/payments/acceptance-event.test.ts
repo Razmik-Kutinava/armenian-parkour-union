@@ -60,7 +60,7 @@ describe.skipIf(!testDbUrl)('payments acceptance: event fee', () => {
 			const { provider } = ownMock();
 			const { effects } = productionEffects();
 			const event = await paidEvent(tx, { capacity: 1 });
-			const { registrationId, payment } = await payStarted(tx, provider, event.id);
+			const { registrationId, payment, member } = await payStarted(tx, provider, event.id);
 			const queued = await insertMember(tx);
 			const waiting = await registerOk(tx, queued.id, event.id);
 			const now = later(35);
@@ -75,7 +75,8 @@ describe.skipIf(!testDbUrl)('payments acceptance: event fee', () => {
 			expect(await releaseExpiredHolds(tx, cancelDeps(box), now)).toBeGreaterThanOrEqual(1);
 			expect((await registrationOf(tx, registrationId)).status).toBe('cancelled');
 			expect((await registrationOf(tx, waiting.id)).status).toBe('pending_payment');
-			expect(box.sent.map((m) => m.to)).toEqual([queued.email]);
+			const ours = [member.email, queued.email];
+			expect(box.sent.map((m) => m.to).filter((to) => ours.includes(to))).toEqual(ours);
 
 			const late = provider.simulate(payment.providerPaymentId!, 'paid');
 			expect(await deliver(tx, provider, late, effects)).toBe(200);

@@ -72,5 +72,11 @@ export const enRegistrations = {
 	'registrations.mail.eventCancelled.text':
 		'Hello, {name}!\n\nUnfortunately, “{event}” ({date}) has been cancelled, and your registration is cancelled with it.{refund}\n\nYour events: {url}',
 	'registrations.mail.eventCancelled.refund':
-		'You have paid for participation: the federation will contact you about the refund.'
+		'You have paid for participation: the federation will contact you about the refund.',
+	'registrations.mail.staffCancelled.subject': 'Registration cancelled: {event}',
+	'registrations.mail.staffCancelled.text':
+		'Hello, {name}!\n\nThe federation has cancelled your registration for “{event}” ({date}). If you think this is a mistake, contact the federation.{refund}\n\nYour events: {url}',
+	'registrations.mail.holdExpired.subject': 'The time to pay has run out: {event}',
+	'registrations.mail.holdExpired.text':
+		'Hello, {name}!\n\nThe time to pay for “{event}” ({date}) has run out, so your registration is cancelled and the place is released. If places are still available, you can register again on the event page.\n\nEvent page: {url}'
 } as const;

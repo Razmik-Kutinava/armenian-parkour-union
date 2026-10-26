@@ -3,13 +3,14 @@ import type { LimitDb } from '../../../auth/rate-limit';
 import { sendMail } from '../../../mail';
 import type { Actor } from '../../users/target';
 import { registrationSettings } from '../settings';
+import { addRegistration, type AddInput, type AddResult } from './add';
 import { cancelRegistrationByStaff, type StaffCancelResult } from './cancel';
 import type { RegistrationRef } from './lock';
 import { promoteRegistration, type PromoteResult } from './promote';
 
 /* docs/05 section 5, tab "Registrations": routes call these; letters go after the commit. */
 
-export { addRegistration, type AddRefusal, type AddResult } from './add';
+export type { AddRefusal, AddResult } from './add';
 export { markAttendance, marksOpen, RESULTS_OPEN, type AttendanceResult } from './attendance';
 export { registrationsCsv } from './export';
 export { saveResults, type ResultsResult } from './results';
@@ -45,4 +46,13 @@ export async function cancelByStaffNow(
 	ip: string | null
 ): Promise<StaffCancelResult> {
 	return cancelRegistrationByStaff(db, actor, ref, await deps(db), ip);
+}
+
+export async function addNow(
+	db: LimitDb,
+	actor: Actor,
+	input: AddInput,
+	ip: string | null
+): Promise<AddResult> {
+	return addRegistration(db, actor, input, ip, { send: sendMail, siteUrl: PUBLIC_SITE_URL });
 }

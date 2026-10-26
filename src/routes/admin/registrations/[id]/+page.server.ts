@@ -6,7 +6,7 @@ import { db } from '#lib/server/db/index.ts';
 import { listEventCategories } from '#lib/server/services/events/categories.ts';
 import { getEvent } from '#lib/server/services/events/list.ts';
 import {
-	addRegistration,
+	addNow,
 	cancelByStaffNow,
 	listRegistrations,
 	promoteNow,
@@ -69,7 +69,7 @@ export const actions: Actions = {
 			member: field(form, 'member').slice(0, 320),
 			categoryId: field(form, 'categoryId') || null
 		};
-		const result = await addRegistration(db, actor, input, getClientAddress());
+		const result = await addNow(db, actor, input, getClientAddress());
 		return result.ok ? done('registrationsAdmin.done.added') : refused(result.reason);
 	}
 };

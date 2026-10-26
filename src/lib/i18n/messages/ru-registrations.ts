@@ -73,5 +73,11 @@ export const ruRegistrations: Partial<Messages> = {
 	'registrations.mail.eventCancelled.text':
 		'Здравствуйте, {name}!\n\nК сожалению, «{event}» ({date}) отменено, и ваша регистрация отменена вместе с ним.{refund}\n\nМои события: {url}',
 	'registrations.mail.eventCancelled.refund':
-		'Вы оплатили участие: о возврате оплаты федерация свяжется с вами.'
+		'Вы оплатили участие: о возврате оплаты федерация свяжется с вами.',
+	'registrations.mail.staffCancelled.subject': 'Регистрация отменена: {event}',
+	'registrations.mail.staffCancelled.text':
+		'Здравствуйте, {name}!\n\nФедерация отменила вашу регистрацию на «{event}» ({date}). Если вы считаете, что это ошибка, свяжитесь с федерацией.{refund}\n\nМои события: {url}',
+	'registrations.mail.holdExpired.subject': 'Время на оплату истекло: {event}',
+	'registrations.mail.holdExpired.text':
+		'Здравствуйте, {name}!\n\nВремя на оплату участия в «{event}» ({date}) истекло, поэтому регистрация отменена и место освобождено. Если места ещё есть, вы можете зарегистрироваться снова на странице события.\n\nСтраница события: {url}'
 };

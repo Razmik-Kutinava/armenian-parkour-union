@@ -37,7 +37,8 @@ describe.skipIf(!testDbUrl)('registrations: releasing expired holds', () => {
 			const promoted = await registrationOf(tx, queued.id);
 			expect(promoted.status).toBe('pending_payment');
 			expect(promoted.holdUntil!.getTime()).toBe(now.getTime() + SETTINGS.offerHours * HOUR);
-			expect(box.sent.map((m) => m.to)).toEqual([a.email, b.email]);
+			const ours = box.sent.map((m) => m.to).filter((to) => to === a.email || to === b.email);
+			expect(ours).toEqual([a.email, b.email]);
 		});
 	});
 

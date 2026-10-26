@@ -88,9 +88,9 @@ describe.skipIf(!testDbUrl)('registrations: letters on staff actions and unpaid 
 			const { id } = await registerOk(tx, queued.id, event.id);
 			const box = mailbox();
 			const ref = { eventId: event.id, registrationId: id, reason: 'Duplicate' };
-			expect(await cancelRegistrationByStaff(tx, await moderator(tx), ref, cancelDeps(box), IP)).toBe(
-				'ok'
-			);
+			expect(
+				await cancelRegistrationByStaff(tx, await moderator(tx), ref, cancelDeps(box), IP)
+			).toBe('ok');
 			expect(box.sent.map((m) => m.to)).toEqual([queued.email]);
 		});
 	});

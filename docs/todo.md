@@ -44,6 +44,6 @@ normal (письма; права и данные не меняются)
 ## Фазы
 
 - [x] SPEC
-- [ ] RED
-- [ ] GREEN
+- [x] RED `ab67953`
+- [x] GREEN — Vitest задачи + `add`, `cancel`, `release`, `acceptance-event`, `points-staff`, `translate` 30/30; check 0, eslint и prettier чистые. Старые проверки точного списка адресатов (`staff/cancel`, `release`, `acceptance-event`) — плюс письмо самому участнику; в `release` и `acceptance-event` — только свои адреса (в `parkour_dev` есть чужие просроченные удержания от гонок)
 - [ ] REVIEW (этапа)
