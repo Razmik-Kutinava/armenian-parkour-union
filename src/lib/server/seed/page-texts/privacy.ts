@@ -2,7 +2,7 @@ import type { PageTexts } from './types';
 
 export const privacy: PageTexts = {
 	en: `<h2>1. General provisions</h2>
-<p>Armenian Parkour Union (the "Federation") respects the right to personal data protection and processes data in accordance with the Law of the Republic of Armenia "On Protection of Personal Data". This policy explains what data we collect, why, and how we protect it.</p>
+<p>The "All-Armenian Federation of Parkour, Freerunning, Tricking and Related Extreme Sports" public organisation (Armenian Parkour Union, Tax ID 03593528, the "Federation") respects the right to personal data protection and processes data in accordance with the Law of the Republic of Armenia "On Protection of Personal Data". This policy explains what data we collect, why, and how we protect it.</p>
 <h2>2. What data we collect</h2>
 <ul>
 <li><p>First name, last name, date of birth.</p></li>
@@ -43,7 +43,7 @@ export const privacy: PageTexts = {
 <h2>11. Changes</h2>
 <p>We may update this policy. The current version is always published on the website. Last updated: 26 October 2026.</p>`,
 	hy: `<h2>1. Ընդհանուր դրույթներ</h2>
-<p>Armenian Parkour Union-ը (այսուհետ՝ Ֆեդերացիա) հարգում է անձնական տվյալների պաշտպանության իրավունքը և տվյալները մշակում է «Անձնական տվյալների պաշտպանության մասին» ՀՀ օրենքին համապատասխան։ Սույն քաղաքականությունը նկարագրում է, թե ինչ տվյալներ ենք հավաքում, ինչու և ինչպես ենք դրանք պաշտպանում։</p>
+<p>«Պարկուրի, ֆրիրանի, տրիկինգի և հարակից էքստրեմալ մարզաձևերի համահայկական ֆեդերացիա» հասարակական կազմակերպությունը (Armenian Parkour Union, ՀՎՀՀ՝ 03593528, այսուհետ՝ Ֆեդերացիա) հարգում է անձնական տվյալների պաշտպանության իրավունքը և տվյալները մշակում է «Անձնական տվյալների պաշտպանության մասին» ՀՀ օրենքին համապատասխան։ Սույն քաղաքականությունը նկարագրում է, թե ինչ տվյալներ ենք հավաքում, ինչու և ինչպես ենք դրանք պաշտպանում։</p>
 <h2>2. Ինչ տվյալներ ենք հավաքում</h2>
 <ul>
 <li><p>Անուն, ազգանուն, ծննդյան ամսաթիվ։</p></li>
@@ -84,7 +84,7 @@ export const privacy: PageTexts = {
 <h2>11. Փոփոխություններ</h2>
 <p>Մենք կարող ենք թարմացնել սույն քաղաքականությունը։ Գործող տարբերակը միշտ հրապարակվում է կայքում։ Վերջին թարմացումը՝ 2026 թվականի հոկտեմբերի 26։</p>`,
 	ru: `<h2>1. Общие положения</h2>
-<p>Armenian Parkour Union (далее — Федерация) уважает право на защиту персональных данных и обрабатывает данные в соответствии с законом РА «О защите персональных данных». Этот документ описывает, какие данные мы собираем, зачем и как их защищаем.</p>
+<p>Общественная организация «Всеармянская федерация паркура, фрирана, трикинга и смежных экстремальных видов спорта» (Armenian Parkour Union, ИНН 03593528, далее — Федерация) уважает право на защиту персональных данных и обрабатывает данные в соответствии с законом РА «О защите персональных данных». Этот документ описывает, какие данные мы собираем, зачем и как их защищаем.</p>
 <h2>2. Какие данные мы собираем</h2>
 <ul>
 <li><p>Имя, фамилия, дата рождения.</p></li>

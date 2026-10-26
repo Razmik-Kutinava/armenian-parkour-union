@@ -1,3 +1,4 @@
+import { existsSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { SYSTEM_PAGE_SLUGS, pageFormSchema } from '#lib/validation/pages.ts';
 import { PAGE_TEXTS } from './page-texts';
@@ -29,11 +30,15 @@ describe('system page texts', () => {
 		}
 	});
 
-	it('site links lead to a page in the same language', () => {
+	it('site links lead to a page in the same language or to a file in static/documents', () => {
 		for (const [slug, body] of Object.entries(PAGE_TEXTS)) {
 			for (const [lang, html] of Object.entries(body)) {
 				const prefix = lang === 'en' ? '/pages/' : `/${lang}/pages/`;
 				for (const [, href] of html.matchAll(/href="(\/[^"]*)"/g)) {
+					if (href.startsWith('/documents/')) {
+						expect(existsSync(`static${href}`), `${slug}.${lang}: ${href}`).toBe(true);
+						continue;
+					}
 					expect(href.startsWith(prefix), `${slug}.${lang}: ${href}`).toBe(true);
 					expect(SYSTEM_PAGE_SLUGS, href).toContain(href.slice(prefix.length));
 				}

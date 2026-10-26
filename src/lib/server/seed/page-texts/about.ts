@@ -1,7 +1,7 @@
 import type { PageTexts } from './types';
 
 export const about: PageTexts = {
-	en: `<p><strong>Armenian Parkour Union</strong> (Parkour, Freestyle and Tricking Federation of Armenia) is a non-profit organisation that develops parkour, freestyle and tricking in Armenia.</p>
+	en: `<p><strong>Armenian Parkour Union</strong> (officially the "All-Armenian Federation of Parkour, Freerunning, Tricking and Related Extreme Sports" public organisation) is a non-profit organisation that develops parkour, freerunning, tricking and related extreme sports in Armenia.</p>
 <p>We bring together coaches, athletes, judges and everyone who moves through the city. Our goal is to make these sports accessible to children and adults, to build a clear training system and a path from beginner to coach and judge.</p>
 <h2>What we do</h2>
 <ul>
@@ -13,8 +13,8 @@ export const about: PageTexts = {
 </ul>
 <h2>Our goals for 2026–2027</h2>
 <p>International recognition, a network of training spots and international competitions held in Armenia.</p>
-<p>The federation is registered as a non-profit organisation. Tax ID (TIN): 03593528.</p>`,
-	hy: `<p><strong>Armenian Parkour Union</strong>-ը (Հայաստանի պարկուրի, ֆրիսթայլի և թրիքինգի ֆեդերացիա) ոչ առևտրային կազմակերպություն է, որը զարգացնում է պարկուրը, ֆրիսթայլը և թրիքինգը Հայաստանում։</p>
+<p>The federation is registered as a public organisation in the State Register of Legal Entities of the Ministry of Justice of Armenia on 2 September 2026, registration number 211.171.1607318. Tax ID (TIN): 03593528. <a href="/documents/state-registration-extract.png" target="_blank" rel="noopener noreferrer">State register extract</a>.</p>`,
+	hy: `<p><strong>Armenian Parkour Union</strong>-ը («Պարկուրի, ֆրիրանի, տրիկինգի և հարակից էքստրեմալ մարզաձևերի համահայկական ֆեդերացիա» հասարակական կազմակերպություն) ոչ առևտրային կազմակերպություն է, որը զարգացնում է պարկուրը, ֆրիրանը, տրիկինգը և հարակից էքստրեմալ մարզաձևերը Հայաստանում։</p>
 <p>Մենք համախմբում ենք մարզիչներին, մարզիկներին, մրցավարներին և բոլոր նրանց, ովքեր զբաղվում են քաղաքային միջավայրում շարժմամբ։ Մեր նպատակն է այս մարզաձևերը հասանելի դարձնել երեխաների և մեծահասակների համար, ստեղծել պատրաստման հստակ համակարգ և ճանապարհ՝ սկսնակից մինչև մարզիչ և մրցավար։</p>
 <h2>Ինչով ենք զբաղվում</h2>
 <ul>
@@ -26,8 +26,8 @@ export const about: PageTexts = {
 </ul>
 <h2>Մեր նպատակները 2026–2027 թվականներին</h2>
 <p>Միջազգային ճանաչում, մարզահրապարակների ցանցի ստեղծում և միջազգային մրցումների անցկացում Հայաստանում։</p>
-<p>Ֆեդերացիան գրանցված է որպես ոչ առևտրային կազմակերպություն։ ՀՎՀՀ՝ 03593528։</p>`,
-	ru: `<p><strong>Armenian Parkour Union</strong> (Федерация паркура, фристайла и трикинга Армении) — некоммерческая организация, которая развивает паркур, фристайл и трикинг в Армении.</p>
+<p>Ֆեդերացիան որպես հասարակական կազմակերպություն գրանցված է ՀՀ արդարադատության նախարարության իրավաբանական անձանց պետական ռեգիստրում 2026 թ. սեպտեմբերի 2-ին, գրանցման համար՝ 211.171.1607318։ ՀՎՀՀ՝ 03593528։ <a href="/documents/state-registration-extract.png" target="_blank" rel="noopener noreferrer">Պետական միասնական գրանցամատյանից քաղվածք</a>։</p>`,
+	ru: `<p><strong>Armenian Parkour Union</strong> (официально — общественная организация «Всеармянская федерация паркура, фрирана, трикинга и смежных экстремальных видов спорта») — некоммерческая организация, которая развивает паркур, фриран, трикинг и смежные экстремальные виды спорта в Армении.</p>
 <p>Мы объединяем тренеров, спортсменов, судей и всех, кто занимается движением в городской среде. Наша задача — сделать эти виды спорта доступными для детей и взрослых, построить понятную систему подготовки и путь от новичка до тренера и судьи.</p>
 <h2>Что мы делаем</h2>
 <ul>
@@ -39,5 +39,5 @@ export const about: PageTexts = {
 </ul>
 <h2>Наши цели на 2026–2027 годы</h2>
 <p>Признание на международном уровне, сеть тренировочных площадок, проведение международных соревнований в Армении.</p>
-<p>Федерация зарегистрирована как некоммерческая организация. ИНН: 03593528.</p>`
+<p>Федерация зарегистрирована как общественная организация в Государственном регистре юридических лиц Министерства юстиции РА 2 сентября 2026 года, регистрационный номер 211.171.1607318. ИНН: 03593528. <a href="/documents/state-registration-extract.png" target="_blank" rel="noopener noreferrer">Выписка из государственного реестра</a>.</p>`
 };
