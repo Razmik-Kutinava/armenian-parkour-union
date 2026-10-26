@@ -16,6 +16,7 @@ export const ADMIN_AUDIT = {
 	'/admin/settings?/default': ['settings.update'],
 	'/admin/settings/payments?/default': ['settings.update'],
 	'/admin/settings/videos?/default': ['settings.update'],
+	'/admin/settings/certificates?/default': ['settings.update'],
 	'/admin/settings/languages?/default': ['settings.update'],
 	'/admin/media?/complete': ['media.upload'],
 	'/admin/media/[id]?/alt': ['media.update'],

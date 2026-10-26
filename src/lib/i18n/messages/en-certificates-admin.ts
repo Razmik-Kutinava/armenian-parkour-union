@@ -75,5 +75,13 @@ export const enCertificatesAdmin = {
 	'certificates.card.revokeText':
 		'The certificate becomes invalid at once, also by its QR code. The level and the points stay: change them separately if needed.',
 	'exams.card.certificate': 'Certificate',
-	'exams.card.issue': 'Issue a certificate'
+	'exams.card.issue': 'Issue a certificate',
+	'settings.tab.certificates': 'Certificates',
+	'certificates.signer.section': 'Signature on the PDF',
+	'certificates.signer.sectionHint':
+		'The name and title under the signature line of new certificate PDFs, one line per PDF language. English is required; an empty Armenian or Russian field shows the English text. Leave every field empty for a plain "Signature". PDFs made earlier change after "Remake PDF" on the certificate card.',
+	'certificates.signer.name': 'Name — {language}',
+	'certificates.signer.title': 'Title — {language}',
+	'certificates.signer.error.required': 'Required once the signature is filled in.',
+	'certificates.signer.error.long': 'At most 80 characters.'
 } as const;

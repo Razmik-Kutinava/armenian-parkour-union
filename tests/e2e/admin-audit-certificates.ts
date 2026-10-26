@@ -2,7 +2,10 @@ import { expect, type Page } from '@playwright/test';
 import type postgres from 'postgres';
 import type { AdminAction } from './admin-audit-map';
 
-type CertificateAction = Extract<AdminAction, `/admin/${'certificates' | 'staff'}${string}`>;
+type CertificateAction = Extract<
+	AdminAction,
+	`/admin/${'certificates' | 'staff'}${string}` | '/admin/settings/certificates?/default'
+>;
 type Post = (path: string, form?: Record<string, string>) => Promise<void>;
 
 const ORIGIN = { origin: 'http://localhost:4173' };
@@ -12,7 +15,8 @@ const ORIGIN = { origin: 'http://localhost:4173' };
  * without an exam (with a comment) — `certificate.issue` and `user.level`; a certificate written by
  * SQL is revoked. No private bucket in tests: the PDF remake is refused and logs nothing —
  * `certificate.pdf` is covered by services/certificates/pdf-store.test.ts. The judge profile of
- * that certificate gets a new category (`staff_profile.update`).
+ * that certificate gets a new category (`staff_profile.update`). The PDF signer is changed and put
+ * back at once, so other tests see the stored one.
  */
 export function certificateActions(
 	sql: postgres.Sql,
@@ -66,6 +70,20 @@ export function certificateActions(
 				category: 'Audit category',
 				isActive: 'on'
 			});
+		},
+		'/admin/settings/certificates?/default': async () => {
+			const [row] = await sql`select value from site_settings where key = 'certificates'`;
+			const signer = row?.value?.signer;
+			const form = (name?: Record<string, string>, title?: Record<string, string>) => ({
+				nameHy: name?.hy ?? '',
+				nameEn: name?.en ?? '',
+				nameRu: name?.ru ?? '',
+				titleHy: title?.hy ?? '',
+				titleEn: title?.en ?? '',
+				titleRu: title?.ru ?? ''
+			});
+			await post('/admin/settings/certificates', form({ en: 'Audit Signer' }, { en: 'Audit' }));
+			await post('/admin/settings/certificates', form(signer?.name, signer?.title));
 		}
 	};
 }

@@ -5,7 +5,8 @@ import { signerFormSchema } from './certificate-signer';
  * English is the fallback, so it is required once anything is filled; all empty — no signer. */
 
 const empty = { nameHy: '', nameEn: '', nameRu: '', titleHy: '', titleEn: '', titleRu: '' };
-const parse = (values: Partial<typeof empty>) => signerFormSchema.safeParse({ ...empty, ...values });
+const parse = (values: Partial<typeof empty>) =>
+	signerFormSchema.safeParse({ ...empty, ...values });
 
 describe('certificate signer form', () => {
 	it('all empty — no signer', () => {

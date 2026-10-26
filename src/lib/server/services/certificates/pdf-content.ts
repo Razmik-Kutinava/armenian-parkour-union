@@ -1,7 +1,8 @@
+import { pickLocalized } from '#lib/i18n/localized.ts';
 import type { Locale } from '#lib/i18n/locales.ts';
 import { translate, type MessageKey } from '#lib/i18n/translate.ts';
 import { certificateTitleKey } from './mail';
-import type { CertificateSettings } from './settings';
+import type { CertificateSettings, CertificateSigner } from './settings';
 
 /* docs/08 section 10: what the PDF says, in which languages — kept apart from the drawing. */
 
@@ -29,11 +30,17 @@ export type CertificateContent = {
 	kind: Multilingual;
 	category: PdfField | null;
 	fields: PdfField[];
-	signature: string;
+	/** Lines under the signature line, top to bottom. */
+	signature: string[];
 	verify: { label: string; url: string };
 };
 
-export type ContentOptions = { languages: Locale[]; unionNames: string[]; siteUrl: string };
+export type ContentOptions = {
+	languages: Locale[];
+	unionNames: string[];
+	siteUrl: string;
+	signer: CertificateSigner | null;
+};
 
 export const pdfLanguages = (s: Pick<CertificateSettings, 'pdfRussian'>): Locale[] =>
 	s.pdfRussian ? ['hy', 'en', 'ru'] : ['hy', 'en'];
@@ -58,10 +65,17 @@ const multilingual = ([main, ...rest]: string[]): Multilingual => ({
 	rest: rest.filter((x, i) => x !== main && rest.indexOf(x) === i)
 });
 
+/** "Name, title" per language (English where a translation is missing), each line once. */
+const signerLines = (signer: CertificateSigner, languages: Locale[]) => [
+	...new Set(
+		languages.map((l) => `${pickLocalized(signer.name, l)}, ${pickLocalized(signer.title, l)}`)
+	)
+];
+
 export function certificateContent(
 	cert: PdfCertificate,
 	holder: PdfHolder,
-	{ languages, unionNames, siteUrl }: ContentOptions
+	{ languages, unionNames, siteUrl, signer }: ContentOptions
 ): CertificateContent {
 	const each = (key: MessageKey) => languages.map((l) => translate(l, key));
 	const label = (key: MessageKey) => each(key).join(' / ');
@@ -84,7 +98,7 @@ export function certificateContent(
 				? [field('certificates.pdf.valid_until', yerevanDate(cert.expiresAt))]
 				: [])
 		],
-		signature: label('certificates.pdf.signature'),
+		signature: signer ? signerLines(signer, languages) : [label('certificates.pdf.signature')],
 		verify: {
 			label: label('certificates.pdf.verify'),
 			url: `${siteUrl.replace(/\/+$/, '')}/certificate/${cert.publicToken}`

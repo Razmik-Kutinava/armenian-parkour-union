@@ -22,6 +22,8 @@ const CX = W / 2;
 const MARGIN = 64;
 const SEAL = 112;
 const SIGNATURE_WIDTH = 120;
+/** Text under the signature: kept clear of the seal's circle on the right. */
+const SIGNATURE_LINE = 150;
 const QR = 84;
 
 type Fonts = Awaited<ReturnType<typeof embedFonts>>;
@@ -98,7 +100,10 @@ function footer(page: PDFPage, f: Fonts, c: CertificateContent) {
 		thickness: 0.6,
 		color: INK
 	});
-	drawCentered(page, c.signature, signX, 78, { font: f.regular, size: 7.5, color: MUTED });
+	c.signature.forEach((line, i) => {
+		const size = fitSize(line, f.regular, 7.5, SIGNATURE_LINE);
+		drawCentered(page, line, signX, 78 - i * 10, { font: f.regular, size, color: MUTED });
+	});
 	const qrX = W - MARGIN - QR;
 	drawQr(page, c.verify.url, qrX, 92, QR, INK);
 	drawRight(page, c.verify.label, W - MARGIN, 80, { font: f.regular, size: 7.5, color: MUTED });

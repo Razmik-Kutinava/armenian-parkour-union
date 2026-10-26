@@ -43,6 +43,6 @@ normal (настройки и PDF; права — `settings.write`, как у в
 ## Фазы
 
 - [x] SPEC
-- [ ] RED
-- [ ] GREEN
+- [x] RED `b0072fe`
+- [x] GREEN — Vitest задачи + `pdf-store`, `translate` 46/46, `access-coverage` и `audit-coverage` зелёные (`audit-coverage` — повтор с `--testTimeout`, первый раз упал по таймауту 20 с); e2e `admin-audit` + `admin-permissions` 5/5; check 0, eslint и prettier чистые. Строки подписи (до ~148 pt шрифтом APU Sans 7.5) помещаются в 150 pt без ужатия, правее — круг печати
 - [ ] REVIEW (этапа)

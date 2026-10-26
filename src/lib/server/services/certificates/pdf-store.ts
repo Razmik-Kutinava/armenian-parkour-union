@@ -65,7 +65,8 @@ export async function storeCertificatePdf(
 	const content = certificateContent(row.cert, row, {
 		languages,
 		unionNames: await unionNames(db, languages),
-		siteUrl: deps.siteUrl
+		siteUrl: deps.siteUrl,
+		signer: deps.settings.signer
 	});
 	const key = certificatePdfKey(row.cert.userId, row.cert.id);
 	try {

@@ -14,7 +14,8 @@ export { IP, daysFrom, insertCertificate, insertStaff, levelOf } from '../exams/
 export const SETTINGS: CertificateSettings = {
 	staffValidMonths: 24,
 	pdfRussian: true,
-	staffRemindDays: [30, 7]
+	staffRemindDays: [30, 7],
+	signer: null
 };
 
 const png = (base64: string) => new Uint8Array(Buffer.from(base64, 'base64'));

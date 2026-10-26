@@ -2,11 +2,17 @@
 	import { t } from '#lib/i18n/index.svelte.ts';
 
 	/* Pages of "Site settings" (docs/05 section 21); the admin menu keeps one entry. */
-	let { current }: { current: 'site' | 'payments' | 'videos' | 'languages' } = $props();
+	let { current }: { current: 'site' | 'payments' | 'videos' | 'certificates' | 'languages' } =
+		$props();
 	const tabs = [
 		{ id: 'site', href: '/admin/settings', label: 'settings.tab.site' },
 		{ id: 'payments', href: '/admin/settings/payments', label: 'settings.tab.payments' },
 		{ id: 'videos', href: '/admin/settings/videos', label: 'settings.tab.videos' },
+		{
+			id: 'certificates',
+			href: '/admin/settings/certificates',
+			label: 'settings.tab.certificates'
+		},
 		{ id: 'languages', href: '/admin/settings/languages', label: 'settings.tab.languages' }
 	] as const;
 </script>

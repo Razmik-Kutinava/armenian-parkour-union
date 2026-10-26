@@ -76,5 +76,13 @@ export const hyCertificatesAdmin: Partial<Messages> = {
 	'certificates.card.revokeText':
 		'Հավաստագիրն անմիջապես անվավեր կդառնա, այդ թվում QR կոդով։ Աստիճանը և միավորները կմնան. անհրաժեշտության դեպքում փոխեք դրանք առանձին։',
 	'exams.card.certificate': 'Հավաստագիր',
-	'exams.card.issue': 'Տալ հավաստագիր'
+	'exams.card.issue': 'Տալ հավաստագիր',
+	'settings.tab.certificates': 'Վկայականներ',
+	'certificates.signer.section': 'Ստորագրությունը PDF-ում',
+	'certificates.signer.sectionHint':
+		'Անունը և պաշտոնը նոր վկայականների PDF-ում ստորագրության գծի տակ՝ մեկ տող PDF-ի յուրաքանչյուր լեզվով։ Անգլերենը պարտադիր է․ դատարկ հայերեն կամ ռուսերեն դաշտի փոխարեն կցուցադրվի անգլերեն տեքստը։ Բոլոր դաշտերը դատարկ՝ գծի տակ պարզապես «Ստորագրություն»։ Արդեն պատրաստված PDF-ները կփոխվեն վկայականի քարտում «Վերստեղծել PDF»-ից հետո։',
+	'certificates.signer.name': 'Անուն — {language}',
+	'certificates.signer.title': 'Պաշտոն — {language}',
+	'certificates.signer.error.required': 'Պարտադիր է, եթե ստորագրությունը լրացված է։',
+	'certificates.signer.error.long': 'Ոչ ավելի, քան 80 նիշ։'
 };

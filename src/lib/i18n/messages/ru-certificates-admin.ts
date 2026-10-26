@@ -75,5 +75,13 @@ export const ruCertificatesAdmin: Partial<Messages> = {
 	'certificates.card.revokeText':
 		'Сертификат сразу станет недействительным, в том числе по QR-коду. Степень и баллы останутся: при необходимости измените их отдельно.',
 	'exams.card.certificate': 'Сертификат',
-	'exams.card.issue': 'Выдать сертификат'
+	'exams.card.issue': 'Выдать сертификат',
+	'settings.tab.certificates': 'Сертификаты',
+	'certificates.signer.section': 'Подпись в PDF',
+	'certificates.signer.sectionHint':
+		'Имя и должность под линией подписи в новых PDF сертификатов — строка на каждом языке PDF. Английский обязателен; пустое армянское или русское поле заменяется английским текстом. Все поля пустые — под линией просто «Подпись». Уже готовые PDF изменятся после «Пересоздать PDF» на карточке сертификата.',
+	'certificates.signer.name': 'Имя — {language}',
+	'certificates.signer.title': 'Должность — {language}',
+	'certificates.signer.error.required': 'Обязательно, если подпись заполнена.',
+	'certificates.signer.error.long': 'Не больше 80 символов.'
 };
