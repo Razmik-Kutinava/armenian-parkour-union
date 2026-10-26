@@ -18,7 +18,12 @@ const holder = { name: 'aram', firstName: 'Արամ', lastName: 'Պետրոսյ�
 const options = {
 	languages: pdfLanguages({ pdfRussian: true }),
 	unionNames: ['Հայաստանի պարկուրի միություն', 'Armenian Parkour Union', 'Armenian Parkour Union'],
-	siteUrl: 'https://parkour.test/'
+	siteUrl: 'https://parkour.test/',
+	signer: null
+};
+const SIGNER = {
+	name: { hy: 'Ռազմիկ Գյուրջյան', en: 'Razmik Giurdzian', ru: 'Размик Гюрджян' },
+	title: { hy: 'ֆեդերացիայի ղեկավար', en: 'Head of the Federation', ru: 'руководитель федерации' }
 };
 
 describe('certificates: PDF content', () => {
@@ -64,7 +69,28 @@ describe('certificates: PDF content', () => {
 			{ label: label('certificates.pdf.issued'), value: '05.03.2026' }
 		]);
 		expect(c.category).toBeNull();
-		expect(c.signature).toBe(label('certificates.pdf.signature'));
+		expect(c.signature).toEqual([label('certificates.pdf.signature')]);
+	});
+
+	it('signer: "name, title" on its own line per PDF language, Armenian first', () => {
+		const c = certificateContent(cert, holder, { ...options, signer: SIGNER });
+		expect(c.signature).toEqual([
+			'Ռազմիկ Գյուրջյան, ֆեդերացիայի ղեկավար',
+			'Razmik Giurdzian, Head of the Federation',
+			'Размик Гюрджян, руководитель федерации'
+		]);
+		const noRu = certificateContent(cert, holder, {
+			...options,
+			languages: ['hy', 'en'],
+			signer: SIGNER
+		});
+		expect(noRu.signature).toHaveLength(2);
+	});
+
+	it('signer without a translation: English in its place, the same line once', () => {
+		const english = { name: { en: 'Razmik Giurdzian' }, title: { en: 'Head of the Federation' } };
+		const c = certificateContent(cert, holder, { ...options, signer: english });
+		expect(c.signature).toEqual(['Razmik Giurdzian, Head of the Federation']);
 	});
 
 	it('coach: category and "valid until"', () => {

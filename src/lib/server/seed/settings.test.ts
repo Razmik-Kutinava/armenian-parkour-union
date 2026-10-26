@@ -71,11 +71,19 @@ describe('seed: site_settings values', () => {
 		expect(SEED_SETTINGS.exams).toEqual({ retake_days: 0, min_days_on_level: 0 });
 	});
 
-	it('certificates: coach and judge valid 24 months, Russian in the PDF, letters 30 and 7 days ahead (docs/03 4.6, 16; 08 10)', () => {
+	it('certificates: coach and judge valid 24 months, Russian in the PDF, letters 30 and 7 days ahead, the head signs (docs/03 4.6, 16; 08 10; questions.md stage 6)', () => {
 		expect(SEED_SETTINGS.certificates).toEqual({
 			staff_valid_months: 24,
 			pdf_russian: true,
-			staff_remind_days: [30, 7]
+			staff_remind_days: [30, 7],
+			signer: {
+				name: { hy: 'Ռազմիկ Գյուրջյան', en: 'Razmik Giurdzian', ru: 'Размик Гюрджян' },
+				title: {
+					hy: 'ֆեդերացիայի ղեկավար',
+					en: 'Head of the Federation',
+					ru: 'руководитель федерации'
+				}
+			}
 		});
 	});
 

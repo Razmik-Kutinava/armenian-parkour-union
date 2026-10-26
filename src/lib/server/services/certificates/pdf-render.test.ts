@@ -21,7 +21,15 @@ const content = (holder: string, kind: 'level' | 'judge' = 'level') =>
 		{
 			languages: pdfLanguages({ pdfRussian: true }),
 			unionNames: ['Armenian Parkour Union'],
-			siteUrl: 'https://parkour.test'
+			siteUrl: 'https://parkour.test',
+			signer: {
+				name: { hy: 'Ռազմիկ Գյուրջյան', en: 'Razmik Giurdzian', ru: 'Размик Гюрджян' },
+				title: {
+					hy: 'ֆեդերացիայի ղեկավար',
+					en: 'Head of the Federation',
+					ru: 'руководитель федерации'
+				}
+			}
 		}
 	);
 
