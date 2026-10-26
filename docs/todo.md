@@ -5,42 +5,45 @@
 
 ## Задача
 
-Этап 8, доработка 5.10 (решение владельца 2026-10-26, `questions.md` этап 5): допуск при переводе из очереди. Сейчас `fillFromWaitlist` и «Дать место» сотрудником условия допуска заново не проверяют — место может получить несовершеннолетний, чьё согласие истекло, пока он ждал, заблокированный или с закончившимся членством (против `03` § 15).
+Этап 8, доработка 5.9 (решение владельца 2026-10-26, `questions.md` этап 5): три письма участнику — ручное добавление сотрудником, отмена регистрации сотрудником, снятие места из-за неоплаты (истёк `hold_until`).
 
 Решения (агент):
-1. Проверка — те же условия участника, что у ручного добавления (`checkStaffAdmission`: статус, email, членство, категория, дата рождения, согласие до 18, возраст категории; без окна регистрации — человек уже в очереди). Удалённый аккаунт — не допускается.
-2. Автоматический перевод: не прошедший пропускается, его строка остаётся `waitlist` (место в очереди сохраняется, как сейчас у полной категории); письма ему нет; место уходит следующему допущенному.
-3. «Дать место» сотрудником: отказ с причиной (`parental_consent`, `no_membership`, `blocked`…) — сообщения в админке уже есть (`outcome.ts`); ничего не меняется, журнала нет.
-4. Данные — `readMember` + `readAdmission(…, lock = false)` (строка регистрации уже заблокирована вызывающим).
+1. Ручное добавление — то же письмо «Вы зарегистрированы» (`registeredLetter`, ссылка на «Мои события»), после коммита. Отказ — без письма.
+2. Отмена сотрудником — новое письмо «Регистрация отменена» (любой отменённый статус: место, ожидание оплаты, очередь). Причину сотрудника не пишем (как у отмены события: внутренний комментарий). Оплаченному (`registered` с платежом) — та же строка о возврате, что у отмены события. Ссылка — «Мои события».
+3. Неоплата — новое письмо «Время на оплату вышло»: регистрация отменена, место ушло следующему; ссылка — страница события (можно записаться снова, если места есть). Удержание, оставленное сверке (платёж `pending`), — без письма.
+4. Письмо не ушло — только `console.warn`, изменение остаётся (`sendLetters`).
 
 ## Файлы (ожидаемо)
 
-- `src/lib/server/services/registrations/waitlist-admission.ts` — новое: `promotionRefusal(tx, event, row, now)` → `Refusal | 'deleted' | null`
-- `src/lib/server/services/registrations/waitlist.ts` — пропуск не прошедших
-- `src/lib/server/services/registrations/staff/promote.ts` — отказ с причиной, `PromoteResult` + `Refusal`
-- `src/lib/server/services/registrations/waitlist.test.ts`, `staff/promote.test.ts` — тесты
+- `src/lib/server/services/registrations/mail.ts` — `staffCancelledLetter`, `holdExpiredLetter`
+- `src/lib/server/services/registrations/staff/add.ts` — `mail?: LetterDeps`, письмо после коммита; `staff/index.ts` — `addNow`; маршрут `src/routes/admin/registrations/[id]/+page.server.ts` — `addNow`
+- `src/lib/server/services/registrations/staff/cancel.ts` — письмо отменённому
+- `src/lib/server/services/registrations/release.ts` — письмо снятому
+- `src/lib/i18n/messages/{en,ru,hy}-registrations.ts` — тексты
+- Тесты: `letters-staff.test.ts` (новый)
 
 ## Не ломать
 
-- Перевод из очереди: первый допущенный получает место, письмо на его языке; платное — `offer_hours`; полная категория пропускается (тесты `waitlist.test`).
-- «Дать место» сотрудником: только на свободное место, журнал `registration.promote` (тесты `promote.test`).
-- Отмена участником / сотрудником, снятие удержания, возврат оплаты — все зовут `fillFromWaitlist`.
+- Ручное добавление: условия допуска, `full`, журнал `registration.add` (`staff/add.test`, `points-staff.test`).
+- Отмена сотрудником: очередь получает место и письмо, платёж — «проверить» (`staff/cancel.test`).
+- Снятие удержания: платёж у провайдера — не трогаем; первый в очереди — письмо о месте (`release.test`, `acceptance-event.test`).
 
 ## Проверка
 
-- `npx vitest --run src/lib/server/services/registrations/waitlist.test.ts src/lib/server/services/registrations/staff/promote.test.ts src/lib/server/services/registrations/release.test.ts src/lib/server/services/registrations/cancel.test.ts`
+- `npx vitest --run src/lib/server/services/registrations/letters-staff.test.ts src/lib/server/services/registrations/staff/add.test.ts src/lib/server/services/registrations/staff/cancel.test.ts src/lib/server/services/registrations/release.test.ts`
 
 ## Риск
 
-high (допуск несовершеннолетних, `03` § 13, 15)
+normal (письма; права и данные не меняются)
 
 ## Читать
 
-- `03` § 7 п. 2–3 (прочитано: условия допуска; первый из очереди — автоматически), § 13 п. 2, § 15 («несовершеннолетнего без одобренного согласия — никогда»)
+- `questions.md` этап 5 (прочитано: добавить все три письма)
+- `zone-notes.md` § «Регистрации и события», 5.9 (прочитано: `eventLetter`, письма после коммита)
 
 ## Фазы
 
 - [x] SPEC
-- [x] RED `1ebcfc8`
-- [x] GREEN — Vitest задачи 11/11 (`waitlist` 6, `promote` 5) + `release`, `cancel` зелёные; check 0, eslint и prettier чистые. Тест очереди разделён на два (6 участников в одном не укладывались в 20 с на медленной Neon)
+- [ ] RED
+- [ ] GREEN
 - [ ] REVIEW (этапа)

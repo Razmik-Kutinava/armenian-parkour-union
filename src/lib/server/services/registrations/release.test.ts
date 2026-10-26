@@ -20,7 +20,7 @@ describe.skipIf(!testDbUrl)('registrations: releasing expired holds', () => {
 	const { inRollback, close } = testDb();
 	afterAll(close);
 
-	it('hold over, never paid: cancelled, the first in line gets the seat and a letter', async () => {
+	it('hold over, never paid: cancelled and told, the first in line gets the seat and a letter', async () => {
 		await inRollback(async (tx) => {
 			const event = await paidEvent(tx, { capacity: 1 });
 			const [a, b] = [await insertMember(tx), await insertMember(tx)];
@@ -37,7 +37,7 @@ describe.skipIf(!testDbUrl)('registrations: releasing expired holds', () => {
 			const promoted = await registrationOf(tx, queued.id);
 			expect(promoted.status).toBe('pending_payment');
 			expect(promoted.holdUntil!.getTime()).toBe(now.getTime() + SETTINGS.offerHours * HOUR);
-			expect(box.sent.map((m) => m.to)).toEqual([b.email]);
+			expect(box.sent.map((m) => m.to)).toEqual([a.email, b.email]);
 		});
 	});
 
