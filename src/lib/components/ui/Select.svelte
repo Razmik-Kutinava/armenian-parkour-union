@@ -23,6 +23,13 @@
 		class: className = '',
 		...rest
 	}: Props = $props();
+
+	/* Svelte keeps an <input> edited before hydration, not a <select>: it resets it to the state.
+	 * Runs before the bind:value effect; `selected` attributes exist only in server markup. */
+	function keepEarlyChoice(select: HTMLSelectElement) {
+		const initial = [...select.options].find((option) => option.defaultSelected);
+		if (initial && !initial.selected) value = select.value;
+	}
 </script>
 
 <Field {label} {hint} {error}>
@@ -31,6 +38,7 @@
 			<select
 				{id}
 				bind:value
+				{@attach keepEarlyChoice}
 				aria-describedby={describedBy}
 				aria-invalid={invalid || undefined}
 				class="{controlClass} appearance-none pr-10 pl-3 {className}"

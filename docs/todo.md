@@ -115,5 +115,5 @@ Svelte 5.57 при гидратации выставляет `<select bind:value
 Риск: normal (общий компонент формы; деньги — только через верный тип и валюту).
 
 - [x] SPEC
-- [ ] RED
-- [ ] GREEN
+- [x] RED `23511b9`
+- [x] GREEN — e2e `admin-payments` + `journey-membership` 5/5, check 0, lint чистый

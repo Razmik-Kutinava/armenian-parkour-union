@@ -1,7 +1,6 @@
 import { existsSync } from 'node:fs';
 import { expect, test } from '@playwright/test';
 import postgres from 'postgres';
-import { hydrated } from './hydrated';
 import { journeyActors } from './journey-actors';
 
 /* Journey (docs/09, 8.11): joining and paying the fee. A guest signs up and confirms the email; the
@@ -34,8 +33,6 @@ test('guest signs up, confirms the email, the admin records the fee, the member 
 	const adminUser = await actors.staff(admin, 'admin');
 	const comment = `Bank transfer ${crypto.randomUUID().slice(0, 8)}`;
 	await admin.goto('/admin/payments/new');
-	/* A type chosen before hydration is reset to "donation". */
-	await hydrated(admin);
 	await admin.getByLabel('Type').selectOption('membership');
 	await admin.getByLabel('Amount').fill('20000');
 	await admin.getByLabel('Payment date').fill(daysAgo(2));
