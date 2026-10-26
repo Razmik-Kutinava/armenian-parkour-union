@@ -26,5 +26,7 @@ export const enPages = {
 	'pages.error.slug': 'Use lowercase Latin letters, digits and single hyphens',
 	'pages.error.slugTaken': 'This address is already taken',
 	'pages.error.status': 'Choose a status',
-	'media.usage.page': 'Page'
+	'media.usage.page': 'Page',
+	'legal.read': 'Read before you agree:',
+	'legal.payAccept': 'By paying, you accept the terms of:'
 } as const;

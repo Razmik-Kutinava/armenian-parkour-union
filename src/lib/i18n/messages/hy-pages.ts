@@ -27,5 +27,7 @@ export const hyPages: Partial<Messages> = {
 	'pages.error.slug': 'Օգտագործեք փոքրատառ լատինատառ, թվեր և միայնակ գծիկներ',
 	'pages.error.slugTaken': 'Այս հասցեն արդեն զբաղված է',
 	'pages.error.status': 'Ընտրեք կարգավիճակը',
-	'media.usage.page': 'Էջ'
+	'media.usage.page': 'Էջ',
+	'legal.read': 'Կարդացեք նախքան համաձայնելը՝',
+	'legal.payAccept': 'Վճարելով՝ դուք ընդունում եք հետևյալ փաստաթղթերի պայմանները՝'
 };

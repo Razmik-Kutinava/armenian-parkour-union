@@ -1,5 +1,6 @@
-// npx tsx scripts/fill-system-pages.ts [--publish] [--dry] — writes the first texts of the system
-// pages through the admin service (cleaning + audit log). A page that already has text is skipped.
+// npx tsx scripts/fill-system-pages.ts [--publish] [--dry] [--overwrite=privacy,rules] — writes the
+// texts of the system pages through the admin service (cleaning + audit log). A page that already
+// has text is skipped unless it is listed in --overwrite (that replaces edits made in the admin panel).
 import { existsSync } from 'node:fs';
 import { and, eq, isNull } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/postgres-js';
@@ -18,6 +19,11 @@ if (!DATABASE_URL || !actorEmail)
 	throw new Error('DATABASE_URL and PAGES_ACTOR_EMAIL are required');
 const publish = process.argv.includes('--publish');
 const dry = process.argv.includes('--dry');
+const overwriteArg = process.argv.find((a) => a.startsWith('--overwrite='));
+const overwrite = new Set(overwriteArg?.slice('--overwrite='.length).split(',').filter(Boolean));
+for (const slug of overwrite) {
+	if (!(slug in PAGE_TEXTS)) throw new Error(`--overwrite: unknown system page ${slug}`);
+}
 
 const client = postgres(DATABASE_URL, { max: 1, onnotice: () => {} });
 try {
@@ -39,7 +45,7 @@ try {
 			.from(pages)
 			.where(and(eq(pages.slug, slug), eq(pages.isSystem, true), isNull(pages.deletedAt)));
 		if (!page) throw new Error(`${slug}: no system page, run db:seed first`);
-		if (Object.values(page.body as object).some(Boolean)) {
+		if (Object.values(page.body as object).some(Boolean) && !overwrite.has(slug)) {
 			console.log(`${slug}: already has text, skipped`);
 			continue;
 		}

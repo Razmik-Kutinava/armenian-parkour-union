@@ -3,6 +3,7 @@
 	import Button from '#lib/components/ui/Button.svelte';
 	import Checkbox from '#lib/components/ui/Checkbox.svelte';
 	import Input from '#lib/components/ui/Input.svelte';
+	import LegalLinks from '#lib/components/site/LegalLinks.svelte';
 	import { currentLocale, localizePath, t } from '#lib/i18n/index.svelte.ts';
 	import { isMinor } from '#lib/validation/auth.ts';
 	import { createSubmit } from '../submit.svelte';
@@ -61,6 +62,7 @@
 		checked={form?.values?.terms === 'on'}
 		error={err('terms')}
 	/>
+	<LegalLinks lead="legal.read" pages={['privacy', 'rules']} />
 	<Button type="submit" loading={sending.submitting}>{t('auth.profile.submit')}</Button>
 </form>
 

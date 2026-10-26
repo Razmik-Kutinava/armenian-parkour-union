@@ -8,6 +8,7 @@
 	import { currentLocale, t, type MessageKey } from '#lib/i18n/index.svelte.ts';
 	import { formatPrice } from '#lib/money.ts';
 	import { amountPresets } from './donation-presets';
+	import LegalLinks from './LegalLinks.svelte';
 
 	type Limits = { currency: string; minMinor: number; maxMinor: number };
 	type FormState = {
@@ -120,5 +121,6 @@
 		name="isAnonymous"
 		checked={form?.values?.isAnonymous === 'on'}
 	/>
+	<LegalLinks lead="legal.payAccept" pages={['offer', 'refund-policy']} />
 	<Button type="submit" loading={submitting} class="self-start">{t('donate.submit')}</Button>
 </form>

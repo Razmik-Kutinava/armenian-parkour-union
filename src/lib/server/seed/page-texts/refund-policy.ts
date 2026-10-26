@@ -11,7 +11,7 @@ export const refundPolicy: PageTexts = {
 </ul>
 <h2>2. Event participation</h2>
 <ul>
-<li><p>If you cancel your participation 14 days or more before the event starts, we refund the full amount. Later cancellations are not refunded.</p></li>
+<li><p>If you cancel your participation at least 48 hours before the event starts, we refund the full amount. Later cancellations are not refunded.</p></li>
 <li><p>If the Federation cancels or moves the event, we refund the full amount or transfer your participation to the new date — whichever you choose.</p></li>
 <li><p>Points awarded for registering for the event are cancelled when the payment is refunded.</p></li>
 </ul>
@@ -29,7 +29,7 @@ export const refundPolicy: PageTexts = {
 </ul>
 <h2>2. Մասնակցություն միջոցառումներին</h2>
 <ul>
-<li><p>Եթե չեղարկում եք մասնակցությունը միջոցառման մեկնարկից 14 և ավելի օր առաջ, վերադարձնում ենք ամբողջ գումարը։ Ավելի ուշ չեղարկման դեպքում գումարը չի վերադարձվում։</p></li>
+<li><p>Եթե չեղարկում եք մասնակցությունը միջոցառման մեկնարկից առնվազն 48 ժամ առաջ, վերադարձնում ենք ամբողջ գումարը։ Ավելի ուշ չեղարկման դեպքում գումարը չի վերադարձվում։</p></li>
 <li><p>Եթե Ֆեդերացիան չեղարկում կամ տեղափոխում է միջոցառումը, վերադարձնում ենք ամբողջ գումարը կամ տեղափոխում ենք ձեր մասնակցությունը նոր ամսաթվին՝ ձեր ընտրությամբ։</p></li>
 <li><p>Միջոցառմանը գրանցվելու համար հաշվարկված միավորները չեղարկվում են վճարումը վերադարձնելիս։</p></li>
 </ul>
@@ -47,7 +47,7 @@ export const refundPolicy: PageTexts = {
 </ul>
 <h2>2. Участие в мероприятиях</h2>
 <ul>
-<li><p>Если вы отменили участие за 14 дней и более до начала мероприятия, возвращаем полную сумму. При более поздней отмене возврат не производится.</p></li>
+<li><p>Если вы отменили участие не позднее чем за 48 часов до начала мероприятия, возвращаем полную сумму. При более поздней отмене возврат не производится.</p></li>
 <li><p>Если мероприятие отменено или перенесено Федерацией, возвращаем полную сумму или переводим участие на новую дату — по вашему выбору.</p></li>
 <li><p>Баллы, начисленные за регистрацию на мероприятие, при возврате оплаты отменяются.</p></li>
 </ul>

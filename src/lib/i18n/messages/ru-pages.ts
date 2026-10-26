@@ -28,5 +28,7 @@ export const ruPages: Record<keyof typeof enPages, string> = {
 	'pages.error.slug': 'Только строчная латиница, цифры и одиночные дефисы',
 	'pages.error.slugTaken': 'Этот адрес уже занят',
 	'pages.error.status': 'Выберите статус',
-	'media.usage.page': 'Страница'
+	'media.usage.page': 'Страница',
+	'legal.read': 'Прочитайте перед согласием:',
+	'legal.payAccept': 'Оплачивая, вы принимаете условия документов:'
 };

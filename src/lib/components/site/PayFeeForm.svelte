@@ -3,6 +3,7 @@
 	import { enhance } from '$app/forms';
 	import Button from '#lib/components/ui/Button.svelte';
 	import { t, type MessageKey } from '#lib/i18n/index.svelte.ts';
+	import LegalLinks from './LegalLinks.svelte';
 
 	/* docs/06 section 9: the reason of a failed start and the button to try again. No amount field. */
 	let { label, error }: { label: MessageKey; error?: MessageKey | null } = $props();
@@ -32,5 +33,6 @@
 			{t(error)}
 		</p>
 	{/if}
+	<LegalLinks lead="legal.payAccept" pages={['offer', 'refund-policy']} />
 	<Button type="submit" loading={submitting} class="self-start">{t(label)}</Button>
 </form>
