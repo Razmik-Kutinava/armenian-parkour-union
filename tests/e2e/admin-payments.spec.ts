@@ -75,6 +75,24 @@ test('manual donation: recorded as paid, found in the list, refunded, exported',
 	expect(row.refunded_at).not.toBeNull();
 });
 
+test('type and currency chosen before the page is interactive are kept', async ({ page }) => {
+	await registerAdmin(page);
+	let release = () => {};
+	const scripts = new Promise<void>((resolve) => (release = resolve));
+	await page.route('**/_app/immutable/**/*.js', async (route) => {
+		await scripts;
+		await route.continue();
+	});
+	await page.goto('/admin/payments/new', { waitUntil: 'domcontentloaded' });
+	await page.getByLabel('Type').selectOption('membership');
+	await page.getByLabel('Currency').selectOption('USD');
+	release();
+	await page.locator('html[data-hydrated]').waitFor({ state: 'attached' });
+	await expect(page.getByLabel('Type')).toHaveValue('membership');
+	await expect(page.getByLabel('Currency')).toHaveValue('USD');
+	await expect(page.getByLabel('Donor name')).toHaveCount(0);
+});
+
 test('needs review: shown by the filter, cleared with a comment', async ({ page }) => {
 	await registerAdmin(page);
 	const donor = `Review ${TAG}`;
