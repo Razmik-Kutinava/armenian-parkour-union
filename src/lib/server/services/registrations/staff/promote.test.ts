@@ -1,11 +1,15 @@
 import { eq } from 'drizzle-orm';
 import { afterAll, describe, expect, it } from 'vitest';
+import { consents } from '../../../db/schema/consents';
 import { events } from '../../../db/schema/events';
+import { memberships } from '../../../db/schema/payments';
 import { insertUser, testDb, testDbUrl } from '../../../db/test-db';
+import { daysFromNow, insertConsent } from '../../consents/test-support';
 import { auditFor } from '../../memberships/test-support';
 import { paidEvent } from '../pay-support';
 import {
 	HOUR,
+	bornBefore,
 	cancelDeps,
 	insertCategory,
 	insertEvent,
@@ -94,6 +98,42 @@ describe.skipIf(!testDbUrl)('registrations staff: move from the waitlist', () =>
 			expect((await registrationOf(tx, queued.id)).status).toBe('waitlist');
 			expect((await registrationOf(tx, inLine.id)).status).toBe('waitlist');
 			expect(await auditFor(tx, 'registration', queued.id)).toEqual([]);
+		});
+	});
+
+	it('a member who would not be admitted now — refused with the reason, nothing changes', async () => {
+		await inRollback(async (tx) => {
+			const event = await insertEvent(tx, { capacity: 1 });
+			await register(tx, (await insertMember(tx)).id, event.id);
+			const minor = await insertMember(tx, { birthDate: bornBefore(15) });
+			const consent = await insertConsent(tx, minor.id, {
+				status: 'approved',
+				validUntil: daysFromNow(30)
+			});
+			const child = await register(tx, minor.id, event.id);
+			const lapsed = await insertMember(tx);
+			const late = await register(tx, lapsed.id, event.id);
+			await tx.update(consents).set({ status: 'expired' }).where(eq(consents.id, consent.id));
+			await tx
+				.update(memberships)
+				.set({ endsAt: new Date(Date.now() - HOUR) })
+				.where(eq(memberships.userId, lapsed.id));
+			await capacity(tx, event.id, 3);
+			const moderator = await staff(tx);
+			const box = mailbox();
+
+			const first = { eventId: event.id, registrationId: child.id };
+			expect(await promoteRegistration(tx, moderator, first, cancelDeps(box), IP)).toBe(
+				'parental_consent'
+			);
+			const second = { eventId: event.id, registrationId: late.id };
+			expect(await promoteRegistration(tx, moderator, second, cancelDeps(box), IP)).toBe(
+				'no_membership'
+			);
+			expect((await registrationOf(tx, child.id)).status).toBe('waitlist');
+			expect((await registrationOf(tx, late.id)).status).toBe('waitlist');
+			expect(await auditFor(tx, 'registration', child.id)).toEqual([]);
+			expect(box.sent).toEqual([]);
 		});
 	});
 

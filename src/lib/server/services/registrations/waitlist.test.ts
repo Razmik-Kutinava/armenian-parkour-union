@@ -1,13 +1,18 @@
 import { eq } from 'drizzle-orm';
 import { afterAll, describe, expect, it } from 'vitest';
 import { translate } from '#lib/i18n/translate.ts';
+import { consents } from '../../db/schema/consents';
 import { events } from '../../db/schema/events';
+import { memberships } from '../../db/schema/payments';
+import { users } from '../../db/schema/users';
 import { testDb, testDbUrl } from '../../db/test-db';
+import { daysFromNow, insertConsent } from '../consents/test-support';
 import { cancelRegistration } from './cancel';
 import {
 	HOUR,
 	SETTINGS,
 	SITE,
+	bornBefore,
 	cancelDeps as deps,
 	insertCategory,
 	insertEvent,
@@ -92,6 +97,43 @@ describe.skipIf(!testDbUrl)('registrations: the waitlist', () => {
 			expect(await cancelRegistration(tx, a.id, event.id, deps())).toBe('ok');
 			expect((await registrationOf(tx, inY.id)).status).toBe('waitlist');
 			expect((await registrationOf(tx, inX.id)).status).toBe('registered');
+		});
+	});
+
+	it('the line skips members who would not be admitted now; they keep their place', async () => {
+		await inRollback(async (tx) => {
+			const event = await insertEvent(tx, { capacity: 1 });
+			const holder = await insertMember(tx);
+			await register(tx, holder.id, event.id);
+			const minor = await insertMember(tx, { birthDate: bornBefore(15) });
+			const consent = await insertConsent(tx, minor.id, {
+				status: 'approved',
+				validUntil: daysFromNow(30)
+			});
+			const [blocked, lapsed, deleted, next] = [
+				await insertMember(tx),
+				await insertMember(tx),
+				await insertMember(tx),
+				await insertMember(tx)
+			];
+			const queued = [];
+			for (const m of [minor, blocked, lapsed, deleted, next]) {
+				queued.push(await register(tx, m.id, event.id));
+			}
+			await tx.update(consents).set({ status: 'expired' }).where(eq(consents.id, consent.id));
+			await tx.update(users).set({ status: 'blocked' }).where(eq(users.id, blocked.id));
+			await tx.update(users).set({ deletedAt: new Date() }).where(eq(users.id, deleted.id));
+			await tx
+				.update(memberships)
+				.set({ endsAt: new Date(Date.now() - HOUR) })
+				.where(eq(memberships.userId, lapsed.id));
+			const box = mailbox();
+
+			expect(await cancelRegistration(tx, holder.id, event.id, deps(box))).toBe('ok');
+			const statuses: string[] = [];
+			for (const row of queued) statuses.push((await registrationOf(tx, row.id)).status);
+			expect(statuses).toEqual(['waitlist', 'waitlist', 'waitlist', 'waitlist', 'registered']);
+			expect(box.sent.map((m) => m.to)).toEqual([next.email]);
 		});
 	});
 
