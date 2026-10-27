@@ -54,8 +54,8 @@ describe.skipIf(!url)('training course schema (migration 0016)', () => {
 		tx.json(Array.from({ length: n }, (_, i) => ({ ru: `Вариант ${i}` })));
 	const question = (
 		tx: postgres.TransactionSql,
-		c: { id: string },
-		t: { id: string },
+		c: postgres.Row,
+		t: postgres.Row,
 		values: Record<string, unknown> = {}
 	) =>
 		insert(tx, 'quiz_questions', {

@@ -113,6 +113,13 @@
       "when": 1792912854840,
       "tag": "0015_shop",
       "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1793090411193,
+      "tag": "0016_training",
+      "breakpoints": true
     }
   ]
 }

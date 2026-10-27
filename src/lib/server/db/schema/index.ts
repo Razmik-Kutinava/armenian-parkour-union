@@ -13,3 +13,5 @@ export * from './consents';
 export * from './certification';
 export * from './videos';
 export * from './shop';
+export * from './training';
+export * from './training-progress';

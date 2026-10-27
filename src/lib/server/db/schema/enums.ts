@@ -66,3 +66,10 @@ export const consentStatus = pgEnum('consent_status', [
 	'rejected',
 	'expired'
 ]);
+export const trainingAccessStatus = pgEnum('training_access_status', [
+	'pending',
+	'approved',
+	'rejected',
+	'revoked'
+]);
+export const practiceStatus = pgEnum('practice_status', ['pending', 'approved', 'rejected']);
