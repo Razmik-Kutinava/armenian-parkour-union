@@ -1,4 +1,5 @@
-// npx tsx scripts/import-quiz-bank.ts --file=training/trainer/quiz-bank.json [--dry] [--by=email]
+// npx tsx scripts/import-quiz-bank.ts --file=training/trainer/quiz-bank.json [--dry]
+// Actor: TRAINING_ACTOR_EMAIL ?? SEED_ADMIN_EMAIL (an active admin), like fill-system-pages.ts.
 // Imports a prepared question bank (roadmap 9.3) through the admin services, so every row is in the
 // audit log. The file stays outside git. The whole file is checked first; one transaction — all or
 // nothing. A repeat adds only new questions (same text — skipped); edits go through the admin panel.
@@ -15,9 +16,11 @@ const arg = (name: string) =>
 	process.argv.find((a) => a.startsWith(`--${name}=`))?.slice(name.length + 3);
 const { DATABASE_URL } = process.env;
 const file = arg('file');
-const actorEmail = arg('by') ?? process.env.SEED_ADMIN_EMAIL;
+const actorEmail = process.env.TRAINING_ACTOR_EMAIL ?? process.env.SEED_ADMIN_EMAIL;
 if (!DATABASE_URL || !file || !actorEmail) {
-	throw new Error('DATABASE_URL, --file and --by (or SEED_ADMIN_EMAIL) are required');
+	throw new Error(
+		'DATABASE_URL, --file and TRAINING_ACTOR_EMAIL (or SEED_ADMIN_EMAIL) are required'
+	);
 }
 const dry = process.argv.includes('--dry');
 

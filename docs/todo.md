@@ -58,7 +58,7 @@
 ## Фазы
 
 - [x] SPEC
-- [ ] RED
-- [ ] GREEN
-- [ ] Данные: `quiz-bank.json`, импорт на dev
+- [x] RED `633fa50`
+- [x] GREEN `114de44`
+- [x] Данные: `quiz-bank.json`, импорт на dev (100 вопросов, повтор — 0)
 - [ ] REVIEW (этапа)
