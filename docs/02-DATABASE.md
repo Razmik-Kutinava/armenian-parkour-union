@@ -4,7 +4,7 @@
 > Правила работы агента — `.cursor/rules/main.mdc` (раздел «База данных (Migration Gate)»).
 > Бизнес-логика (когда и почему что меняется) — `03-BUSINESS-RULES.md`. Права — `04-ROLES-PERMISSIONS.md`.
 
-**Оглавление** (раздел искать по заголовку `## …`, читать только его): Общие соглашения · Enum-типы · 1. Пользователи и авторизация · 2. Членство, экзамены, сертификаты · 3. События · 4. Платежи · 5. Баллы · 6. Видео · 7. Магазин · 8. Контент и главная · 9. Согласия и документы · 10. Служебные · Карта связей · Начальные данные (seed) · Что нужно уточнить у владельца
+**Оглавление** (раздел искать по заголовку `## …`, читать только его): Общие соглашения · Enum-типы · 1. Пользователи и авторизация · 2. Членство, экзамены, сертификаты · 3. События · 4. Платежи · 5. Баллы · 6. Видео · 7. Магазин · 8. Контент и главная · 9. Согласия и документы · 10. Служебные · 11. Обучающий портал · Карта связей · Начальные данные (seed) · Что нужно уточнить у владельца
 
 Источник правды по структуре БД. Любое отклонение сначала вносится сюда (с согласия владельца), потом в код.
 СУБД: PostgreSQL. ORM: Drizzle. Схема лежит в `src/lib/server/db/schema/`, миграции только через `db:generate`.
@@ -52,6 +52,8 @@
 | `hero_type` | `event`, `presentation`, `video`, `person`, `custom` |
 | `consent_kind` | `parental`, `medical`, `privacy` |
 | `consent_status` | `pending`, `approved`, `rejected`, `expired` |
+| `training_access_status` | `pending`, `approved`, `rejected`, `revoked` (этап 9) |
+| `practice_status` | `pending`, `approved`, `rejected` (этап 9) |
 
 Роль `user_role` это системный доступ. **Тренер и судья не роли:** это участник, у которого есть профиль в `staff_profiles` и действующий сертификат. Права по ролям описаны в `04-ROLES-PERMISSIONS.md`.
 
@@ -534,6 +536,147 @@
 
 ---
 
+## 11. Обучающий портал
+
+Этап 9 (`09`). Логика — `03` раздел 18, права — `04`, админка — `05` раздел 27, кабинет — `06` раздел 5.11. Таблицы создаются одной миграцией через Migration Gate (задача 9.1).
+Многоязычные поля портала — тот же `jsonb` `{en, hy, ru}`; какой язык обязателен на старте (контент сначала только на русском) — вопрос в `questions.md`, этап 9.
+
+### `courses`
+Курс: теория, тест и практика, ведущие к экзамену одного вида. Настройки теста и допуска — здесь, правятся в админке.
+| Поле | Тип | Описание |
+|---|---|---|
+| id | uuid PK | |
+| slug | text unique not null | адрес курса, например `trainer` |
+| exam_kind | exam_kind not null | какой экзамен создаётся по итогам (`trainer`, позже `judge`, `level_*`) |
+| title, description | jsonb | |
+| status | content_status default 'draft' | участник видит только `published` |
+| quiz_size | smallint not null default 27 | вопросов в тесте |
+| pass_count | smallint not null default 25 | сколько правильных нужно; `1 ≤ pass_count ≤ quiz_size` |
+| quiz_minutes | smallint not null default 60 | время на попытку |
+| retake_days | smallint not null default 30 | пауза после несданной попытки |
+| attempts_limit | smallint not null default 3 | попыток за период |
+| attempts_period_days | smallint not null default 180 | период лимита («полгода»), скользящий |
+| requires_membership | boolean not null default true | нужно действующее членство |
+| min_age | smallint null | минимальный возраст (тренер — 18) |
+| required_level | membership_level null | минимальная степень (тренер — `advanced`) |
+| created_at, updated_at | timestamptz | |
+
+### `course_topics`
+Темы курса: группируют уроки и вопросы, по ним тест берёт вопросы равномерно.
+| Поле | Тип | Описание |
+|---|---|---|
+| id | uuid PK | |
+| course_id | uuid FK courses not null | |
+| title | jsonb not null | |
+| sort_order | smallint not null | |
+| hidden_at | timestamptz null | скрытая тема не участвует в тесте и не видна в портале |
+| created_at, updated_at | timestamptz | |
+
+### `course_lessons`
+| Поле | Тип | Описание |
+|---|---|---|
+| id | uuid PK | |
+| course_id | uuid FK courses not null | |
+| topic_id | uuid FK course_topics null | |
+| title | jsonb not null | |
+| body | jsonb null | очищенный HTML по языкам (как `posts.body`): текст, картинки из медиатеки, YouTube |
+| file_key | text null | PDF в **приватном** бакете R2 (`training/<course id>/<uuid>.pdf`) |
+| file_name | text null | имя файла для скачивания |
+| sort_order | smallint not null | |
+| status | content_status default 'draft' | |
+| created_by | uuid FK users | |
+| created_at, updated_at | timestamptz | |
+| deleted_at | timestamptz null | |
+
+Индексы: (`course_id`, `sort_order`).
+
+### `quiz_questions`
+Банк вопросов курса. Вопрос не удаляется — скрывается (старые попытки хранят снимок, но статистика ссылается на `id`).
+| Поле | Тип | Описание |
+|---|---|---|
+| id | uuid PK | |
+| course_id | uuid FK courses not null | |
+| topic_id | uuid FK course_topics not null | |
+| text | jsonb not null | |
+| options | jsonb not null | массив вариантов `[{en,hy,ru}, …]`, от 2 до 6 |
+| correct_index | smallint not null | номер правильного варианта (с 0); проверка: внутри массива `options` |
+| source | text null | ссылка на раздел материала («Первая помощь, раздел 3») |
+| hidden_at | timestamptz null | |
+| created_by | uuid FK users | |
+| created_at, updated_at | timestamptz | |
+
+Индексы: (`course_id`, `topic_id`) where `hidden_at is null`.
+
+### `course_access`
+Заявка участника на курс и её решение. Одна строка на пару курс — участник; повторная заявка после отказа возвращает ту же строку в `pending`.
+| Поле | Тип | Описание |
+|---|---|---|
+| id | uuid PK | |
+| course_id | uuid FK courses not null | |
+| user_id | uuid FK users not null | |
+| status | training_access_status default 'pending' | |
+| reviewed_by | uuid FK users null | |
+| reviewed_at | timestamptz null | |
+| review_note | text null | причина отказа или закрытия доступа, видна участнику; обязательна при `rejected` и `revoked` |
+| extra_attempts | smallint not null default 0 | внеочередные попытки, выданные админом и ещё не использованные |
+| exam_id | uuid FK exams null unique | экзамен, созданный по итогам курса; заполнен — курс завершён |
+| created_at, updated_at | timestamptz | |
+
+Ограничения: unique(`course_id`, `user_id`). Индексы: (`status`, `created_at`).
+
+### `quiz_attempts`
+Попытка теста. Вопросы и правильные ответы фиксируются снимком в момент начала — правка банка старые попытки не меняет.
+| Поле | Тип | Описание |
+|---|---|---|
+| id | uuid PK | |
+| course_id | uuid FK courses not null | |
+| user_id | uuid FK users not null | |
+| questions | jsonb not null | снимок: `[{question_id, text, options (в перемешанном порядке), correct_index}]`; в браузер `correct_index` не отдаётся |
+| answers | jsonb null | выбранные номера вариантов по порядку вопросов |
+| total | smallint not null | вопросов в попытке |
+| pass_count | smallint not null | порог на момент начала |
+| correct_count | smallint null | |
+| passed | boolean null | `null` — попытка идёт |
+| is_extra | boolean not null default false | внеочередная (не считается в лимите) |
+| started_at | timestamptz not null | |
+| expires_at | timestamptz not null | `started_at + quiz_minutes` |
+| submitted_at | timestamptz null | время отправки или истечения |
+| created_at | timestamptz | |
+
+Ограничения: одна идущая попытка — unique(`course_id`, `user_id`) where `passed is null`. Индексы: (`user_id`, `course_id`, `started_at` desc).
+
+### `practice_tasks`
+Практическое задание курса: что показать на видео и по каким признакам «правильно».
+| Поле | Тип | Описание |
+|---|---|---|
+| id | uuid PK | |
+| course_id | uuid FK courses not null | |
+| title | jsonb not null | |
+| description | jsonb not null | что показать, требования к видео и критерии проверки (очищенный HTML) |
+| sort_order | smallint not null | |
+| hidden_at | timestamptz null | скрытое задание не требуется для завершения курса |
+| created_at, updated_at | timestamptz | |
+
+### `practice_submissions`
+Видео участника по заданию — только ссылка (YouTube, Google Drive), файлы не принимаются. Пересъёмка — новая строка, история остаётся.
+| Поле | Тип | Описание |
+|---|---|---|
+| id | uuid PK | |
+| task_id | uuid FK practice_tasks not null | |
+| user_id | uuid FK users not null | |
+| url | text not null | нормализованная ссылка |
+| platform | text not null | `youtube`, `google_drive` |
+| status | practice_status default 'pending' | |
+| reviewed_by | uuid FK users null | |
+| reviewed_at | timestamptz null | |
+| review_note | text null | комментарий проверяющего; обязателен при `rejected` |
+| created_at, updated_at | timestamptz | |
+
+Ограничения: одна живая отправка на задание — unique(`task_id`, `user_id`) where `status in ('pending', 'approved')`. Индексы: (`status`, `created_at`), `user_id`.
+Таблица отдельна от `videos`: практические видео не публичны и баллов не дают.
+
+---
+
 ## Карта связей
 
 - `users` 1—N `memberships`, `exams`, `certificates`, `event_registrations`, `payments`, `videos`, `points_ledger`, `shop_orders`, `consents`
@@ -546,6 +689,9 @@
 - `shop_orders` 1—N `shop_order_items` N—1 `shop_items`; `shop_orders` N—1 `points_ledger`
 - `hero_blocks` N—1 `events` (тип `event`), N—1 `users` (тип `person`)
 - `donation_purposes` 1—N `payments`
+- `courses` 1—N `course_topics`, `course_lessons`, `quiz_questions`, `course_access`, `quiz_attempts`, `practice_tasks`; `course_topics` 1—N `course_lessons`, `quiz_questions`
+- `practice_tasks` 1—N `practice_submissions`; `users` 1—N `course_access`, `quiz_attempts`, `practice_submissions`
+- `course_access` 1—1 `exams` (экзамен по итогам курса)
 
 ## Начальные данные (seed)
 
