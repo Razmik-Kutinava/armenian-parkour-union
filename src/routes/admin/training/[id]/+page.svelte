@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { currentLocale, t } from '#lib/i18n/index.svelte.ts';
-	import { pickLocalized } from '#lib/i18n/localized.ts';
+	import { pickPortal } from '#lib/i18n/localized.ts';
 	import CourseForm from '../CourseForm.svelte';
 	import type { PageProps } from './$types';
 
@@ -10,7 +10,7 @@
 </script>
 
 <svelte:head>
-	<title>{pickLocalized(data.course.title, currentLocale())} — {t('admin.title')}</title>
+	<title>{pickPortal(data.course.title, currentLocale())} — {t('admin.title')}</title>
 </svelte:head>
 
 {#if form && 'saved' in form}

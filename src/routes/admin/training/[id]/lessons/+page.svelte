@@ -3,7 +3,7 @@
 	import DataTable, { type Column } from '#lib/components/admin/DataTable.svelte';
 	import EmptyState from '#lib/components/ui/EmptyState.svelte';
 	import { currentLocale, t } from '#lib/i18n/index.svelte.ts';
-	import { pickLocalized } from '#lib/i18n/localized.ts';
+	import { pickPortal } from '#lib/i18n/localized.ts';
 	import CourseStatusBadge from '../../CourseStatusBadge.svelte';
 	import type { PageProps } from './$types';
 
@@ -17,7 +17,7 @@
 		{ key: 'status', label: t('training.lessons.col.status') },
 		{ key: 'file', label: t('training.lessons.col.file') }
 	]);
-	const local = (text: Parameters<typeof pickLocalized>[0]) => pickLocalized(text, currentLocale());
+	const local = (text: Parameters<typeof pickPortal>[0]) => pickPortal(text, currentLocale());
 </script>
 
 <svelte:head>

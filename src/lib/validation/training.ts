@@ -3,11 +3,10 @@ import type { MessageKey } from '#lib/i18n/translate.ts';
 import { richTextSchema } from '#lib/server/rich-text/schema.ts';
 import { intField } from './events';
 import { EXAM_KINDS } from './exam-enums';
-import { requireEnIfAny } from './localized';
 import { fileName } from './media';
 import { slugSchema } from './pages';
 import type { PostText } from './posts';
-import { localizedText } from './site-settings';
+import { portalText, portalTextOptional } from './portal-text';
 import {
 	COURSE_LEVELS,
 	COURSE_LIMITS,
@@ -31,23 +30,13 @@ const keepFilled = (text: Record<string, string | undefined>): PostText => {
 	return kept;
 };
 
-const plain = z
-	.string()
-	.trim()
-	.max(2000, { error: 'auth.error.tooLong' })
-	.optional()
-	.transform((s) => s || undefined);
-
+/* Portal texts: any one language (docs/02 section 11, decisions 2026-10-27). */
 export const courseFormSchema = z
 	.object({
 		slug: slugSchema,
 		examKind: z.enum(EXAM_KINDS, { error: 'training.error.examKind' }),
-		title: localizedText(200),
-		description: z
-			.object({ en: plain, hy: plain, ru: plain })
-			.prefault({})
-			.transform(keepFilled)
-			.superRefine(requireEnIfAny),
+		title: portalText(200),
+		description: portalTextOptional(2000),
 		status: z.enum(COURSE_STATUSES, { error: 'pages.error.status' }),
 		quizSize: limit('quizSize', 'training.error.quizSize'),
 		passCount: intField(1, COURSE_LIMITS.quizSize[1], 'training.error.passCount'),
@@ -71,7 +60,7 @@ export type CourseValues = z.output<typeof courseFormSchema>;
 
 const topicId = z.string().regex(UUID, { error: 'training.error.topic' });
 
-export const topicFormSchema = z.object({ title: localizedText(200) });
+export const topicFormSchema = z.object({ title: portalText(200) });
 export type TopicValues = z.output<typeof topicFormSchema>;
 export const topicIdSchema = z.object({ topicId });
 export const topicMoveSchema = z.object({ topicId, direction: z.enum(TOPIC_DIRECTIONS) });
@@ -80,12 +69,8 @@ export const lessonFormSchema = (mediaBaseUrl: string | null) => {
 	const rich = richTextSchema(mediaBaseUrl).optional();
 	return z.object({
 		topicId: z.preprocess(emptyToNull, topicId.nullable()),
-		title: localizedText(200),
-		body: z
-			.object({ en: rich, hy: rich, ru: rich })
-			.default({})
-			.transform(keepFilled)
-			.superRefine(requireEnIfAny),
+		title: portalText(200),
+		body: z.object({ en: rich, hy: rich, ru: rich }).default({}).transform(keepFilled),
 		sortOrder: intField(0, 9999, 'training.error.sortOrder').default(0),
 		status: z.enum(COURSE_STATUSES, { error: 'pages.error.status' })
 	});

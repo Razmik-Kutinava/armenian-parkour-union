@@ -3,7 +3,7 @@
 	import DataTable, { type Column } from '#lib/components/admin/DataTable.svelte';
 	import EmptyState from '#lib/components/ui/EmptyState.svelte';
 	import { currentLocale, t } from '#lib/i18n/index.svelte.ts';
-	import { pickLocalized } from '#lib/i18n/localized.ts';
+	import { pickPortal } from '#lib/i18n/localized.ts';
 	import CourseStatusBadge from './CourseStatusBadge.svelte';
 	import type { PageProps } from './$types';
 
@@ -42,7 +42,7 @@
 	{#snippet cell(row, column)}
 		{#if column.key === 'title'}
 			<a class="font-bold text-navy-700 underline-offset-2 hover:underline" href={href(row.id)}
-				>{pickLocalized(row.title, currentLocale())}</a
+				>{pickPortal(row.title, currentLocale())}</a
 			>
 		{:else if column.key === 'kind'}{t(`exams.kind.${row.examKind}`)}
 		{:else if column.key === 'status'}<CourseStatusBadge status={row.status} />

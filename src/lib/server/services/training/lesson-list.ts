@@ -1,5 +1,5 @@
 import { and, asc, eq, isNull, sql } from 'drizzle-orm';
-import type { LocalizedText } from '#lib/i18n/localized.ts';
+import type { PortalText } from '#lib/i18n/localized.ts';
 import type { LessonValues } from '#lib/validation/training.ts';
 import type { LimitDb } from '../../auth/rate-limit';
 import { courseLessons, courseTopics } from '../../db/schema/training';
@@ -9,9 +9,9 @@ import { isUuid } from '../users/target';
 
 export type LessonRow = {
 	id: string;
-	title: LocalizedText;
+	title: PortalText;
 	topicId: string | null;
-	topicTitle: LocalizedText | null;
+	topicTitle: PortalText | null;
 	topicHidden: boolean;
 	sortOrder: number;
 	status: LessonValues['status'];
@@ -41,8 +41,8 @@ export async function listLessons(db: LimitDb, courseId: string): Promise<Lesson
 		);
 	return rows.map(({ topicHiddenAt, fileKey, ...r }) => ({
 		...r,
-		title: r.title as LocalizedText,
-		topicTitle: r.topicTitle as LocalizedText | null,
+		title: r.title as PortalText,
+		topicTitle: r.topicTitle as PortalText | null,
 		topicHidden: topicHiddenAt !== null,
 		hasFile: fileKey !== null
 	}));

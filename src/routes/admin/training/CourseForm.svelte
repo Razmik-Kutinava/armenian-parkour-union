@@ -50,13 +50,7 @@
 			options={EXAM_KINDS.map((k) => ({ value: k, label: t(`exams.kind.${k}`) }))}
 			error={shown.examKind}
 		/>
-		<LocalizedInput
-			name="title"
-			label={t('training.course.title')}
-			{values}
-			errors={shown}
-			required
-		/>
+		<LocalizedInput name="title" label={t('training.course.title')} {values} errors={shown} />
 		<LocalizedInput
 			name="description"
 			label={t('training.course.description')}

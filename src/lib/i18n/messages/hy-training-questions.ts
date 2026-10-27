@@ -1,0 +1,43 @@
+import type { Messages } from '../translate';
+
+/** Admin "Training": the question bank. Part of `hyTrainingAdmin` (proofreading — a native speaker). */
+export const hyTrainingQuestions: Partial<Messages> = {
+	'training.tab.questions': 'Հարցեր',
+	'training.questions.create': 'Նոր հարց',
+	'training.questions.empty': 'Հարցեր չեն գտնվել',
+	'training.questions.search': 'Որոնում հարցի տեքստում',
+	'training.questions.filter.topic': 'Թեմա',
+	'training.questions.filter.state': 'Տեսանելիություն',
+	'training.questions.state.visible': 'Միայն տեսանելի',
+	'training.questions.state.hidden': 'Միայն թաքցված',
+	'training.questions.col.number': '№',
+	'training.questions.col.topic': 'Թեմա',
+	'training.questions.col.text': 'Հարց',
+	'training.questions.col.correct': 'Ճիշտ պատասխան',
+	'training.questions.col.source': 'Աղբյուր',
+	'training.questions.col.hidden': 'Թաքցված',
+	'training.questions.total': 'Տեսանելի թեմաների տեսանելի հարցեր՝ {count}; թեստում՝ {size}։',
+	'training.questions.inTopic': 'Թեմայի տեսանելի հարցեր՝ {count}; թեստում անհրաժեշտ է՝ {need}։',
+	'training.questions.hidden': 'Թաքցված',
+	'training.question.back': 'Բոլոր հարցերը',
+	'training.question.new': 'Նոր հարց',
+	'training.question.section.main': 'Հարց',
+	'training.question.section.options': 'Պատասխանի տարբերակներ',
+	'training.question.topic': 'Թեմա',
+	'training.question.topicChoose': 'Ընտրեք թեման',
+	'training.question.text': 'Հարցի տեքստ',
+	'training.question.source': 'Աղբյուր',
+	'training.question.sourceHint': 'Դաս և բաժին, օրինակ՝ «Առաջին օգնություն, բաժին 3.2»։',
+	'training.question.optionsHint':
+		'2-ից 6 տարբերակ, որոնցից մեկը ճիշտ է։ Մասնակիցը տարբերակները տեսնում է խառնված։',
+	'training.question.option': 'Տարբերակ {n}',
+	'training.question.correct': 'Ճիշտ պատասխան',
+	'training.question.hiddenNote': 'Հարցը թաքցված է և թեստում չի ներառվում։',
+	'training.question.hide': 'Թաքցնել հարցը',
+	'training.question.restore': 'Վերադարձնել հարցը',
+	'training.error.anyLanguage': 'Լրացրեք առնվազն մեկ լեզու։',
+	'training.error.options': 'Լրացրեք 2-ից 6 տարբերակ։',
+	'training.error.correct': 'Լրացված տարբերակներից մեկը նշեք որպես ճիշտ։',
+	'training.error.optionLang': 'Լրացրեք այս տարբերակը հարցի բոլոր լեզուներով։',
+	'training.error.questionState': 'Հարցն արդեն այս վիճակում է։ Թարմացրեք էջը։'
+};

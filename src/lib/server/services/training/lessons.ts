@@ -13,7 +13,8 @@ import { isUuid, type Actor } from '../users/target';
 type Refusal = 'not_allowed' | 'not_found' | 'bad_topic';
 const LOGGED = ['title', 'topicId', 'sortOrder', 'status'] as const;
 
-async function topicFits(tx: LimitDb, courseId: string, topicId: string | null) {
+/** A topic of this course; a hidden one is allowed — material is prepared in advance. */
+export async function topicFits(tx: LimitDb, courseId: string, topicId: string | null) {
 	if (topicId === null) return true;
 	const [row] = await tx
 		.select({ id: courseTopics.id })

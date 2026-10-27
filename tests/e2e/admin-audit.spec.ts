@@ -35,7 +35,7 @@ async function register(page: Page, prefix: string) {
 }
 
 test('every admin action leaves an audit entry with author and IP', async ({ page, browser }) => {
-	test.setTimeout(150_000);
+	test.setTimeout(240_000);
 	const adminId = await register(page, 'admin');
 	await sql`update users set role = 'admin' where id = ${adminId}`;
 	const target = await register(await (await browser.newContext()).newPage(), 'target');

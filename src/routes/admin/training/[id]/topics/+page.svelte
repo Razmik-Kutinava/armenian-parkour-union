@@ -4,7 +4,7 @@
 	import Button from '#lib/components/ui/Button.svelte';
 	import EmptyState from '#lib/components/ui/EmptyState.svelte';
 	import { currentLocale, t, type MessageKey } from '#lib/i18n/index.svelte.ts';
-	import { pickLocalized } from '#lib/i18n/localized.ts';
+	import { pickPortal } from '#lib/i18n/localized.ts';
 	import TopicRow from './TopicRow.svelte';
 	import type { PageProps } from './$types';
 
@@ -18,7 +18,7 @@
 
 <svelte:head>
 	<title
-		>{t('training.tab.topics')}: {pickLocalized(data.course.title, currentLocale())} — {t(
+		>{t('training.tab.topics')}: {pickPortal(data.course.title, currentLocale())} — {t(
 			'admin.title'
 		)}</title
 	>
@@ -60,7 +60,6 @@
 			label={t('training.topics.title')}
 			values={forNew?.values ?? {}}
 			errors={shown(forNew?.errors)}
-			required
 		/>
 	{/key}
 	<div><Button type="submit">{t('training.topics.add')}</Button></div>

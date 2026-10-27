@@ -2,7 +2,7 @@
 	import ConfirmDialog from '#lib/components/admin/ConfirmDialog.svelte';
 	import Button from '#lib/components/ui/Button.svelte';
 	import { currentLocale, t } from '#lib/i18n/index.svelte.ts';
-	import { pickLocalized } from '#lib/i18n/localized.ts';
+	import { pickPortal } from '#lib/i18n/localized.ts';
 	import LessonForm from '../LessonForm.svelte';
 	import LessonPdf from './LessonPdf.svelte';
 	import type { PageProps } from './$types';
@@ -12,7 +12,7 @@
 	const values = $derived((form && 'values' in form && form.values) || data.values);
 	const errors = $derived(form && 'errors' in form ? form.errors : undefined);
 	const base = $derived(`/admin/training/${data.course.id}/lessons`);
-	const title = $derived(pickLocalized(data.lesson.title, currentLocale()));
+	const title = $derived(pickPortal(data.lesson.title, currentLocale()));
 	let deleteOpen = $state(false);
 </script>
 

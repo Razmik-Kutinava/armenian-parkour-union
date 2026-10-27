@@ -6,7 +6,7 @@
 	import Button from '#lib/components/ui/Button.svelte';
 	import { flattenValues } from '#lib/validation/site-settings-form.ts';
 	import { currentLocale, t } from '#lib/i18n/index.svelte.ts';
-	import { pickLocalized, type LocalizedText } from '#lib/i18n/localized.ts';
+	import { pickPortal, type PortalText } from '#lib/i18n/localized.ts';
 
 	type Props = {
 		topic: {
@@ -22,7 +22,7 @@
 		failed: { values: Record<string, string>; errors: Record<string, string | undefined> } | null;
 	};
 	let { topic, first, last, failed }: Props = $props();
-	const title = $derived(pickLocalized(topic.title as LocalizedText, currentLocale()));
+	const title = $derived(pickPortal(topic.title as PortalText, currentLocale()));
 	const values = $derived(failed?.values ?? flattenValues({ title: topic.title }));
 </script>
 
@@ -71,7 +71,6 @@
 				label={t('training.topics.title')}
 				{values}
 				errors={failed?.errors}
-				required
 			/>
 			<div><Button type="submit" size="sm">{t('training.topics.save')}</Button></div>
 		</form>

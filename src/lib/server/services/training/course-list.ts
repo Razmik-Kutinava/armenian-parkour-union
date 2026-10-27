@@ -1,5 +1,5 @@
 import { asc, eq, sql } from 'drizzle-orm';
-import type { LocalizedText } from '#lib/i18n/localized.ts';
+import type { PortalText } from '#lib/i18n/localized.ts';
 import type { CourseValues } from '#lib/validation/training.ts';
 import type { LimitDb } from '../../auth/rate-limit';
 import { courses } from '../../db/schema/training';
@@ -9,7 +9,7 @@ import { isUuid } from '../users/target';
 
 export type CourseRow = {
 	id: string;
-	title: LocalizedText;
+	title: PortalText;
 	examKind: CourseValues['examKind'];
 	status: CourseValues['status'];
 	lessons: number;
@@ -37,7 +37,7 @@ export async function listCourses(db: LimitDb): Promise<CourseRow[]> {
 		})
 		.from(courses)
 		.orderBy(asc(courses.createdAt));
-	return rows.map((r) => ({ ...r, title: r.title as LocalizedText }));
+	return rows.map((r) => ({ ...r, title: r.title as PortalText }));
 }
 
 export type CourseDetail = CourseValues & { id: string };

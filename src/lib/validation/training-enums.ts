@@ -6,6 +6,9 @@ export type CourseLevel = (typeof COURSE_LEVELS)[number];
 
 export const TOPIC_DIRECTIONS = ['up', 'down'] as const;
 
+/** Option rows in the question form: 2 to 6 options (docs/05 section 27). */
+export const QUESTION_OPTION_ROWS = 6;
+
 /** Same as the media library and consents (docs/05 section 27). */
 export const LESSON_PDF_MAX_BYTES = 10 * 1024 * 1024;
 

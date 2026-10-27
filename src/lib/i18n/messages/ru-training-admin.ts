@@ -1,6 +1,8 @@
 import type { Messages } from '../translate';
+import { ruTrainingQuestions } from './ru-training-questions';
 
 export const ruTrainingAdmin: Partial<Messages> = {
+	...ruTrainingQuestions,
 	'admin.group.training': 'Обучение',
 	'admin.nav.training': 'Курсы',
 	'media.usage.course_lesson': 'Урок курса',

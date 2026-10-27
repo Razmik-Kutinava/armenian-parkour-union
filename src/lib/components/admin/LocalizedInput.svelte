@@ -17,8 +17,10 @@
 	};
 	let { name, label, values, errors = {}, required = false }: Props = $props();
 	const field = (locale: string) => `${name}.${locale}`;
+	/** An error of the whole value (no language filled at all) shows under every language. */
+	const errorOf = (locale: string) => errors[field(locale)] ?? errors[name];
 	const tabs = $derived(
-		locales.map((l) => ({ id: l, label: l.toUpperCase() + (errors[field(l)] ? ' !' : '') }))
+		locales.map((l) => ({ id: l, label: l.toUpperCase() + (errorOf(l) ? ' !' : '') }))
 	);
 </script>
 
@@ -31,7 +33,7 @@
 					name={field(locale)}
 					required={required && locale === 'en'}
 					value={values[field(locale)] ?? ''}
-					error={errors[field(locale)]}
+					error={errorOf(locale)}
 				/>
 			</div>
 		{/each}

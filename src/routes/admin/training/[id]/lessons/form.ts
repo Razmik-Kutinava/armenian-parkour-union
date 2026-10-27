@@ -1,6 +1,6 @@
 import { error, fail } from '@sveltejs/kit';
 import { R2_PUBLIC_URL } from '$app/env/private';
-import type { LocalizedText } from '#lib/i18n/localized.ts';
+import type { PortalText } from '#lib/i18n/localized.ts';
 import { db } from '#lib/server/db/index.ts';
 import type { LessonDetail } from '#lib/server/services/training/lesson-list.ts';
 import { listTopics } from '#lib/server/services/training/topics.ts';
@@ -32,7 +32,7 @@ export async function topicChoices(courseId: string) {
 	const topics = await listTopics(db, courseId);
 	return topics.map((t) => ({
 		id: t.id,
-		title: t.title as LocalizedText,
+		title: t.title as PortalText,
 		hidden: t.hiddenAt !== null
 	}));
 }

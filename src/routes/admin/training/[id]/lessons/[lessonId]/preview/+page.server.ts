@@ -1,5 +1,5 @@
 import { error } from '@sveltejs/kit';
-import { pickLocalized } from '#lib/i18n/localized.ts';
+import { pickPortal } from '#lib/i18n/localized.ts';
 import { requirePermission } from '#lib/server/auth/guard.ts';
 import { db } from '#lib/server/db/index.ts';
 import { lessonPdfLink } from '#lib/server/services/training/lesson-files.ts';
@@ -16,7 +16,7 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 	return {
 		lesson: {
 			id: lesson.id,
-			title: pickLocalized(lesson.title, locals.locale),
+			title: pickPortal(lesson.title, locals.locale),
 			html: body[locals.locale] || body.en || '',
 			fileName: lesson.fileName
 		},

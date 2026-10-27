@@ -1,0 +1,43 @@
+import type { Messages } from '../translate';
+
+/** Админка «Обучение»: банк вопросов. Часть `ruTrainingAdmin`. */
+export const ruTrainingQuestions: Partial<Messages> = {
+	'training.tab.questions': 'Вопросы',
+	'training.questions.create': 'Новый вопрос',
+	'training.questions.empty': 'Вопросов не найдено',
+	'training.questions.search': 'Поиск по тексту вопроса',
+	'training.questions.filter.topic': 'Тема',
+	'training.questions.filter.state': 'Видимость',
+	'training.questions.state.visible': 'Только видимые',
+	'training.questions.state.hidden': 'Только скрытые',
+	'training.questions.col.number': '№',
+	'training.questions.col.topic': 'Тема',
+	'training.questions.col.text': 'Вопрос',
+	'training.questions.col.correct': 'Правильный ответ',
+	'training.questions.col.source': 'Источник',
+	'training.questions.col.hidden': 'Скрыт',
+	'training.questions.total': 'Видимых вопросов в видимых темах: {count}; в тесте — {size}.',
+	'training.questions.inTopic': 'Видимых вопросов в теме: {count}; нужно в тесте — {need}.',
+	'training.questions.hidden': 'Скрыт',
+	'training.question.back': 'Все вопросы',
+	'training.question.new': 'Новый вопрос',
+	'training.question.section.main': 'Вопрос',
+	'training.question.section.options': 'Варианты ответа',
+	'training.question.topic': 'Тема',
+	'training.question.topicChoose': 'Выберите тему',
+	'training.question.text': 'Текст вопроса',
+	'training.question.source': 'Источник',
+	'training.question.sourceHint': 'Урок и раздел, например «Первая помощь, раздел 3.2».',
+	'training.question.optionsHint':
+		'От 2 до 6 вариантов, один из них правильный. Участник видит варианты перемешанными.',
+	'training.question.option': 'Вариант {n}',
+	'training.question.correct': 'Правильный ответ',
+	'training.question.hiddenNote': 'Вопрос скрыт и не попадает в тест.',
+	'training.question.hide': 'Скрыть вопрос',
+	'training.question.restore': 'Вернуть вопрос',
+	'training.error.anyLanguage': 'Заполните хотя бы один язык.',
+	'training.error.options': 'Заполните от 2 до 6 вариантов.',
+	'training.error.correct': 'Отметьте правильным один из заполненных вариантов.',
+	'training.error.optionLang': 'Заполните этот вариант на всех языках вопроса.',
+	'training.error.questionState': 'Вопрос уже в этом состоянии. Обновите страницу.'
+};
