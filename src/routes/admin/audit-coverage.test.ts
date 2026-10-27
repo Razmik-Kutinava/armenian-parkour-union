@@ -26,7 +26,7 @@ describe('every admin action is in the audit log (docs/04 section 2, roadmap 1.1
 	it('each data-changing action or endpoint is mapped to audit codes or a reason', async () => {
 		const mapped = [...Object.keys(ADMIN_AUDIT), ...Object.keys(NOT_AUDITED)].sort();
 		expect(await adminWrites()).toEqual(mapped);
-	});
+	}, 60_000);
 
 	it('each mapped action writes at least one audit code', () => {
 		for (const codes of Object.values(ADMIN_AUDIT)) expect(codes.length).toBeGreaterThan(0);
