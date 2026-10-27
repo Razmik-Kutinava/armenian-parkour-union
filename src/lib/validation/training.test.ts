@@ -6,6 +6,7 @@ import {
 	lessonPdfKey,
 	lessonPdfSignSchema,
 	LESSON_PDF_MAX_BYTES,
+	topicFormSchema,
 	topicMoveSchema
 } from './training';
 
@@ -77,9 +78,23 @@ describe('course form', () => {
 		expect(issue(course({ status: 'deleted' }))).toBe('status');
 	});
 
-	it('English title is required; a description in Russian only needs English too', () => {
-		expect(issue(course({ title: { en: '' } }))).toBe('title.en');
-		expect(issue(course({ description: { ru: 'Описание' } }))).toBe('description.en');
+	it('a title in any one language; Russian only is enough (decisions 2026-10-27)', () => {
+		expect(issue(course({ title: {} }))).toBe('title');
+		expect(issue(course({ title: { en: ' ' } }))).toBe('title');
+		const r = course({ title: { ru: 'Курс тренера' }, description: { ru: 'Описание' } });
+		expect(r.data).toMatchObject({
+			title: { ru: 'Курс тренера' },
+			description: { ru: 'Описание' }
+		});
+	});
+});
+
+describe('topic form', () => {
+	it('a title in any one language', () => {
+		expect(topicFormSchema.safeParse({ title: { ru: 'Первая помощь' } }).data).toEqual({
+			title: { ru: 'Первая помощь' }
+		});
+		expect(topicFormSchema.safeParse({ title: {} }).success).toBe(false);
 	});
 });
 
@@ -97,6 +112,12 @@ describe('lesson form', () => {
 		const r = lesson();
 		expect(r.data).toMatchObject({ topicId: null, sortOrder: 0, status: 'draft' });
 		expect(r.data?.body.en).not.toContain('script');
+	});
+
+	it('a lesson only in Russian is enough; no title at all is refused', () => {
+		const r = lesson({ title: { ru: 'Разминка' }, body: { ru: '<p>Текст</p>' } });
+		expect(r.data).toMatchObject({ title: { ru: 'Разминка' }, body: { ru: '<p>Текст</p>' } });
+		expect(issue(lesson({ title: {} }))).toBe('title');
 	});
 
 	it('a topic is an id; a bad id or order is refused', () => {

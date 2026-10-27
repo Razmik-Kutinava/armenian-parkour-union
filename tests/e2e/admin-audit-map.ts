@@ -94,7 +94,11 @@ export const ADMIN_AUDIT = {
 	'/admin/training/[id]/lessons/[lessonId]?/update': ['course_lesson.update'],
 	'/admin/training/[id]/lessons/[lessonId]?/pdfComplete': ['course_lesson.update'],
 	'/admin/training/[id]/lessons/[lessonId]?/pdfRemove': ['course_lesson.update'],
-	'/admin/training/[id]/lessons/[lessonId]?/delete': ['course_lesson.delete']
+	'/admin/training/[id]/lessons/[lessonId]?/delete': ['course_lesson.delete'],
+	'/admin/training/[id]/questions/new?/default': ['quiz_question.create'],
+	'/admin/training/[id]/questions/[questionId]?/update': ['quiz_question.update'],
+	'/admin/training/[id]/questions/[questionId]?/hide': ['quiz_question.hide'],
+	'/admin/training/[id]/questions/[questionId]?/restore': ['quiz_question.restore']
 } as const;
 
 export type AdminAction = keyof typeof ADMIN_AUDIT;

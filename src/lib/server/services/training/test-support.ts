@@ -1,4 +1,5 @@
 import { and, eq } from 'drizzle-orm';
+import type { QuestionValues } from '#lib/validation/training-questions.ts';
 import type { CourseValues, LessonValues } from '#lib/validation/training.ts';
 import type { LimitDb } from '../../auth/rate-limit';
 import type { UserRole } from '../../auth/session';
@@ -40,6 +41,18 @@ export const lessonValues = (extra: Partial<LessonValues> = {}): LessonValues =>
 	body: { en: '<p>Warm up</p>' },
 	sortOrder: 0,
 	status: 'draft',
+	...extra
+});
+
+export const questionValues = (
+	topicId: string,
+	extra: Partial<QuestionValues> = {}
+): QuestionValues => ({
+	topicId,
+	text: { ru: 'Сколько вопросов в тесте Maddocks?' },
+	options: [{ ru: '3' }, { ru: '5' }, { ru: '10' }],
+	correctIndex: 1,
+	source: null,
 	...extra
 });
 

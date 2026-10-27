@@ -1,13 +1,17 @@
 import { describe, expect, it } from 'vitest';
-import { pickLocalized } from './localized';
+import { pickPortal } from './localized';
 
-describe('pickLocalized', () => {
-	it('returns the text in the page language', () => {
-		expect(pickLocalized({ en: 'Yerevan', ru: 'Ереван' }, 'ru')).toBe('Ереван');
+/* Portal texts: page language → ru → en (docs/02 section 11, decisions 2026-10-27). */
+describe('pickPortal', () => {
+	it('the page language first, then Russian, then English', () => {
+		expect(pickPortal({ en: 'Rules', ru: 'Правила', hy: 'Կանոններ' }, 'hy')).toBe('Կանոններ');
+		expect(pickPortal({ en: 'Rules', ru: 'Правила' }, 'hy')).toBe('Правила');
+		expect(pickPortal({ en: 'Rules' }, 'ru')).toBe('Rules');
+		expect(pickPortal({ hy: 'Կանոններ' }, 'en')).toBe('Կանոններ');
 	});
 
-	it('falls back to English when the translation is missing or empty', () => {
-		expect(pickLocalized({ en: 'Yerevan', ru: 'Ереван' }, 'hy')).toBe('Yerevan');
-		expect(pickLocalized({ en: 'Yerevan', hy: '' }, 'hy')).toBe('Yerevan');
+	it('nothing filled — an empty string', () => {
+		expect(pickPortal({}, 'en')).toBe('');
+		expect(pickPortal(null, 'ru')).toBe('');
 	});
 });

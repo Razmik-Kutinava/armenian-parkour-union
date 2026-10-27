@@ -43,6 +43,18 @@ export function trainingActions(
 				where c.slug = ${slug} and l.deleted_at is null`
 		)[0].id as string;
 	const lesson = async () => `${await course()}/lessons/${await lessonId()}`;
+	const questionForm = async (correct = '1') => ({
+		topicId: await topicId(),
+		'text.ru': 'Аудит: вопрос',
+		'option0.ru': 'Нет',
+		'option1.ru': 'Да',
+		correct
+	});
+	const question = async () => {
+		const [row] = await sql`select q.id from quiz_questions q join courses c on c.id = q.course_id
+			where c.slug = ${slug}`;
+		return `${await course()}/questions/${row.id}`;
+	};
 
 	return {
 		'/admin/training/new?/default': () => postRedirect('/admin/training/new', courseForm),
@@ -67,6 +79,14 @@ export function trainingActions(
 			post(`${await course()}/topics?/hide`, { topicId: await topicId() }),
 		'/admin/training/[id]/topics?/restore': async () =>
 			post(`${await course()}/topics?/restore`, { topicId: await topicId() }),
+		'/admin/training/[id]/questions/new?/default': async () =>
+			postRedirect(`${await course()}/questions/new`, await questionForm()),
+		'/admin/training/[id]/questions/[questionId]?/update': async () =>
+			post(`${await question()}?/update`, await questionForm('0')),
+		'/admin/training/[id]/questions/[questionId]?/hide': async () =>
+			post(`${await question()}?/hide`),
+		'/admin/training/[id]/questions/[questionId]?/restore': async () =>
+			post(`${await question()}?/restore`),
 		'/admin/training/[id]/lessons/new?/default': async () =>
 			postRedirect(`${await course()}/lessons/new`, lessonForm),
 		'/admin/training/[id]/lessons/[lessonId]?/update': async () =>
