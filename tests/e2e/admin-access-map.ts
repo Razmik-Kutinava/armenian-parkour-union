@@ -73,7 +73,16 @@ export const ADMIN_READS = {
 	'/admin/products/new': 'shop.items_write',
 	'/admin/products/[id]': 'shop.items_write',
 	'/admin/orders': 'shop.orders_manage',
-	'/admin/orders/[id]': 'shop.orders_manage'
+	'/admin/orders/[id]': 'shop.orders_manage',
+	/* docs/05 section 27: editors see the courses only to reach the lessons. */
+	'/admin/training': 'training.lessons',
+	'/admin/training/new': 'training.manage',
+	'/admin/training/[id]': 'training.manage',
+	'/admin/training/[id]/topics': 'training.manage',
+	'/admin/training/[id]/lessons': 'training.lessons',
+	'/admin/training/[id]/lessons/new': 'training.lessons',
+	'/admin/training/[id]/lessons/[lessonId]': 'training.lessons',
+	'/admin/training/[id]/lessons/[lessonId]/preview': 'training.lessons'
 } as const satisfies Record<string, Access>;
 
 export const ADMIN_WRITES = {
@@ -157,5 +166,18 @@ export const ADMIN_WRITES = {
 	'/admin/orders/[id]?/status': 'shop.orders_manage',
 	'/admin/orders/[id]?/tracking': 'shop.orders_manage',
 	'/admin/orders/[id]?/cancel': 'shop.orders_cancel',
+	'/admin/training/new?/default': 'training.manage',
+	'/admin/training/[id]?/update': 'training.manage',
+	'/admin/training/[id]/topics?/create': 'training.manage',
+	'/admin/training/[id]/topics?/update': 'training.manage',
+	'/admin/training/[id]/topics?/move': 'training.manage',
+	'/admin/training/[id]/topics?/hide': 'training.manage',
+	'/admin/training/[id]/topics?/restore': 'training.manage',
+	'/admin/training/[id]/lessons/new?/default': 'training.lessons',
+	'/admin/training/[id]/lessons/[lessonId]?/update': 'training.lessons',
+	'/admin/training/[id]/lessons/[lessonId]?/delete': 'training.lessons',
+	'/admin/training/[id]/lessons/[lessonId]?/pdfSign': 'training.lessons',
+	'/admin/training/[id]/lessons/[lessonId]?/pdfComplete': 'training.lessons',
+	'/admin/training/[id]/lessons/[lessonId]?/pdfRemove': 'training.lessons',
 	'POST /admin/locale': 'staff'
 } as const satisfies Record<AdminAction | NotAuditedAction, Access>;

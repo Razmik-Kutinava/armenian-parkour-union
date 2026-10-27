@@ -35,7 +35,10 @@ const expected: Record<string, UserRole[]> = {
 	'hero.write': ['editor', 'admin'],
 	'media.write': ['editor', 'admin'],
 	'settings.write': ['admin'],
-	'audit.read': ['admin']
+	'audit.read': ['admin'],
+	'training.lessons': ['editor', 'admin'],
+	'training.manage': ['admin'],
+	'training.review': ['moderator', 'admin']
 };
 
 const user = (role: UserRole): LocalsUser => ({

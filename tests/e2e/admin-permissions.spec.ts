@@ -5,6 +5,11 @@ import { ADMIN_READS, ADMIN_WRITES } from './admin-access-map';
 import { certificateFixtures, stageSixPath } from './admin-permissions-certs';
 import { shopFixtures, shopPath, type ShopIds } from './admin-permissions-shop';
 import {
+	trainingFixtures,
+	trainingPath,
+	type TrainingIds
+} from './admin-permissions-training';
+import {
 	expectedStatus,
 	HOSTILE_FORM,
 	ORIGIN,
@@ -46,6 +51,7 @@ const {
 } = permissionFixtures(sql);
 const { insertCertificate, certificateRows } = certificateFixtures(sql);
 const { insertShop, shopRows } = shopFixtures(sql);
+const { insertTraining, trainingRows } = trainingFixtures(sql);
 
 /* Pending: approve and reject could really run on it. */
 const insertConsent = async (userId: string) =>
@@ -58,9 +64,11 @@ const consentRow = async (id: string) =>
 	(
 		await sql`select status, reviewed_by, review_note, valid_until from consents where id = ${id}`
 	)[0];
-type Extra = Parameters<typeof stageSixPath>[1] & ShopIds & { consentId: string };
+type Extra = Parameters<typeof stageSixPath>[1] &
+	ShopIds &
+	TrainingIds & { consentId: string };
 const pathOf = (key: string, ids: Parameters<typeof toPath>[1], extra: Extra) =>
-	shopPath(stageSixPath(toPath(key, ids), extra), extra).replace(
+	trainingPath(shopPath(stageSixPath(toPath(key, ids), extra), extra), extra).replace(
 		'/consents/[id]',
 		`/consents/${extra.consentId}`
 	);
@@ -98,10 +106,12 @@ for (const role of ['member', 'editor', 'moderator'] as const) {
 		const extra = {
 			consentId,
 			...(await insertCertificate(target)),
-			...(await insertShop(target))
+			...(await insertShop(target)),
+			...(await insertTraining())
 		};
 		const certificatesBefore = await certificateRows(target);
 		const shopBefore = await shopRows(extra);
+		const trainingBefore = await trainingRows(extra);
 		await registerAs(page, role);
 
 		for (const [key, access] of Object.entries(ADMIN_READS)) {
@@ -132,6 +142,7 @@ for (const role of ['member', 'editor', 'moderator'] as const) {
 		expect(await examRows(target)).toEqual(examsBefore);
 		expect(await certificateRows(target)).toEqual(certificatesBefore);
 		expect(await shopRows(extra)).toEqual(shopBefore);
+		expect(await trainingRows(extra)).toEqual(trainingBefore);
 		expect(
 			await sql`select 1 from audit_log where entity_id in (${target}, ${ids.mediaId}, ${ids.pageId}, ${ids.postId}, ${ids.eventId}, ${ids.heroId}, ${ids.paymentId}, ${ids.purposeId}, ${ids.ruleId}, ${ids.examId}, ${extra.certificateId}, ${extra.staffId}, ${extra.productId}, ${extra.orderId})`
 		).toHaveLength(0);
@@ -186,7 +197,8 @@ test('admin opens every admin page; audit pages take no writes and the entry sta
 	const extra = {
 		consentId: await insertConsent(target),
 		...(await insertCertificate(target)),
-		...(await insertShop(target))
+		...(await insertShop(target)),
+		...(await insertTraining())
 	};
 	for (const key of Object.keys(ADMIN_READS)) {
 		const res = await page.request.get(pathOf(key, ids, extra), { maxRedirects: 0 });

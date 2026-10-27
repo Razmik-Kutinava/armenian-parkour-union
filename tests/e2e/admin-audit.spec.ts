@@ -12,6 +12,13 @@ test.beforeEach(async () => {
 	await sql`delete from rate_limit where key ~ '^sign-up:ip:(127\.0\.0\.1|::1|::ffff:127\.0\.0\.1)$'`;
 });
 
+/* No bucket in e2e: refused before writing; their entries are covered by the service tests. */
+const NO_BUCKET: string[] = [
+	'/admin/media?/complete',
+	'/admin/certificates/[id]?/pdf',
+	'/admin/training/[id]/lessons/[lessonId]?/pdfComplete'
+];
+
 async function register(page: Page, prefix: string) {
 	const email = `e2e-audit-${prefix}-${crypto.randomUUID()}@example.com`;
 	await page.goto('/register');
@@ -39,9 +46,10 @@ test('every admin action leaves an audit entry with author and IP', async ({ pag
 	for (const row of rows) expect(row.ip, row.action).not.toBeNull();
 	/* settings.update writes one entry per changed key, the rest exactly one per action */
 	const userCodes = rows.map((r) => r.action as string).filter((a) => a !== 'settings.update');
-	const expected = Object.values(ADMIN_AUDIT)
-		.flat()
-		.filter((a) => !['settings.update', 'media.upload', 'certificate.pdf'].includes(a));
+	const expected = Object.entries(ADMIN_AUDIT)
+		.filter(([action]) => !NO_BUCKET.includes(action))
+		.flatMap(([, codes]) => codes)
+		.filter((a) => a !== 'settings.update');
 	expect(userCodes.sort()).toEqual(expected.sort());
 	expect(rows.some((r) => r.action === 'settings.update')).toBe(true);
 });

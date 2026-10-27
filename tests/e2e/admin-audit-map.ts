@@ -82,7 +82,19 @@ export const ADMIN_AUDIT = {
 	'/admin/products/[id]?/duplicate': ['shop_item.create'],
 	'/admin/orders/[id]?/status': ['shop_order.status'],
 	'/admin/orders/[id]?/tracking': ['shop_order.tracking'],
-	'/admin/orders/[id]?/cancel': ['shop_order.cancel']
+	'/admin/orders/[id]?/cancel': ['shop_order.cancel'],
+	'/admin/training/new?/default': ['course.create'],
+	'/admin/training/[id]?/update': ['course.update'],
+	'/admin/training/[id]/topics?/create': ['course_topic.create'],
+	'/admin/training/[id]/topics?/update': ['course_topic.update'],
+	'/admin/training/[id]/topics?/move': ['course_topic.reorder'],
+	'/admin/training/[id]/topics?/hide': ['course_topic.hide'],
+	'/admin/training/[id]/topics?/restore': ['course_topic.restore'],
+	'/admin/training/[id]/lessons/new?/default': ['course_lesson.create'],
+	'/admin/training/[id]/lessons/[lessonId]?/update': ['course_lesson.update'],
+	'/admin/training/[id]/lessons/[lessonId]?/pdfComplete': ['course_lesson.update'],
+	'/admin/training/[id]/lessons/[lessonId]?/pdfRemove': ['course_lesson.update'],
+	'/admin/training/[id]/lessons/[lessonId]?/delete': ['course_lesson.delete']
 } as const;
 
 export type AdminAction = keyof typeof ADMIN_AUDIT;
@@ -91,7 +103,9 @@ export type AdminAction = keyof typeof ADMIN_AUDIT;
 export const NOT_AUDITED = {
 	'POST /admin/locale': 'own interface language of the staff member',
 	'/admin/media?/sign':
-		'only issues an upload link; the file enters the library at complete (media.upload)'
+		'only issues an upload link; the file enters the library at complete (media.upload)',
+	'/admin/training/[id]/lessons/[lessonId]?/pdfSign':
+		'only issues an upload link; the file is attached at pdfComplete (course_lesson.update)'
 } as const satisfies Record<string, string>;
 
 export type NotAuditedAction = keyof typeof NOT_AUDITED;

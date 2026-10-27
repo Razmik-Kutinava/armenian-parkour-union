@@ -5,72 +5,58 @@
 
 ## Задача
 
-**9.1** (`09` этап 9): таблицы обучающего портала одной миграцией — `courses`, `course_topics`, `course_lessons`, `quiz_questions`, `course_access`, `quiz_attempts`, `practice_tasks`, `practice_submissions` + enum `training_access_status`, `practice_status`.
+**9.2** (`09` этап 9): админка портала — курсы (настройки теста и допуска), темы, уроки с PDF в приватном бакете.
 
-Граница: только схема, миграция 0016, откат и тесты схемы. Админка курсов и тем — 9.2; банк вопросов и импорт — 9.3; заявки — 9.4; уроки — 9.5; тест — 9.6; практика — 9.7; завершение курса — 9.8; контент — 9.9; тесты этапа — 9.10. Права `training.*` и seed курса — не здесь.
+Граница: без миграций (таблицы 9.1). Банк вопросов — 9.3, заявки — 9.4, портал участника — 9.5, задания практики — 9.7, счётчики дашборда — 9.8. Колонки «вопросов / заданий / заявок» в списке курсов считаются по таблицам 9.1 (пока нули).
 
-Факты из документов (`02` § 11, `03` § 18 — прочитаны, выписано):
-- Многоязычные поля — `jsonb {en, hy, ru}`, обязателен хотя бы один любой язык (проверяет сервис, как у прочих таблиц).
-- `courses`: `slug` unique, `exam_kind`, `status content_status` default `draft`, `quiz_size` 27, `pass_count` 25 (`1 ≤ pass_count ≤ quiz_size`), `quiz_minutes` 60, `retake_days` 30, `attempts_limit` 3, `attempts_period_days` 180, `requires_membership` true, `min_age` null, `required_level membership_level` null.
-- `course_topics`: `hidden_at` — тема не в тесте и не в портале; `sort_order`.
-- `course_lessons`: `topic_id` null, `body` jsonb null, `file_key` / `file_name` (PDF в приватном бакете), `status`, `created_by`, `deleted_at`; индекс (`course_id`, `sort_order`).
-- `quiz_questions`: вопрос не удаляется, скрывается; `options` — массив 2–6, `correct_index` с 0 внутри массива; индекс (`course_id`, `topic_id`) where `hidden_at is null`.
-- `course_access`: одна строка на (курс, участник), повторная заявка — та же строка в `pending`; `review_note` обязательна при `rejected` / `revoked`; `extra_attempts` default 0; `exam_id` unique — экзамен дважды не создаётся (`03` 18.5); индекс (`status`, `created_at`).
-- `quiz_attempts`: снимок вопросов с `correct_index`; `passed null` — идёт; одна идущая — unique(`course_id`, `user_id`) where `passed is null`; индекс (`user_id`, `course_id`, `started_at desc`); `updated_at` в `02` нет.
-- `practice_submissions`: только ссылка, `platform` `youtube` | `google_drive`; `review_note` обязателен при `rejected`; одна живая — unique(`task_id`, `user_id`) where `status in ('pending','approved')`; индексы (`status`, `created_at`), `user_id`.
+Факты из документов (прочитаны, выписано):
+- `05` § 27: адреса `/admin/training`, `/admin/training/{course id}`; список курсов — название, вид экзамена, статус, уроков, вопросов, заданий, заявок `pending`; форма — slug, вид экзамена, название и описание ×3, статус; настройки теста (вопросов, правильных + процент, минут, пауза дней, попыток за период, период дней); допуск (членство, мин. возраст, мин. степень); изменение настроек — в журнал. Вкладки карточки: «Темы» (admin: название ×3, ↑ / ↓, скрыть / вернуть, в строке — уроков и видимых вопросов), «Уроки» (`training.lessons`: по темам; тема, название ×3, текст — редактор новостей, PDF до 10 МБ в приватный бакет, тип по сигнатуре, порядок, статус, предпросмотр; удаление мягкое).
+- `04`: `training.lessons` — editor, admin; `training.manage` — admin; `training.review` — moderator, admin.
+- `03` § 18.2: PDF — приватный бакет, ключ `training/<course id>/<uuid>.pdf` (`02`); § 18.6: в журнал — изменение настроек курса (остальное в 9.2 — по правилу админки «каждое действие — в карту журнала»).
 
-## Решения (агент, по `02` § 11 и образцам 0012–0015) — входят в «go»
+## Решения (агент)
 
-1. **NOT NULL сверх `02`** (как 6.1, 7.3): `courses.title` (description default `{}`), `status` всех таблиц, `sort_order` default 0, `is_extra`, `extra_attempts`; `quiz_attempts.started_at` default `now()`. `created_by` / `reviewed_by` — null (= «система», общее соглашение `02`).
-2. **Check-и `courses`:** `quiz_size ≥ 1`, `1 ≤ pass_count ≤ quiz_size`, `quiz_minutes ≥ 1`, `retake_days ≥ 0`, `attempts_limit ≥ 1`, `attempts_period_days ≥ 1`, `min_age` null или ≥ 1.
-3. **Тема — того же курса:** `course_topics` unique(`course_id`, `id`); `quiz_questions` и `course_lessons` ссылаются составным FK (`course_id`, `topic_id`) → `course_topics` (у урока `topic_id` null — не проверяется). Вопрос или урок с темой чужого курса база не примет.
-4. **Check-и вопросов:** `options` — массив из 2–6 элементов, `0 ≤ correct_index < длины` (через `CASE`, чтобы не-массив давал `23514`, а не ошибку функции).
-5. **Check-и уроков:** `file_key` и `file_name` — оба или ни одного.
-6. **Check-и `course_access`:** `extra_attempts ≥ 0`; `rejected` / `revoked` ⇒ непустая `review_note` (как `certificates_revoked_reason`); `pending` ⇔ `reviewed_at is null` (повторная заявка обязана сбросить прошлое решение).
-7. **Check-и `quiz_attempts`:** `questions` — массив, `answers` — массив или null; `total ≥ 1`, `1 ≤ pass_count ≤ total`; `expires_at > started_at`; `passed`, `correct_count`, `submitted_at` — все null (идёт) или все заполнены; `0 ≤ correct_count ≤ total`; `passed = (correct_count ≥ pass_count)`.
-8. **Check-и `practice_submissions`:** `platform in ('youtube','google_drive')`; `rejected` ⇒ непустой `review_note`; `pending` ⇔ `reviewed_at is null`. `practice_tasks.description` — not null (по `02`).
-9. **Связи без каскада:** курсы, темы, задания не удаляются (скрытие / статус), участник с попытками и отправками не удаляется жёстко (мягкое удаление), экзамен с `course_access.exam_id` не удаляется. Индексы — только из `02` (+ unique из решения 3).
-10. **Файлы схемы** (лимит 200 строк): `schema/training.ts` — курсы, темы, уроки, вопросы; `schema/training-progress.ts` — доступ, попытки, задания, отправки. Тесты так же на два файла.
-
-## Миграция 0016 (Migration Gate — ждёт «go»)
-
-`drizzle/0016_training.sql` (через `npm run db:generate`):
-- `CREATE TYPE training_access_status AS ENUM ('pending','approved','rejected','revoked')`, `CREATE TYPE practice_status AS ENUM ('pending','approved','rejected')`.
-- `CREATE TABLE` восьми таблиц `02` § 11 с решениями 1–9; FK на `users`, `exams` и между собой; индексы и частичные unique из `02`.
-- Существующие таблицы, enum и данные не меняются; на проде таблиц нет до деплоя этапа 9.
-
-Откат — `scripts/rollback/0016_down.sql`: `DROP TABLE` `practice_submissions`, `practice_tasks`, `quiz_attempts`, `course_access`, `quiz_questions`, `course_lessons`, `course_topics`, `courses`; `DROP TYPE practice_status`, `training_access_status` (только по «go»; теряется весь контент и история портала, экзамены в `exams` остаются), затем убрать строку 0016 из `drizzle.__drizzle_migrations` и из `drizzle/meta`. Применение на dev — `npm run db:migrate`; прод — деплой этапа 9 (`release_command`).
+1. **Права:** три кода `training.*` в `permissions.ts` по `04`. `/admin/training` (список) — `training.lessons` (editor видит курсы только чтобы попасть в уроки; «Новый курс» — только при `training.manage`); `new`, `[id]` (курс), `[id]/topics` — `training.manage`; `[id]/lessons/**` — `training.lessons`. Меню — пункт «Обучение» в группе «Участники», право `training.lessons` (moderator — с 9.7). Общий `[id]/+layout.server.ts` — `training.lessons`, шапка курса и вкладки по правам.
+2. **Курс (форма):** slug (`slugSchema`, уникален), вид экзамена (`EXAM_KINDS`), название ×3 (EN обязателен, ≤ 200), описание ×3 — простой текст ≤ 2000, необязательно (EN, если есть другой язык), статус `draft | published | archived`. Тест: вопросов 1–200, правильных 1–«вопросов», минут 1–600, пауза 0–365 дней, попыток 1–50, период 1–3650 дней. Допуск: членство (галочка), мин. возраст — пусто или 1–99, мин. степень — пусто или `novice | advanced | pro`. Процент рядом с порогом — в браузере.
+3. **Журнал:** `course.create` (after — настройки), `course.update` (before / after только изменённых полей; пустое сохранение — без записи); `course_topic.create | update | reorder | hide | restore`; `course_lesson.create | update | delete`; PDF прикреплён / убран — `course_lesson.update` с полем `file`. `?/pdfSign` — в `NOT_AUDITED` (только ссылка на загрузку).
+4. **Темы:** новая — в конец (`max(sort_order) + 1`); ↑ / ↓ — обмен с соседом среди всех тем курса (скрытые тоже), темы курса блокируются `FOR UPDATE`, порядок перенумеровывается 0…n−1. Скрыть / вернуть — `hidden_at`; повтор — `bad_state`. Счётчики: уроков без `deleted_at`, вопросов без `hidden_at`.
+5. **Уроки:** тема — пусто или тема этого курса (иначе `bad_topic`; скрытая допустима — готовят заранее); текст ×3 — `richTextSchema` как у новостей, картинки из медиатеки берутся `FOR SHARE` (`lockPageMedia`), поиск использования файла — `course_lesson` в `media/usage.ts` (кроме удалённых); порядок 0–9999; статус ×3. Удаление — `deleted_at`, файл остаётся в бакете. Список — по `sort_order` темы (без темы — в конце), затем урока.
+6. **PDF:** только у сохранённого урока (на странице урока). `pdfSign` — урок есть в курсе, `application/pdf`, 1 байт–10 МБ → ключ `training/<course id>/<uuid>.pdf` и подписанный PUT; `pdfComplete` — ключ этого курса, объект есть, ≤ 10 МБ, сигнатура `%PDF-` (иначе объект удаляется), затем в транзакции с блокировкой урока — `file_key` / `file_name` + журнал; прежний файл удаляется после коммита (ошибка — только в лог). `pdfRemove` — то же, без нового файла. Нет бакета — понятная ошибка, не 500. Ссылка на просмотр — `presignGet` на 5 минут.
+7. **Предпросмотр:** `/admin/training/[id]/lessons/[lessonId]/preview` — сохранённая версия в любом статусе (название, текст, ссылка на PDF), `training.lessons`.
+8. **Кеш:** `training: []` в `cache/admin-groups.ts` (портал публично не кешируется).
+9. **Переводы:** `en-training-admin.ts` + `hy` / `ru` (вычитка — носитель языка).
 
 ## Файлы (ожидаемо)
 
-- `src/lib/server/db/schema/enums.ts`, `schema/index.ts` — два enum, экспорт.
-- `src/lib/server/db/schema/training.ts`, `schema/training-progress.ts` — восемь таблиц.
-- `drizzle/0016_training.sql`, `drizzle/meta/*`, `scripts/rollback/0016_down.sql` — миграция и откат.
-- `src/lib/server/db/training-schema.test.ts`, `training-progress-schema.test.ts` — тесты схемы по образцу `shop-schema.test.ts` (в транзакции с откатом): умолчания, check-и, unique и частичные unique, тема чужого курса, нет жёсткого удаления.
+- `src/lib/server/auth/permissions.ts` (+ test), `src/lib/server/admin/nav.ts`, `src/lib/components/admin/nav-icons.ts`, `src/lib/server/cache/admin-groups.ts` (+ test).
+- `src/lib/validation/training.ts` (+ test).
+- `src/lib/server/services/training/` — `courses.ts`, `course-list.ts`, `topics.ts`, `lessons.ts`, `lesson-list.ts`, `lesson-files.ts` + тесты; `services/media/usage.ts`.
+- `src/routes/admin/training/**` — список, `new`, `[id]` (курс, `topics`, `lessons`, `lessons/new`, `lessons/[lessonId]`, `preview`).
+- `src/lib/i18n/messages/{en,hy,ru}-training-admin.ts`, `{en,hy,ru}.ts`.
+- `tests/e2e/admin-access-map.ts`, `admin-audit-map.ts`, `admin-audit-training.ts`, `admin-audit-actions.ts`, `admin-permissions-training.ts`, `admin-permissions.spec.ts`.
 
 ## Не ломать
 
-- Миграции 0000–0015 и тесты схемы `src/lib/server/db/*-schema.test.ts`.
-- `exams`, `certificates` и их проверки (6.1) — без изменений; `exam_kind`, `membership_level`, `content_status` — без новых значений.
-- Удаление тестовых пользователей в e2e `global-setup.ts` — мягкое, новые FK его не задевают.
+- Права прочих разделов админки и карта прав / журнала (`access-coverage`, `audit-coverage`, `admin-permissions.spec.ts`).
+- Удаление файла медиатеки: файл в тексте урока не удаляется (`findUsages`).
+- Приватный бакет согласий и сертификатов — без изменений `storage/r2.ts`.
 
 ## Проверка
 
-- `npx vitest run src/lib/server/db` → PASS (новые и прежние тесты схемы).
-- `npm run check`, `npm run lint`.
+- `npx vitest run src/lib/server/services/training src/lib/validation/training.test.ts src/lib/server/auth src/lib/server/cache src/routes/admin/access-coverage.test.ts` → PASS.
+- `npm run check`, `npm run lint`; e2e (по возможности) — `admin-permissions.spec.ts`, `admin-audit.spec.ts`.
 
 ## Риск
 
-`high` — миграция (`drizzle/*.sql`).
+`high` — права (`permissions.ts`, новые `training.*`).
 
 ## Читать
 
-- `02` § 11 и enum (выписано), `03` § 18 (выписано), `zone-notes.md` § «Экзамены и сертификаты» (прочитано: `exams` из 6.1, `exam_id` у сертификата).
+- `05` § 27, `04` § 5.1 (`training.*`), `03` § 18.1–18.2, 18.6 (выписано); `zone-notes.md` § «Обучающий портал», § «Согласия и приватные файлы», § «Контент и админка» (прочитано).
 
 ## Фазы
 
-- [x] SPEC (`7ee2639`)
-- [x] «go» на миграцию 0016, решения 1–10 (2026-10-27)
-- [x] RED (`b12eec1`)
-- [x] GREEN — 0016 применена на dev; `src/lib/server/db` 50/50 (новые 11/11); `check` 0 ошибок, `lint` чистый
+- [x] SPEC
+- [ ] RED
+- [ ] GREEN
 - [ ] REVIEW (этапа)
