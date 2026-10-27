@@ -57,6 +57,6 @@
 ## Фазы
 
 - [x] SPEC
-- [ ] RED
-- [ ] GREEN
+- [x] RED (`aa7b6c5`)
+- [x] GREEN
 - [ ] REVIEW (этапа)

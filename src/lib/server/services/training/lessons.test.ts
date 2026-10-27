@@ -45,7 +45,10 @@ describe.skipIf(!testDbUrl)('training: lessons in the admin', () => {
 			expect(await updateLesson(tx, editor, courseId, id, next, IP)).toBe('ok');
 			expect(await stored(tx, id)).toMatchObject({ topicId: null, status: 'published' });
 			const entries = await auditOf(tx, 'course_lesson', id);
-			expect(entries.map((e) => e.action)).toEqual(['course_lesson.create', 'course_lesson.update']);
+			expect(entries.map((e) => e.action)).toEqual([
+				'course_lesson.create',
+				'course_lesson.update'
+			]);
 			expect(entries[1]).toMatchObject({ actorId: editor.id, ip: IP });
 			expect(entries[1].after).toEqual({ topicId: null, status: 'published', sortOrder: 3 });
 		});
@@ -73,9 +76,7 @@ describe.skipIf(!testDbUrl)('training: lessons in the admin', () => {
 			for (const role of ['moderator', 'member'] as const) {
 				const actor = await staff(tx, role);
 				expect(await createLesson(tx, actor, courseId, lessonValues(), IP)).toBe('not_allowed');
-				expect(await updateLesson(tx, actor, courseId, id, lessonValues(), IP)).toBe(
-					'not_allowed'
-				);
+				expect(await updateLesson(tx, actor, courseId, id, lessonValues(), IP)).toBe('not_allowed');
 				expect(await deleteLesson(tx, actor, courseId, id, IP)).toBe('not_allowed');
 			}
 			const other = await insertCourse(tx);
@@ -134,7 +135,7 @@ describe.skipIf(!testDbUrl)('training: lessons in the admin', () => {
 			const courseId = await insertCourse(tx);
 			const body = { en: `<p><img src="https://media.parkour.am/${key}" alt=""></p>` };
 			const id = await lesson(tx, admin, courseId, lessonValues({ body }));
-			expect(await findUsages(tx, key)).toEqual([{ kind: 'course_lesson', id }]);
+			expect(await findUsages(tx, key)).toEqual([{ kind: 'course_lesson', id, courseId }]);
 			await deleteLesson(tx, admin, courseId, id, IP);
 			expect(await findUsages(tx, key)).toEqual([]);
 		});

@@ -7,6 +7,7 @@ import CreditCard from '@lucide/svelte/icons/credit-card';
 import FileCheck from '@lucide/svelte/icons/file-check';
 import FileText from '@lucide/svelte/icons/file-text';
 import GalleryHorizontal from '@lucide/svelte/icons/gallery-horizontal';
+import GraduationCap from '@lucide/svelte/icons/graduation-cap';
 import HandHeart from '@lucide/svelte/icons/hand-heart';
 import IdCard from '@lucide/svelte/icons/id-card';
 import Image from '@lucide/svelte/icons/image';
@@ -35,6 +36,7 @@ export const navIcons: Record<AdminIcon, LucideIcon> = {
 	certificates: Award,
 	staff: IdCard,
 	consents: FileCheck,
+	training: GraduationCap,
 	videos: Video,
 	registrations: ListChecks,
 	points: Coins,

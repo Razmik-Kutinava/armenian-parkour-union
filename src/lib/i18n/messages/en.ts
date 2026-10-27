@@ -33,6 +33,7 @@ import { enTeam } from './en-team';
 import { enUsers } from './en-users';
 import { enShop } from './en-shop';
 import { enShopAdmin } from './en-shop-admin';
+import { enTrainingAdmin } from './en-training-admin';
 import { enVideosAdmin } from './en-videos-admin';
 
 /** Source of truth for UI text keys. hy and ru may omit keys: English is shown instead. */
@@ -64,6 +65,7 @@ export const en = {
 	...enVideosAdmin,
 	...enDashboard,
 	...enShopAdmin,
+	...enTrainingAdmin,
 	...enShop,
 	...enConsents,
 	...enRegistrations,

@@ -28,6 +28,8 @@ const BY_SECTION: Record<string, CacheGroup[]> = {
 	products: ['shop'],
 	/* a cancel returns stock (7.6) */
 	orders: ['shop'],
+	/* the portal is behind a sign-in and not cached (9.2) */
+	training: [],
 	media: ALL_GROUPS,
 	audit: [],
 	roles: [],

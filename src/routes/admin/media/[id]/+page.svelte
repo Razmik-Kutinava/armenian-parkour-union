@@ -115,6 +115,12 @@
 								<a class="text-navy-700 underline" href="/admin/products/{usage.id}"
 									>{t('media.usage.shop_item')}</a
 								>
+							{:else if usage.kind === 'course_lesson'}
+								<a
+									class="text-navy-700 underline"
+									href="/admin/training/{usage.courseId}/lessons/{usage.id}"
+									>{t('media.usage.course_lesson')}</a
+								>
 							{:else if data.canOpenUsers}
 								<a class="text-navy-700 underline" href="/admin/users/{usage.id}"
 									>{t(`media.usage.${usage.kind}`)}</a

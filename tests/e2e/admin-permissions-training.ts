@@ -24,7 +24,8 @@ export function trainingFixtures(sql: postgres.Sql) {
 		trainingRows: async (ids: TrainingIds) => ({
 			course: (await sql`select * from courses where id = ${ids.courseId}`)[0],
 			topics: await sql`select * from course_topics where course_id = ${ids.courseId} order by id`,
-			lessons: await sql`select * from course_lessons where course_id = ${ids.courseId} order by id`,
+			lessons:
+				await sql`select * from course_lessons where course_id = ${ids.courseId} order by id`,
 			created: await sql`select slug from courses where slug like 'e2e-hostile-%'`,
 			audit: await sql`select 1 from audit_log
 				where entity_id in (${ids.courseId}, ${ids.topicId}, ${ids.lessonId})`

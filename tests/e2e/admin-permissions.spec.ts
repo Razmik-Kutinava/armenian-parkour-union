@@ -4,11 +4,7 @@ import postgres from 'postgres';
 import { ADMIN_READS, ADMIN_WRITES } from './admin-access-map';
 import { certificateFixtures, stageSixPath } from './admin-permissions-certs';
 import { shopFixtures, shopPath, type ShopIds } from './admin-permissions-shop';
-import {
-	trainingFixtures,
-	trainingPath,
-	type TrainingIds
-} from './admin-permissions-training';
+import { trainingFixtures, trainingPath, type TrainingIds } from './admin-permissions-training';
 import {
 	expectedStatus,
 	HOSTILE_FORM,
@@ -64,9 +60,7 @@ const consentRow = async (id: string) =>
 	(
 		await sql`select status, reviewed_by, review_note, valid_until from consents where id = ${id}`
 	)[0];
-type Extra = Parameters<typeof stageSixPath>[1] &
-	ShopIds &
-	TrainingIds & { consentId: string };
+type Extra = Parameters<typeof stageSixPath>[1] & ShopIds & TrainingIds & { consentId: string };
 const pathOf = (key: string, ids: Parameters<typeof toPath>[1], extra: Extra) =>
 	trainingPath(shopPath(stageSixPath(toPath(key, ids), extra), extra), extra).replace(
 		'/consents/[id]',

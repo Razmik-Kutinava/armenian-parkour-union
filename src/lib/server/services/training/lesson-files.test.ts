@@ -6,12 +6,7 @@ import { courseLessons } from '../../db/schema/training';
 import { testDb, testDbUrl } from '../../db/test-db';
 import { StorageNotConfigured } from '../../storage/types';
 import { fakeStorage } from '../media/fake-storage';
-import {
-	completeLessonPdf,
-	lessonPdfLink,
-	removeLessonPdf,
-	signLessonPdf
-} from './lesson-files';
+import { completeLessonPdf, lessonPdfLink, removeLessonPdf, signLessonPdf } from './lesson-files';
 import { auditOf, insertCourse, IP, PDF, staff } from './test-support';
 
 /* docs/05 section 27 "Lessons": PDF in the private bucket, type by signature; decisions — todo 9.2 (6). */
@@ -34,10 +29,18 @@ async function upload(tx: LimitDb, s: Awaited<ReturnType<typeof setup>>, body = 
 	const signed = await signLessonPdf(tx, s.storage, s.actor, s.courseId, s.lessonId, pdf);
 	if (typeof signed === 'string') throw new Error(signed);
 	s.storage.objects.set(signed.key, body);
-	const done = await completeLessonPdf(tx, s.storage, s.actor, s.courseId, s.lessonId, {
-		key: signed.key,
-		name: 'safety.pdf'
-	}, IP);
+	const done = await completeLessonPdf(
+		tx,
+		s.storage,
+		s.actor,
+		s.courseId,
+		s.lessonId,
+		{
+			key: signed.key,
+			name: 'safety.pdf'
+		},
+		IP
+	);
 	return { key: signed.key, done };
 }
 
@@ -82,7 +85,15 @@ describe.skipIf(!testDbUrl)('training: lesson PDF', () => {
 			expect(large.done).toBe('too_large');
 			expect(s.storage.objects.has(large.key)).toBe(false);
 			const complete = (key: string) =>
-				completeLessonPdf(tx, s.storage, s.actor, s.courseId, s.lessonId, { key, name: 'a.pdf' }, IP);
+				completeLessonPdf(
+					tx,
+					s.storage,
+					s.actor,
+					s.courseId,
+					s.lessonId,
+					{ key, name: 'a.pdf' },
+					IP
+				);
 			expect(await complete(`training/${s.courseId}/${crypto.randomUUID()}.pdf`)).toBe('missing');
 			const foreign = `training/${crypto.randomUUID()}/${crypto.randomUUID()}.pdf`;
 			s.storage.objects.set(foreign, PDF);
@@ -99,7 +110,9 @@ describe.skipIf(!testDbUrl)('training: lesson PDF', () => {
 			expect(await removeLessonPdf(tx, s.storage, s.actor, s.courseId, s.lessonId, IP)).toBe('ok');
 			expect(await stored(tx, s.lessonId)).toMatchObject({ fileKey: null, fileName: null });
 			expect(s.storage.objects.has(key)).toBe(false);
-			expect((await auditOf(tx, 'course_lesson', s.lessonId)).at(-1)?.after).toEqual({ file: null });
+			expect((await auditOf(tx, 'course_lesson', s.lessonId)).at(-1)?.after).toEqual({
+				file: null
+			});
 			expect(await removeLessonPdf(tx, s.storage, s.actor, s.courseId, s.lessonId, IP)).toBe(
 				'no_file'
 			);

@@ -1,5 +1,6 @@
 import { afterAll, describe, expect, it } from 'vitest';
 import type { LimitDb } from '../../auth/rate-limit';
+import type { UserRole } from '../../auth/session';
 import { courseLessons, quizQuestions } from '../../db/schema/training';
 import { testDb, testDbUrl } from '../../db/test-db';
 import { createTopic, listTopics, moveTopic, setTopicHidden, updateTopic } from './topics';
@@ -7,7 +8,7 @@ import { auditOf, insertCourse, IP, staff } from './test-support';
 
 /* docs/05 section 27 "Topics"; decisions — docs/todo.md 9.2 (3, 4). */
 
-type Admin = { id: string; role: 'admin' };
+type Admin = { id: string; role: UserRole };
 
 async function topic(tx: LimitDb, admin: Admin, courseId: string, en: string) {
 	const result = await createTopic(tx, admin, courseId, { title: { en } }, IP);

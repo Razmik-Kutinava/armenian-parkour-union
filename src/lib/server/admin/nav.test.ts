@@ -17,7 +17,7 @@ const groups = (role: UserRole) => adminNav(user(role)).map((g) => g.key);
 
 /* docs/05 section 2 filtered by the matrix of docs/04 section 5.1. */
 describe('adminNav', () => {
-	it('editor: dashboard and content, plus shop items', () => {
+	it('editor: dashboard and content, training lessons, plus shop items', () => {
 		expect(hrefs('editor')).toEqual([
 			'/admin',
 			'/admin/hero',
@@ -25,11 +25,13 @@ describe('adminNav', () => {
 			'/admin/pages',
 			'/admin/events',
 			'/admin/media',
+			'/admin/training',
 			'/admin/products'
 		]);
 		expect(groups('editor')).toEqual([
 			'admin.group.overview',
 			'admin.group.content',
+			'admin.group.training',
 			'admin.group.shop'
 		]);
 	});
@@ -52,12 +54,13 @@ describe('adminNav', () => {
 
 	it('admin: every section, system group last', () => {
 		const all = hrefs('admin');
-		expect(all).toHaveLength(22);
+		expect(all).toHaveLength(23);
 		expect(all.slice(-3)).toEqual(['/admin/settings', '/admin/audit', '/admin/roles']);
 		expect(groups('admin')).toEqual([
 			'admin.group.overview',
 			'admin.group.content',
 			'admin.group.members',
+			'admin.group.training',
 			'admin.group.moderation',
 			'admin.group.shop',
 			'admin.group.money',

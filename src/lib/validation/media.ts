@@ -46,7 +46,7 @@ export function mimeOfKey(key: string): MediaMime | null {
 	return mediaMimes.find((m) => mediaTypes[m] === ext) ?? null;
 }
 
-const fileName = z
+export const fileName = z
 	.string()
 	.transform((s) => s.replace(/[\p{Cc}/\\]/gu, '').trim())
 	.pipe(

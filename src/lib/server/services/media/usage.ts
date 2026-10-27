@@ -4,6 +4,7 @@ import { pages, posts } from '../../db/schema/content';
 import { events } from '../../db/schema/events';
 import { heroBlocks } from '../../db/schema/hero';
 import { shopItems } from '../../db/schema/shop';
+import { courseLessons } from '../../db/schema/training';
 import { users } from '../../db/schema/users';
 
 /*
@@ -12,8 +13,10 @@ import { users } from '../../db/schema/users';
  * using a file locks its media row FOR SHARE in the same transaction, so a delete cannot slip in.
  */
 export type MediaUsage = {
-	kind: 'user_avatar' | 'page' | 'post' | 'event' | 'hero' | 'shop_item';
+	kind: 'user_avatar' | 'page' | 'post' | 'event' | 'hero' | 'shop_item' | 'course_lesson';
 	id: string;
+	/** A lesson opens inside its course. */
+	courseId?: string;
 };
 
 type Finder = (db: LimitDb, key: string) => Promise<MediaUsage[]>;
@@ -89,13 +92,27 @@ const itemPhotosAndDescriptions: Finder = async (db, key) => {
 	return rows.map((r) => ({ kind: 'shop_item' as const, id: r.id }));
 };
 
+const lessonBodies: Finder = async (db, key) => {
+	const rows = await db
+		.select({ id: courseLessons.id, courseId: courseLessons.courseId })
+		.from(courseLessons)
+		.where(
+			and(
+				sql`strpos(${courseLessons.body}::text, ${inText(key)}) > 0`,
+				isNull(courseLessons.deletedAt)
+			)
+		);
+	return rows.map((r) => ({ kind: 'course_lesson' as const, id: r.id, courseId: r.courseId }));
+};
+
 const finders: Finder[] = [
 	avatars,
 	pageBodies,
 	postCoversAndBodies,
 	eventCoversAndDescriptions,
 	heroBackgrounds,
-	itemPhotosAndDescriptions
+	itemPhotosAndDescriptions,
+	lessonBodies
 ];
 
 export async function findUsages(db: LimitDb, key: string): Promise<MediaUsage[]> {

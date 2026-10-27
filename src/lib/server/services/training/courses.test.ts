@@ -1,7 +1,9 @@
 import { eq } from 'drizzle-orm';
 import { afterAll, describe, expect, it } from 'vitest';
 import type { LimitDb } from '../../auth/rate-limit';
-import { courseAccess, courseLessons, quizQuestions } from '../../db/schema/training';
+import type { UserRole } from '../../auth/session';
+import { courseLessons, quizQuestions } from '../../db/schema/training';
+import { courseAccess } from '../../db/schema/training-progress';
 import { insertUser, testDb, testDbUrl } from '../../db/test-db';
 import { getCourse, listCourses } from './course-list';
 import { createCourse, updateCourse } from './courses';
@@ -9,7 +11,7 @@ import { auditOf, courseValues, insertTopic, IP, staff } from './test-support';
 
 /* docs/05 section 27 "Courses", docs/03 section 18.6; decisions — docs/todo.md 9.2 (1–3). */
 
-async function created(tx: LimitDb, actor: { id: string; role: 'admin' }, slug?: string) {
+async function created(tx: LimitDb, actor: { id: string; role: UserRole }, slug?: string) {
 	const result = await createCourse(tx, actor, courseValues(slug ? { slug } : {}), IP);
 	if (typeof result === 'string') throw new Error(result);
 	return result.id;
@@ -101,9 +103,10 @@ describe.skipIf(!testDbUrl)('training: courses in the admin', () => {
 			await tx.insert(courseAccess).values({ courseId: id, userId: member.id });
 			const row = (await listCourses(tx)).find((c) => c.id === id);
 			expect(row).toMatchObject({ lessons: 1, questions: 1, tasks: 0, pending: 1 });
-			await tx.update(courseAccess).set({ status: 'approved', reviewedAt: new Date() }).where(
-				eq(courseAccess.courseId, id)
-			);
+			await tx
+				.update(courseAccess)
+				.set({ status: 'approved', reviewedAt: new Date() })
+				.where(eq(courseAccess.courseId, id));
 			expect((await listCourses(tx)).find((c) => c.id === id)?.pending).toBe(0);
 		});
 	});
