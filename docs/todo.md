@@ -5,58 +5,60 @@
 
 ## Задача
 
-**9.2** (`09` этап 9): админка портала — курсы (настройки теста и допуска), темы, уроки с PDF в приватном бакете.
+**9.3** (`09` этап 9): админка — банк вопросов; импорт 100 вопросов из `training/trainer/Банк вопросов.pdf` с правками (54 — новый вариант, 18 — в тему 1-го года, 93 и другие по Положению — под правила портала, ссылки на разделы исправить). Скрипт читает подготовленный файл из `training/`, вопросы в git не попадают.
 
-Граница: без миграций (таблицы 9.1). Банк вопросов — 9.3, заявки — 9.4, портал участника — 9.5, задания практики — 9.7, счётчики дашборда — 9.8. Колонки «вопросов / заданий / заявок» в списке курсов считаются по таблицам 9.1 (пока нули).
+Граница: без миграций (`quiz_questions` — 9.1). Выдача теста — 9.6. Памятка 9.2 — `git show 52faf67:docs/todo.md`.
 
 Факты из документов (прочитаны, выписано):
-- `05` § 27: адреса `/admin/training`, `/admin/training/{course id}`; список курсов — название, вид экзамена, статус, уроков, вопросов, заданий, заявок `pending`; форма — slug, вид экзамена, название и описание ×3, статус; настройки теста (вопросов, правильных + процент, минут, пауза дней, попыток за период, период дней); допуск (членство, мин. возраст, мин. степень); изменение настроек — в журнал. Вкладки карточки: «Темы» (admin: название ×3, ↑ / ↓, скрыть / вернуть, в строке — уроков и видимых вопросов), «Уроки» (`training.lessons`: по темам; тема, название ×3, текст — редактор новостей, PDF до 10 МБ в приватный бакет, тип по сигнатуре, порядок, статус, предпросмотр; удаление мягкое).
-- `04`: `training.lessons` — editor, admin; `training.manage` — admin; `training.review` — moderator, admin.
-- `03` § 18.2: PDF — приватный бакет, ключ `training/<course id>/<uuid>.pdf` (`02`); § 18.6: в журнал — изменение настроек курса (остальное в 9.2 — по правилу админки «каждое действие — в карту журнала»).
+- `05` § 27 «Банк вопросов» (admin): таблица — №, тема, начало текста, правильный вариант, источник, скрыт; фильтры — тема, скрытые; поиск по тексту. Форма — тема, текст ×3, 2–6 вариантов ×3 с отметкой одного правильного, источник. Создать, редактировать, скрыть / вернуть; удаления нет. Под фильтром — «вопросов в теме / нужно в тесте».
+- `02` § 11: `quiz_questions` — `topic_id` not null (тема своего курса, составной FK), `text` jsonb, `options` `[{en,hy,ru}, …]` 2–6, `correct_index` с 0 внутри, `source` text null, `hidden_at`, `created_by`. Многоязычные поля портала — **хотя бы один любой язык**, показ — язык страницы → `ru` → `en` (решение 2026-10-27).
+- `03` § 18.3: в тест — видимые вопросы видимых тем, поровну по темам. § 18.6: в журнал — создание и правка вопроса (в т. ч. правильного ответа) и скрытие.
+- Банк (PDF): 10 блоков = 10 материалов курса (УТП 1, 2, 3 года, педагогика, планирование, первая помощь, EAP, Safeguarding, Положение об аттестации, Этический кодекс), по 4 варианта, правильный + «(источник)». Правки — `questions.md` этап 9 (54, 93, 18), `decisions.md` 2026-10-27.
 
 ## Решения (агент)
 
-1. **Права:** три кода `training.*` в `permissions.ts` по `04`. `/admin/training` (список) — `training.lessons` (editor видит курсы только чтобы попасть в уроки; «Новый курс» — только при `training.manage`); `new`, `[id]` (курс), `[id]/topics` — `training.manage`; `[id]/lessons/**` — `training.lessons`. Меню — пункт «Обучение» в группе «Участники», право `training.lessons` (moderator — с 9.7). Общий `[id]/+layout.server.ts` — `training.lessons`, шапка курса и вкладки по правам.
-2. **Курс (форма):** slug (`slugSchema`, уникален), вид экзамена (`EXAM_KINDS`), название ×3 (EN обязателен, ≤ 200), описание ×3 — простой текст ≤ 2000, необязательно (EN, если есть другой язык), статус `draft | published | archived`. Тест: вопросов 1–200, правильных 1–«вопросов», минут 1–600, пауза 0–365 дней, попыток 1–50, период 1–3650 дней. Допуск: членство (галочка), мин. возраст — пусто или 1–99, мин. степень — пусто или `novice | advanced | pro`. Процент рядом с порогом — в браузере.
-3. **Журнал:** `course.create` (after — настройки), `course.update` (before / after только изменённых полей; пустое сохранение — без записи); `course_topic.create | update | reorder | hide | restore`; `course_lesson.create | update | delete`; PDF прикреплён / убран — `course_lesson.update` с полем `file`. `?/pdfSign` — в `NOT_AUDITED` (только ссылка на загрузку).
-4. **Темы:** новая — в конец (`max(sort_order) + 1`); ↑ / ↓ — обмен с соседом среди всех тем курса (скрытые тоже), темы курса блокируются `FOR UPDATE`, порядок перенумеровывается 0…n−1. Скрыть / вернуть — `hidden_at`; повтор — `bad_state`. Счётчики: уроков без `deleted_at`, вопросов без `hidden_at`.
-5. **Уроки:** тема — пусто или тема этого курса (иначе `bad_topic`; скрытая допустима — готовят заранее); текст ×3 — `richTextSchema` как у новостей, картинки из медиатеки берутся `FOR SHARE` (`lockPageMedia`), поиск использования файла — `course_lesson` в `media/usage.ts` (кроме удалённых); порядок 0–9999; статус ×3. Удаление — `deleted_at`, файл остаётся в бакете. Список — по `sort_order` темы (без темы — в конце), затем урока.
-6. **PDF:** только у сохранённого урока (на странице урока). `pdfSign` — урок есть в курсе, `application/pdf`, 1 байт–10 МБ → ключ `training/<course id>/<uuid>.pdf` и подписанный PUT; `pdfComplete` — ключ этого курса, объект есть, ≤ 10 МБ, сигнатура `%PDF-` (иначе объект удаляется), затем в транзакции с блокировкой урока — `file_key` / `file_name` + журнал; прежний файл удаляется после коммита (ошибка — только в лог). `pdfRemove` — то же, без нового файла. Нет бакета — понятная ошибка, не 500. Ссылка на просмотр — `presignGet` на 5 минут.
-7. **Предпросмотр:** `/admin/training/[id]/lessons/[lessonId]/preview` — сохранённая версия в любом статусе (название, текст, ссылка на PDF), `training.lessons`.
-8. **Кеш:** `training: []` в `cache/admin-groups.ts` (портал публично не кешируется).
-9. **Переводы:** `en-training-admin.ts` + `hy` / `ru` (вычитка — носитель языка).
+1. **Язык портала (дефект 9.2):** формы 9.2 требуют EN (`localizedText`, `requireEnIfAny`) — против решения 2026-10-27; русский контент (банк, 9.9) не сохранится. Общая схема `portalText(max)` — хотя бы один язык (иначе `training.error.anyLanguage`), показ `pickPortal` — язык страницы → `ru` → `en` → `hy`. Применить: курс (название; описание — можно пусто), тема, урок (название, текст — без «EN, если есть другой»), вопрос. Поля EN в формах — не `required`.
+2. **Права:** банк — `training.manage` (admin). Вкладка «Вопросы» в карточке курса — только admin.
+3. **Адреса:** `/admin/training/[id]/questions` (список; `?topic=`, `?hidden=1`, `?q=`), `/questions/new`, `/questions/[questionId]` (форма + `?/hide`, `?/restore`).
+4. **Форма:** тема — тема этого курса (скрытая допустима, иначе `bad_topic`); текст — простой, ≤ 1000; варианты — 6 строк в форме, пустые строки (все языки пусты) отбрасываются, номер правильного пересчитывается; правильный — заполненная строка (`training.error.correct`); итог 2–6 (`training.error.options`); вариант ≤ 300; у каждого варианта есть все языки текста вопроса (`training.error.optionLang`); источник ≤ 200, необязателен.
+5. **Сервис `questions.ts`:** `createQuestion`, `updateQuestion`, `setQuestionHidden`; право внутри, отказ — код (`not_allowed | not_found | bad_topic | bad_state`). Журнал в той же транзакции: `quiz_question.create` (after — всё), `update` (before / after только изменённых: `topicId`, `text`, `options`, `correctIndex`, `source`; без изменений — без записи), `hide | restore` (повтор — `bad_state`). Правка скрытого вопроса разрешена.
+6. **Список `question-list.ts`:** все вопросы курса по `sort_order` темы, `created_at`, `id`; № — место в этом порядке (не меняется от фильтров); фильтры и поиск (без регистра, по всем языкам текста) — в памяти (банк — сотни строк). Счётчики: видимых вопросов в видимых темах всего / `quiz_size`; по выбранной теме — видимых в ней / `ceil(quiz_size / видимых тем)`; не хватает — предупреждение.
+7. **Импорт:** логика — `services/training/question-import.ts` (весь файл проверяется до записи; курс по `slug` — нет: создаётся `createCourse` из блока `course` файла, есть: настройки не трогаются; темы — по совпадению названия на любом языке, иначе `createTopic` в порядке файла; вопрос с тем же `text` в курсе — пропуск; остальное — `createQuestion`). Всё через сервисы — журнал пишется. Скрипт `scripts/import-quiz-bank.ts --file=… [--dry]`, актор — `TRAINING_ACTOR_EMAIL ?? SEED_ADMIN_EMAIL` (активный admin), как `fill-system-pages.ts`. Повторный запуск добавляет только новые вопросы; правки — через админку.
+8. **Данные:** `training/trainer/quiz-bank.json` (вне git) — агент из PDF: 54 — «Желание спать» → «Покраснение кожи»; 18 — в тему 1-го года, источник по программе 1-го года; 93 — «за полгода»; 86–93 сверить с Положением и правилами портала (27 / 25, 30 дней, 3 за полгода); источники — «<урок>, раздел N» по тексту материалов. Импорт на dev; на прод — с деплоем этапа 9.
+9. **Переводы:** `{en,hy,ru}-training-questions.ts`, подключаются в `*-training-admin.ts` (`en.ts` > 200 строк не трогаем).
 
 ## Файлы (ожидаемо)
 
-- `src/lib/server/auth/permissions.ts` (+ test), `src/lib/server/admin/nav.ts`, `src/lib/components/admin/nav-icons.ts`, `src/lib/server/cache/admin-groups.ts` (+ test).
-- `src/lib/validation/training.ts` (+ test).
-- `src/lib/server/services/training/` — `courses.ts`, `course-list.ts`, `topics.ts`, `lessons.ts`, `lesson-list.ts`, `lesson-files.ts` + тесты; `services/media/usage.ts`.
-- `src/routes/admin/training/**` — список, `new`, `[id]` (курс, `topics`, `lessons`, `lessons/new`, `lessons/[lessonId]`, `preview`).
-- `src/lib/i18n/messages/{en,hy,ru}-training-admin.ts`, `{en,hy,ru}.ts`.
-- `tests/e2e/admin-access-map.ts`, `admin-audit-map.ts`, `admin-audit-training.ts`, `admin-audit-actions.ts`, `admin-permissions-training.ts`, `admin-permissions.spec.ts`.
+- `src/lib/validation/training.ts` (+ test) — `portalText`, `questionFormSchema`; `src/lib/i18n/localized.ts` — `pickPortal`.
+- `src/lib/server/services/training/questions.ts`, `question-list.ts`, `question-import.ts` (+ тесты), `test-support.ts`.
+- `src/routes/admin/training/[id]/questions/**`, `[id]/+layout.svelte` (вкладка); формы и страницы 9.2 — `pickPortal`, EN не `required`.
+- `scripts/import-quiz-bank.ts`.
+- `src/lib/i18n/messages/{en,hy,ru}-training-questions.ts`, `*-training-admin.ts`.
+- `tests/e2e/admin-access-map.ts`, `admin-audit-map.ts`, `admin-audit-training.ts`, `admin-permissions-training.ts`.
 
 ## Не ломать
 
-- Права прочих разделов админки и карта прав / журнала (`access-coverage`, `audit-coverage`, `admin-permissions.spec.ts`).
-- Удаление файла медиатеки: файл в тексте урока не удаляется (`findUsages`).
-- Приватный бакет согласий и сертификатов — без изменений `storage/r2.ts`.
+- Права и журнал прочих разделов (`access-coverage`, `audit-coverage`, `admin-permissions.spec.ts`); editor не видит вкладку и адреса банка.
+- Курсы, темы, уроки 9.2 с английским текстом сохраняются как раньше; счётчик «вопросов» в темах и списке курсов.
+- Вопрос не удаляется; тема вопроса — только своего курса.
 
 ## Проверка
 
-- `npx vitest run src/lib/server/services/training src/lib/validation/training.test.ts src/lib/server/auth src/lib/server/cache src/routes/admin/access-coverage.test.ts` → PASS.
-- `npm run check`, `npm run lint`; e2e (по возможности) — `admin-permissions.spec.ts`, `admin-audit.spec.ts`.
+- `npx vitest run src/lib/server/services/training src/lib/validation/training.test.ts src/routes/admin/access-coverage.test.ts` → PASS.
+- `npm run check`, `npm run lint`; импорт на dev: `npx tsx scripts/import-quiz-bank.ts --file=training/trainer/quiz-bank.json` (100 вопросов, повтор — 0 новых).
 
 ## Риск
 
-`high` — права (`permissions.ts`, новые `training.*`).
+`high` — права новых адресов (`training.manage`), журнал правильного ответа (`03` § 18.6).
 
 ## Читать
 
-- `05` § 27, `04` § 5.1 (`training.*`), `03` § 18.1–18.2, 18.6 (выписано); `zone-notes.md` § «Обучающий портал», § «Согласия и приватные файлы», § «Контент и админка» (прочитано).
+- `05` § 27, `02` § 11, `03` § 18.3, 18.6 (выписано); `zone-notes.md` § «Обучающий портал» (прочитано); `questions.md` этап 9, `decisions.md` 2026-10-27 (выписано).
 
 ## Фазы
 
 - [x] SPEC
-- [x] RED (`aa7b6c5`)
-- [x] GREEN
+- [ ] RED
+- [ ] GREEN
+- [ ] Данные: `quiz-bank.json`, импорт на dev
 - [ ] REVIEW (этапа)
