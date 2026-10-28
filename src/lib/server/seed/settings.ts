@@ -28,7 +28,7 @@ export const SEED_SETTINGS = {
 	 * PDF (docs/08 section 10; 6.4); letters before the end, in days (questions.md stage 6, 6.9);
 	 * who signs the PDF (questions.md stage 6; in Latin script only "Razmik Giurdzian", docs/00). */
 	certificates: {
-		staff_valid_months: 24,
+		staff_valid_months: 36,
 		pdf_russian: true,
 		staff_remind_days: [30, 7],
 		signer: {

@@ -6,7 +6,7 @@ import { siteSettings } from '../../db/schema/service';
 import { writeSettings } from '../site-settings';
 import type { Actor } from '../users/target';
 
-/* docs/03 section 4.6, 16: `site_settings.certificates`; coach and judge — 2 years by default.
+/* docs/03 section 4.6, 16: `site_settings.certificates`; coach and judge — 3 years by default.
  * docs/08 section 10: Russian in the PDF is optional (on by default, questions.md stage 6).
  * Letters before a coach or judge certificate ends — 30 and 7 days (questions.md stage 6, 6.9).
  * The signer under the PDF line — name and title, they change with the head (questions.md stage 6). */
@@ -25,7 +25,7 @@ export type CertificateSettings = {
 };
 
 export const CERTIFICATE_DEFAULTS: CertificateSettings = {
-	staffValidMonths: 24,
+	staffValidMonths: 36,
 	pdfRussian: true,
 	staffRemindDays: [30, 7],
 	signer: null
