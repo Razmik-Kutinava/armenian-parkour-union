@@ -7,7 +7,16 @@ import { testDb, testDbUrl } from '../../db/test-db';
 import { setTaskHidden } from './practice-tasks';
 import { insertSubmission, practiceCourse } from './practice-test-support';
 import { pastAttempt } from './quiz-test-support';
-import { accessRow, applicant, auditOf, IP, mailbox, setFederationEmail, SITE, staff } from './test-support';
+import {
+	accessRow,
+	applicant,
+	auditOf,
+	IP,
+	mailbox,
+	setFederationEmail,
+	SITE,
+	staff
+} from './test-support';
 
 /* docs/03 sections 18.5–18.6; decisions — docs/todo.md 9.13 (1–8): hiding the last task a member
  * has not got accepted finishes the course in the same transaction, the admin is the actor. */
@@ -105,7 +114,10 @@ describe.skipIf(!testDbUrl)('training: hiding a practice task finishes the cours
 				.insert(exams)
 				.values({ userId: done.user.id, kind: 'trainer', result: 'passed', decidedAt: new Date() })
 				.returning({ id: exams.id });
-			await tx.update(courseAccess).set({ examId: old.id }).where(eq(courseAccess.id, done.accessId));
+			await tx
+				.update(courseAccess)
+				.set({ examId: old.id })
+				.where(eq(courseAccess.id, done.accessId));
 			const other = await practiceCourse(tx);
 			await accept(tx, other.tasks[0], other.user.id, moderator.id);
 			await hideDirectly(tx, other.tasks[1]);

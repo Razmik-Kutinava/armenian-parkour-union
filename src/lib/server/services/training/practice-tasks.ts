@@ -8,8 +8,10 @@ import { practiceTasks } from '../../db/schema/training-progress';
 import type { Mail } from '../../mail/resend';
 import { writeAudit } from '../audit';
 import { isUuid, type Actor } from '../users/target';
+import { completeAfterHide, lockOpenAccess } from './course-complete-hide';
 
-/* docs/05 section 27 "Practice tasks" (admin); decisions — docs/todo.md 9.7 (1). Never deleted. */
+/* docs/05 section 27 "Practice tasks" (admin); decisions — docs/todo.md 9.7 (1), 9.13. Never
+ * deleted; hiding may finish courses (docs/03 section 18.5), the letters go after the commit. */
 
 type Refusal = 'not_allowed' | 'not_found';
 
@@ -106,16 +108,24 @@ export async function setTaskHidden(
 	deps: HideDeps
 ): Promise<'ok' | 'bad_state' | Refusal> {
 	if (!roleCan(actor.role, 'training.manage')) return 'not_allowed';
-	const { ip } = deps;
-	return db.transaction(async (tx) => {
+	if (!isUuid(courseId) || !isUuid(taskId)) return 'not_found';
+	const { ip, siteUrl } = deps;
+	const now = deps.now ?? new Date();
+	const outcome = await db.transaction(async (tx) => {
+		const members = hidden ? await lockOpenAccess(tx, courseId) : [];
 		const task = await lockTask(tx, courseId, taskId);
 		if (!task) return 'not_found' as const;
 		if ((task.hiddenAt !== null) === hidden) return 'bad_state' as const;
 		await tx
 			.update(practiceTasks)
-			.set({ hiddenAt: hidden ? new Date() : null })
+			.set({ hiddenAt: hidden ? now : null })
 			.where(eq(practiceTasks.id, task.id));
 		await writeAudit(tx, entry(actor, hidden ? 'hide' : 'restore', task.id, ip));
-		return 'ok' as const;
+		return completeAfterHide(tx, courseId, members, actor.id, { siteUrl, ip, now });
 	});
+	if (typeof outcome === 'string') return outcome;
+	for (const letter of outcome) {
+		await deps.send(letter).catch((e) => console.warn(`practice task ${taskId}: letter`, e));
+	}
+	return 'ok';
 }
