@@ -24,7 +24,7 @@
 - `src/lib/server/services/media/usage.ts` — `taskDescriptions`, вид `practice_task` (122 → ~135).
 - `src/routes/admin/media/[id]/+page.svelte` — ветка ссылки `practice_task` (155 → ~160).
 - `src/lib/i18n/messages/{en,hy,ru}-training-admin.ts` — `media.usage.practice_task`; `{en,hy,ru}-training-practice.ts` — `training.task.descriptionHint`.
-- Тесты (RED): `practice-tasks.test.ts` (111 строк) — картинка медиатеки в описании сохраняется схемой с адресом и находится `findUsages` как `{ kind: 'practice_task', id, courseId }`, у скрытого задания — тоже, `deleteMedia` → `inUse`; схема с `null` картинку отбрасывает. `content-import.test.ts` (177) — только если сменится вызов, строк не добавлять.
+- Тесты (RED): новый `practice-task-media.test.ts` (не раздувать `practice-tasks.test.ts`, 111 строк) — картинка медиатеки в описании сохраняется схемой с адресом и находится `findUsages` как `{ kind: 'practice_task', id, courseId }`, у скрытого задания — тоже, `deleteMedia` → `inUse`; схема с `null` картинку отбрасывает. `content-import.test.ts` (177) — только если сменится вызов, строк не добавлять.
 
 ## Не ломать
 
