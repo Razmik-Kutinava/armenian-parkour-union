@@ -31,13 +31,13 @@ export function practiceActions(
 				where c.slug = ${slug}`
 		)[0].id as string;
 	const taskForm = { 'title.en': 'Audit task', 'description.en': '<p>Kong</p>', sortOrder: '0' };
+	const url = `https://www.youtube.com/watch?v=${'a'.repeat(11)}`;
 	const pending = async () => {
 		const [user] = await sql`insert into users (email, name)
 			values (${`e2e-audit-practice-${crypto.randomUUID()}@example.com`}, 'Audit Practice')
 			returning id`;
 		const [row] = await sql`insert into practice_submissions (task_id, user_id, url, platform)
-			values (${await taskId()}, ${user.id}, ${`https://www.youtube.com/watch?v=${'a'.repeat(11)}`},
-				'youtube') returning id`;
+			values (${await taskId()}, ${user.id}, ${url}, 'youtube') returning id`;
 		return `/admin/training/practice/${row.id}`;
 	};
 
@@ -50,8 +50,8 @@ export function practiceActions(
 			post(`${await course()}/tasks?/hide`, { taskId: await taskId() }),
 		'/admin/training/[id]/tasks?/restore': async () =>
 			post(`${await course()}/tasks?/restore`, { taskId: await taskId() }),
-		'/admin/training/practice/[id]?/approve': async () => post(`${await pending()}?/approve`),
+		'/admin/training/practice/[id]?/approve': async () => post(`${await pending()}?/approve`, { url }),
 		'/admin/training/practice/[id]?/reject': async () =>
-			post(`${await pending()}?/reject`, { comment: 'Audit return' })
+			post(`${await pending()}?/reject`, { comment: 'Audit return', url })
 	};
 }

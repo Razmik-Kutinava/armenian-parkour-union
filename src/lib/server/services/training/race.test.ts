@@ -22,7 +22,7 @@ import { accessRow, IP, mailbox, SITE } from './test-support';
  * tests commit (race-support.ts). */
 
 const DAY = 86_400_000;
-const approve = { action: 'approve' as const, comment: '' };
+const approve = { action: 'approve' as const, comment: '', url: YT(1) };
 const reviewDeps = (send: (mail: Mail) => Promise<void>) => ({ send, siteUrl: SITE, ip: IP });
 const to = (sent: Mail[], email: string) => sent.filter((m) => m.to === email);
 
@@ -114,7 +114,7 @@ describe.skipIf(!testDbUrl)('training portal: simultaneous clicks', () => {
 		const { user, member, tasks } = await db.practice();
 		const [a, b] = await Promise.all([db.staff('moderator'), db.staff('moderator')]);
 		const first = await insertSubmission(db.main, tasks[0], member.id, { url: YT(1) });
-		const second = await insertSubmission(db.main, tasks[1], member.id, { url: YT(2) });
+		const second = await insertSubmission(db.main, tasks[1], member.id, { url: YT(1) });
 		const box = mailbox();
 		const [x, y] = await db.race(
 			(tx) => reviewPractice(tx, a, first, approve, reviewDeps(box.send)),
@@ -136,7 +136,7 @@ describe.skipIf(!testDbUrl)('training portal: simultaneous clicks', () => {
 			reviewedBy: moderator.id,
 			reviewedAt: new Date(Date.now() - 60_000)
 		});
-		const last = await insertSubmission(db.main, tasks[1], member.id, { url: YT(2) });
+		const last = await insertSubmission(db.main, tasks[1], member.id, { url: YT(1) });
 		const started = await startAttempt(db.main, member, course.slug, quizDeps());
 		if (!started.ok) throw new Error(started.reason);
 		const answers = rightAnswers((await attemptRow(db.main, started.id)).questions);

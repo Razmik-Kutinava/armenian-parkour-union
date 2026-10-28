@@ -17,7 +17,7 @@ import { accessRow, auditOf, IP, mailbox, setFederationEmail, SITE, staff } from
  * docs/todo.md 9.8 (1–4). */
 
 const FED = 'federation@parkour.test';
-const approve = { action: 'approve' as const, comment: '' };
+const approve = { action: 'approve' as const, comment: '', url: YT(1) };
 const reviewDeps = (send = mailbox().send) => ({ send, siteUrl: SITE, ip: IP });
 const examsOf = (tx: LimitDb, userId: string) =>
 	tx.select().from(exams).where(eq(exams.userId, userId));
@@ -37,7 +37,7 @@ async function lastPending(tx: LimitDb, locale = 'ru') {
 		reviewedBy: earlier.id,
 		reviewedAt: new Date(Date.now() - 60_000)
 	});
-	const last = await insertSubmission(tx, ctx.tasks[1], ctx.member.id, { url: YT(2) });
+	const last = await insertSubmission(tx, ctx.tasks[1], ctx.member.id);
 	return { ...ctx, earlier, last };
 }
 

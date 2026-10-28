@@ -16,7 +16,7 @@ import { createLesson, deleteLesson, updateLesson } from './lessons';
 import { openPortal } from './portal-gate';
 import { reviewPractice } from './practice-review';
 import { createTask, setTaskHidden, updateTask } from './practice-tasks';
-import { insertSubmission, insertTask, practiceCourse } from './practice-test-support';
+import { insertSubmission, insertTask, practiceCourse, YT } from './practice-test-support';
 import { createQuestion, setQuestionHidden, updateQuestion } from './questions';
 import { grantExtraAttempt } from './quiz-extra';
 import { quizCourse } from './quiz-test-support';
@@ -138,7 +138,7 @@ const ACTIONS: Record<keyof typeof DOC04, Record<string, Action>> = {
 				tx,
 				a,
 				f.submission,
-				{ action: 'approve', comment: '' },
+				{ action: 'approve', comment: '', url: YT(1) },
 				{ send: mailbox().send, siteUrl: SITE, ip: IP }
 			)
 	}
