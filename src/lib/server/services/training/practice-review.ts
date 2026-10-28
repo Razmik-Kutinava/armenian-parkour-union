@@ -13,12 +13,14 @@ import { practiceDecisionLetter } from './practice-mail';
 import { accessOf } from './quiz-facts';
 
 /* docs/03 sections 18.4 p. 4–5 and 18.6, docs/05 section 27 "Practice": accept or return (the
- * comment is required) a pending video, never one's own. Row lock, audit in the same transaction,
- * the letters after the commit; an accepted video may finish the course (section 18.5).
- * Decisions — docs/todo.md 9.7 (4), 9.8 (2–3). */
+ * comment is required) a pending video, never one's own, and only the link shown on the card — the
+ * member may replace it meanwhile. Row lock, audit in the same transaction, the letters after the
+ * commit; an accepted video may finish the course (section 18.5).
+ * Decisions — docs/todo.md 9.7 (4), 9.8 (2–3), 9.14 (1–5). */
 
-export type ReviewInput = { action: 'approve' | 'reject'; comment: string };
-export type ReviewRefusal = 'not_allowed' | 'invalid' | 'not_found' | 'bad_state' | 'own';
+export type ReviewInput = { action: 'approve' | 'reject'; comment: string; url: string };
+export type ReviewRefusal =
+	'not_allowed' | 'invalid' | 'not_found' | 'bad_state' | 'own' | 'changed';
 export type ReviewResult = { ok: true } | { ok: false; reason: ReviewRefusal };
 export type ReviewDeps = {
 	send: (mail: Mail) => Promise<void>;
@@ -80,6 +82,7 @@ export async function reviewPractice(
 		if (!row) return refuse('not_found');
 		if (row.userId === actor.id) return refuse('own');
 		if (row.status !== 'pending') return refuse('bad_state');
+		if (row.url !== input.url) return refuse('changed');
 		const status = STATUS[input.action];
 		await tx
 			.update(practiceSubmissions)

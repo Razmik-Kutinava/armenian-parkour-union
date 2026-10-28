@@ -62,5 +62,7 @@ export const hyTrainingPractice: Partial<Messages> = {
 	'training.practice.done.reject': 'Տեսանյութը վերադարձված է, մասնակցին նամակ է ուղարկվել։',
 	'training.practice.error.comment': 'Մուտքագրեք մեկնաբանություն՝ մինչև 1000 նիշ։',
 	'training.practice.error.state': 'Տեսանյութի վերաբերյալ արդեն որոշում կա։ Թարմացրեք էջը։',
-	'training.practice.error.own': 'Ձեր սեփական տեսանյութը չեք կարող ստուգել։'
+	'training.practice.error.own': 'Ձեր սեփական տեսանյութը չեք կարող ստուգել։',
+	'training.practice.error.changed':
+		'Մասնակիցը փոխարինել է հղումը։ Թարմացրեք էջը և դիտեք նոր տեսանյութը։'
 };

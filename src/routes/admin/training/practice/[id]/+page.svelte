@@ -88,4 +88,6 @@
 	confirmLabel={t(`training.practice.${dialog}`)}
 	danger={dialog === 'reject'}
 	comment={dialog === 'reject' ? 'required' : 'optional'}
-/>
+>
+	{#snippet fields()}<input type="hidden" name="url" value={c.url} />{/snippet}
+</ConfirmDialog>

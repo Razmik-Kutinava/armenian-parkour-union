@@ -56,7 +56,11 @@ describe.skipIf(!testDbUrl)('training practice: the review', () => {
 			const long = { action: 'reject' as const, comment: 'x'.repeat(1001), url: YT(1) };
 			expect(await reviewPractice(tx, admin, id, long, deps(box.send))).toEqual(refused('invalid'));
 			expect((await submissionRow(tx, id)).status).toBe('pending');
-			const input = { action: 'reject' as const, comment: ' The landing is not visible ', url: YT(1) };
+			const input = {
+				action: 'reject' as const,
+				comment: ' The landing is not visible ',
+				url: YT(1)
+			};
 			expect(await reviewPractice(tx, admin, id, input, deps(box.send))).toEqual({ ok: true });
 			expect(await submissionRow(tx, id)).toMatchObject({
 				status: 'rejected',
@@ -78,7 +82,13 @@ describe.skipIf(!testDbUrl)('training practice: the review', () => {
 			const id = await insertSubmission(tx, tasks[0], member.id);
 			const admin = await staff(tx);
 			const box = mailbox();
-			await reviewPractice(tx, admin, id, { action: 'approve', comment: '', url: YT(1) }, deps(box.send));
+			await reviewPractice(
+				tx,
+				admin,
+				id,
+				{ action: 'approve', comment: '', url: YT(1) },
+				deps(box.send)
+			);
 			const again = { action: 'reject' as const, comment: 'Передумал', url: YT(2) };
 			expect(await reviewPractice(tx, admin, id, again, deps(box.send))).toEqual(
 				refused('bad_state')

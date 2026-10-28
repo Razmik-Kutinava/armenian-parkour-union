@@ -17,20 +17,23 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 	return { card };
 };
 
-const REFUSED: Record<'invalid' | 'bad_state' | 'own', MessageKey> = {
+const REFUSED: Record<'invalid' | 'bad_state' | 'own' | 'changed', MessageKey> = {
 	invalid: 'training.practice.error.comment',
 	bad_state: 'training.practice.error.state',
-	own: 'training.practice.error.own'
+	own: 'training.practice.error.own',
+	changed: 'training.practice.error.changed'
 };
 
 async function decide(event: RequestEvent<{ id: string }>, action: ReviewInput['action']) {
 	const actor = requirePermission(event.locals.user, 'training.review');
-	const comment = String((await event.request.formData()).get('comment') ?? '');
+	const form = await event.request.formData();
+	const comment = String(form.get('comment') ?? '');
+	const url = String(form.get('url') ?? '');
 	const result = await reviewPractice(
 		db,
 		actor,
 		event.params.id,
-		{ action, comment },
+		{ action, comment, url },
 		{
 			send: sendMail,
 			siteUrl: PUBLIC_SITE_URL,

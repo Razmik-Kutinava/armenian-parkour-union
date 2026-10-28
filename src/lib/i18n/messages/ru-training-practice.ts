@@ -62,5 +62,7 @@ export const ruTrainingPractice: Partial<Messages> = {
 	'training.practice.done.reject': 'Видео возвращено, участнику отправлено письмо.',
 	'training.practice.error.comment': 'Введите комментарий, до 1000 символов.',
 	'training.practice.error.state': 'По видео уже есть решение. Обновите страницу.',
-	'training.practice.error.own': 'Своё видео проверять нельзя.'
+	'training.practice.error.own': 'Своё видео проверять нельзя.',
+	'training.practice.error.changed':
+		'Участник заменил ссылку. Обновите страницу и посмотрите новое видео.'
 };

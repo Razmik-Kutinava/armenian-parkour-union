@@ -50,7 +50,8 @@ export function practiceActions(
 			post(`${await course()}/tasks?/hide`, { taskId: await taskId() }),
 		'/admin/training/[id]/tasks?/restore': async () =>
 			post(`${await course()}/tasks?/restore`, { taskId: await taskId() }),
-		'/admin/training/practice/[id]?/approve': async () => post(`${await pending()}?/approve`, { url }),
+		'/admin/training/practice/[id]?/approve': async () =>
+			post(`${await pending()}?/approve`, { url }),
 		'/admin/training/practice/[id]?/reject': async () =>
 			post(`${await pending()}?/reject`, { comment: 'Audit return', url })
 	};

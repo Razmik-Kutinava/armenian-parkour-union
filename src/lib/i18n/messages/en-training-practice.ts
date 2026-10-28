@@ -60,5 +60,7 @@ export const enTrainingPractice = {
 	'training.practice.done.reject': 'Video returned, the member is notified by email.',
 	'training.practice.error.comment': 'Enter a comment, up to 1000 characters.',
 	'training.practice.error.state': 'The video has already been decided. Reload the page.',
-	'training.practice.error.own': 'You cannot review your own video.'
+	'training.practice.error.own': 'You cannot review your own video.',
+	'training.practice.error.changed':
+		'The participant has replaced the link. Reload the page and watch the new video.'
 } as const;
