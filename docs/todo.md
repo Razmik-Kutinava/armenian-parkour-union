@@ -5,54 +5,51 @@
 
 ## Задача
 
-9.11 (доделки этапа 9 после REVIEW, решения владельца 2026-10-28): `/admin/training/attempts` — список попыток теста и карточка попытки по `05` § 27 «Попытки»; лимит — из настроек курса (`attempts_limit` за `attempts_period_days`, у `trainer` — 3 за 180 дней), не зашит в код.
+9.12 (доделки этапа 9 после REVIEW, решения владельца 2026-10-28): карточка участника в заявке по `05` § 27 «Заявки» — попытки теста участника (ссылки на `/admin/training/attempts/{id}`), статус практики по заданиям, ссылка на экзамен, если курс завершён.
 
-Решения (из `05` § 27, `04`, `02` § 11; чего нет в документах — помечено «решение агента»):
-1. Право — `training.review` (moderator, admin; `04`: «просмотр попыток»). Действий на странице нет, журнал не пишется (только чтение). Внеочередная попытка — по-прежнему в «Заявках» (`training.manage`).
-2. Список: участник, курс, начало, правильных / всего, результат (сдал / не сдал / идёт / время вышло), внеочередная. Новые сверху по `started_at` (решение агента: журнал попыток, а не очередь), страницы по `PAGE_SIZE`, поиск по имени — как в очереди практики.
-3. Фильтры: курс, результат (`passed` / `failed` / `running`; `running` = `passed is null`, в т. ч. истёкшие и ещё не закрытые), период — `from` / `to` по `started_at` в днях Еревана (как `posts/list.ts`). Неизвестные значения — игнор.
-4. Карточка `/admin/training/attempts/[id]`: участник, курс, начало, окончание (`submitted_at` или `expires_at`), правильных / всего, порог (`pass_count` попытки), результат, внеочередная; вопросы со снимка — текст, варианты в порядке попытки, ответ участника, правильный ответ, отметка верно / неверно / без ответа.
-5. Идущая попытка (`passed is null` и `expires_at > now`) — в карточке только «идёт до …», без вопросов и ответов (решение агента: модератор не видит правильные ответы, пока участник сдаёт). Истёкшая, но не закрытая — вопросы, сохранённые ответы и правильные показываются, результат «время вышло, не закрыта» (закроет участник при визите или 9.16); страница ничего не закрывает и не пишет.
-6. Лимит в карточке (по настройкам курса, на сейчас): «обычных попыток за последние {attempts_period_days} дн.: N из {attempts_limit}», «внеочередных доступно: {extra_attempts}» (из `course_access`; заявки нет — 0). Счёт — `quiz-rules.ts` (`attemptsLeft` / окно), не новая формула.
-7. Неизвестный или не-uuid `id` — 404. Участник удалён мягко — попытка видна (имя как есть).
-8. Меню: «Попытки» в группе «Обучение», `training.review`; переводы en / hy / ru.
+Решения (из `05` § 27, `04`; чего нет в документах — помечено «решение агента»):
+1. Адрес — `/admin/training/access/[id]` (`id` — `course_access.id`), право `training.manage`, как у списка (`05`: «Заявки» — admin). Только чтение: журнал не пишется, `settleExpired` не зовётся, попытки и отправки не меняются. Неизвестный или не-uuid `id` — 404.
+2. Действия (одобрить, отклонить, закрыть доступ, внеочередная попытка) остаются в списке, в карточке их нет (решение агента: не дублировать формы и диалоги; шаблон «список → карточка» соблюдён). В списке — ссылка «Карточка» в колонке действий у каждой строки.
+3. Шапка: участник (ссылка `/admin/users/{userId}`; удалён мягко — имя как есть), курс, статус заявки, дата подачи (`created_at`), дата решения (`reviewed_at`, пусто — «—»), причина (`review_note`), внеочередных не использовано (`extra_attempts`).
+4. Попытки: все попытки участника по этому курсу, новые сверху по `started_at` — начало, правильных / всего, результат (`resultOf`: сдал / не сдал / идёт / время вышло), внеочередная; строка — ссылка на `/admin/training/attempts/{id}`. Колонки и результат — общие с 9.11 (`attemptColumns`, `typed` / `resultOf` из `attempt-list.ts`), не новая формула. Нет попыток — пустое состояние.
+5. Практика: видимые задания курса в порядке `taskOrder` (скрытые не показываются — как при завершении курса), у каждого — статус текущей отправки (живая или последняя вернутая: на проверке / принято / вернуто / нет отправки), ссылка на `/admin/training/practice/{submissionId}` текущей отправки, число отправок; сверху «принято N из M». Логика «текущей» — из `practice-read.ts` (`practiceStatus`), не новая.
+6. Экзамен: `exam_id` есть — «Курс завершён» и ссылка на `/admin/exams/{examId}` (`exams.manage` у admin есть); нет — «Курс не завершён».
+7. Меню не меняется (карточка — внутри «Заявок»). Переводы en / hy / ru (`hy` — по глоссарию `zone-notes.md` § «Обучающий портал», шаг 4).
 
 ## Файлы (ожидаемо)
 
-- `src/lib/server/services/training/attempt-list.ts` (+ `attempt-list.test.ts`) — `attemptListOptions`, `attemptFilter`, `listAttempts`; `attempt-card.ts` — `attemptDetail` (карточка + лимит через `quiz-rules.ts`).
-- `src/lib/components/admin/nav-icons.ts` — иконка пункта.
-- `src/routes/admin/training/attempts/+page.server.ts`, `+page.svelte` — список (образец — `training/practice/`).
-- `src/routes/admin/training/attempts/[id]/+page.server.ts`, `+page.svelte` — карточка.
-- `src/lib/server/admin/nav.ts` (+ `nav.test.ts`) — пункт `trainingAttempts`.
-- `src/lib/i18n/messages/{en,hy,ru}-training-attempts.ts` (+ подключение в `*-training-admin.ts`) — тексты `training.attempts.*`, `admin.nav.trainingAttempts`.
-- `tests/e2e/admin-access-map.ts`, `tests/e2e/admin-permissions-training.ts` — две страницы `training.review`, попытка в фикстуре и подстановка `[id]`.
+- `src/lib/server/services/training/access-card.ts` (+ `access-card.test.ts`) — `accessDetail(db, id, now)`: шапка заявки, попытки (через `attemptColumns` / `typed`), практика (через `practiceStatus`), `examId`; `null` — 404.
+- `src/routes/admin/training/access/[id]/+page.server.ts`, `+page.svelte` — карточка (образец — `training/attempts/[id]/`).
+- `src/routes/admin/training/access/+page.svelte` — ссылка «Карточка» в колонке действий.
+- `src/lib/i18n/messages/{en,hy,ru}-training-access.ts` — тексты `training.access.card.*` (файл > 120 строк — отдельный `*-training-access-card.ts` с подключением, как `*-training-attempts.ts`).
+- `tests/e2e/admin-access-map.ts`, `tests/e2e/admin-permissions-training.ts` — страница `/admin/training/access/[id]` (`training.manage`) и подстановка `accessId` в `trainingPath`.
 
 ## Не ломать
 
-- Правильные ответы не уходят участнику: `quiz-secrets.test.ts` зелёный; в админке ответы — только `training.review`, у идущей попытки — не показываются.
-- Editor (только `training.lessons`) и участник — 403 / вход на `/admin/training/attempts` и карточке; карта прав e2e и `rights.test.ts` согласованы.
-- Очередь практики и заявки работают как раньше (общие `accessCourses`, меню).
-- Страница не меняет попытки (нет `settleExpired`, нет записи в журнал).
+- Editor, moderator (без `training.manage`) и участник — 403 / вход на `/admin/training/access/[id]`; карта прав e2e и `rights.test.ts` согласованы.
+- Правильные ответы не уходят участнику: `quiz-secrets.test.ts` зелёный; карточка заявки ответов попытки не показывает (только ссылка на карточку попытки).
+- Список заявок и его действия (approve / reject / revoke / extra) работают как раньше.
+- Карточка ничего не пишет (нет журнала, нет закрытия истёкших попыток).
 
 ## Проверка
 
-- `npx vitest run src/lib/server/services/training/attempt-list.test.ts src/lib/server/admin/nav.test.ts src/lib/server/services/training/quiz-secrets.test.ts`
-- `npm run check`, `npm run lint`; e2e `admin-permissions` (training) — только если CI не прогонит (по `sbr.mdc` — CI).
+- `npx vitest run src/lib/server/services/training/access-card.test.ts src/lib/server/services/training/access-list.test.ts src/lib/server/services/training/quiz-secrets.test.ts`
+- `npm run check`, `npm run lint`; e2e `admin-permissions` (training) — CI.
 
 ## Риск
 
-`normal` — серверное чтение и страницы админки; право существующее (`training.review`), новых действий, миграций и журнала нет. В REVIEW этапа — общий уровень этапа 9 (`high`).
+`normal` — серверное чтение и страница админки; право существующее (`training.manage`), новых действий, миграций и журнала нет. В REVIEW этапа — общий уровень этапа 9 (`high`).
 
 ## Читать
 
-- `05` § 27 «Попытки» (строки 415–417) — выписано выше.
-- `04` таблица `training.*` (строки 176–178) — выписано: `training.review` — moderator, admin, «просмотр попыток».
-- `02` § 11 `quiz_attempts` (строки 627–645) — выписано: снимок `[{question_id, text, options, correct_index}]`, `answers` по порядку вопросов, `is_extra` вне лимита.
-- `zone-notes.md` § «Обучающий портал», 9.6 (`quiz-rules.ts`, `quiz-facts.ts`) и REVIEW (новый вызывающий чтений — только за `requirePermission`).
+- `05` § 27 «Заявки» (строки 405–408) — выписано выше: «Карточка участника в заявке: попытки теста, статус практики по заданиям, ссылка на экзамен, если курс завершён».
+- `04` права: `training.manage` — admin; `training.review`, `exams.manage` — moderator, admin (сверено с `permissions.ts`).
+- `02` § 11 `course_access` — выписано: `created_at`, `reviewed_at`, `review_note`, `extra_attempts`, `exam_id` (есть — курс завершён).
+- `zone-notes.md` § «Обучающий портал», 9.7 (`practice-read.ts`), 9.8 (новая страница с `[id]` — строка в фикстуре и подстановка в `trainingPath`), 9.11 («Для 9.12»).
 
 ## Фазы
 
 - [x] SPEC
-- [x] RED `1e56389`
-- [x] GREEN
+- [ ] RED
+- [ ] GREEN
 - [ ] REVIEW (этапа 9)
