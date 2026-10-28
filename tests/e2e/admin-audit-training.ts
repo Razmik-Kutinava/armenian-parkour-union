@@ -50,6 +50,20 @@ export function trainingActions(
 		'option1.ru': 'Да',
 		correct
 	});
+	/* A published course without conditions: approve does not depend on memberships. */
+	const accessRow = async (status: 'pending' | 'approved') => {
+		const [user] = await sql`insert into users (email, name, first_name, last_name, birth_date)
+			values (${`e2e-audit-access-${crypto.randomUUID()}@example.com`}, 'Audit Applicant',
+				'Audit', 'Applicant', '1990-01-01') returning id`;
+		const [course] = await sql`insert into courses
+				(slug, exam_kind, title, status, requires_membership)
+			values (${`e2e-audit-open-${crypto.randomUUID().slice(0, 8)}`}, 'trainer',
+				${sql.json({ en: 'Audit open course' })}, 'published', false) returning id`;
+		const [row] = await sql`insert into course_access (course_id, user_id, status, reviewed_at)
+			values (${course.id}, ${user.id}, ${status}, ${status === 'pending' ? null : new Date()})
+			returning id`;
+		return row.id as string;
+	};
 	const question = async () => {
 		const [row] = await sql`select q.id from quiz_questions q join courses c on c.id = q.course_id
 			where c.slug = ${slug}`;
@@ -105,6 +119,18 @@ export function trainingActions(
 			await post(`${await lesson()}?/pdfRemove`);
 		},
 		'/admin/training/[id]/lessons/[lessonId]?/delete': async () =>
-			postRedirect(`${await lesson()}?/delete`)
+			postRedirect(`${await lesson()}?/delete`),
+		'/admin/training/access?/approve': async () =>
+			post('/admin/training/access?/approve', { accessId: await accessRow('pending') }),
+		'/admin/training/access?/reject': async () =>
+			post('/admin/training/access?/reject', {
+				accessId: await accessRow('pending'),
+				reason: 'Audit refusal'
+			}),
+		'/admin/training/access?/revoke': async () =>
+			post('/admin/training/access?/revoke', {
+				accessId: await accessRow('approved'),
+				reason: 'Audit revoke'
+			})
 	};
 }

@@ -7,6 +7,7 @@ export type TrainingIds = {
 	topicId: string;
 	lessonId: string;
 	questionId: string;
+	accessId: string;
 };
 
 export const trainingPath = (path: string, ids: TrainingIds) =>
@@ -29,11 +30,17 @@ export function trainingFixtures(sql: postgres.Sql) {
 					(course_id, topic_id, text, options, correct_index)
 				values (${course.id}, ${topic.id}, ${sql.json({ en: 'E2e perm question' })},
 					${sql.json([{ en: 'No' }, { en: 'Yes' }])}, 1) returning id`;
+			const [applicant] = await sql`insert into users (email, name, birth_date)
+				values (${`e2e-perm-applicant-${crypto.randomUUID()}@example.com`}, 'Perm Applicant',
+					'1990-01-01') returning id`;
+			const [access] = await sql`insert into course_access (course_id, user_id)
+				values (${course.id}, ${applicant.id}) returning id`;
 			return {
 				courseId: course.id,
 				topicId: topic.id,
 				lessonId: lesson.id,
-				questionId: question.id
+				questionId: question.id,
+				accessId: access.id
 			};
 		},
 		trainingRows: async (ids: TrainingIds) => ({
@@ -43,9 +50,10 @@ export function trainingFixtures(sql: postgres.Sql) {
 				await sql`select * from course_lessons where course_id = ${ids.courseId} order by id`,
 			questions:
 				await sql`select * from quiz_questions where course_id = ${ids.courseId} order by id`,
+			access: await sql`select * from course_access where id = ${ids.accessId}`,
 			created: await sql`select slug from courses where slug like 'e2e-hostile-%'`,
-			audit: await sql`select 1 from audit_log
-				where entity_id in (${ids.courseId}, ${ids.topicId}, ${ids.lessonId}, ${ids.questionId})`
+			audit: await sql`select 1 from audit_log where entity_id in
+				(${ids.courseId}, ${ids.topicId}, ${ids.lessonId}, ${ids.questionId}, ${ids.accessId})`
 		})
 	};
 }

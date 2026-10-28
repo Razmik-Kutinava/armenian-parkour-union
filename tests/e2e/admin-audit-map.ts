@@ -98,7 +98,10 @@ export const ADMIN_AUDIT = {
 	'/admin/training/[id]/questions/new?/default': ['quiz_question.create'],
 	'/admin/training/[id]/questions/[questionId]?/update': ['quiz_question.update'],
 	'/admin/training/[id]/questions/[questionId]?/hide': ['quiz_question.hide'],
-	'/admin/training/[id]/questions/[questionId]?/restore': ['quiz_question.restore']
+	'/admin/training/[id]/questions/[questionId]?/restore': ['quiz_question.restore'],
+	'/admin/training/access?/approve': ['course_access.approve'],
+	'/admin/training/access?/reject': ['course_access.reject'],
+	'/admin/training/access?/revoke': ['course_access.revoke']
 } as const;
 
 export type AdminAction = keyof typeof ADMIN_AUDIT;

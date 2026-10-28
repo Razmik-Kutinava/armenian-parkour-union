@@ -116,7 +116,7 @@ for (const role of ['member', 'editor', 'moderator'] as const) {
 			const expected = expectedStatus(role, access);
 			if (expected === 200) continue;
 			const res = await page.request.post(pathOf(key, ids, extra), {
-				form: HOSTILE_FORM(target, ids.heroId, entryId),
+				form: { ...HOSTILE_FORM(target, ids.heroId, entryId), accessId: extra.accessId },
 				headers: ORIGIN,
 				maxRedirects: 0
 			});

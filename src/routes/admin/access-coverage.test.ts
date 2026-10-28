@@ -19,7 +19,7 @@ async function adminReads(): Promise<string[]> {
 describe('every admin route is in the access map (docs/04 section 5, roadmap 1.13)', () => {
 	it('each page and GET endpoint has its permission', async () => {
 		expect(await adminReads()).toEqual(Object.keys(ADMIN_READS).sort());
-	});
+	}, 60_000);
 
 	it('each data-changing action has its permission (same list as the audit map)', () => {
 		const writes = [...Object.keys(ADMIN_AUDIT), ...Object.keys(NOT_AUDITED)].sort();

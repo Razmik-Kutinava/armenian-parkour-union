@@ -3,9 +3,13 @@ import type { QuestionValues } from '#lib/validation/training-questions.ts';
 import type { CourseValues, LessonValues } from '#lib/validation/training.ts';
 import type { LimitDb } from '../../auth/rate-limit';
 import type { UserRole } from '../../auth/session';
-import { auditLog } from '../../db/schema/service';
+import { memberships } from '../../db/schema/payments';
+import { auditLog, siteSettings } from '../../db/schema/service';
 import { courses, courseTopics } from '../../db/schema/training';
+import { courseAccess } from '../../db/schema/training-progress';
 import { insertUser } from '../../db/test-db';
+import type { Mail } from '../../mail/resend';
+import { applyForCourse } from './access';
 
 /* Test support only: training rows and actors. */
 
@@ -71,6 +75,78 @@ export async function insertTopic(tx: LimitDb, courseId: string, sortOrder = 0) 
 		.values({ courseId, title: { en: `Topic ${sortOrder}` }, sortOrder })
 		.returning({ id: courseTopics.id });
 	return row.id;
+}
+
+/** A published course with the coach conditions (membership, 18+, advanced) unless overridden. */
+export async function insertOpenCourse(
+	tx: LimitDb,
+	extra: Partial<typeof courses.$inferInsert> = {}
+) {
+	const [row] = await tx
+		.insert(courses)
+		.values({
+			slug: `t-open-${crypto.randomUUID().slice(0, 8)}`,
+			examKind: 'trainer',
+			title: { ru: 'Курс тренера', en: 'Coach course' },
+			status: 'published',
+			requiresMembership: true,
+			minAge: 18,
+			requiredLevel: 'advanced',
+			...extra
+		})
+		.returning({ id: courses.id, slug: courses.slug });
+	return row;
+}
+
+type MemberOptions = Parameters<typeof insertUser>[1] & { member?: boolean };
+
+/** A member who meets the coach conditions unless overridden; `member: false` — no membership. */
+export async function applicant(tx: LimitDb, { member = true, ...values }: MemberOptions = {}) {
+	const user = await insertUser(tx, { birthDate: '1990-01-01', level: 'advanced', ...values });
+	if (member) {
+		const day = 86_400_000;
+		await tx.insert(memberships).values({
+			userId: user.id,
+			status: 'active',
+			startsAt: new Date(Date.now() - 10 * day),
+			endsAt: new Date(Date.now() + 300 * day)
+		});
+	}
+	return user;
+}
+
+/** The federation address for letters to the admin (`site_settings.contacts.email`). */
+export async function setFederationEmail(tx: LimitDb, email: string | null) {
+	const value = email ? { email } : {};
+	await tx
+		.insert(siteSettings)
+		.values({ key: 'contacts', value })
+		.onConflictDoUpdate({ target: siteSettings.key, set: { value } });
+}
+
+/** Letters the code tried to send; `failing` throws like an unreachable mail service. */
+export function mailbox(failing = false) {
+	const sent: Mail[] = [];
+	const send = async (mail: Mail) => {
+		if (failing) throw new Error('mail is down');
+		sent.push(mail);
+	};
+	return { sent, send };
+}
+
+export const SITE = 'https://parkour.test';
+export const accessDeps = (send: (mail: Mail) => Promise<void>) => ({ send, siteUrl: SITE, ip: IP });
+
+export const accessRow = async (tx: LimitDb, id: string) =>
+	(await tx.select().from(courseAccess).where(eq(courseAccess.id, id)))[0];
+
+/** A pending request of a member who meets the coach conditions (unless overridden). */
+export async function applied(tx: LimitDb, values: MemberOptions = {}) {
+	const course = await insertOpenCourse(tx);
+	const user = await applicant(tx, values);
+	const result = await applyForCourse(tx, user.id, course.id, accessDeps(mailbox().send));
+	if (!result.ok) throw new Error(result.reason);
+	return { course, user, id: result.id };
 }
 
 export const auditOf = (tx: LimitDb, entityType: string, id: string) =>
