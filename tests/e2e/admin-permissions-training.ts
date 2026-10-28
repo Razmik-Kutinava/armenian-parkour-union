@@ -1,20 +1,24 @@
 import type postgres from 'postgres';
 
-/* A course with a topic, a lesson and a question for admin-permissions.spec.ts: every training
- * action could really run on them. */
+/* A course with a topic, a lesson, a question, a practice task and a pending video for
+ * admin-permissions.spec.ts: every training action could really run on them. */
 export type TrainingIds = {
 	courseId: string;
 	topicId: string;
 	lessonId: string;
 	questionId: string;
 	accessId: string;
+	taskId: string;
+	submissionId: string;
 };
 
 export const trainingPath = (path: string, ids: TrainingIds) =>
 	path
+		.replace('/training/practice/[id]', `/training/practice/${ids.submissionId}`)
 		.replace('/training/[id]', `/training/${ids.courseId}`)
 		.replace('/lessons/[lessonId]', `/lessons/${ids.lessonId}`)
-		.replace('/questions/[questionId]', `/questions/${ids.questionId}`);
+		.replace('/questions/[questionId]', `/questions/${ids.questionId}`)
+		.replace('/tasks/[taskId]', `/tasks/${ids.taskId}`);
 
 export function trainingFixtures(sql: postgres.Sql) {
 	return {
@@ -35,12 +39,20 @@ export function trainingFixtures(sql: postgres.Sql) {
 					'1990-01-01') returning id`;
 			const [access] = await sql`insert into course_access (course_id, user_id)
 				values (${course.id}, ${applicant.id}) returning id`;
+			const [task] = await sql`insert into practice_tasks (course_id, title, description)
+				values (${course.id}, ${sql.json({ en: 'E2e perm task' })}, ${sql.json({})}) returning id`;
+			const [submission] = await sql`insert into practice_submissions
+					(task_id, user_id, url, platform)
+				values (${task.id}, ${applicant.id}, 'https://www.youtube.com/watch?v=e2ePermVid1',
+					'youtube') returning id`;
 			return {
 				courseId: course.id,
 				topicId: topic.id,
 				lessonId: lesson.id,
 				questionId: question.id,
-				accessId: access.id
+				accessId: access.id,
+				taskId: task.id,
+				submissionId: submission.id
 			};
 		},
 		trainingRows: async (ids: TrainingIds) => ({
@@ -51,9 +63,12 @@ export function trainingFixtures(sql: postgres.Sql) {
 			questions:
 				await sql`select * from quiz_questions where course_id = ${ids.courseId} order by id`,
 			access: await sql`select * from course_access where id = ${ids.accessId}`,
+			tasks: await sql`select * from practice_tasks where course_id = ${ids.courseId} order by id`,
+			submission: await sql`select * from practice_submissions where id = ${ids.submissionId}`,
 			created: await sql`select slug from courses where slug like 'e2e-hostile-%'`,
 			audit: await sql`select 1 from audit_log where entity_id in
-				(${ids.courseId}, ${ids.topicId}, ${ids.lessonId}, ${ids.questionId}, ${ids.accessId})`
+				(${ids.courseId}, ${ids.topicId}, ${ids.lessonId}, ${ids.questionId}, ${ids.accessId},
+					${ids.taskId}, ${ids.submissionId})`
 		})
 	};
 }
