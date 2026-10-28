@@ -19,11 +19,12 @@
 
 ## Файлы (ожидаемо)
 
-- `src/lib/server/services/training/attempt-list.ts` (+ `attempt-list.test.ts`) — `attemptListOptions`, `attemptFilter`, `listAttempts`, `attemptDetail` (карточка + лимит через `quiz-rules.ts`).
+- `src/lib/server/services/training/attempt-list.ts` (+ `attempt-list.test.ts`) — `attemptListOptions`, `attemptFilter`, `listAttempts`; `attempt-card.ts` — `attemptDetail` (карточка + лимит через `quiz-rules.ts`).
+- `src/lib/components/admin/nav-icons.ts` — иконка пункта.
 - `src/routes/admin/training/attempts/+page.server.ts`, `+page.svelte` — список (образец — `training/practice/`).
 - `src/routes/admin/training/attempts/[id]/+page.server.ts`, `+page.svelte` — карточка.
 - `src/lib/server/admin/nav.ts` (+ `nav.test.ts`) — пункт `trainingAttempts`.
-- `src/lib/i18n/messages/{en,hy,ru}-training-practice.ts` или новый `*-training-attempts.ts` — тексты `training.attempts.*`, `admin.nav.trainingAttempts`.
+- `src/lib/i18n/messages/{en,hy,ru}-training-attempts.ts` (+ подключение в `*-training-admin.ts`) — тексты `training.attempts.*`, `admin.nav.trainingAttempts`.
 - `tests/e2e/admin-access-map.ts`, `tests/e2e/admin-permissions-training.ts` — две страницы `training.review`, попытка в фикстуре и подстановка `[id]`.
 
 ## Не ломать
@@ -52,6 +53,6 @@
 ## Фазы
 
 - [x] SPEC
-- [ ] RED
-- [ ] GREEN
+- [x] RED `1e56389`
+- [x] GREEN
 - [ ] REVIEW (этапа 9)

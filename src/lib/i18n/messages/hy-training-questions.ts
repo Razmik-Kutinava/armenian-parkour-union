@@ -1,6 +1,6 @@
 import type { Messages } from '../translate';
 
-/** Admin "Training": the question bank. Part of `hyTrainingAdmin` (proofreading — a native speaker). */
+/** Admin "Training": the question bank. Part of `hyTrainingAdmin`. */
 export const hyTrainingQuestions: Partial<Messages> = {
 	'training.tab.questions': 'Հարցեր',
 	'training.questions.create': 'Նոր հարց',
@@ -16,8 +16,8 @@ export const hyTrainingQuestions: Partial<Messages> = {
 	'training.questions.col.correct': 'Ճիշտ պատասխան',
 	'training.questions.col.source': 'Աղբյուր',
 	'training.questions.col.hidden': 'Թաքցված',
-	'training.questions.total': 'Տեսանելի թեմաների տեսանելի հարցեր՝ {count}; թեստում՝ {size}։',
-	'training.questions.inTopic': 'Թեմայի տեսանելի հարցեր՝ {count}; թեստում անհրաժեշտ է՝ {need}։',
+	'training.questions.total': 'Տեսանելի թեմաների տեսանելի հարցեր՝ {count}․ թեստում՝ {size}։',
+	'training.questions.inTopic': 'Թեմայի տեսանելի հարցեր՝ {count}․ թեստում անհրաժեշտ է՝ {need}։',
 	'training.questions.hidden': 'Թաքցված',
 	'training.question.back': 'Բոլոր հարցերը',
 	'training.question.new': 'Նոր հարց',

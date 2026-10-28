@@ -1,5 +1,6 @@
 import type { Messages } from '../translate';
 import { hyTrainingAccess } from './hy-training-access';
+import { hyTrainingAttempts } from './hy-training-attempts';
 import { hyTrainingPractice } from './hy-training-practice';
 import { hyTrainingQuestions } from './hy-training-questions';
 
@@ -7,6 +8,7 @@ export const hyTrainingAdmin: Partial<Messages> = {
 	...hyTrainingQuestions,
 	...hyTrainingAccess,
 	...hyTrainingPractice,
+	...hyTrainingAttempts,
 	'admin.group.training': 'Ուսուցում',
 	'admin.nav.training': 'Դասընթացներ',
 	'media.usage.course_lesson': 'Դասընթացի դաս',
@@ -16,7 +18,7 @@ export const hyTrainingAdmin: Partial<Messages> = {
 	'training.courses.create': 'Նոր դասընթաց',
 	'training.courses.empty': 'Դասընթացներ դեռ չկան',
 	'training.courses.readOnly':
-		'Դասընթացները և դրանց կարգավորումները կառավարում է ադմինիստրատորը. դուք կարող եք խմբագրել դասերը։',
+		'Դասընթացները և դրանց կարգավորումները կառավարում է ադմինիստրատորը․ դուք կարող եք խմբագրել դասերը։',
 	'training.courses.col.title': 'Դասընթաց',
 	'training.courses.col.kind': 'Քննություն',
 	'training.courses.col.status': 'Կարգավիճակ',
@@ -85,11 +87,11 @@ export const hyTrainingAdmin: Partial<Messages> = {
 	'training.lesson.status': 'Կարգավիճակ',
 	'training.lesson.preview': 'Նախադիտում',
 	'training.lesson.previewBanner':
-		'Պահպանված տարբերակի նախադիտում. անդամները դասը տեսնում են միայն հրապարակվելուց հետո։',
+		'Պահպանված տարբերակի նախադիտում․ մասնակիցները դասը տեսնում են միայն հրապարակվելուց հետո։',
 	'training.lesson.delete': 'Ջնջել դասը',
 	'training.lesson.deleteConfirm': 'Ջնջե՞լ այս դասը։ Այն կանհետանա պորտալից։',
 	'training.lesson.pdf': 'PDF',
-	'training.lesson.pdfHint': 'Մինչև 10 ՄԲ։ Անդամը ներբեռնում է 5 րոպե գործող հղումով։',
+	'training.lesson.pdfHint': 'Մինչև 10 ՄԲ։ Մասնակիցը ներբեռնում է 5 րոպե գործող հղումով։',
 	'training.lesson.pdfAfterSave': 'Նախ պահպանեք դասը, ապա կցեք PDF։',
 	'training.lesson.pdfNone': 'PDF դեռ չկա։',
 	'training.lesson.pdfUpload': 'Վերբեռնել PDF',

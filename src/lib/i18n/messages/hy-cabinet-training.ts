@@ -1,6 +1,6 @@
 import type { Messages } from '../translate';
 
-/** Cabinet "Training": courses and access requests. Part of `hyCabinet` (proofreading — a native speaker). */
+/** Cabinet "Training": courses and access requests. Part of `hyCabinet`. */
 export const hyCabinetTraining: Partial<Messages> = {
 	'cabinet.nav.training': 'Ուսուցում',
 	'cabinet.training.intro':
@@ -10,7 +10,7 @@ export const hyCabinetTraining: Partial<Messages> = {
 	'cabinet.training.need.membership': 'գործող անդամակցություն',
 	'cabinet.training.need.age': 'առնվազն {age} տարեկան (ծննդյան ամսաթիվը՝ պրոֆիլում)',
 	'cabinet.training.need.level': '«{level}» կամ ավելի բարձր աստիճան',
-	'cabinet.training.apply': 'Խնդրել մուտք',
+	'cabinet.training.apply': 'Ներկայացնել հայտ',
 	'cabinet.training.applyAgain': 'Կրկին դիմել',
 	'cabinet.training.pending': 'Հայտը քննարկման մեջ է։ Որոշման մասին կտեղեկացնենք նամակով։',
 	'cabinet.training.rejected': 'Հայտը մերժված է։ Պատճառը՝ {reason}',

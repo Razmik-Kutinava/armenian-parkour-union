@@ -1,6 +1,6 @@
 import type { Messages } from '../translate';
 
-/** Admin "Training": practice tasks and the review queue. Part of `hyTrainingAdmin` (proofreading — a native speaker). */
+/** Admin "Training": practice tasks and the review queue. Part of `hyTrainingAdmin`. */
 export const hyTrainingPractice: Partial<Messages> = {
 	'admin.nav.trainingPractice': 'Պրակտիկա',
 	'training.tab.tasks': 'Գործնական առաջադրանքներ',
@@ -23,7 +23,7 @@ export const hyTrainingPractice: Partial<Messages> = {
 	'training.task.title': 'Անվանում',
 	'training.task.description': 'Ինչ ցույց տալ, տեսանյութի պահանջներ, չափանիշներ',
 	'training.task.descriptionHint':
-		'Մեդիադարանի նկարները առաջադրանքում չեն պահպանվում․ YouTube-ի օրինակը՝ կարելի է։',
+		'Մեդիադարանի նկարներն առաջադրանքում չեն պահպանվում․ YouTube-ի օրինակ ավելացնել կարելի է։',
 	'training.task.sortOrder': 'Հերթականություն',
 	'training.task.sortOrderHint': 'Փոքր թվերը՝ վերևում։',
 	'training.practice.empty': 'Տեսանյութեր չեն գտնվել',
@@ -60,7 +60,7 @@ export const hyTrainingPractice: Partial<Messages> = {
 	'training.practice.own': 'Սա ձեր տեսանյութն է․ որոշումը կայացնում է այլ ստուգող։',
 	'training.practice.done.approve': 'Տեսանյութն ընդունված է, մասնակցին նամակ է ուղարկվել։',
 	'training.practice.done.reject': 'Տեսանյութը վերադարձված է, մասնակցին նամակ է ուղարկվել։',
-	'training.practice.error.comment': 'Մուտքագրեք մեկնաբանություն, մինչև 1000 նիշ։',
+	'training.practice.error.comment': 'Մուտքագրեք մեկնաբանություն՝ մինչև 1000 նիշ։',
 	'training.practice.error.state': 'Տեսանյութի վերաբերյալ արդեն որոշում կա։ Թարմացրեք էջը։',
 	'training.practice.error.own': 'Ձեր սեփական տեսանյութը չեք կարող ստուգել։'
 };

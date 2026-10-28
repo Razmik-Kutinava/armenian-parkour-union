@@ -1,6 +1,6 @@
 import type { Messages } from '../translate';
 
-/** Cabinet "Training": practice videos and the decision letter. Part of `hyCabinet` (proofreading — a native speaker). */
+/** Cabinet "Training": practice videos and the decision letter. Part of `hyCabinet`. */
 export const hyCabinetPractice: Partial<Messages> = {
 	'cabinet.practice.title': 'Պրակտիկա',
 	'cabinet.practice.go': 'Անցնել պրակտիկային',

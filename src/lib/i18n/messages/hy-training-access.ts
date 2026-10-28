@@ -1,6 +1,6 @@
 import type { Messages } from '../translate';
 
-/** Admin "Training": access requests and letters. Part of `hyTrainingAdmin` (proofreading — a native speaker). */
+/** Admin "Training": access requests and letters. Part of `hyTrainingAdmin`. */
 export const hyTrainingAccess: Partial<Messages> = {
 	'admin.nav.trainingAccess': 'Հայտեր',
 	'training.access.empty': 'Հայտեր չեն գտնվել',
@@ -50,7 +50,8 @@ export const hyTrainingAccess: Partial<Messages> = {
 	'training.missing.age': 'տարիք',
 	'training.missing.level': 'աստիճան',
 	'training.mail.request.subject': 'Նոր հայտ դասընթացի համար',
-	'training.mail.request.text': '{name}-ը խնդրում է մուտք «{course}» դասընթացին։\n\nՀայտեր՝ {url}',
+	'training.mail.request.text':
+		'Նոր հայտ «{course}» դասընթացի մուտքի համար։ Մասնակից՝ {name}։\n\nՀայտեր՝ {url}',
 	'training.mail.approved.subject': 'Դասընթացի մուտքը բաց է',
 	'training.mail.approved.text':
 		'Բարև, {name}։\n\n«{course}» դասընթացի ձեր հայտը հաստատված է։\n\nԴասընթացի պորտալ՝ {url}',

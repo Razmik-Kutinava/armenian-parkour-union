@@ -2,7 +2,8 @@ import { eq } from 'drizzle-orm';
 import { afterAll, describe, expect, it } from 'vitest';
 import { courseAccess } from '../../db/schema/training-progress';
 import { insertUser, testDb, testDbUrl } from '../../db/test-db';
-import { attemptDetail, attemptFilter, listAttempts } from './attempt-list';
+import { attemptDetail } from './attempt-card';
+import { attemptFilter, listAttempts } from './attempt-list';
 import { pastAttempt, quizCourse } from './quiz-test-support';
 
 /* docs/05 section 27 "Attempts" (moderator read, admin): the list with filters course, result,
@@ -12,27 +13,43 @@ import { pastAttempt, quizCourse } from './quiz-test-support';
 const DAY = 86_400_000;
 const ago = (days: number) => new Date(Date.now() - days * DAY);
 const snapshot = [
-	{ question_id: 'q1', text: { ru: 'Вопрос 1' }, options: [{ ru: 'А' }, { ru: 'Б' }], correct_index: 1 },
-	{ question_id: 'q2', text: { ru: 'Вопрос 2' }, options: [{ ru: 'В' }, { ru: 'Г' }], correct_index: 0 },
-	{ question_id: 'q3', text: { ru: 'Вопрос 3' }, options: [{ ru: 'Д' }, { ru: 'Е' }], correct_index: 0 }
+	{
+		question_id: 'q1',
+		text: { ru: 'Вопрос 1' },
+		options: [{ ru: 'А' }, { ru: 'Б' }],
+		correct_index: 1
+	},
+	{
+		question_id: 'q2',
+		text: { ru: 'Вопрос 2' },
+		options: [{ ru: 'В' }, { ru: 'Г' }],
+		correct_index: 0
+	},
+	{
+		question_id: 'q3',
+		text: { ru: 'Вопрос 3' },
+		options: [{ ru: 'Д' }, { ru: 'Е' }],
+		correct_index: 0
+	}
 ];
 const base = { courseId: null, result: 'all', from: null, to: null, page: 1 } as const;
 
 describe('attemptFilter', () => {
-	const state = (filters: Record<string, string>, q?: string) => ({
+	const state = (filters: Record<string, string>, q = '') => ({
 		page: 2,
+		sort: 'started',
+		dir: 'desc' as const,
 		q,
-		sort: { key: 'started', dir: 'desc' as const },
 		filters
 	});
 	it('keeps known values and drops the rest', () => {
 		const id = crypto.randomUUID();
-		expect(attemptFilter(state({ course: id, result: 'failed', from: '2026-01-31' }, 'Ann'))).toEqual(
-			{ courseId: id, result: 'failed', from: '2026-01-31', to: null, page: 2, q: 'Ann' }
-		);
-		expect(attemptFilter(state({ course: 'x', result: 'odd', from: '2026-02-30', to: '1' }))).toEqual(
-			{ courseId: null, result: 'all', from: null, to: null, page: 2, q: undefined }
-		);
+		expect(
+			attemptFilter(state({ course: id, result: 'failed', from: '2026-01-31' }, 'Ann'))
+		).toEqual({ courseId: id, result: 'failed', from: '2026-01-31', to: null, page: 2, q: 'Ann' });
+		expect(
+			attemptFilter(state({ course: 'x', result: 'odd', from: '2026-02-30', to: '1' }))
+		).toEqual({ courseId: null, result: 'all', from: null, to: null, page: 2, q: '' });
 	});
 });
 

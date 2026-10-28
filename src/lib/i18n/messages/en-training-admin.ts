@@ -1,4 +1,5 @@
 import { enTrainingAccess } from './en-training-access';
+import { enTrainingAttempts } from './en-training-attempts';
 import { enTrainingPractice } from './en-training-practice';
 import { enTrainingQuestions } from './en-training-questions';
 
@@ -7,6 +8,7 @@ export const enTrainingAdmin = {
 	...enTrainingQuestions,
 	...enTrainingAccess,
 	...enTrainingPractice,
+	...enTrainingAttempts,
 	'admin.group.training': 'Training',
 	'admin.nav.training': 'Courses',
 	'media.usage.course_lesson': 'Course lesson',

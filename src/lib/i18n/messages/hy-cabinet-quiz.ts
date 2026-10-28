@@ -1,6 +1,6 @@
 import type { Messages } from '../translate';
 
-/** Cabinet "Training": the course quiz and its letter. Part of `hyCabinet` (proofreading — a native speaker). */
+/** Cabinet "Training": the course quiz and its letter. Part of `hyCabinet`. */
 export const hyCabinetQuiz: Partial<Messages> = {
 	'cabinet.quiz.title': 'Թեստ',
 	'cabinet.quiz.go': 'Անցնել թեստին',
@@ -8,7 +8,7 @@ export const hyCabinetQuiz: Partial<Messages> = {
 		'Հարցեր՝ {size}, հանձնելու համար՝ {need} ճիշտ պատասխան, ժամանակը՝ {minutes} րոպե։',
 	'cabinet.quiz.attemptsLeft': 'Ժամանակահատվածում մնացած փորձեր՝ {left} / {limit}։',
 	'cabinet.quiz.extraLeft': 'Ֆեդերացիայի արտահերթ փորձեր՝ {count}։',
-	'cabinet.quiz.oneTry': 'Փորձը հաշվվում է սկզբից․ եթե լքեք էջը, այն ծախսված է։',
+	'cabinet.quiz.oneTry': 'Փորձը հաշվվում է սկզբից․ եթե լքեք էջը, այն կհամարվի օգտագործված։',
 	'cabinet.quiz.start': 'Սկսել',
 	'cabinet.quiz.startExtra': 'Սկսել արտահերթ փորձը',
 	'cabinet.quiz.state.open': 'Կարող եք անցնել թեստը։',

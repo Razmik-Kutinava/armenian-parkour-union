@@ -17,6 +17,7 @@ export type AdminIcon =
 	| 'training'
 	| 'trainingAccess'
 	| 'trainingPractice'
+	| 'trainingAttempts'
 	| 'videos'
 	| 'registrations'
 	| 'points'
@@ -71,7 +72,8 @@ const sections: [MessageKey, Section[]][] = [
 		[
 			section('training', 'training', 'training.lessons'),
 			section('trainingAccess', 'training/access', 'training.manage'),
-			section('trainingPractice', 'training/practice', 'training.review')
+			section('trainingPractice', 'training/practice', 'training.review'),
+			section('trainingAttempts', 'training/attempts', 'training.review')
 		]
 	],
 	[
