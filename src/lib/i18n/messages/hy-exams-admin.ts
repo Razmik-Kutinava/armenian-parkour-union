@@ -16,6 +16,8 @@ export const hyExamsAdmin: Partial<Messages> = {
 	'exams.col.result': 'Արդյունք',
 	'exams.col.score': 'Գնահատական',
 	'exams.search': 'Մասնակից',
+	'exams.filter.certificate': 'Վկայական',
+	'exams.filter.certificate.course': 'Դասընթացն ավարտված է, սպասում է',
 	'exams.filter.from': 'Սկսած',
 	'exams.filter.to': 'Մինչև',
 	'exams.empty': 'Քննություններ դեռ չկան։',

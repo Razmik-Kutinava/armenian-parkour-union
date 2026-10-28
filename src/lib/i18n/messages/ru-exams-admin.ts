@@ -16,6 +16,8 @@ export const ruExamsAdmin: Partial<Messages> = {
 	'exams.col.result': 'Результат',
 	'exams.col.score': 'Оценка',
 	'exams.search': 'Участник',
+	'exams.filter.certificate': 'Сертификат',
+	'exams.filter.certificate.course': 'Курс пройден, ждёт',
 	'exams.filter.from': 'С',
 	'exams.filter.to': 'По',
 	'exams.empty': 'Экзаменов пока нет.',

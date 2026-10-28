@@ -8,11 +8,14 @@ import { users } from '../../db/schema/users';
 import type { Mail } from '../../mail/resend';
 import { writeAudit } from '../audit';
 import { isUuid, type Actor } from '../users/target';
+import { completeCourse } from './course-complete';
 import { practiceDecisionLetter } from './practice-mail';
+import { accessOf } from './quiz-facts';
 
 /* docs/03 sections 18.4 p. 4–5 and 18.6, docs/05 section 27 "Practice": accept or return (the
  * comment is required) a pending video, never one's own. Row lock, audit in the same transaction,
- * the letter after the commit. Decisions — docs/todo.md 9.7 (4). */
+ * the letters after the commit; an accepted video may finish the course (section 18.5).
+ * Decisions — docs/todo.md 9.7 (4), 9.8 (2–3). */
 
 export type ReviewInput = { action: 'approve' | 'reject'; comment: string };
 export type ReviewRefusal = 'not_allowed' | 'invalid' | 'not_found' | 'bad_state' | 'own';
@@ -61,6 +64,14 @@ export async function reviewPractice(
 	if (!isUuid(id)) return refuse('not_found');
 	const now = deps.now ?? new Date();
 	const outcome = await db.transaction(async (tx) => {
+		const [owner] = await tx
+			.select({ userId: practiceSubmissions.userId, courseId: practiceTasks.courseId })
+			.from(practiceSubmissions)
+			.innerJoin(practiceTasks, eq(practiceTasks.id, practiceSubmissions.taskId))
+			.where(eq(practiceSubmissions.id, id));
+		if (!owner) return refuse('not_found');
+		/* The member's submit locks the access row before the submission: the same order here. */
+		await accessOf(tx, owner.courseId, owner.userId, true);
 		const [row] = await tx
 			.select()
 			.from(practiceSubmissions)
@@ -97,9 +108,15 @@ export async function reviewPractice(
 			{ status, note },
 			deps.siteUrl
 		);
-		return { ok: true, letter } as const;
+		const finished =
+			status === 'approved'
+				? await completeCourse(tx, owner.courseId, row.userId, actor.id, { ...deps, now })
+				: [];
+		return { ok: true, letters: [letter, ...finished] } as const;
 	});
 	if (!outcome.ok) return outcome;
-	await deps.send(outcome.letter).catch((e) => console.warn(`practice ${id}: letter`, e));
+	for (const letter of outcome.letters) {
+		await deps.send(letter).catch((e) => console.warn(`practice ${id}: letter`, e));
+	}
 	return { ok: true };
 }

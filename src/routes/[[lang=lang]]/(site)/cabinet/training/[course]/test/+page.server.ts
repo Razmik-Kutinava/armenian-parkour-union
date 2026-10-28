@@ -48,10 +48,13 @@ export const actions: Actions = {
 		if (result.reason === 'not_found') error(404, 'Not found');
 		return fail(409, { message: 'cabinet.quiz.error.closed' as const });
 	},
-	submit: async ({ locals, params, request }) => {
+	submit: async ({ locals, params, request, getClientAddress }) => {
 		const user = requireUser(locals.user);
 		const { attemptId, answers } = await readForm(request);
-		const result = await submitAttempt(db, user, params.course, attemptId, answers, deps());
+		const result = await submitAttempt(db, user, params.course, attemptId, answers, {
+			...deps(),
+			ip: getClientAddress()
+		});
 		if (!result.ok) error(404, 'Not found');
 		return { result: { ...result } };
 	}

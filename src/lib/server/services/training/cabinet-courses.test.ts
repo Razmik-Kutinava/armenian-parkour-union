@@ -94,7 +94,10 @@ describe.skipIf(!testDbUrl)('training access: courses in the cabinet', () => {
 			const passing = await insertOpenCourse(tx);
 			await access(tx, passing.id, user.id, 'approved');
 			await pastAttempt(tx, passing.id, user.id, startedAt, { correctCount: 4, passed: true });
-			const [first, second] = [await insertTask(tx, passing.id, 0), await insertTask(tx, passing.id, 1)];
+			const [first, second] = [
+				await insertTask(tx, passing.id, 0),
+				await insertTask(tx, passing.id, 1)
+			];
 			const hidden = await insertTask(tx, passing.id, 2, { hiddenAt: new Date() });
 			const reviewed = { status: 'approved' as const, reviewedAt: new Date() };
 			await insertSubmission(tx, first, user.id, reviewed);

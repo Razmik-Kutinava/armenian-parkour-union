@@ -45,10 +45,37 @@
 		<p role="alert" class="rounded-md bg-error-bg p-3 text-sm text-error-fg">{t(result.message)}</p>
 	{/if}
 
-	{#if course.state === 'finished'}
+	{#if course.state === 'finished' && course.certified}
+		<p class="font-bold text-ink-900">{t('cabinet.training.certified')}</p>
+		<a
+			class="w-fit font-bold text-navy-700 underline underline-offset-2 hover:text-navy-800"
+			href={localizePath('/cabinet/progress', currentLocale())}
+			>{t('cabinet.training.toCertificate')}</a
+		>
+	{:else if course.state === 'finished'}
 		<p class="font-bold text-ink-900">{t('cabinet.training.finished')}</p>
 	{:else if course.state === 'approved'}
 		<p class="text-ink-900">{t('cabinet.training.approved')}</p>
+		{#if course.progress}
+			{@const p = course.progress}
+			<ul class="text-sm text-ink-700">
+				<li>
+					{#if p.quizPassed}{t('cabinet.training.quizPassed')}
+					{:else if p.retakeAt}{t('cabinet.training.quizRetake', {
+							date: p.retakeAt.toLocaleDateString(currentLocale(), {
+								dateStyle: 'long',
+								timeZone: 'Asia/Yerevan'
+							})
+						})}
+					{:else}{t('cabinet.training.quizNotPassed')}{/if}
+				</li>
+				{#if p.total > 0}
+					<li>
+						{t('cabinet.training.practiceProgress', { accepted: p.accepted, total: p.total })}
+					</li>
+				{/if}
+			</ul>
+		{/if}
 		<a
 			class="inline-flex min-h-11 w-fit items-center rounded-md bg-navy-700 px-4 font-bold text-surface hover:bg-navy-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy-600"
 			href={localizePath(`/cabinet/training/${course.slug}`, currentLocale())}

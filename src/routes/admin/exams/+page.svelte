@@ -32,6 +32,11 @@
 			label: t('exams.col.result'),
 			options: EXAM_RESULTS.map((r) => ({ value: r, label: t(`exams.result.${r}`) }))
 		},
+		{
+			key: 'certificate',
+			label: t('exams.filter.certificate'),
+			options: [{ value: 'course', label: t('exams.filter.certificate.course') }]
+		},
 		{ key: 'from', label: t('exams.filter.from'), type: 'date' },
 		{ key: 'to', label: t('exams.filter.to'), type: 'date' }
 	]);

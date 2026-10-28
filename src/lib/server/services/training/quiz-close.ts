@@ -4,6 +4,7 @@ import type { LimitDb } from '../../auth/rate-limit';
 import { quizAttempts } from '../../db/schema/training-progress';
 import { users } from '../../db/schema/users';
 import type { Mail } from '../../mail/resend';
+import { completeCourse } from './course-complete';
 import type { SnapshotQuestion } from './quiz-draw';
 import { accessOf, attemptsOf, quizCourse, type AttemptRow } from './quiz-facts';
 import { quizResultLetter, type QuizResult } from './quiz-mail';
@@ -17,6 +18,8 @@ export type QuizDeps = {
 	send: (mail: Mail) => Promise<void>;
 	siteUrl: string | undefined;
 	now?: Date;
+	/** For the audit of a course finished by the quiz. */
+	ip?: string | null;
 };
 export type Answers = (number | null)[];
 
@@ -64,7 +67,7 @@ async function resultLetter(
 	return quizResultLetter(member, { slug: course.slug, title }, result, retakeAt, siteUrl);
 }
 
-/** `row` is locked and running. */
+/** `row` is locked and running; a passed attempt may finish the course (docs/03 section 18.5). */
 export async function closeAttempt(
 	tx: LimitDb,
 	row: AttemptRow,
@@ -81,11 +84,21 @@ export async function closeAttempt(
 		.set({ answers, correctCount: correct, passed, submittedAt: at })
 		.where(eq(quizAttempts.id, row.id));
 	const result = { correct, total: row.total, passCount: row.passCount, passed };
-	return { result, letter: await resultLetter(tx, row, result, now, deps.siteUrl) };
+	const letter = await resultLetter(tx, row, result, now, deps.siteUrl);
+	const finished = passed
+		? await completeCourse(tx, row.courseId, row.userId, row.userId, {
+				siteUrl: deps.siteUrl,
+				ip: deps.ip ?? null,
+				now
+			})
+		: [];
+	return { result, letters: [...(letter ? [letter] : []), ...finished] };
 }
 
-export async function sendLetter(deps: QuizDeps, letter: Mail | null, id: string) {
-	if (letter) await deps.send(letter).catch((e) => console.warn(`quiz attempt ${id}: letter`, e));
+export async function sendLetters(deps: QuizDeps, letters: Mail[], id: string) {
+	for (const letter of letters) {
+		await deps.send(letter).catch((e) => console.warn(`quiz attempt ${id}: letter`, e));
+	}
 }
 
 /** Closes the member's attempts past their time; called before every read and write of the quiz. */
@@ -96,7 +109,10 @@ export async function settleExpired(
 	deps: QuizDeps,
 	now: Date
 ) {
+	/* Closed by the clock, not by a request of the member: no address in the audit. */
+	const lazy = { ...deps, ip: null };
 	const closed = await db.transaction(async (tx) => {
+		await accessOf(tx, courseId, userId, true);
 		const rows = await tx
 			.select()
 			.from(quizAttempts)
@@ -109,13 +125,13 @@ export async function settleExpired(
 				)
 			)
 			.for('update');
-		const out: { id: string; letter: Mail | null }[] = [];
+		const out: { id: string; letters: Mail[] }[] = [];
 		for (const row of rows) {
 			const answers = normalizeAnswers(row.questions as SnapshotQuestion[], row.answers ?? []);
-			const { letter } = await closeAttempt(tx, row, answers, row.expiresAt, deps, now);
-			out.push({ id: row.id, letter });
+			const { letters } = await closeAttempt(tx, row, answers, row.expiresAt, lazy, now);
+			out.push({ id: row.id, letters });
 		}
 		return out;
 	});
-	for (const { id, letter } of closed) await sendLetter(deps, letter, id);
+	for (const { id, letters } of closed) await sendLetters(deps, letters, id);
 }

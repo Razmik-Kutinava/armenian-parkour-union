@@ -7,13 +7,23 @@ import { events } from '../../db/schema/events';
 import { payments } from '../../db/schema/payments';
 import { eventRegistrations } from '../../db/schema/registrations';
 import { shopOrders } from '../../db/schema/shop';
+import { courseAccess, practiceSubmissions } from '../../db/schema/training-progress';
 import { videos } from '../../db/schema/videos';
+import { awaitingCertificateCount } from '../exams/awaiting';
 import type { Actor } from '../users/target';
 
 /* docs/05 section 3 "Needs action": a counter only for a role with the right to its section
  * (docs/04 section 5.1). A failed payment is an abandoned checkout, not a task: only "needs review". */
 
-export type AttentionKey = 'videos' | 'consents' | 'orders' | 'payments' | 'waitlist';
+export type AttentionKey =
+	| 'videos'
+	| 'consents'
+	| 'orders'
+	| 'payments'
+	| 'waitlist'
+	| 'training_requests'
+	| 'practice'
+	| 'training_finished';
 export type AttentionItem = { key: AttentionKey; count: number; href: string };
 
 type Counter = {
@@ -72,6 +82,24 @@ const COUNTERS: Counter[] = [
 		permission: 'registrations.read',
 		href: '/admin/registrations?period=upcoming',
 		count: waitlist
+	},
+	{
+		key: 'training_requests',
+		permission: 'training.manage',
+		href: '/admin/training/access',
+		count: (db) => countOf(db, courseAccess, eq(courseAccess.status, 'pending'))
+	},
+	{
+		key: 'practice',
+		permission: 'training.review',
+		href: '/admin/training/practice',
+		count: (db) => countOf(db, practiceSubmissions, eq(practiceSubmissions.status, 'pending'))
+	},
+	{
+		key: 'training_finished',
+		permission: 'certificates.issue',
+		href: '/admin/exams?certificate=course',
+		count: awaitingCertificateCount
 	}
 ];
 

@@ -1,12 +1,14 @@
 import { enCabinetPractice } from './en-cabinet-practice';
 import { enCabinetQuiz } from './en-cabinet-quiz';
 import { enCabinetTraining } from './en-cabinet-training';
+import { enTrainingComplete } from './en-training-complete';
 
 /** Cabinet: overview, profile, payments, status banner (docs/06 sections 2, 5). Part of `en`. */
 export const enCabinet = {
 	...enCabinetTraining,
 	...enCabinetQuiz,
 	...enCabinetPractice,
+	...enTrainingComplete,
 	'cabinet.nav.label': 'Cabinet',
 	'cabinet.nav.overview': 'Overview',
 	'cabinet.nav.profile': 'Profile',

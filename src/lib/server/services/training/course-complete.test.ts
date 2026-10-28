@@ -154,7 +154,14 @@ describe.skipIf(!testDbUrl)('training: course completion', () => {
 			if (!started.ok) throw new Error(started.reason);
 			const { questions } = await attemptRow(tx, started.id);
 			const deps = quizDeps();
-			await submitAttempt(tx, ctx.member, ctx.course.slug, started.id, rightAnswers(questions), deps);
+			await submitAttempt(
+				tx,
+				ctx.member,
+				ctx.course.slug,
+				started.id,
+				rightAnswers(questions),
+				deps
+			);
 			expect((await accessRow(tx, ctx.accessId)).examId).toBeNull();
 		});
 	});
@@ -163,7 +170,12 @@ describe.skipIf(!testDbUrl)('training: course completion', () => {
 		await inRollback(async (tx) => {
 			const start = new Date(Date.now() - 2 * 3_600_000);
 			const ctx = await quizCourse(tx);
-			const started = await startAttempt(tx, ctx.member, ctx.course.slug, quizDeps(undefined, start));
+			const started = await startAttempt(
+				tx,
+				ctx.member,
+				ctx.course.slug,
+				quizDeps(undefined, start)
+			);
 			if (!started.ok) throw new Error(started.reason);
 			const { questions } = await attemptRow(tx, started.id);
 			const deps = quizDeps(undefined, start);
@@ -217,7 +229,13 @@ describe.skipIf(!testDbUrl)('training: course completion', () => {
 			expect(box.sent.map((m) => m.to)).toEqual([told.user.email, told.user.email]);
 
 			const down = await lastPending(tx);
-			const result = await reviewPractice(tx, admin, down.last, approve, reviewDeps(mailbox(true).send));
+			const result = await reviewPractice(
+				tx,
+				admin,
+				down.last,
+				approve,
+				reviewDeps(mailbox(true).send)
+			);
 			expect(result).toEqual({ ok: true });
 			expect((await accessRow(tx, down.accessId)).examId).not.toBeNull();
 		});

@@ -3,8 +3,9 @@ import type { LimitDb } from '../../auth/rate-limit';
 import { quizAttempts } from '../../db/schema/training-progress';
 import { isUuid, type Actor } from '../users/target';
 import { openPortal } from './portal-gate';
-import { closeAttempt, normalizeAnswers, sendLetter, type QuizDeps } from './quiz-close';
+import { closeAttempt, normalizeAnswers, sendLetters, type QuizDeps } from './quiz-close';
 import type { SnapshotQuestion } from './quiz-draw';
+import { accessOf } from './quiz-facts';
 
 /* docs/03 section 18.3 p. 4–6, docs/06 section 5.11 "Quiz": answers saved on the way, the result
  * counted once under the row lock; past the time the posted answers are refused and the saved
@@ -72,12 +73,14 @@ export async function submitAttempt(
 	if (!courseId) return notFound;
 	const now = deps.now ?? new Date();
 	const outcome = await db.transaction(async (tx) => {
+		/* The same lock order as the start: the access row, then the attempt. */
+		await accessOf(tx, courseId, viewer.id, true);
 		const row = await lockOwn(tx, courseId, viewer.id, attemptId);
 		if (!row) return null;
 		if (row.passed !== null) {
 			const expired = row.submittedAt !== null && row.submittedAt >= row.expiresAt;
 			const result = { correct: row.correctCount ?? 0, total: row.total, passed: row.passed };
-			return { result, expired, letter: null };
+			return { result, expired, letters: [] };
 		}
 		const expired = row.expiresAt <= now;
 		const questions = row.questions as SnapshotQuestion[];
@@ -86,7 +89,7 @@ export async function submitAttempt(
 		return { ...closed, expired };
 	});
 	if (!outcome) return notFound;
-	await sendLetter(deps, outcome.letter, attemptId);
+	await sendLetters(deps, outcome.letters, attemptId);
 	const { correct, total, passed } = outcome.result;
 	return { ok: true, correct, total, passed, expired: outcome.expired };
 }

@@ -61,7 +61,11 @@ describe.skipIf(!testDbUrl)('exams: finished courses waiting for a certificate',
 			});
 			await insertExam(tx, { userId: member.id, kind: 'trainer', result: 'passed' });
 
-			const { rows, total } = await listExams(tx, admin, state(member.tag, { certificate: 'course' }));
+			const { rows, total } = await listExams(
+				tx,
+				admin,
+				state(member.tag, { certificate: 'course' })
+			);
 			expect(total).toBe(2);
 			expect(rows.map((r) => r.id).sort()).toEqual([waiting.id, revoked.id].sort());
 			const all = await listExams(tx, admin, state(member.tag, {}));

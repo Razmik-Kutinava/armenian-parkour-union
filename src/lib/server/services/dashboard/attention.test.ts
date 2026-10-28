@@ -72,7 +72,8 @@ async function addTraining(tx: LimitDb, userId: string, done: boolean) {
 	await tx
 		.insert(courseAccess)
 		.values({ courseId: finished.id, userId, ...decided, examId: exam.id });
-	if (done) await insertCertificate(tx, { userId, kind: 'trainer', issuedBy: userId, examId: exam.id });
+	if (done)
+		await insertCertificate(tx, { userId, kind: 'trainer', issuedBy: userId, examId: exam.id });
 }
 
 describe.skipIf(!testDbUrl)('dashboard: needs action', () => {

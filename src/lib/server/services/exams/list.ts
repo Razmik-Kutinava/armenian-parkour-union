@@ -13,12 +13,13 @@ import { examKind, examResult } from '../../db/schema/enums';
 import { users } from '../../db/schema/users';
 import { validDay, ZONE } from '../audit-list';
 import type { Actor } from '../users/target';
+import { awaitingCourseCertificate } from './awaiting';
 
 /* docs/05 section 7: the exam list; filter values are checked before reaching SQL. */
 
 export const examListOptions: ListOptions = {
 	sortable: ['scheduledAt'],
-	filters: ['kind', 'result', 'from', 'to'],
+	filters: ['kind', 'result', 'certificate', 'from', 'to'],
 	defaultSort: { key: 'scheduledAt', dir: 'desc' }
 };
 
@@ -48,6 +49,7 @@ function conditions(state: ListState, contacts: boolean): SQL | undefined {
 	if (kind) where.push(eq(exams.kind, kind));
 	const result = examResult.enumValues.find((r) => r === f.result);
 	if (result) where.push(eq(exams.result, result));
+	if (f.certificate === 'course') where.push(awaitingCourseCertificate);
 	const from = validDay(f.from);
 	if (from)
 		where.push(sql`${exams.scheduledAt} >= (${from}::date)::timestamp at time zone ${ZONE}`);

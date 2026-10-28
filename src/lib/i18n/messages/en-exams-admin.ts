@@ -15,6 +15,8 @@ export const enExamsAdmin = {
 	'exams.col.result': 'Result',
 	'exams.col.score': 'Score',
 	'exams.search': 'Member',
+	'exams.filter.certificate': 'Certificate',
+	'exams.filter.certificate.course': 'Course completed, waiting',
 	'exams.filter.from': 'From',
 	'exams.filter.to': 'To',
 	'exams.empty': 'No exams yet.',
