@@ -46,3 +46,4 @@
 - Этап 8, доработка 6.4: подпись в PDF сертификата из `site_settings.certificates`, вкладка «Сертификаты» — `git show 06eb3e1:docs/todo.md`
 - 9.3 банк вопросов (любой один язык портала, форма вариантов, импорт из файла) — `git show e5e9027:docs/todo.md`
 - 9.4 доступ к порталу (условия, заявка, решения, письма, `/cabinet/training`) — `git show 3c9b48a:docs/todo.md`
+- 9.5 портал (вход `openPortal`, уроки по темам, PDF, предпросмотр) — `git show 2097d04:docs/todo.md`
