@@ -5,60 +5,61 @@
 
 ## Задача
 
-**9.6** (`09` этап 9): тест — вопросы поровну по темам, перемешивание, снимок, таймер, проверка на сервере, пауза и лимит, внеочередная попытка, письмо с результатом; блок «Тест» внизу портала.
+**9.7** (`09` этап 9): практика — задания в админке, отправка ссылки (YouTube, Google Drive), очередь проверки, возврат с комментарием, письма; блок «Практика» на портале.
 
-Граница: без миграций (таблицы 9.1). Не входит: `/admin/training/attempts` и карточка участника в заявке (`05` § 27 — в роадмапе 9.6 нет), прогресс теста в списке `/cabinet/training`, завершение курса и экзамен (9.8), практика (9.7). Памятка 9.5 — `git show 2097d04:docs/todo.md`.
+Граница: без миграций (таблицы 9.1). Не входит: завершение курса и экзамен (9.8 — вызов из принятия видео), `/admin/training/attempts` и карточка участника в заявке, прогресс «принято N из M» в списке `/cabinet/training` (как и прогресс теста — после 9.8). Памятка 9.6 — `git show 979d522:docs/todo.md`.
 
 Факты из документов (прочитаны, выписано):
-- `03` § 18.3: начать — `approved`, `exam_id` пуст, тест не сдан, нет идущей, членство (если `requires_membership`), и либо прошло `retake_days` с последней несданной и обычных за `attempts_period_days` < `attempts_limit`, либо `extra_attempts > 0` (пауза и лимит не действуют, −1). Начал и бросил — потрачена. `quiz_size` случайных видимых вопросов видимых тем поровну (остаток — темам с бо́льшим числом вопросов; не хватает — из других), варианты перемешаны, снимок; правильные в браузер не уходят. `quiz_minutes`; после `expires_at` отправка не принимается, попытка — несданная с сохранёнными ответами (пустые — неправильные). Сдал — `correct_count ≥ pass_count` попытки; показываем X из Y и результат, ошибки по вопросам — нет. Двойная отправка — один раз (блокировка строки).
-- `03` § 18.6: внеочередная попытка — в журнал; письмо участнику — результат теста и дата пересдачи. `04`: внеочередная — `training.manage` (admin).
-- `06` § 5.11 «Тест» `/cabinet/training/{course}/test`: до начала — правила (вопросов, нужно, минут, попыток осталось, когда пересдать), «Начать» или причина; во время — все вопросы на странице, таймер, ответы сохраняются по ходу (без JS — отправка в конце), «Завершить» с подтверждением; после — X из Y, сдал / нет, когда пересдать; история (дата, результат). Портал — внизу блок «Тест» с состоянием.
-- `05` § 27 «Заявки»: у одобренных — «Выдать внеочередную попытку» (подтверждение), в журнал.
-- `02` § 11 `quiz_attempts`: снимок `[{question_id, text, options, correct_index}]`, `answers` — номера по порядку, `total`, `pass_count` на момент начала, `is_extra`, `expires_at = started_at + quiz_minutes`; одна идущая — unique where `passed is null` (`23505`).
+- `03` § 18.4: практика открыта после сданного теста, до того задания — списком без формы. На каждое видимое задание — ссылка YouTube (в т. ч. «по ссылке») или Google Drive, файлы не принимаются, ссылка нормализуется. Одновременно одна `pending` или `approved` на задание; пока `pending` — можно заменить ссылку; после `rejected` — новая отправка, без лимита. Проверяет moderator / admin: «Принять» / «Вернуть» (комментарий обязателен); своё видео не проверяет. Принятая не отзывается.
+- `03` § 18.1 п. 3–4: при `revoked` отправки остаются в истории; предпросмотр (`training.manage` без заявки) практику не сдаёт. § 18.5 п. 5: задание, скрытое или добавленное после завершения курса, на него не влияет.
+- `03` § 18.6: решение по видео — в журнал и письмо участнику (после коммита).
+- `04`: `training.manage` (admin) — задания; `training.review` (moderator, admin) — практические видео.
+- `05` § 27: вкладка «Практические задания» (admin): название ×3, описание ×3 (что показать, требования, критерии), порядок, скрыть / вернуть. `/admin/training/practice` (moderator, admin): очередь — участник, курс, задание, ссылка, дата, статус; по умолчанию `pending`, старые сверху; фильтры курс, задание, статус. Просмотр: YouTube — плеер `youtube-nocookie`, Google Drive — «Открыть ссылку»; рядом описание и критерии, история прошлых отправок по заданию. Свои отправки — без кнопок.
+- `06` § 5.11: `/cabinet/training/{course}/practice` — до теста список без формы; после — описание, поле ссылки с подсказкой «загрузите ролик с доступом по ссылке», статус (на проверке / принято / вернули с комментарием), история. Портал — блок «Практика». Обзор кабинета: видео вернули — «Переснимите задание».
+- `02` § 11 / схема `training-progress.ts`: `practice_tasks` (`title`, `description` jsonb, `sort_order`, `hidden_at`), `practice_submissions` (`url` нормализован, `platform` `youtube | google_drive`, `status` `pending | approved | rejected`, `reviewed_by/at`, `review_note` — обязателен для `rejected`, `pending` ⇔ `reviewed_at` пуст; одна `pending` / `approved` на (задание, участник) — `23505`).
 
 ## Решения (агент)
 
-1. **Выбор** (`quiz-draw.ts`, чистая функция, случайность — параметром): темы с видимыми вопросами; каждой `floor(size / T)`, остаток — по одной темам с бо́льшим числом вопросов (равенство — порядок тем); тема с недобором отдаёт все, недостача — случайно из оставшихся вопросов других тем. Порядок вопросов и вариантов — перемешан (Фишер — Йетс), `correct_index` пересчитан. **Банк меньше `quiz_size`** — старт отказан (`bank`, «Тест пока недоступен») — в документах нет, снимок всегда полного размера.
-2. **Состояние** (`quiz-rules.ts`, чистая): пауза — от `submitted_at` последней несданной (любой, в т. ч. внеочередной); лимит — обычные попытки с `started_at` в скользящем окне; освободится — когда старейшая лишняя выйдет из окна. Можно обычной — тратится обычная (внеочередная бережётся); нельзя, но `extra > 0` — внеочередная. Порядок причин: `finished` → `passed` → `running` → `membership` → `wait` (с датой).
-3. **Истечение** — лениво (`settleExpired`): идущая с `expires_at ≤ now` закрывается под блокировкой строки с сохранёнными ответами, `submitted_at = expires_at`, письмо с результатом. Вызывается при открытии страницы теста и портала, старте, сохранении, отправке. Известное: не вернулся — строка остаётся «идущей» до следующего визита.
-4. **Старт** (`quiz-start.ts`): только `preview === false`; транзакция — блокировка `course_access` (`approved`, `exam_id` пуст), участник `active`, курс `published`, правила, выбор, вставка, при внеочередной `extra_attempts − 1`. Гонка `23505` — `running`. Журнал не пишет (`03` § 18.6).
-5. **Сохранение и отправка** (`quiz-submit.ts`): попытка ищется по `id` + свой участник + курс (чужая — `not_found`). Ответы — массив длины `total`, элемент — `null` или целое в пределах вариантов, остальное — `null`. Сохранение после срока — `expired`. Отправка: уже закрыта — тот же результат без второго письма; после срока — засчитываются сохранённые, присланные отбрасываются. Письмо — после коммита.
-6. **Браузер** получает только `{ text, options }` вопросов, свои `answers`, оставшиеся секунды (по часам сервера). `correct_index` — только в БД.
-7. **Письмо** (`quiz-mail.ts`): язык участника; X из Y (нужно N), сдал / не сдал; не сдал — дата и время пересдачи (Ереван) по правилам после этой попытки; ссылка на страницу теста.
-8. **Внеочередная** (`quiz-extra.ts`): `training.manage`; заявка `approved`, `exam_id` пуст, тест не сдан → `extra_attempts + 1`; журнал `course_access.extra_attempt` (before/after `{ extraAttempts }`); письма нет (нет в § 18.6). В «Заявках» — кнопка с подтверждением у одобренных и число невыданных.
-9. **Страница теста**: `[course]/test/+page.server.ts` (`start`, `save`, `submit`), форма — радиокнопки `q{i}`, с JS — сохранение `fetch('?/save')` на каждый выбор, таймер, на нуле — отправка; «Завершить» — `confirm`. Предпросмотр — правила без кнопки.
-10. **Блок «Тест»** на портале (`QuizBlock.svelte`): состояние одной строкой и ссылка на страницу теста.
+1. **Задания** (`practice-tasks.ts`, `training.manage`): создать / изменить / скрыть / вернуть, журнал `practice_task.create|update|hide|restore` (update — before/after изменённых `title`, `sortOrder`, `descriptionChanged`; без изменений — без записи). Порядок — число (как у уроков), список — `sort_order`, затем создание. Название — любой один язык (≤ 200), описание — rich text, необязательно. **Картинки медиатеки в описании не принимаются** (`richTextSchema(null)`): учёта использования для заданий нет; YouTube-пример — можно. Удаления нет.
+2. **Ссылка** (`practice-link.ts`, чистая): только https; YouTube — как `parseVideoUrl` (watch, youtu.be, shorts, embed) → `https://www.youtube.com/watch?v=ID`; Google Drive — `drive.google.com/file/d/ID/…`, `open?id=ID`, `uc?id=ID` → `https://drive.google.com/file/d/ID/view`; папки и прочее — `null`.
+3. **Отправка** (`practice-submit.ts`): вход `openPortal` (нет — `not_found`, предпросмотр — `preview`); ссылка — `bad_url`; транзакция: блокировка `course_access` (`approved`), `exam_id` есть — `finished`; нет попытки `passed = true` — `quiz`; задание этого курса, не скрыто — иначе `not_found`; живая `approved` — `bad_state`; `pending` — замена ссылки (`replaced: true`); иначе новая `pending`. Журнал и письма нет (действие участника; в § 18.6 нет). Членство не проверяется (в § 18.4 нет).
+4. **Решение** (`practice-review.ts`, `training.review`): комментарий ≤ 1000, для «Вернуть» обязателен (`invalid`); у «Принять» — необязателен, сохраняется в `review_note`. Блокировка строки; не `pending` — `bad_state`; своя — `own`. Журнал `practice_submission.approve|reject` (before `{status}`, after `{status, taskId, userId, reviewNote?}`), письмо участнику после коммита (его язык; название задания, комментарий, ссылка на страницу практики). Доступ участника не перепроверяется (закрытый доступ — отправки остаются в истории). **Для 9.8:** завершение курса — в этой транзакции после принятия.
+5. **Чтение участника** (`practice-read.ts`): `practiceStatus(db, gate, userId)` → `{ state: 'open' | 'quiz' | 'finished' | 'preview', tasks: [{ id, title, description, current: { status, url, note } | null, history }], accepted, total }`; задания — видимые по порядку; `current` — последняя отправка; `accepted` — видимых с принятой.
+6. **Очередь** (`practice-queue.ts`): `listPractice` — фильтры `status` (по умолчанию `pending`, `all`), `course`, `task`; старые сверху (`created_at`); страницами. `practiceDetail` — отправка, участник, курс, задание (название, описание), история этого участника по заданию (без текущей, новые сверху), `own`.
+7. **Страницы**: админ — вкладка «Задания» `/admin/training/[id]/tasks` (`?/hide`, `?/restore`, поле `taskId`), `tasks/new`, `tasks/[taskId]` (`?/update`); очередь `/admin/training/practice`, карточка `/admin/training/practice/[id]` (`?/approve`, `?/reject`, поле `comment`); пункт меню «Практика» (`training.review`). Кабинет — `/cabinet/training/{course}/practice` (`?/submit`, поля `taskId`, `url`), блок «Практика» на портале, в обзоре у портала — «Переснимите задание» (есть вернутое видео без новой отправки по видимому заданию).
+8. **Письмо** (`practice-mail.ts`): «Видео принято» / «Видео вернули» + комментарий; ссылка `/cabinet/training/{slug}/practice`.
 
 ## Файлы (ожидаемо)
 
-- `src/lib/server/services/training/quiz-draw.ts`, `quiz-rules.ts` (+ тесты, чистые), `quiz-facts.ts` (чтения), `quiz-close.ts` (подсчёт, закрытие, ленивое истечение), `quiz-start.ts`, `quiz-submit.ts`, `quiz-read.ts`, `quiz-mail.ts`, `quiz-extra.ts` (+ `quiz-start.test.ts`, `quiz-submit.test.ts`, `quiz-extra.test.ts`, помощники — `quiz-test-support.ts`).
-- `tests/e2e/admin-audit-map.ts`, `admin-access-map.ts`, `admin-audit-training.ts` — действие `?/extra`.
-- `src/routes/[[lang=lang]]/(site)/cabinet/training/[course]/test/+page.server.ts`, `+page.svelte`, `QuizForm.svelte`; `[course]/QuizBlock.svelte`, `[course]/+page.server.ts`, `+page.svelte`.
-- `src/routes/admin/training/access/+page.server.ts`, `+page.svelte`; `services/training/access-list.ts` (`extraAttempts`).
-- `src/lib/i18n/messages/{en,hy,ru}-cabinet-quiz.ts` (+ подключение в `*-cabinet.ts`), `{en,hy,ru}-training-access.ts`.
+- `src/lib/server/services/training/practice-link.ts`, `practice-tasks.ts`, `practice-submit.ts`, `practice-review.ts`, `practice-mail.ts`, `practice-read.ts`, `practice-queue.ts` (+ `practice-link.test.ts`, `practice-tasks.test.ts`, `practice-submit.test.ts`, `practice-review.test.ts`, помощники — `practice-test-support.ts`); `services/cabinet/overview.ts` (+ тест).
+- `src/lib/validation/training-practice.ts`.
+- `src/routes/admin/training/[id]/tasks/**`, `[id]/+layout.svelte`; `src/routes/admin/training/practice/**`; `src/lib/server/admin/nav.ts`, `components/admin/nav-icons.ts`.
+- `src/routes/[[lang=lang]]/(site)/cabinet/training/[course]/practice/**`, `[course]/PracticeBlock.svelte`, `[course]/+page.server.ts`, `+page.svelte`; `cabinet/+page.svelte`.
+- `src/lib/i18n/messages/{en,hy,ru}-training-practice.ts` (админка), `{en,hy,ru}-cabinet-practice.ts` (кабинет и письма).
+- `tests/e2e/admin-audit-map.ts`, `admin-access-map.ts`, `admin-audit-practice.ts` (новый), `admin-audit-actions.ts`.
 
 ## Не ломать
 
-- Портал и уроки 9.5: вход `openPortal`, 404 без доступа; предпросмотр не сдаёт.
-- Заявки 9.4: одобрить / отклонить / закрыть — прежние.
-- Чужая попытка (подмена `attemptId`) — `not_found`; правильные ответы не попадают в данные страницы.
+- Портал, уроки и тест 9.5–9.6: `openPortal`, 404 без доступа; предпросмотр не сдаёт.
+- Чужая отправка (подмена `id`) и задание чужого курса — `not_found`; своё видео сотрудник не проверяет.
+- Модерация видео 7.2 (`videos`) не задета: практика — отдельная таблица, без баллов.
 
 ## Проверка
 
-- `npx vitest run src/lib/server/services/training/quiz-draw.test.ts src/lib/server/services/training/quiz-rules.test.ts src/lib/server/services/training/quiz-start.test.ts src/lib/server/services/training/quiz-submit.test.ts src/lib/server/services/training/quiz-extra.test.ts src/lib/server/services/training/portal.test.ts src/lib/server/services/training/access-list.test.ts src/routes/admin/audit-coverage.test.ts` → PASS.
+- `npx vitest run src/lib/server/services/training/practice-link.test.ts src/lib/server/services/training/practice-tasks.test.ts src/lib/server/services/training/practice-submit.test.ts src/lib/server/services/training/practice-review.test.ts src/lib/server/services/cabinet/overview.test.ts src/routes/admin/audit-coverage.test.ts` → PASS.
 - `npm run check`, `npm run lint`.
 
 ## Риск
 
-`high` — права (своя попытка, предпросмотр, `training.manage`), журнал действий, проверка ответов на сервере.
+`high` — права (`training.review`, своё видео, чужая отправка, предпросмотр), журнал действий.
 
 ## Читать
 
-- `03` § 18.3, 18.6; `06` § 5.11; `05` § 27; `02` § 11 `quiz_attempts`, `course_access`; `04` `training.*` (выписано); `zone-notes.md` § «Обучающий портал» (прочитано).
+- `03` § 18.1, 18.4–18.6; `05` § 27; `06` § 5.11; `02` § 11 (схема); `04` `training.*` (выписано); `zone-notes.md` § «Обучающий портал» (прочитано).
 
 ## Фазы
 
-- [x] SPEC `edfc58a`
-- [x] RED `06d84b5`
-- [x] GREEN
+- [x] SPEC
+- [ ] RED
+- [ ] GREEN
 - [ ] REVIEW (этапа)
