@@ -2,6 +2,7 @@ import { eq } from 'drizzle-orm';
 import { afterAll, describe, expect, it } from 'vitest';
 import { courseAccess, quizAttempts } from '../../db/schema/training-progress';
 import { testDb, testDbUrl } from '../../db/test-db';
+import { insertTask } from './practice-test-support';
 import { quizPage } from './quiz-read';
 import { startAttempt } from './quiz-start';
 import { saveAnswers, submitAttempt } from './quiz-submit';
@@ -26,6 +27,7 @@ describe.skipIf(!testDbUrl)('training quiz: answers and the result', () => {
 	it('all correct: passed, a letter with the score; a second submit counts once, no second letter', async () => {
 		await inRollback(async (tx) => {
 			const { course, member, user, id, questions } = await running(tx);
+			await insertTask(tx, course.id);
 			const mail = mailbox();
 			const answers = rightAnswers(questions);
 			const result = await submitAttempt(tx, member, course.slug, id, answers, quizDeps(mail.send));
