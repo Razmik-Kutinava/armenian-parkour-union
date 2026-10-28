@@ -22,8 +22,7 @@ export const hyTrainingPractice: Partial<Messages> = {
 	'training.task.section.main': 'Առաջադրանք',
 	'training.task.title': 'Անվանում',
 	'training.task.description': 'Ինչ ցույց տալ, տեսանյութի պահանջներ, չափանիշներ',
-	'training.task.descriptionHint':
-		'Մեդիադարանի նկարներն առաջադրանքում չեն պահպանվում․ YouTube-ի օրինակ ավելացնել կարելի է։',
+	'training.task.descriptionHint': 'Նկարները՝ մեդիադարանից․ շարժման օրինակը՝ YouTube-ի հղումով։',
 	'training.task.sortOrder': 'Հերթականություն',
 	'training.task.sortOrderHint': 'Փոքր թվերը՝ վերևում։',
 	'training.practice.empty': 'Տեսանյութեր չեն գտնվել',

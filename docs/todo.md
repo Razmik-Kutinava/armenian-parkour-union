@@ -51,6 +51,8 @@
 ## Фазы
 
 - [x] SPEC
-- [ ] RED
-- [ ] GREEN
+- [x] RED `f267712`
+- [x] GREEN
+
+Итог: `taskFormSchema(mediaBaseUrl)`; `lockPageMedia` в `createTask` и в `updateTask` (только при изменении); `taskDescriptions` в `usage.ts` — без фильтра скрытых; ветка `practice_task` на странице медиафайла до `canOpenUsers`. В RED-тесте ключ без UUID очиститель отбрасывал — ключ теста заменён на настоящий.
 - [ ] REVIEW (этапа 9)

@@ -12,6 +12,7 @@ export const hyTrainingAdmin: Partial<Messages> = {
 	'admin.group.training': 'Ուսուցում',
 	'admin.nav.training': 'Դասընթացներ',
 	'media.usage.course_lesson': 'Դասընթացի դաս',
+	'media.usage.practice_task': 'Գործնական առաջադրանք',
 	'training.status.draft': 'Սևագիր',
 	'training.status.published': 'Հրապարակված',
 	'training.status.archived': 'Արխիվում',

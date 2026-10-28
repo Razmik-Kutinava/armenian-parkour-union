@@ -11,7 +11,7 @@ const filled = (text: object) => Object.keys(text).length > 0;
 
 export const courseContentSchema = (mediaBaseUrl: string | null) => {
 	const lesson = lessonFormSchema(mediaBaseUrl).shape;
-	const task = taskFormSchema.shape;
+	const task = taskFormSchema(mediaBaseUrl).shape;
 	return z.object({
 		topics: z
 			.array(

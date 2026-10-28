@@ -4,8 +4,8 @@ import { intField } from './events';
 import { portalText } from './portal-text';
 import type { PostText } from './posts';
 
-/* docs/05 section 27 "Practice tasks" and "Practice"; decisions — docs/todo.md 9.7 (1, 4).
- * No library images in a task: their use is not tracked for tasks, so the cleaner drops them. */
+/* docs/05 section 27 "Practice tasks" and "Practice"; decisions — docs/todo.md 9.7 (1, 4), 9.15.
+ * Library images are kept as in a lesson; without the library address the cleaner drops them. */
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -15,14 +15,15 @@ const keepFilled = (text: Record<string, string | undefined>): PostText => {
 	return kept;
 };
 
-const rich = richTextSchema(null).optional();
-
-export const taskFormSchema = z.object({
-	title: portalText(200),
-	description: z.object({ en: rich, hy: rich, ru: rich }).default({}).transform(keepFilled),
-	sortOrder: intField(0, 9999, 'training.error.sortOrder').default(0)
-});
-export type TaskValues = z.output<typeof taskFormSchema>;
+export const taskFormSchema = (mediaBaseUrl: string | null) => {
+	const rich = richTextSchema(mediaBaseUrl).optional();
+	return z.object({
+		title: portalText(200),
+		description: z.object({ en: rich, hy: rich, ru: rich }).default({}).transform(keepFilled),
+		sortOrder: intField(0, 9999, 'training.error.sortOrder').default(0)
+	});
+};
+export type TaskValues = z.output<ReturnType<typeof taskFormSchema>>;
 
 export const taskIdSchema = z.object({ taskId: z.string().regex(UUID) });
 

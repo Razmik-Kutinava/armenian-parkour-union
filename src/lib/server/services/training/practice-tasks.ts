@@ -7,10 +7,11 @@ import { courses } from '../../db/schema/training';
 import { practiceTasks } from '../../db/schema/training-progress';
 import type { Mail } from '../../mail/resend';
 import { writeAudit } from '../audit';
+import { lockPageMedia } from '../pages/media';
 import { isUuid, type Actor } from '../users/target';
 import { completeAfterHide, lockOpenAccess } from './course-complete-hide';
 
-/* docs/05 section 27 "Practice tasks" (admin); decisions — docs/todo.md 9.7 (1), 9.13. Never
+/* docs/05 section 27 "Practice tasks" (admin); decisions — docs/todo.md 9.7 (1), 9.13, 9.15. Never
  * deleted; hiding may finish courses (docs/03 section 18.5), the letters go after the commit. */
 
 type Refusal = 'not_allowed' | 'not_found';
@@ -48,6 +49,7 @@ export async function createTask(
 			.from(courses)
 			.where(eq(courses.id, courseId));
 		if (!course) return 'not_found' as const;
+		await lockPageMedia(tx, values.description);
 		const [row] = await tx
 			.insert(practiceTasks)
 			.values({ ...values, courseId })
@@ -82,6 +84,7 @@ export async function updateTask(
 		}
 		const descriptionChanged = !isDeepStrictEqual(task.description ?? {}, values.description);
 		if (!descriptionChanged && Object.keys(after).length === 0) return 'ok' as const;
+		await lockPageMedia(tx, values.description);
 		await tx.update(practiceTasks).set(values).where(eq(practiceTasks.id, task.id));
 		await writeAudit(tx, {
 			...entry(actor, 'update', task.id, ip),

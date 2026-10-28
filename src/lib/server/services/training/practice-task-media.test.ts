@@ -30,8 +30,9 @@ const form = (key: string, base: string | null) =>
 
 describe('practice task form: library images', () => {
 	it('kept with the library address, dropped without it', () => {
-		expect(form('media/2026/10/a.png', BASE).description.en).toContain(`${BASE}/media/2026/10/a.png`);
-		expect(form('media/2026/10/a.png', null).description.en).not.toContain('<img');
+		const key = `media/2026/10/${crypto.randomUUID()}.png`;
+		expect(form(key, BASE).description.en).toContain(`${BASE}/${key}`);
+		expect(form(key, null).description.en).not.toContain('<img');
 	});
 });
 

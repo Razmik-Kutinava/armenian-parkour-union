@@ -5,6 +5,7 @@ import { events } from '../../db/schema/events';
 import { heroBlocks } from '../../db/schema/hero';
 import { shopItems } from '../../db/schema/shop';
 import { courseLessons } from '../../db/schema/training';
+import { practiceTasks } from '../../db/schema/training-progress';
 import { users } from '../../db/schema/users';
 
 /*
@@ -13,9 +14,17 @@ import { users } from '../../db/schema/users';
  * using a file locks its media row FOR SHARE in the same transaction, so a delete cannot slip in.
  */
 export type MediaUsage = {
-	kind: 'user_avatar' | 'page' | 'post' | 'event' | 'hero' | 'shop_item' | 'course_lesson';
+	kind:
+		| 'user_avatar'
+		| 'page'
+		| 'post'
+		| 'event'
+		| 'hero'
+		| 'shop_item'
+		| 'course_lesson'
+		| 'practice_task';
 	id: string;
-	/** A lesson opens inside its course. */
+	/** A lesson or a practice task opens inside its course. */
 	courseId?: string;
 };
 
@@ -105,6 +114,15 @@ const lessonBodies: Finder = async (db, key) => {
 	return rows.map((r) => ({ kind: 'course_lesson' as const, id: r.id, courseId: r.courseId }));
 };
 
+/** Hidden tasks too: tasks are never deleted, a hidden one comes back with its description. */
+const taskDescriptions: Finder = async (db, key) => {
+	const rows = await db
+		.select({ id: practiceTasks.id, courseId: practiceTasks.courseId })
+		.from(practiceTasks)
+		.where(sql`strpos(${practiceTasks.description}::text, ${inText(key)}) > 0`);
+	return rows.map((r) => ({ kind: 'practice_task' as const, id: r.id, courseId: r.courseId }));
+};
+
 const finders: Finder[] = [
 	avatars,
 	pageBodies,
@@ -112,7 +130,8 @@ const finders: Finder[] = [
 	eventCoversAndDescriptions,
 	heroBackgrounds,
 	itemPhotosAndDescriptions,
-	lessonBodies
+	lessonBodies,
+	taskDescriptions
 ];
 
 export async function findUsages(db: LimitDb, key: string): Promise<MediaUsage[]> {

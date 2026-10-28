@@ -22,8 +22,7 @@ export const ruTrainingPractice: Partial<Messages> = {
 	'training.task.section.main': 'Задание',
 	'training.task.title': 'Название',
 	'training.task.description': 'Что показать, требования к видео, критерии',
-	'training.task.descriptionHint':
-		'Картинки из медиатеки в задании не сохраняются; пример на YouTube — можно.',
+	'training.task.descriptionHint': 'Картинки — из медиатеки; пример движения — ссылкой на YouTube.',
 	'training.task.sortOrder': 'Порядок',
 	'training.task.sortOrderHint': 'Меньшие числа — выше.',
 	'training.practice.empty': 'Видео не найдено',

@@ -12,6 +12,7 @@ export const enTrainingAdmin = {
 	'admin.group.training': 'Training',
 	'admin.nav.training': 'Courses',
 	'media.usage.course_lesson': 'Course lesson',
+	'media.usage.practice_task': 'Practice task',
 	'training.status.draft': 'Draft',
 	'training.status.published': 'Published',
 	'training.status.archived': 'Archived',

@@ -121,6 +121,12 @@
 									href="/admin/training/{usage.courseId}/lessons/{usage.id}"
 									>{t('media.usage.course_lesson')}</a
 								>
+							{:else if usage.kind === 'practice_task'}
+								<a
+									class="text-navy-700 underline"
+									href="/admin/training/{usage.courseId}/tasks/{usage.id}"
+									>{t('media.usage.practice_task')}</a
+								>
 							{:else if data.canOpenUsers}
 								<a class="text-navy-700 underline" href="/admin/users/{usage.id}"
 									>{t(`media.usage.${usage.kind}`)}</a

@@ -12,6 +12,7 @@ export const ruTrainingAdmin: Partial<Messages> = {
 	'admin.group.training': 'Обучение',
 	'admin.nav.training': 'Курсы',
 	'media.usage.course_lesson': 'Урок курса',
+	'media.usage.practice_task': 'Практическое задание',
 	'training.status.draft': 'Черновик',
 	'training.status.published': 'Опубликован',
 	'training.status.archived': 'В архиве',

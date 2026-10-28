@@ -21,7 +21,7 @@ export const enTrainingPractice = {
 	'training.task.title': 'Title',
 	'training.task.description': 'What to show, video requirements, criteria',
 	'training.task.descriptionHint':
-		'Images from the media library are not kept in a task; a YouTube sample is fine.',
+		'Images — from the media library; a sample of the movement — as a YouTube link.',
 	'training.task.sortOrder': 'Order',
 	'training.task.sortOrderHint': 'Smaller numbers go first.',
 	'training.practice.empty': 'No videos found',
