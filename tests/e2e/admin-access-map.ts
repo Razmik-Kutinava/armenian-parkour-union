@@ -190,5 +190,6 @@ export const ADMIN_WRITES = {
 	'/admin/training/access?/approve': 'training.manage',
 	'/admin/training/access?/reject': 'training.manage',
 	'/admin/training/access?/revoke': 'training.manage',
+	'/admin/training/access?/extra': 'training.manage',
 	'POST /admin/locale': 'staff'
 } as const satisfies Record<AdminAction | NotAuditedAction, Access>;

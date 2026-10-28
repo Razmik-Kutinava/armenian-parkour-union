@@ -2,9 +2,11 @@
 	import { currentLocale, localizePath, t } from '#lib/i18n/index.svelte.ts';
 	import { pickPortal } from '#lib/i18n/localized.ts';
 	import PreviewBanner from './PreviewBanner.svelte';
+	import QuizBlock from './QuizBlock.svelte';
 	import type { PageProps } from './$types';
 
-	/* docs/06 section 5.11 "Portal": topics with their lessons in order; quiz and practice — 9.6, 9.7. */
+	/* docs/06 section 5.11 "Portal": topics with their lessons in order, the quiz block at the bottom;
+	 * practice — 9.7. */
 	let { data }: PageProps = $props();
 	const p = $derived(data.portal);
 	const text = (value: Parameters<typeof pickPortal>[0]) => pickPortal(value, currentLocale());
@@ -48,4 +50,6 @@
 	{:else}
 		<p class="text-ink-700">{t('cabinet.training.noLessons')}</p>
 	{/each}
+
+	{#if data.quiz}<QuizBlock quiz={data.quiz} slug={p.course.slug} />{/if}
 </div>

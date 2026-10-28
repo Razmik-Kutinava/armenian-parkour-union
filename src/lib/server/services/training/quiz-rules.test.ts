@@ -36,8 +36,14 @@ describe('quiz rules: can a member start', () => {
 	it('pause after a failed attempt counts from its end', () => {
 		const last = failed(10);
 		const state = quizState(facts({ attempts: [last] }), now);
-		expect(state).toEqual({ kind: 'wait', retakeAt: new Date(last.submittedAt!.getTime() + 30 * DAY) });
-		expect(quizState(facts({ attempts: [failed(31)] }), now)).toEqual({ kind: 'open', extra: false });
+		expect(state).toEqual({
+			kind: 'wait',
+			retakeAt: new Date(last.submittedAt!.getTime() + 30 * DAY)
+		});
+		expect(quizState(facts({ attempts: [failed(31)] }), now)).toEqual({
+			kind: 'open',
+			extra: false
+		});
 	});
 
 	it('limit: three regular attempts in the sliding period — wait until the oldest leaves it', () => {
@@ -55,9 +61,16 @@ describe('quiz rules: can a member start', () => {
 	});
 
 	it('both pause and limit — the later date', () => {
-		const attempts = [failed(175), failed(100), failed(5)];
-		const state = quizState(facts({ attempts }), now);
-		expect(state).toEqual({ kind: 'wait', retakeAt: new Date(attempts[0].startedAt.getTime() + 180 * DAY) });
+		const limitLater = [failed(150), failed(100), failed(5)];
+		expect(quizState(facts({ attempts: limitLater }), now)).toEqual({
+			kind: 'wait',
+			retakeAt: new Date(limitLater[0].startedAt.getTime() + 180 * DAY)
+		});
+		const pauseLater = [failed(175), failed(100), failed(5)];
+		expect(quizState(facts({ attempts: pauseLater }), now)).toEqual({
+			kind: 'wait',
+			retakeAt: new Date(pauseLater[2].submittedAt!.getTime() + 30 * DAY)
+		});
 	});
 
 	it('an extra attempt is out of the limit', () => {
@@ -93,8 +106,12 @@ describe('quiz rules: can a member start', () => {
 			passed: null,
 			isExtra: false
 		};
-		expect(quizState(facts({ finished: true, attempts: [passed] }), now)).toEqual({ kind: 'finished' });
-		expect(quizState(facts({ attempts: [passed], extraAttempts: 1 }), now)).toEqual({ kind: 'passed' });
+		expect(quizState(facts({ finished: true, attempts: [passed] }), now)).toEqual({
+			kind: 'finished'
+		});
+		expect(quizState(facts({ attempts: [passed], extraAttempts: 1 }), now)).toEqual({
+			kind: 'passed'
+		});
 		expect(quizState(facts({ attempts: [running], membership: false }), now)).toEqual({
 			kind: 'running'
 		});

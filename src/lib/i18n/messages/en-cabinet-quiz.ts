@@ -1,0 +1,40 @@
+/** Cabinet "Training": the course quiz and its letter (docs/06 section 5.11, docs/03 section 18.6). Part of `enCabinet`. */
+export const enCabinetQuiz = {
+	'cabinet.quiz.title': 'Quiz',
+	'cabinet.quiz.go': 'Go to the quiz',
+	'cabinet.quiz.rules': '{size} questions, {need} correct answers to pass, {minutes} minutes.',
+	'cabinet.quiz.attemptsLeft': 'Attempts left in the period: {left} of {limit}.',
+	'cabinet.quiz.extraLeft': 'Extra attempts from the federation: {count}.',
+	'cabinet.quiz.oneTry': 'An attempt counts from its start: if you leave the page, it is used.',
+	'cabinet.quiz.start': 'Start',
+	'cabinet.quiz.startExtra': 'Start the extra attempt',
+	'cabinet.quiz.state.open': 'You can take the quiz.',
+	'cabinet.quiz.state.running': 'An attempt is in progress.',
+	'cabinet.quiz.state.passed': 'Quiz passed.',
+	'cabinet.quiz.state.finished': 'Course completed.',
+	'cabinet.quiz.state.membership': 'The quiz needs a valid membership.',
+	'cabinet.quiz.state.wait': 'Next attempt: from {date}.',
+	'cabinet.quiz.state.bank': 'The quiz is not available yet. Please contact the federation.',
+	'cabinet.quiz.state.preview': 'Preview: the quiz is taken only with an approved request.',
+	'cabinet.quiz.timeLeft': 'Time left',
+	'cabinet.quiz.question': 'Question {n} of {total}',
+	'cabinet.quiz.finish': 'Finish',
+	'cabinet.quiz.confirm': 'Finish the attempt? Unanswered questions count as wrong.',
+	'cabinet.quiz.saveFailed':
+		'The last answer is not saved yet: check the connection. Answers are also sent with “Finish”.',
+	'cabinet.quiz.result': 'Correct: {correct} of {total}.',
+	'cabinet.quiz.passed': 'Passed',
+	'cabinet.quiz.failed': 'Not passed',
+	'cabinet.quiz.expired': 'Time ran out: the answers saved before the end were counted.',
+	'cabinet.quiz.history': 'Attempts',
+	'cabinet.quiz.extra': 'extra',
+	'cabinet.quiz.error.start': 'The attempt cannot be started now: see the reason above.',
+	'cabinet.quiz.error.closed': 'This attempt is already finished.',
+	'training.mail.quizPassed.subject': 'Quiz passed',
+	'training.mail.quizPassed.text':
+		'Hello, {name}!\n\nYou passed the quiz of the course “{course}”: {correct} of {total} correct ({need} needed).\n\nQuiz: {url}',
+	'training.mail.quizFailed.subject': 'Quiz not passed',
+	'training.mail.quizFailed.text':
+		'Hello, {name}!\n\nThe quiz of the course “{course}” is not passed: {correct} of {total} correct, {need} needed.\n\nYou can retake it: {retake}.\n\nQuiz: {url}',
+	'training.mail.quizRetakeNow': 'right away'
+} as const;

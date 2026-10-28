@@ -12,9 +12,11 @@ import {
 	accessListOptions,
 	listAccess
 } from '#lib/server/services/training/access-list.ts';
+import { grantExtraAttempt } from '#lib/server/services/training/quiz-extra.ts';
 import type { Actions, PageServerLoad } from './$types';
 
-/* docs/05 section 27 "Requests" (admin): the queue, approve, reject and revoke with a reason. */
+/* docs/05 section 27 "Requests" (admin): the queue, approve, reject and revoke with a reason,
+ * an extra quiz attempt. */
 export const load: PageServerLoad = async ({ locals, url }) => {
 	requirePermission(locals.user, 'training.manage');
 	const read = readListState(url.searchParams, accessListOptions);
@@ -47,8 +49,19 @@ async function decide(event: RequestEvent, action: DecisionInput['action']) {
 	return fail(400, { message: REFUSED[result.reason] });
 }
 
+async function extra(event: RequestEvent) {
+	const actor = requirePermission(event.locals.user, 'training.manage');
+	const id = String((await event.request.formData()).get('accessId') ?? '');
+	const result = await grantExtraAttempt(db, actor, id, { ip: event.getClientAddress() });
+	if (result.ok) return { done: 'extra' as const };
+	if (result.reason === 'not_allowed') error(403, 'Forbidden');
+	if (result.reason === 'not_found') error(404, 'Not found');
+	return fail(400, { message: 'training.access.error.extraState' as MessageKey });
+}
+
 export const actions: Actions = {
 	approve: (event) => decide(event, 'approve'),
 	reject: (event) => decide(event, 'reject'),
-	revoke: (event) => decide(event, 'revoke')
+	revoke: (event) => decide(event, 'revoke'),
+	extra
 };

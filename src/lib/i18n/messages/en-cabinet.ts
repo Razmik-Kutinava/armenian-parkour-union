@@ -1,8 +1,10 @@
+import { enCabinetQuiz } from './en-cabinet-quiz';
 import { enCabinetTraining } from './en-cabinet-training';
 
 /** Cabinet: overview, profile, payments, status banner (docs/06 sections 2, 5). Part of `en`. */
 export const enCabinet = {
 	...enCabinetTraining,
+	...enCabinetQuiz,
 	'cabinet.nav.label': 'Cabinet',
 	'cabinet.nav.overview': 'Overview',
 	'cabinet.nav.profile': 'Profile',

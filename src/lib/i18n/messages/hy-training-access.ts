@@ -36,6 +36,14 @@ export const hyTrainingAccess: Partial<Messages> = {
 	'training.access.done.revoke': 'Մուտքը փակված է, մասնակցին նամակ է ուղարկվել։',
 	'training.access.error.reason': 'Նշեք պատճառը՝ մինչև 1000 նիշ։',
 	'training.access.error.state': 'Հայտի վերաբերյալ արդեն որոշում կա։ Թարմացրեք էջը։',
+	'training.access.extra': 'Արտահերթ փորձ',
+	'training.access.extraTitle': 'Տրամադրել թեստի արտահերթ փորձ',
+	'training.access.extraText':
+		'Մասնակիցը կկարողանա ևս մեկ անգամ անցնել թեստը՝ առանց դադարի և փորձերի սահմանափակման։ Գործողությունը գրանցվում է մատյանում։',
+	'training.access.extraUnused': 'Չօգտագործված արտահերթ փորձեր՝ {count}',
+	'training.access.done.extra': 'Արտահերթ փորձը տրամադրված է։',
+	'training.access.error.extraState':
+		'Արտահերթ փորձ կարելի է տալ միայն հաստատված հայտով, քանի դեռ թեստը հանձնված չէ։ Թարմացրեք էջը։',
 	'training.access.error.conditions':
 		'Մասնակիցն այլևս չի համապատասխանում դասընթացի պայմաններին ({missing})։ Մերժեք հայտը կամ սպասեք։',
 	'training.missing.membership': 'գործող անդամակցություն',

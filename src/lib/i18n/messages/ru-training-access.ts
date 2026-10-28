@@ -36,6 +36,14 @@ export const ruTrainingAccess: Partial<Messages> = {
 	'training.access.done.revoke': 'Доступ закрыт, участнику отправлено письмо.',
 	'training.access.error.reason': 'Укажите причину, до 1000 символов.',
 	'training.access.error.state': 'По заявке уже есть решение. Обновите страницу.',
+	'training.access.extra': 'Внеочередная попытка',
+	'training.access.extraTitle': 'Выдать внеочередную попытку теста',
+	'training.access.extraText':
+		'Участник сможет пройти тест ещё раз без паузы и лимита попыток. Действие пишется в журнал.',
+	'training.access.extraUnused': 'Невыданных внеочередных попыток: {count}',
+	'training.access.done.extra': 'Внеочередная попытка выдана.',
+	'training.access.error.extraState':
+		'Внеочередную попытку можно выдать только по одобренной заявке, пока тест не сдан. Обновите страницу.',
 	'training.access.error.conditions':
 		'Участник больше не подходит под условия курса ({missing}). Отклоните заявку или подождите.',
 	'training.missing.membership': 'действующее членство',

@@ -34,6 +34,14 @@ export const enTrainingAccess = {
 	'training.access.done.revoke': 'Access closed, the member is notified by email.',
 	'training.access.error.reason': 'Enter a reason, up to 1000 characters.',
 	'training.access.error.state': 'The request has already been decided. Reload the page.',
+	'training.access.extra': 'Extra attempt',
+	'training.access.extraTitle': 'Grant an extra quiz attempt',
+	'training.access.extraText':
+		'The member can take the quiz once more without the pause and the attempts limit. The action is logged.',
+	'training.access.extraUnused': 'Extra attempts not used: {count}',
+	'training.access.done.extra': 'Extra attempt granted.',
+	'training.access.error.extraState':
+		'An extra attempt is possible only for an approved request while the quiz is not passed. Reload the page.',
 	'training.access.error.conditions':
 		'The member no longer meets the course conditions ({missing}). Reject the request or wait.',
 	'training.missing.membership': 'valid membership',

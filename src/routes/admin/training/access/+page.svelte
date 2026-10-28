@@ -12,12 +12,14 @@
 	import { pickPortal } from '#lib/i18n/localized.ts';
 	import type { PageProps } from './$types';
 
-	/* docs/05 section 27 "Requests": pending by default, oldest on top; a reason for reject and revoke. */
+	/* docs/05 section 27 "Requests": pending by default, oldest on top; a reason for reject and revoke;
+	 * an extra quiz attempt for an approved request, with a confirmation. */
 	let { data, form }: PageProps = $props();
 
-	let dialog = $state<{ action: 'reject' | 'revoke'; id: string } | null>(null);
+	type Ask = 'reject' | 'revoke' | 'extra';
+	let dialog = $state<{ action: Ask; id: string } | null>(null);
 	let open = $state(false);
-	const ask = (action: 'reject' | 'revoke', id: string) => {
+	const ask = (action: Ask, id: string) => {
 		dialog = { action, id };
 		open = true;
 	};
@@ -83,6 +85,11 @@
 		{:else if column.key === 'status'}
 			{t(`training.access.status.${row.status}`)}
 			{#if row.reviewNote}<p class="text-xs text-ink-700">{row.reviewNote}</p>{/if}
+			{#if row.extraAttempts > 0}
+				<p class="text-xs text-ink-700">
+					{t('training.access.extraUnused', { count: row.extraAttempts })}
+				</p>
+			{/if}
 		{:else if column.key === 'age'}{row.age ?? t('training.access.none')}
 		{:else if column.key === 'level'}{row.level
 				? t(`level.${row.level}`)
@@ -99,6 +106,9 @@
 						>{t('training.access.reject')}</Button
 					>
 				{:else if row.status === 'approved'}
+					<Button size="sm" variant="secondary" onclick={() => ask('extra', row.id)}
+						>{t('training.access.extra')}</Button
+					>
 					<Button size="sm" variant="danger" onclick={() => ask('revoke', row.id)}
 						>{t('training.access.revoke')}</Button
 					>
@@ -120,8 +130,8 @@
 		text={t(`training.access.${dialog.action}Text`)}
 		action="?/{dialog.action}"
 		confirmLabel={t(`training.access.${dialog.action}`)}
-		danger
-		comment="required"
+		danger={dialog.action !== 'extra'}
+		comment={dialog.action === 'extra' ? 'none' : 'required'}
 	>
 		{#snippet fields()}<input type="hidden" name="accessId" value={dialog?.id} />{/snippet}
 	</ConfirmDialog>

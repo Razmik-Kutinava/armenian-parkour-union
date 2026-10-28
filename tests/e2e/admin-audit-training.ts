@@ -131,6 +131,8 @@ export function trainingActions(
 			post('/admin/training/access?/revoke', {
 				accessId: await accessRow('approved'),
 				comment: 'Audit revoke'
-			})
+			}),
+		'/admin/training/access?/extra': async () =>
+			post('/admin/training/access?/extra', { accessId: await accessRow('approved') })
 	};
 }

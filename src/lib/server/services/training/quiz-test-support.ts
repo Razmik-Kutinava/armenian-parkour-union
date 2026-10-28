@@ -44,7 +44,8 @@ export async function attemptRow(tx: LimitDb, id: string) {
 	return { ...row, questions: row.questions as SnapshotQuestion[] };
 }
 
-export const rightAnswers = (questions: SnapshotQuestion[]) => questions.map((q) => q.correct_index);
+export const rightAnswers = (questions: SnapshotQuestion[]) =>
+	questions.map((q) => q.correct_index);
 export const wrongAnswers = (questions: SnapshotQuestion[]) =>
 	questions.map((q) => (q.correct_index + 1) % q.options.length);
 

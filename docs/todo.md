@@ -31,7 +31,8 @@
 
 ## Файлы (ожидаемо)
 
-- `src/lib/server/services/training/quiz-draw.ts`, `quiz-rules.ts` (+ тесты, чистые), `quiz-facts.ts` (чтения), `quiz-start.ts`, `quiz-submit.ts`, `quiz-read.ts`, `quiz-mail.ts`, `quiz-extra.ts` (+ `quiz.test.ts`, `quiz-extra.test.ts`).
+- `src/lib/server/services/training/quiz-draw.ts`, `quiz-rules.ts` (+ тесты, чистые), `quiz-facts.ts` (чтения), `quiz-close.ts` (подсчёт, закрытие, ленивое истечение), `quiz-start.ts`, `quiz-submit.ts`, `quiz-read.ts`, `quiz-mail.ts`, `quiz-extra.ts` (+ `quiz-start.test.ts`, `quiz-submit.test.ts`, `quiz-extra.test.ts`, помощники — `quiz-test-support.ts`).
+- `tests/e2e/admin-audit-map.ts`, `admin-access-map.ts`, `admin-audit-training.ts` — действие `?/extra`.
 - `src/routes/[[lang=lang]]/(site)/cabinet/training/[course]/test/+page.server.ts`, `+page.svelte`, `QuizForm.svelte`; `[course]/QuizBlock.svelte`, `[course]/+page.server.ts`, `+page.svelte`.
 - `src/routes/admin/training/access/+page.server.ts`, `+page.svelte`; `services/training/access-list.ts` (`extraAttempts`).
 - `src/lib/i18n/messages/{en,hy,ru}-cabinet-quiz.ts` (+ подключение в `*-cabinet.ts`), `{en,hy,ru}-training-access.ts`.
@@ -44,7 +45,7 @@
 
 ## Проверка
 
-- `npx vitest run src/lib/server/services/training/quiz-draw.test.ts src/lib/server/services/training/quiz-rules.test.ts src/lib/server/services/training/quiz.test.ts src/lib/server/services/training/quiz-extra.test.ts src/lib/server/services/training/portal.test.ts src/lib/server/services/training/access-list.test.ts` → PASS.
+- `npx vitest run src/lib/server/services/training/quiz-draw.test.ts src/lib/server/services/training/quiz-rules.test.ts src/lib/server/services/training/quiz-start.test.ts src/lib/server/services/training/quiz-submit.test.ts src/lib/server/services/training/quiz-extra.test.ts src/lib/server/services/training/portal.test.ts src/lib/server/services/training/access-list.test.ts src/routes/admin/audit-coverage.test.ts` → PASS.
 - `npm run check`, `npm run lint`.
 
 ## Риск
@@ -57,7 +58,7 @@
 
 ## Фазы
 
-- [x] SPEC
-- [ ] RED
-- [ ] GREEN
+- [x] SPEC `edfc58a`
+- [x] RED `06d84b5`
+- [x] GREEN
 - [ ] REVIEW (этапа)

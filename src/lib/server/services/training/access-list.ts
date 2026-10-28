@@ -78,7 +78,8 @@ export async function listAccess(db: LimitDb, filter: AccessFilter, now = new Da
 				birthDate: users.birthDate,
 				level: users.level,
 				paidUntil: paidUntil(now),
-				reviewNote: courseAccess.reviewNote
+				reviewNote: courseAccess.reviewNote,
+				extraAttempts: courseAccess.extraAttempts
 			})
 			.from(courseAccess)
 			.innerJoin(users, eq(users.id, courseAccess.userId))
