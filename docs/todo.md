@@ -5,55 +5,52 @@
 
 ## Задача
 
-9.14 (доделки этапа 9 после REVIEW, решения владельца 2026-10-28): «Принять» видео — только если ссылка не менялась с момента показа карточки проверяющему; иначе отказ «ссылка изменилась, обновите страницу». Сейчас участник может заменить ссылку `pending`-отправки, пока проверяющий смотрит карточку, — и тот примет уже новую, не просмотренную (`zone-notes.md` § «Обучающий портал», 9.7 «Известное»).
+9.15 (доделки этапа 9 после REVIEW, решения владельца 2026-10-28): картинки медиатеки в описании практического задания. Сейчас `taskFormSchema` чистит описание `richTextSchema(null)` — картинка из медиатеки молча отбрасывается при сохранении, подсказка формы так и говорит («в задании не сохраняются»), потому что использование файла заданиями не учитывалось (`zone-notes.md` § «Обучающий портал», 9.7).
 
 Решения (чего нет в документах — помечено «решение агента»):
-1. Сравнивается сама ссылка: карточка отдаёт в форму решения показанную `url` (скрытое поле `url` через `fields` у `ConfirmDialog`), сервис сравнивает её со `practice_submissions.url` строки под блокировкой. Хранимая ссылка уже нормализована (`normalizePracticeUrl`), карточка показывает её же — сравнение строгое, без повторной нормализации. Замена A → B → A — ссылка та же, принимать можно (ровно то, что видел проверяющий). Миграции нет.
-2. Проверка и для «Вернуть» (решение агента): комментарий написан про показанное видео; вернуть не просмотренную ссылку — участник теряет отправку и пересдаёт без причины. Владелец может сузить до «Принять».
-3. Новый отказ `changed` у `reviewPractice`; порядок проверок: права → комментарий → `id` → (блокировки) → нет строки `not_found` → `own` → не `pending` — `bad_state` → ссылка не та — `changed`. Решение уже есть — важнее, чем «ссылка изменилась».
-4. Поле `url` пустое или его нет — `changed` (наша форма шлёт его всегда; запрос в обход формы не принимает непоказанное).
-5. При `changed` ничего не пишется: статус `pending`, журнала и писем нет, курс не завершается.
-6. Сравнение — после `accessOf(..., true)` и `FOR UPDATE` строки отправки: `submitPractice` держит тот же порядок (заявка → строка), поэтому замена и решение строго по очереди — либо замена раньше (решение видит новую ссылку → `changed`), либо решение раньше (замена видит `approved` → `bad_state`, после `rejected` — новая строка).
-7. Маршрут: `url` из формы → `ReviewInput.url`; `changed` → `fail(400, { message: 'training.practice.error.changed' })`; тексты en / hy / ru — «Участник заменил ссылку. Обновите страницу и посмотрите новое видео.» (по смыслу; hy — по глоссарию `zone-notes` шаг 4).
-8. `ReviewInput = { action, comment, url }` — `url` обязателен (необязательный открыл бы обход проверки). В тестах сервиса — `url: YT(1)` (ссылка `insertSubmission` по умолчанию).
+1. Как у урока: `taskFormSchema(mediaBaseUrl: string | null)` — функция, как `lessonFormSchema`; форма админки передаёт `R2_PUBLIC_URL || null`, импорт контента (`courseContentSchema(mediaBaseUrl)`) — тот же адрес. Без `R2_PUBLIC_URL` (`null`) картинки отбрасываются, как раньше.
+2. `createTask` и `updateTask` блокируют строки `media` картинок описания `FOR SHARE` (`lockPageMedia(tx, values.description)`) в своей транзакции — параллельное удаление файла ждёт (`05` § 20). В `updateTask` — только если что-то меняется (после раннего `return 'ok'`), как в `updateLesson`.
+3. Учёт использования: в `media/usage.ts` новый поиск `taskDescriptions` — `strpos(description::text, …)`, вид `practice_task` с `courseId`. **Скрытые задания тоже считаются** (решение агента): задания не удаляются, скрытое возвращается вместе с описанием — как архивные hero и товары. Значит, файл из описания любого задания курса удалить нельзя (`deleteMedia` → `inUse`).
+4. Страница медиафайла `/admin/media/[id]`: ветка `practice_task` → ссылка `/admin/training/{courseId}/tasks/{id}`, подпись `media.usage.practice_task` (en «Practice task», ru «Практическое задание», hy «Գործնական առաջադրանք» — по глоссарию). Ветку ставить **до** `{:else if data.canOpenUsers}` — иначе ссылка уйдёт на `/admin/users/{id задания}`.
+5. Подсказка `training.task.descriptionHint` (en / hy / ru) — по смыслу «Картинки — из медиатеки; пример движения — ссылкой на YouTube.»; комментарий в шапке `training-practice.ts` поправить.
+6. Показ не меняется: кабинет (`PracticeTask.svelte`) и карточка проверки (`practice/[id]/+page.svelte`) выводят очищенный текст `{@html}`; хост медиа уже в CSP (уроки). Журнал — прежний (`descriptionChanged: true`), права — прежние (`training.manage`). Миграции нет.
 
 ## Файлы (ожидаемо)
 
-- `src/lib/server/services/training/practice-review.ts` — `ReviewInput.url`, отказ `changed`, сравнение под блокировкой (сейчас 122 строки, станет ~127 — в норме до 200).
-- `src/lib/server/services/training/practice-review.test.ts` — RED: другая ссылка → `changed`, строка `pending`, журнала и писем нет (и для «Вернуть»); пустая → `changed`; та же → `ok`; решённая + другая ссылка → `bad_state`.
-- `src/lib/server/services/training/practice-review-race.test.ts` (новый; `race.test.ts` уже 200 строк — не дописывать) — замена ссылки (`submitPractice`) и «Принять» по старой параллельно через `portalRaceDb`: либо `changed` и строка `pending` с новой ссылкой, либо принята старая и замена — `bad_state`; принятой непоказанной ссылки нет.
-- `src/routes/admin/training/practice/[id]/+page.server.ts` — поле `url`, `REFUSED.changed`.
-- `src/routes/admin/training/practice/[id]/+page.svelte` — скрытое `url` в `ConfirmDialog` (`fields`).
-- `src/lib/i18n/messages/{en,hy,ru}-training-practice.ts` — `training.practice.error.changed`.
-- Сигнатура в тестах: `course-complete.test.ts`, `race.test.ts`, `rights.test.ts` (константа `approve` / вызов — `url: YT(1)`, строк не добавлять: первые два > 200); e2e `tests/e2e/admin-audit-practice.ts` — `url` в `?/approve` и `?/reject` (иначе аудит-e2e получит 400).
+- `src/lib/validation/training-practice.ts` — `taskFormSchema(mediaBaseUrl)`, шапка-комментарий.
+- `src/routes/admin/training/[id]/tasks/form.ts` — `taskFormSchema(R2_PUBLIC_URL || null)` (как `lessons/form.ts`).
+- `src/lib/validation/training-content.ts` — `taskFormSchema(mediaBaseUrl).shape`.
+- `src/lib/server/services/training/practice-tasks.ts` — `lockPageMedia` в `createTask` / `updateTask` (131 → ~134 строки).
+- `src/lib/server/services/media/usage.ts` — `taskDescriptions`, вид `practice_task` (122 → ~135).
+- `src/routes/admin/media/[id]/+page.svelte` — ветка ссылки `practice_task` (155 → ~160).
+- `src/lib/i18n/messages/{en,hy,ru}-training-admin.ts` — `media.usage.practice_task`; `{en,hy,ru}-training-practice.ts` — `training.task.descriptionHint`.
+- Тесты (RED): `practice-tasks.test.ts` (111 строк) — картинка медиатеки в описании сохраняется схемой с адресом и находится `findUsages` как `{ kind: 'practice_task', id, courseId }`, у скрытого задания — тоже, `deleteMedia` → `inUse`; схема с `null` картинку отбрасывает. `content-import.test.ts` (177) — только если сменится вызов, строк не добавлять.
 
 ## Не ломать
 
-- «Принять» и «Вернуть» по показанной ссылке — как раньше: статус, журнал `practice_submission.approve|reject`, письмо участнику, завершение курса после последнего принятого (`practice-review.test.ts`, `course-complete.test.ts`).
-- Отказы `own`, `bad_state`, `not_allowed`, `not_found`, `invalid` — прежние (`practice-review.test.ts`, `rights.test.ts`).
-- Двойное «Принять» двумя проверяющими и завершение курса — один экзамен (`race.test.ts`).
-- Отправка и замена ссылки участником (`practice-submit.test.ts`) — не меняются.
+- Задания: создание, правка, порядок, скрытие / возврат, журнал `practice_task.*`, правка без изменений — без записи (`practice-tasks.test.ts`, `practice-task-hide.test.ts`).
+- Импорт контента курса: задания создаются, повтор пропускает (`content-import.test.ts`).
+- Медиатека: учёт использования прочих видов (страницы, новости, события, hero, товары, уроки, аватары) и запрет удаления используемого файла (`media/edit.test.ts`, `lessons.test.ts`).
+- Описание без картинок у участника и в карточке проверки — как раньше.
 
 ## Проверка
 
-- `npx vitest run src/lib/server/services/training/practice-review.test.ts src/lib/server/services/training/practice-review-race.test.ts src/lib/server/services/training/course-complete.test.ts src/lib/server/services/training/race.test.ts src/lib/server/services/training/rights.test.ts`
-- `npm run check`, `npm run lint`; e2e (`admin-audit` практики) — CI.
+- `npx vitest run src/lib/server/services/training/practice-tasks.test.ts src/lib/server/services/training/practice-task-hide.test.ts src/lib/server/services/training/content-import.test.ts src/lib/server/services/training/lessons.test.ts src/lib/server/services/media/edit.test.ts`
+- `npm run check`, `npm run lint`; e2e — CI.
 
 ## Риск
 
-`high` — «Принять» ведёт к экзамену `passed` (путь к сертификату и степени), журнал, порядок блокировок в транзакции решения; прав и миграций не меняет.
+`normal` — валидация формы, сервис заданий и учёт использования медиа (запрет удаления используемого файла); прав, денег, баллов, степеней и миграций не трогает.
 
 ## Читать
 
-- `03` § 18.4 п. 4–5 (решение проверяющего) — только если в RED понадобится формулировка; остальное выписано выше.
-- `zone-notes.md` § «Обучающий портал»: 9.7 (`practice-submit`, `practice-review`, «Известное» про замену), 9.8 (порядок блокировок), 9.10 (`race-support.ts`, уборка по курсу) — уже прочитано.
-- Код: `practice-review.ts`, `practice-submit.ts`, `practice-queue.ts` (`practiceDetail` — `url` в карточке), `ConfirmDialog.svelte` (`fields`), `race.test.ts` (образец гонки).
+- `05` § 20 (медиатека, «где используется») — только если в RED понадобится формулировка; правило выписано в решении 2.
+- `zone-notes.md` § «Обучающий портал» 9.2 (картинки в уроке — `MediaUsage.kind = 'course_lesson'`), 9.7 (задания, `richTextSchema(null)`) — уже прочитано.
+- Код: `lessons.ts` + `lessons.test.ts` (образец: `lockPageMedia`, тест «a library image in the lesson text…»), `pages/media.ts` (`lockPageMedia`), `media/usage.ts`, `media/edit.ts` (`deleteMedia`), `lessons/form.ts`.
 
 ## Фазы
 
 - [x] SPEC
-- [x] RED `51a82f4`
-- [x] GREEN
-
-Итог: сравнение `row.url !== input.url` после проверки `bad_state`, под блокировками заявки и строки. Гонка в `practice-review-race.test.ts` — оба порядка (`race` детерминирован: первая транзакция целиком, вторая ждёт блокировку). Чтобы одна константа `approve` подходила ко всем отправкам, в `course-complete.test.ts` и `race.test.ts` ожидающие отправки получили ссылку `YT(1)` (задания разные — уникальность не задета).
+- [ ] RED
+- [ ] GREEN
 - [ ] REVIEW (этапа 9)
