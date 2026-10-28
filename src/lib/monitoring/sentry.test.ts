@@ -26,7 +26,7 @@ describe('scrubEvent', () => {
 			]
 		} as ErrorEvent;
 
-		const out = scrubEvent(event);
+		const out = scrubEvent(event)!;
 
 		expect(JSON.stringify(out)).not.toContain('kid@example.com');
 		expect(out.message).toBe('certificate letter to [email] not sent');
@@ -46,13 +46,30 @@ describe('scrubEvent', () => {
 			mechanism: { type: 'x', synthetic: true }
 		});
 
-		const warning = scrubEvent(consoleEvent('warning', synthetic())).exception?.values?.[0];
-		const error = scrubEvent(consoleEvent('error', synthetic())).exception?.values?.[0];
+		const warning = scrubEvent(consoleEvent('warning', synthetic()))?.exception?.values?.[0];
+		const error = scrubEvent(consoleEvent('error', synthetic()))?.exception?.values?.[0];
 		const logged = scrubEvent(consoleEvent('error', { type: 'TypeError', value: 'y' }));
 
 		expect(warning).toMatchObject({ type: 'Warning', mechanism: { synthetic: false } });
 		expect(error?.type).toBe('Error');
-		expect(logged.exception?.values?.[0].type).toBe('TypeError');
+		expect(logged?.exception?.values?.[0].type).toBe('TypeError');
+	});
+
+	it('drops the Better Auth wrong-password warning, keeps its other warnings', () => {
+		const warn = (text: string) =>
+			({
+				type: undefined,
+				logger: 'console',
+				level: 'warning',
+				message: text,
+				exception: { values: [{ value: text, mechanism: { type: 'x', synthetic: true } }] }
+			}) as ErrorEvent;
+		const at = '2026-10-28T12:00:00.000Z WARN [Better Auth]: ';
+
+		expect(scrubEvent(warn(`${at}Invalid password`))).toBeNull();
+		expect(scrubEvent(warn('\x1b[1m[Better Auth]:\x1b[0m Invalid password'))).toBeNull();
+		expect(scrubEvent(warn(`${at}Invalid email or password`))).not.toBeNull();
+		expect(scrubEvent(warn('order 7: Invalid password field in letter'))).not.toBeNull();
 	});
 
 	it('accepts an event without optional parts', () => {

@@ -30,8 +30,15 @@ function nameConsoleCapture(event: ErrorEvent) {
 	}
 }
 
+/* A wrong password is the user's mistake, yet Better Auth logs it with console.warn. */
+function isWrongPassword(event: ErrorEvent) {
+	const texts = [event.message, ...(event.exception?.values ?? []).map((e) => e.value)];
+	return texts.some((text) => text?.includes('[Better Auth]') && text.includes('Invalid password'));
+}
+
 /** Log lines name letter recipients (`certificate letter to a@b.c not sent`). */
-export function scrubEvent(event: ErrorEvent): ErrorEvent {
+export function scrubEvent(event: ErrorEvent): ErrorEvent | null {
+	if (isWrongPassword(event)) return null;
 	nameConsoleCapture(event);
 	if (event.message) event.message = scrubEmails(event.message);
 	for (const exception of event.exception?.values ?? []) {

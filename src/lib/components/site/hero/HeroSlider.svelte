@@ -42,7 +42,7 @@
 	<div class="grid">
 		{#each slides as slide, i (slide.id ?? `fallback-${i}`)}
 			<div
-				class="col-start-1 row-start-1 aspect-[4/5] sm:aspect-video sm:max-h-[85vh]"
+				class="col-start-1 row-start-1 aspect-[4/5] w-full sm:aspect-video sm:max-h-[85vh]"
 				role="group"
 				aria-roledescription="slide"
 				aria-label="{i + 1} / {slides.length}"

@@ -2,7 +2,7 @@ import { inArray } from 'drizzle-orm';
 import { pickLocalized } from '#lib/i18n/localized.ts';
 import type { Locale } from '#lib/i18n/locales.ts';
 import { translate } from '#lib/i18n/translate.ts';
-import { settingsFormSchema } from '#lib/validation/site-settings-form.ts';
+import { localizedText } from '#lib/validation/site-settings.ts';
 import type { LimitDb } from '../../auth/rate-limit';
 import { siteSettings } from '../../db/schema/service';
 import { parseSiteLocales } from '../site-locales';
@@ -24,7 +24,7 @@ export async function getSeoBase(db: LimitDb, locale: Locale, siteUrl: string): 
 		.from(siteSettings)
 		.where(inArray(siteSettings.key, ['site_name', 'seo_description', 'locales']));
 	const pick = (key: 'site_name' | 'seo_description') => {
-		const parsed = settingsFormSchema.shape[key].safeParse(rows.find((r) => r.key === key)?.value);
+		const parsed = localizedText().safeParse(rows.find((r) => r.key === key)?.value);
 		return parsed.success ? pickLocalized(parsed.data, locale) : null;
 	};
 	return {

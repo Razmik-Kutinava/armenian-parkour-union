@@ -27,20 +27,20 @@
 			.join('')
 	);
 	const link =
-		'flex min-h-11 items-center rounded-sm px-3 font-bold text-navy-100 hover:text-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-500';
+		'flex min-h-11 items-center rounded-sm font-bold text-navy-100 hover:text-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-500';
 	const panel = 'absolute top-full right-0 z-40 mt-2 rounded-md bg-navy-900 p-2 shadow-lg';
 </script>
 
 {#snippet menuLinks(vertical: boolean)}
 	<ul class={vertical ? 'flex flex-col gap-1' : 'flex items-center gap-1'}>
 		{#each menu as [key, path] (path)}
-			<li><a class={link} href={href(path)}>{t(key)}</a></li>
+			<li><a class="{link} {vertical ? 'px-3' : 'px-2'}" href={href(path)}>{t(key)}</a></li>
 		{/each}
 	</ul>
 {/snippet}
 
 {#snippet guestLinks()}
-	<a class={link} href={href('/login')}>{t('nav.login')}</a>
+	<a class="{link} px-3" href={href('/login')}>{t('nav.login')}</a>
 	<a
 		class="flex min-h-11 items-center rounded-md bg-accent-500 px-4 font-bold text-navy-950 hover:bg-accent-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-500"
 		href={href('/join')}>{t('nav.join')}</a
@@ -48,21 +48,22 @@
 {/snippet}
 
 <header class="relative bg-navy-900 text-surface">
-	<div class="mx-auto flex max-w-6xl items-center gap-2 px-4 py-2">
+	<div class="mx-auto flex max-w-page items-center gap-2 px-4 py-2">
 		<a
 			href={href('/')}
-			class="mr-auto flex items-center gap-3 rounded-sm py-1 text-lg font-bold whitespace-nowrap focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-500 lg:mr-4"
+			class="mr-auto flex items-center gap-3 rounded-sm py-1 text-lg font-bold whitespace-nowrap focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-500 xl:mr-4"
 		>
 			<img src={logo} alt="" width="44" height="44" class="size-11" />
 			{siteName ?? t('site.name')}
 		</a>
 
-		<nav aria-label={t('nav.main')} class="hidden lg:mr-auto lg:block">
+		<!-- The full row from xl: narrower, the hy menu runs into the site name. -->
+		<nav aria-label={t('nav.main')} class="hidden xl:mr-auto xl:block">
 			{@render menuLinks(false)}
 		</nav>
 
-		<div class="hidden items-center gap-2 lg:flex">
-			<LanguageSwitcher />
+		<div class="hidden items-center gap-2 xl:flex">
+			<LanguageSwitcher short />
 			{#if viewer}
 				<Disclosure summaryClass="text-navy-100 hover:text-surface">
 					{#snippet summary()}
@@ -70,7 +71,7 @@
 							class="flex size-8 items-center justify-center rounded-full bg-navy-100 text-sm text-navy-900"
 							aria-hidden="true">{initials}</span
 						>
-						{viewer.name}
+						<span class="max-w-28 truncate" title={viewer.name}>{viewer.name}</span>
 					{/snippet}
 					<div class="{panel} w-56">
 						<AccountLinks isStaff={viewer.isStaff} />
@@ -81,7 +82,7 @@
 			{/if}
 		</div>
 
-		<Disclosure class="lg:hidden" summaryClass="text-navy-100 hover:text-surface">
+		<Disclosure class="xl:hidden" summaryClass="text-navy-100 hover:text-surface">
 			{#snippet summary()}
 				<Menu class="size-5" aria-hidden="true" />
 				{t('nav.menu')}

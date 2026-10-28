@@ -8,7 +8,7 @@ import { shopOrderItems, shopOrders } from '../../db/schema/shop';
 import { users } from '../../db/schema/users';
 import { insertUser, testDb, testDbUrl } from '../../db/test-db';
 import { placeOrder } from './checkout';
-import { cancelOrder } from './order-cancel';
+import { cancelOrder, staffCanCancel } from './order-cancel';
 import {
 	addItem,
 	balanceOf,
@@ -186,5 +186,16 @@ describe.skipIf(!testDbUrl)('shop: cancelling an order with a refund', () => {
 				expect(await cancelOrder(tx, admin, id, deps())).toBe('not_found');
 			}
 		});
+	});
+});
+
+describe('the cancel button in the order card (docs/05 section 15)', () => {
+	it('is offered only before shipping, as the cancel itself checks', () => {
+		expect(['new', 'confirmed'].map(staffCanCancel)).toEqual([true, true]);
+		expect(['shipped', 'delivered', 'cancelled'].map(staffCanCancel)).toEqual([
+			false,
+			false,
+			false
+		]);
 	});
 });

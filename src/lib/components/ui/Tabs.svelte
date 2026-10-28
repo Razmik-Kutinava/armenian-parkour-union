@@ -30,7 +30,12 @@
 </script>
 
 <div>
-	<div role="tablist" aria-label={label} class="flex overflow-x-auto border-b border-line">
+	<!-- The base line is an inset shadow: a tab's own border covers it without overflowing the list. -->
+	<div
+		role="tablist"
+		aria-label={label}
+		class="flex overflow-x-auto overflow-y-hidden shadow-[inset_0_-1px_0_var(--color-line)]"
+	>
 		{#each tabs as tab, i (tab.id)}
 			{@const selected = tab.id === value}
 			<button
@@ -43,7 +48,7 @@
 				tabindex={selected ? 0 : -1}
 				onclick={() => (value = tab.id)}
 				onkeydown={(e) => onkeydown(e, i)}
-				class="-mb-px shrink-0 border-b-2 px-4 py-3 text-base whitespace-nowrap transition-colors duration-(--dur-fast) focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-navy-600 {selected
+				class="shrink-0 border-b-2 px-4 py-3 text-base whitespace-nowrap transition-colors duration-(--dur-fast) focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-navy-600 {selected
 					? 'border-accent-500 font-bold text-navy-700'
 					: 'border-transparent text-ink-700 hover:text-ink-900'}"
 			>

@@ -108,6 +108,21 @@ test('on a phone the menu opens from the menu button', async ({ page }) => {
 	await expect(header.getByRole('link', { name: 'Events' })).toBeVisible();
 });
 
+test('the header row fits without overlaps from 1024 px in every language', async ({ page }) => {
+	for (const width of [1024, 1279, 1280, 1440]) {
+		await page.setViewportSize({ width, height: 800 });
+		for (const path of ['/', '/hy', '/ru']) {
+			await page.goto(path);
+			const overflow = await page.getByRole('banner').evaluate((header) => {
+				const row = header.firstElementChild as HTMLElement;
+				const shown = [...row.children].filter((e) => getComputedStyle(e).display !== 'none');
+				return [row, ...shown].filter((e) => e.scrollWidth > e.clientWidth).map((e) => e.tagName);
+			});
+			expect(overflow, `${path} at ${width} px`).toEqual([]);
+		}
+	}
+});
+
 test('unknown page gives a branded 404 with a link home in the page language', async ({ page }) => {
 	const response = await page.goto('/no-such-page');
 	expect(response?.status()).toBe(404);

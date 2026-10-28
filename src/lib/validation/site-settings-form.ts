@@ -12,7 +12,10 @@ import {
 
 export const settingsFormSchema = z.object({
 	site_name: localizedText(100),
-	seo_description: localizedText(300),
+	/* Optional: a blank one is stored as {}, and pages use the i18n description. */
+	seo_description: localizedText(300)
+		.optional()
+		.transform((v) => v ?? {}),
 	contacts: contactsSchema.default({}),
 	socials: socialsSchema.default({}),
 	footer: footerSchema.default({}),

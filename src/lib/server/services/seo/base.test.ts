@@ -38,4 +38,15 @@ describe.skipIf(!testDbUrl)('seo: site name and description from settings', () =
 			expect(base.locales).toEqual(['en', 'hy', 'ru']);
 		});
 	});
+
+	it('a description saved blank falls back to the translation', async () => {
+		await inRollback(async (tx) => {
+			await tx.delete(siteSettings);
+			await tx.insert(siteSettings).values({ key: 'seo_description', value: {} });
+			expect((await getSeoBase(tx, 'ru', 'https://parkour.am')).description).not.toBe('');
+			expect((await getSeoBase(tx, 'en', 'https://parkour.am')).description).toBe(
+				'Armenian Parkour Union: events, news, membership and certification.'
+			);
+		});
+	});
 });

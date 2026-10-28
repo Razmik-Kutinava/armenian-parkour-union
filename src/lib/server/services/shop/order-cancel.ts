@@ -27,6 +27,9 @@ type Canceller = {
 const BY_STAFF: readonly string[] = ['new', 'confirmed'];
 const BY_MEMBER: readonly string[] = ['new'];
 
+/** Whether the admin cancel accepts an order in this status. */
+export const staffCanCancel = (status: string) => BY_STAFF.includes(status);
+
 /** The write-off entry back with the opposite sign; none, or a deleted account — nothing back. */
 async function refund(tx: LimitDb, order: Order, actorId: string | null) {
 	if (!order.ledgerId) return { points: 0, entryId: null };

@@ -45,6 +45,20 @@ describe('site settings form (docs/05 section 21)', () => {
 		});
 	});
 
+	it('the SEO description is optional: a blank one saves as an empty value', () => {
+		const r = settingsFormSchema.safeParse(
+			formToObject(form({ 'site_name.en': 'APU', 'seo_description.en': ' ' }))
+		);
+		expect(r.success && r.data.seo_description).toEqual({});
+	});
+
+	it('the SEO description still needs English when another language is filled', () => {
+		const r = settingsFormSchema.safeParse(
+			formToObject(form({ 'site_name.en': 'APU', 'seo_description.ru': 'Паркур' }))
+		);
+		expect(r.error && settingsErrors(r.error)['seo_description.en']).toBe('auth.error.required');
+	});
+
 	it('English is required where another language is filled; errors carry the full field name', () => {
 		const r = settingsFormSchema.safeParse(
 			formToObject(

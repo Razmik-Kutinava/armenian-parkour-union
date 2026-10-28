@@ -53,7 +53,7 @@
 <FormLayout cancelHref="/admin" novalidate>
 	<FormSection title={t('settings.main')}>
 		<LocalizedInput name="site_name" label={t('settings.siteName')} {values} {errors} required />
-		<LocalizedInput name="seo_description" label={t('settings.seo')} {values} {errors} required />
+		<LocalizedInput name="seo_description" label={t('settings.seo')} {values} {errors} />
 	</FormSection>
 	<FormSection title={t('footer.contacts')}>
 		<div class="grid gap-4 sm:grid-cols-2">

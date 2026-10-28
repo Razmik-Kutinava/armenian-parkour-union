@@ -16,9 +16,6 @@
 	let { data, form }: PageProps = $props();
 	const order = $derived(data.order);
 	let cancelOpen = $state(false);
-	const cancellable = $derived(
-		data.canCancel && (order.status === 'new' || order.status === 'confirmed')
-	);
 	const flow = ['new', 'confirmed', 'shipped', 'delivered'] as const;
 	const forward = flow.slice(1) as Exclude<(typeof flow)[number], 'new'>[];
 	const next = $derived(forward.slice(flow.indexOf(order.status as (typeof flow)[number])));
@@ -129,7 +126,7 @@
 		</FormSection>
 	{/if}
 
-	{#if cancellable}
+	{#if data.canCancel}
 		<FormSection title={t('shop.order.cancelTitle')}>
 			<p class="text-sm text-ink-700">{t('shop.order.cancelHint')}</p>
 			<div>
@@ -141,11 +138,13 @@
 	{/if}
 </div>
 
-<ConfirmDialog
-	bind:open={cancelOpen}
-	title={t('shop.order.cancelTitle')}
-	text={t('shop.order.cancelText', { number: order.number, points: order.totalPoints })}
-	action="?/cancel"
-	confirmLabel={t('shop.order.cancelConfirm')}
-	danger
-/>
+{#if data.canCancel}
+	<ConfirmDialog
+		bind:open={cancelOpen}
+		title={t('shop.order.cancelTitle')}
+		text={t('shop.order.cancelText', { number: order.number, points: order.totalPoints })}
+		action="?/cancel"
+		confirmLabel={t('shop.order.cancelConfirm')}
+		danger
+	/>
+{/if}

@@ -11,8 +11,12 @@
 
 	/* landmark: false — a repeat of the header switcher (footer): a labelled group, not a second
 	 * "Language" navigation landmark for screen readers. */
-	let { surface = 'dark', landmark = true }: { surface?: 'light' | 'dark'; landmark?: boolean } =
-		$props();
+	/* short — codes for the desktop header row, where full names do not fit (hy is the widest). */
+	let {
+		surface = 'dark',
+		landmark = true,
+		short = false
+	}: { surface?: 'light' | 'dark'; landmark?: boolean; short?: boolean } = $props();
 
 	/* Enabled languages from the site layout (site settings); all three where it did not load. */
 	const shown = $derived<readonly Locale[]>(page.data.locales ?? locales);
@@ -38,9 +42,11 @@
 						hreflang={locale}
 						lang={locale}
 						aria-current={locale === currentLocale() ? 'true' : undefined}
+						aria-label={short ? localeNames[locale] : undefined}
+						title={short ? localeNames[locale] : undefined}
 						class="inline-flex min-h-11 items-center rounded-sm px-2 text-sm font-bold focus-visible:outline-2 focus-visible:outline-offset-2 aria-[current=true]:underline aria-[current=true]:underline-offset-4 {tone}"
 					>
-						{localeNames[locale]}
+						{short ? locale.toUpperCase() : localeNames[locale]}
 					</a>
 				</li>
 			{/each}
