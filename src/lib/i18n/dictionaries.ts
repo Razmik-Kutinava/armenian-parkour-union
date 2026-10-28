@@ -15,8 +15,8 @@ const loaded: Partial<Record<Locale, Dictionary>> = { en };
 
 /* Each language is a third of all the texts: the browser gets English (the fallback) at once and
  * another language when a page in it opens. The server has them all — letters and cron jobs
- * translate without a page. */
-if (import.meta.env.SSR) {
+ * translate without a page. Outside Vite (`tsx` scripts) there is no `import.meta.env`: a server. */
+if (import.meta.env?.SSR ?? true) {
 	for (const locale of locales) loaded[locale] = await load[locale]();
 }
 
