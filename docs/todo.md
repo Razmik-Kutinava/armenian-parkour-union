@@ -5,51 +5,54 @@
 
 ## Задача
 
-9.12 (доделки этапа 9 после REVIEW, решения владельца 2026-10-28): карточка участника в заявке по `05` § 27 «Заявки» — попытки теста участника (ссылки на `/admin/training/attempts/{id}`), статус практики по заданиям, ссылка на экзамен, если курс завершён.
+9.13 (доделки этапа 9 после REVIEW, решения владельца 2026-10-28): скрытие практического задания завершает курс у одобренных участников, у которых скрытое было последним непринятым (тест сдан, все остальные видимые задания приняты). Сейчас курс у них висит до следующего события (`zone-notes.md` § «Обучающий портал», 9.8 «Известное»).
 
-Решения (из `05` § 27, `04`; чего нет в документах — помечено «решение агента»):
-1. Адрес — `/admin/training/access/[id]` (`id` — `course_access.id`), право `training.manage`, как у списка (`05`: «Заявки» — admin). Только чтение: журнал не пишется, `settleExpired` не зовётся, попытки и отправки не меняются. Неизвестный или не-uuid `id` — 404.
-2. Действия (одобрить, отклонить, закрыть доступ, внеочередная попытка) остаются в списке, в карточке их нет (решение агента: не дублировать формы и диалоги; шаблон «список → карточка» соблюдён). В списке — ссылка «Карточка» в колонке действий у каждой строки.
-3. Шапка: участник (ссылка `/admin/users/{userId}`; удалён мягко — имя как есть), курс, статус заявки, дата подачи (`created_at`), дата решения (`reviewed_at`, пусто — «—»), причина (`review_note`), внеочередных не использовано (`extra_attempts`).
-4. Попытки: все попытки участника по этому курсу, новые сверху по `started_at` — начало, правильных / всего, результат (`resultOf`: сдал / не сдал / идёт / время вышло), внеочередная; строка — ссылка на `/admin/training/attempts/{id}`. Колонки и результат — общие с 9.11 (`attemptColumns`, `typed` / `resultOf` из `attempt-list.ts`), не новая формула. Нет попыток — пустое состояние.
-5. Практика: видимые задания курса в порядке `taskOrder` (скрытые не показываются — как при завершении курса), у каждого — статус текущей отправки (живая или последняя вернутая: на проверке / принято / вернуто / нет отправки), ссылка на `/admin/training/practice/{submissionId}` текущей отправки, число отправок; сверху «принято N из M». Логика «текущей» — из `practice-read.ts` (`practiceStatus`), не новая.
-6. Экзамен: `exam_id` есть — «Курс завершён» и ссылка на `/admin/exams/{examId}` (`exams.manage` у admin есть); нет — «Курс не завершён».
-7. Меню не меняется (карточка — внутри «Заявок»). Переводы en / hy / ru (`hy` — по глоссарию `zone-notes.md` § «Обучающий портал», шаг 4).
+Решения (чего нет в документах — помечено «решение агента»):
+1. Только скрытие (`hidden = true`). Возврат задания ничего не завершает и не отменяет: завершённый курс от заданий не зависит (`03` § 18.5 п. 5).
+2. Кандидаты — все `course_access` этого курса со статусом `approved` и пустым `exam_id`; каждый проходит через `completeCourse` (он сам проверяет сданный тест и «принято = видимых»). Новой формулы завершения нет.
+3. Порядок блокировок портала (`zone-notes` 9.8): при скрытии сначала `course_access` кандидатов (`FOR UPDATE`, по `id`), потом строка задания (`lockTask`). Иначе взаимная блокировка с `submitPractice` (держит заявку, вставка отправки берёт ключевую блокировку задания). Возврат — как сейчас.
+4. Актор экзамена и журнала `exam.course_complete` — админ, скрывший задание (`03` § 18.6 п. 1: «тот, чьё действие завершило курс»); `examiner_id` — как в `completeCourse` (кто принял последнее видимое). `hidden_at` и `now` экзамена — одно время.
+5. Письма «курс завершён» (участнику и на `contacts.email`) — после коммита; ошибка отправки — `console.warn`, экзамен остаётся (как в `reviewPractice`).
+6. Статус курса и участника не проверяется — как у остальных событий завершения (решение агента).
+7. Ответ админу не меняется (`'ok'`), сообщения «завершено у N» нет — в `05` его нет (решение агента).
+8. Сигнатура: `setTaskHidden(db, actor, courseId, taskId, hidden, deps)`, `deps = { send, siteUrl, ip, now? }` вместо `ip`.
+
+Хвост документов (на закрытие этапа, владельцу): `03` § 18.5 п. 1 — добавить третье событие проверки «скрытие задания админом».
 
 ## Файлы (ожидаемо)
 
-- `src/lib/server/services/training/access-card.ts` (+ `access-card.test.ts`) — `accessDetail(db, id, now)`: шапка заявки, попытки (через `attemptColumns` / `typed`), практика (через `practiceStatus`), `examId`; `null` — 404.
-- `src/routes/admin/training/access/[id]/+page.server.ts`, `+page.svelte` — карточка (образец — `training/attempts/[id]/`).
-- `src/routes/admin/training/access/+page.svelte` — ссылка «Карточка» в колонке действий.
-- `src/lib/i18n/messages/{en,hy,ru}-training-access.ts` — тексты `training.access.card.*` (файл > 120 строк — отдельный `*-training-access-card.ts` с подключением, как `*-training-attempts.ts`).
-- `tests/e2e/admin-access-map.ts`, `tests/e2e/admin-permissions-training.ts` — страница `/admin/training/access/[id]` (`training.manage`) и подстановка `accessId` в `trainingPath`.
+- `src/lib/server/services/training/practice-tasks.ts` — `setTaskHidden`: `deps`, блокировка заявок до задания, завершение кандидатов, письма после коммита.
+- `src/lib/server/services/training/course-complete-hide.ts` (новый, если `practice-tasks.ts` уходит за 120 строк) — `lockOpenAccess(tx, courseId)` и цикл `completeCourse` по кандидатам.
+- `src/lib/server/services/training/practice-task-hide.test.ts` (новый) — RED: скрыли последнее непринятое → экзамен, `exam_id`, журнал с админом, два письма; не последнее / тест не сдан / доступ закрыт / курс уже завершён → ничего; возврат → ничего; другой курс не задет.
+- `src/lib/server/services/training/race.test.ts` (+ `race-support.ts` при нужде) — скрытие и отправка видео параллельно: без `40P01`, экзамен не больше одного.
+- `src/routes/admin/training/[id]/tasks/+page.server.ts` — `send: sendMail`, `siteUrl: PUBLIC_SITE_URL`, `ip`.
+- `practice-tasks.test.ts`, `rights.test.ts` — новая сигнатура (`deps` вместо `IP`).
 
 ## Не ломать
 
-- Editor, moderator (без `training.manage`) и участник — 403 / вход на `/admin/training/access/[id]`; карта прав e2e и `rights.test.ts` согласованы.
-- Правильные ответы не уходят участнику: `quiz-secrets.test.ts` зелёный; карточка заявки ответов попытки не показывает (только ссылка на карточку попытки).
-- Список заявок и его действия (approve / reject / revoke / extra) работают как раньше.
-- Карточка ничего не пишет (нет журнала, нет закрытия истёкших попыток).
+- Скрытие и возврат: журнал `practice_task.hide|restore`, повтор — `bad_state`, чужой курс — `not_found`, editor и moderator — `not_allowed` (`practice-tasks.test.ts`, `rights.test.ts`).
+- Экзамен по курсу — не больше одного (`exam_id` unique, двойная блокировка `race.test.ts`); завершённый курс не завершается снова.
+- Завершение при «Принять» и сдаче теста (`course-complete.test.ts`) — как раньше.
+- Участник без сданного теста или с непринятым видимым заданием курс не получает.
 
 ## Проверка
 
-- `npx vitest run src/lib/server/services/training/access-card.test.ts src/lib/server/services/training/access-list.test.ts src/lib/server/services/training/quiz-secrets.test.ts`
-- `npm run check`, `npm run lint`; e2e `admin-permissions` (training) — CI.
+- `npx vitest run src/lib/server/services/training/practice-task-hide.test.ts src/lib/server/services/training/practice-tasks.test.ts src/lib/server/services/training/course-complete.test.ts src/lib/server/services/training/rights.test.ts src/lib/server/services/training/race.test.ts`
+- `npm run check`, `npm run lint`; e2e — CI.
 
 ## Риск
 
-`normal` — серверное чтение и страница админки; право существующее (`training.manage`), новых действий, миграций и журнала нет. В REVIEW этапа — общий уровень этапа 9 (`high`).
+`high` — создаёт экзамен `passed` (путь к сертификату и степени), журнал, новый порядок блокировок в транзакции; прав и миграций не меняет.
 
 ## Читать
 
-- `05` § 27 «Заявки» (строки 405–408) — выписано выше: «Карточка участника в заявке: попытки теста, статус практики по заданиям, ссылка на экзамен, если курс завершён».
-- `04` права: `training.manage` — admin; `training.review`, `exams.manage` — moderator, admin (сверено с `permissions.ts`).
-- `02` § 11 `course_access` — выписано: `created_at`, `reviewed_at`, `review_note`, `extra_attempts`, `exam_id` (есть — курс завершён).
-- `zone-notes.md` § «Обучающий портал», 9.7 (`practice-read.ts`), 9.8 (новая страница с `[id]` — строка в фикстуре и подстановка в `trainingPath`), 9.11 («Для 9.12»).
+- `03` § 18.5 (п. 1 — условия и транзакция; п. 5 — скрытие после завершения не влияет), § 18.6 п. 1 (актор экзамена) — выписано выше.
+- `zone-notes.md` § «Обучающий портал»: 9.7 (`practice-tasks.ts`), 9.8 (`completeCourse`, порядок блокировок, «Известное» про скрытие), 9.10 (`race.test.ts`, уборка по курсу).
+- Образец зависимостей и писем — `practice-review.ts` (`ReviewDeps`, отправка после коммита), маршрут `admin/training/practice/[id]/+page.server.ts`.
 
 ## Фазы
 
 - [x] SPEC
-- [x] RED `e84864b`
-- [x] GREEN
+- [ ] RED
+- [ ] GREEN
 - [ ] REVIEW (этапа 9)
