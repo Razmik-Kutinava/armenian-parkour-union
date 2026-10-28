@@ -1,6 +1,8 @@
 import type { Messages } from '../translate';
+import { hyCabinetTraining } from './hy-cabinet-training';
 
 export const hyCabinet: Partial<Messages> = {
+	...hyCabinetTraining,
 	'cabinet.nav.label': 'Անձնական էջ',
 	'cabinet.nav.overview': 'Ակնարկ',
 	'cabinet.nav.profile': 'Պրոֆիլ',

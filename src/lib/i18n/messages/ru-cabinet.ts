@@ -1,6 +1,8 @@
 import type { Messages } from '../translate';
+import { ruCabinetTraining } from './ru-cabinet-training';
 
 export const ruCabinet: Partial<Messages> = {
+	...ruCabinetTraining,
 	'cabinet.nav.label': 'Кабинет',
 	'cabinet.nav.overview': 'Обзор',
 	'cabinet.nav.profile': 'Профиль',

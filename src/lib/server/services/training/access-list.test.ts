@@ -43,9 +43,7 @@ describe.skipIf(!testDbUrl)('training access: the admin list of requests', () =>
 			const approved = await request(tx, course.id, 'approved', '2026-10-15T10:00:00Z');
 			await request(tx, other.id, 'pending', '2026-10-01T10:00:00Z');
 			const ids = async (status: Parameters<typeof listAccess>[1]['status']) =>
-				(await listAccess(tx, { status, courseId: course.id, page: 1 }, NOW)).rows.map(
-					(r) => r.id
-				);
+				(await listAccess(tx, { status, courseId: course.id, page: 1 }, NOW)).rows.map((r) => r.id);
 			expect(await ids('pending')).toEqual([older.id, newer.id]);
 			expect(await ids('approved')).toEqual([approved.id]);
 			expect(await ids('all')).toEqual([older.id, approved.id, newer.id]);

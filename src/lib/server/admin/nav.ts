@@ -15,6 +15,7 @@ export type AdminIcon =
 	| 'staff'
 	| 'consents'
 	| 'training'
+	| 'trainingAccess'
 	| 'videos'
 	| 'registrations'
 	| 'points'
@@ -64,7 +65,13 @@ const sections: [MessageKey, Section[]][] = [
 		]
 	],
 	/* docs/05 section 27: editors reach the lessons through the course list. */
-	['admin.group.training', [section('training', 'training', 'training.lessons')]],
+	[
+		'admin.group.training',
+		[
+			section('training', 'training', 'training.lessons'),
+			section('trainingAccess', 'training/access', 'training.manage')
+		]
+	],
 	[
 		'admin.group.moderation',
 		[

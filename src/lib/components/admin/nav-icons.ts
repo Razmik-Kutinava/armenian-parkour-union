@@ -20,6 +20,7 @@ import ScrollText from '@lucide/svelte/icons/scroll-text';
 import Settings from '@lucide/svelte/icons/settings';
 import ShieldCheck from '@lucide/svelte/icons/shield-check';
 import ShoppingBag from '@lucide/svelte/icons/shopping-bag';
+import UserCheck from '@lucide/svelte/icons/user-check';
 import Users from '@lucide/svelte/icons/users';
 import Video from '@lucide/svelte/icons/video';
 import type { AdminIcon } from '#lib/server/admin/nav.ts';
@@ -37,6 +38,7 @@ export const navIcons: Record<AdminIcon, LucideIcon> = {
 	staff: IdCard,
 	consents: FileCheck,
 	training: GraduationCap,
+	trainingAccess: UserCheck,
 	videos: Video,
 	registrations: ListChecks,
 	points: Coins,

@@ -1,8 +1,10 @@
+import { enTrainingAccess } from './en-training-access';
 import { enTrainingQuestions } from './en-training-questions';
 
 /** Admin "Training": courses, topics, lessons (docs/05 section 27). Part of `en`. */
 export const enTrainingAdmin = {
 	...enTrainingQuestions,
+	...enTrainingAccess,
 	'admin.group.training': 'Training',
 	'admin.nav.training': 'Courses',
 	'media.usage.course_lesson': 'Course lesson',

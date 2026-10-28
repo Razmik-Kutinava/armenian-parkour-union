@@ -14,6 +14,7 @@
 		['cabinet.nav.progress', '/cabinet/progress'],
 		['cabinet.nav.points', '/cabinet/points'],
 		['cabinet.nav.videos', '/cabinet/videos'],
+		['cabinet.nav.training', '/cabinet/training'],
 		['cabinet.nav.orders', '/cabinet/orders'],
 		['cabinet.nav.payments', '/cabinet/payments'],
 		['cabinet.nav.documents', '/cabinet/documents']

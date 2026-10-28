@@ -42,10 +42,7 @@ describe.skipIf(!testDbUrl)('training access: courses in the cabinet', () => {
 				.insert(exams)
 				.values({ userId: user.id, kind: 'trainer', result: 'passed', decidedAt: new Date() })
 				.returning({ id: exams.id });
-			await tx
-				.update(courseAccess)
-				.set({ examId: exam.id })
-				.where(eq(courseAccess.id, doneId));
+			await tx.update(courseAccess).set({ examId: exam.id }).where(eq(courseAccess.id, doneId));
 
 			const list = await cabinetCourses(tx, user.id);
 			const byId = new Map(list.map((c) => [c.id, c]));

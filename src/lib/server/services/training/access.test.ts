@@ -70,9 +70,7 @@ describe.skipIf(!testDbUrl)('training access: a request from the cabinet', () =>
 			const user = await applicant(tx);
 			const send = mailbox().send;
 			const refused = (reason: string) => ({ ok: false, reason });
-			expect(await applyForCourse(tx, user.id, draft.id, deps(send))).toEqual(
-				refused('not_found')
-			);
+			expect(await applyForCourse(tx, user.id, draft.id, deps(send))).toEqual(refused('not_found'));
 			expect(await applyForCourse(tx, user.id, crypto.randomUUID(), deps(send))).toEqual(
 				refused('not_found')
 			);

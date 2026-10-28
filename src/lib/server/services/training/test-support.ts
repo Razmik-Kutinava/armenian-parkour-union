@@ -135,7 +135,11 @@ export function mailbox(failing = false) {
 }
 
 export const SITE = 'https://parkour.test';
-export const accessDeps = (send: (mail: Mail) => Promise<void>) => ({ send, siteUrl: SITE, ip: IP });
+export const accessDeps = (send: (mail: Mail) => Promise<void>) => ({
+	send,
+	siteUrl: SITE,
+	ip: IP
+});
 
 export const accessRow = async (tx: LimitDb, id: string) =>
 	(await tx.select().from(courseAccess).where(eq(courseAccess.id, id)))[0];

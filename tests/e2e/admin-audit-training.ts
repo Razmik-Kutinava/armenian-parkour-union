@@ -125,12 +125,12 @@ export function trainingActions(
 		'/admin/training/access?/reject': async () =>
 			post('/admin/training/access?/reject', {
 				accessId: await accessRow('pending'),
-				reason: 'Audit refusal'
+				comment: 'Audit refusal'
 			}),
 		'/admin/training/access?/revoke': async () =>
 			post('/admin/training/access?/revoke', {
 				accessId: await accessRow('approved'),
-				reason: 'Audit revoke'
+				comment: 'Audit revoke'
 			})
 	};
 }

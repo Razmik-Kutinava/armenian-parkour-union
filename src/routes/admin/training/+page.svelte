@@ -49,7 +49,13 @@
 		{:else if column.key === 'lessons'}{row.lessons}
 		{:else if column.key === 'questions'}{row.questions}
 		{:else if column.key === 'tasks'}{row.tasks}
-		{:else if column.key === 'pending'}{row.pending}
+		{:else if column.key === 'pending'}
+			{#if data.canManage && row.pending > 0}
+				<a
+					class="font-bold text-navy-700 underline-offset-2 hover:underline"
+					href="/admin/training/access?course={row.id}">{row.pending}</a
+				>
+			{:else}{row.pending}{/if}
 		{/if}
 	{/snippet}
 	{#snippet empty()}
