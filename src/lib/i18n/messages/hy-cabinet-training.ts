@@ -17,7 +17,8 @@ export const hyCabinetTraining: Partial<Messages> = {
 	'cabinet.training.revoked': 'Դասընթացի մուտքը փակված է։ Պատճառը՝ {reason}',
 	'cabinet.training.approved': 'Մուտքը բաց է։',
 	'cabinet.training.open': 'Բացել պորտալը',
-	'cabinet.training.finished': 'Դասընթացն ավարտված է, սպասում է վկայականի տրամադրմանը։',
+	'cabinet.training.finished':
+		'Հեռակա մասն ավարտված է։ Վկայականը տրամադրվում է ատեստավորման առկա փուլերից հետո։',
 	'cabinet.training.applied': 'Հայտն ուղարկված է։ Որոշման մասին կտեղեկացնենք նամակով։',
 	'cabinet.training.error.state': 'Հայտն արդեն ներկայացված է կամ որոշում կա։ Թարմացրեք էջը։',
 	'cabinet.training.error.blocked': 'Ձեր հաշիվն արգելափակված է։',

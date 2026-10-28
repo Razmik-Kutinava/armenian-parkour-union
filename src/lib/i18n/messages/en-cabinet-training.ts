@@ -15,7 +15,8 @@ export const enCabinetTraining = {
 	'cabinet.training.revoked': 'Your access to the course is closed. Reason: {reason}',
 	'cabinet.training.approved': 'Access is open.',
 	'cabinet.training.open': 'Open the portal',
-	'cabinet.training.finished': 'Course completed, waiting for the certificate.',
+	'cabinet.training.finished':
+		'The distance part is completed. The certificate is issued after the in-person stages of the attestation.',
 	'cabinet.training.applied': 'Request sent. We will email you the decision.',
 	'cabinet.training.error.state': 'The request has already been sent or decided. Reload the page.',
 	'cabinet.training.error.blocked': 'Your account is blocked.',

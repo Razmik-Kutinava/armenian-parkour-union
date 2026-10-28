@@ -17,7 +17,8 @@ export const ruCabinetTraining: Partial<Messages> = {
 	'cabinet.training.revoked': 'Доступ к курсу закрыт. Причина: {reason}',
 	'cabinet.training.approved': 'Доступ открыт.',
 	'cabinet.training.open': 'Открыть портал',
-	'cabinet.training.finished': 'Курс пройден, ждёт выдачи сертификата.',
+	'cabinet.training.finished':
+		'Заочная часть пройдена. Сертификат выдаётся после очных этапов аттестации.',
 	'cabinet.training.applied': 'Заявка отправлена. О решении сообщим письмом.',
 	'cabinet.training.error.state': 'Заявка уже подана или по ней есть решение. Обновите страницу.',
 	'cabinet.training.error.blocked': 'Ваш аккаунт заблокирован.',
