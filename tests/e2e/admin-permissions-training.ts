@@ -17,6 +17,7 @@ export const trainingPath = (path: string, ids: TrainingIds) =>
 	path
 		.replace('/training/practice/[id]', `/training/practice/${ids.submissionId}`)
 		.replace('/training/attempts/[id]', `/training/attempts/${ids.attemptId}`)
+		.replace('/training/access/[id]', `/training/access/${ids.accessId}`)
 		.replace('/training/[id]', `/training/${ids.courseId}`)
 		.replace('/lessons/[lessonId]', `/lessons/${ids.lessonId}`)
 		.replace('/questions/[questionId]', `/questions/${ids.questionId}`)

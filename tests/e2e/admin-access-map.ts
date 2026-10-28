@@ -90,6 +90,7 @@ export const ADMIN_READS = {
 	'/admin/training/[id]/tasks/new': 'training.manage',
 	'/admin/training/[id]/tasks/[taskId]': 'training.manage',
 	'/admin/training/access': 'training.manage',
+	'/admin/training/access/[id]': 'training.manage',
 	'/admin/training/practice': 'training.review',
 	'/admin/training/practice/[id]': 'training.review',
 	'/admin/training/attempts': 'training.review',
