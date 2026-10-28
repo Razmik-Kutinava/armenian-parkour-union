@@ -1,9 +1,12 @@
 import { afterAll, describe, expect, it } from 'vitest';
 import type { LimitDb } from '../../auth/rate-limit';
+import { exams } from '../../db/schema/certification';
 import { memberships } from '../../db/schema/payments';
+import { courseAccess } from '../../db/schema/training-progress';
 import { insertUser, testDb, testDbUrl } from '../../db/test-db';
 import { bornYearsAgo, insertConsent } from '../consents/test-support';
 import { daysFromNow } from '../memberships/test-support';
+import { insertOpenCourse } from '../training/test-support';
 import { getCabinetOverview } from './overview';
 
 /* docs/06 section 5.1: greeting, membership, points and "what needs action" — own data only. */
@@ -102,6 +105,36 @@ describe.skipIf(!testDbUrl)('cabinet: overview', () => {
 			await period(tx, other.id, 'active', -10, 355);
 			await insertConsent(tx, other.id, { status: 'approved' });
 			expect((await getCabinetOverview(tx, other.id))?.actions).toEqual([]);
+		});
+	});
+
+	it('an approved course request: "open the portal" until the course is finished', async () => {
+		await inRollback(async (tx) => {
+			const user = await insertUser(tx, { emailVerified: true });
+			await period(tx, user.id, 'active', -10, 355);
+			const open = await insertOpenCourse(tx);
+			const done = await insertOpenCourse(tx);
+			const draft = await insertOpenCourse(tx, { status: 'draft' });
+			const waiting = await insertOpenCourse(tx);
+			const [exam] = await tx
+				.insert(exams)
+				.values({ userId: user.id, kind: 'trainer', result: 'passed', decidedAt: new Date() })
+				.returning({ id: exams.id });
+			const decided = { userId: user.id, reviewedAt: new Date() };
+			await tx.insert(courseAccess).values([
+				{ ...decided, courseId: open.id, status: 'approved' },
+				{ ...decided, courseId: done.id, status: 'approved', examId: exam.id },
+				{ ...decided, courseId: draft.id, status: 'approved' },
+				{ userId: user.id, courseId: waiting.id, status: 'pending' }
+			]);
+			const o = await getCabinetOverview(tx, user.id);
+			expect(o?.portals).toEqual([
+				{ slug: open.slug, title: { ru: 'Курс тренера', en: 'Coach course' } }
+			]);
+			expect(o?.actions).toEqual([]);
+
+			const other = await insertUser(tx, { emailVerified: true });
+			expect((await getCabinetOverview(tx, other.id))?.portals).toEqual([]);
 		});
 	});
 
