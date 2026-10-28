@@ -47,6 +47,8 @@
 ## Фазы
 
 - [x] SPEC
-- [ ] RED
-- [ ] GREEN
+- [x] RED `d36430d`
+- [x] GREEN
+
+Итог: `runQuizDaily` (`quiz-daily.ts`) — пары с брошенными попытками при открытом портале → `settleExpired` (теперь возвращает число закрытых), ошибка пары — `failed`; `POST /api/cron/training`; job `training` в `cron.yml` (09:00 по Еревану). Тесты сервиса против Neon локально 16–25 с — таймаут 60 с, как в `rights.test.ts`.
 - [ ] REVIEW (этапа 9)

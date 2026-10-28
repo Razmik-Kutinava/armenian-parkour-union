@@ -101,14 +101,15 @@ export async function sendLetters(deps: QuizDeps, letters: Mail[], id: string) {
 	}
 }
 
-/** Closes the member's attempts past their time; called before every read and write of the quiz. */
+/** Closes the member's attempts past their time; called before every read and write of the quiz
+ * and by the daily job. Returns how many were closed. */
 export async function settleExpired(
 	db: LimitDb,
 	courseId: string,
 	userId: string,
 	deps: QuizDeps,
 	now: Date
-) {
+): Promise<number> {
 	/* Closed by the clock, not by a request of the member: no address in the audit. */
 	const lazy = { ...deps, ip: null };
 	const closed = await db.transaction(async (tx) => {
@@ -134,4 +135,5 @@ export async function settleExpired(
 		return out;
 	});
 	for (const { id, letters } of closed) await sendLetters(deps, letters, id);
+	return closed.length;
 }

@@ -20,7 +20,12 @@ describe.skipIf(!testDbUrl)('training quiz: the daily close of abandoned attempt
 
 	async function attempt(tx: LimitDb, startedAt = new Date(Date.now() - 2 * HOUR)) {
 		const ctx = await quizCourse(tx);
-		const started = await startAttempt(tx, ctx.member, ctx.course.slug, quizDeps(undefined, startedAt));
+		const started = await startAttempt(
+			tx,
+			ctx.member,
+			ctx.course.slug,
+			quizDeps(undefined, startedAt)
+		);
 		if (!started.ok) throw new Error(started.reason);
 		return { ...ctx, id: started.id };
 	}
@@ -55,7 +60,7 @@ describe.skipIf(!testDbUrl)('training quiz: the daily close of abandoned attempt
 			expect(await runQuizDaily(tx, quizDeps(again.send))).toEqual({ closed: 0, failed: 0 });
 			expect(again.sent).toHaveLength(0);
 		});
-	});
+	}, 60_000);
 
 	it('leaves an attempt in time and members whose portal is closed', async () => {
 		await inRollback(async (tx) => {
@@ -79,5 +84,5 @@ describe.skipIf(!testDbUrl)('training quiz: the daily close of abandoned attempt
 				expect(to(mail.sent, left.user.email)).toHaveLength(0);
 			}
 		});
-	});
+	}, 60_000);
 });
