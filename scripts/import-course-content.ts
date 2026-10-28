@@ -27,26 +27,40 @@ if (!DATABASE_URL || !manifestFile || !slug || !actorEmail) {
 }
 const dry = process.argv.includes('--dry');
 
-type Entry = { file: string; title: string };
+/** A string is in `language`; an object holds several languages: { "ru": …, "hy": …, "en": … }. */
+type Texts = string | Record<string, string>;
+type Entry = { file: Texts; title: Texts };
 type Manifest = {
-	language: string;
-	topics: { title: string; lessons: Entry[] }[];
+	language?: string;
+	topics: { title: Texts; lessons: Entry[] }[];
 	practiceTasks: Entry[];
 };
 const manifest = JSON.parse(readFileSync(manifestFile, 'utf8')) as Manifest;
 const lang = manifest.language;
-if (!['en', 'hy', 'ru'].includes(lang)) throw new Error(`${manifestFile}: language ${lang}`);
-const text = (value: string) => ({ [lang]: value });
-const html = (entry: Entry) => readFileSync(join(dirname(manifestFile), entry.file), 'utf8');
+if (lang !== undefined && !['en', 'hy', 'ru'].includes(lang)) {
+	throw new Error(`${manifestFile}: language ${lang}`);
+}
+const text = (value: Texts) => {
+	if (typeof value !== 'string') return value;
+	if (!lang) throw new Error(`${manifestFile}: "${value}" without language`);
+	return { [lang]: value };
+};
+const html = (entry: Entry) =>
+	Object.fromEntries(
+		Object.entries(text(entry.file)).map(([code, file]) => [
+			code,
+			readFileSync(join(dirname(manifestFile), file), 'utf8')
+		])
+	);
 
 const parsed = courseContentSchema(R2_PUBLIC_URL || null).safeParse({
 	topics: manifest.topics.map((topic) => ({
 		title: text(topic.title),
-		lessons: topic.lessons.map((l) => ({ title: text(l.title), body: text(html(l)) }))
+		lessons: topic.lessons.map((l) => ({ title: text(l.title), body: html(l) }))
 	})),
 	practiceTasks: manifest.practiceTasks.map((t) => ({
 		title: text(t.title),
-		description: text(html(t))
+		description: html(t)
 	}))
 });
 if (!parsed.success) {
