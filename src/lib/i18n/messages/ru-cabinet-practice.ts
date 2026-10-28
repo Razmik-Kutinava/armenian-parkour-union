@@ -12,7 +12,7 @@ export const ruCabinetPractice: Partial<Messages> = {
 	'cabinet.practice.empty': 'Заданий пока нет.',
 	'cabinet.practice.link': 'Ссылка на видео (YouTube или Google Drive)',
 	'cabinet.practice.hint':
-		'Загрузите ролик с доступом по ссылке (YouTube «Доступ по ссылке» или Google Drive «Все, у кого есть ссылка») и вставьте ссылку. Файлы не принимаются.',
+		'Загрузите ролик так, чтобы он открывался по ссылке: на YouTube — доступ «по ссылке», на Google Drive — доступ «все, у кого есть ссылка». Затем вставьте ссылку сюда. Файлы не принимаются.',
 	'cabinet.practice.send': 'Отправить на проверку',
 	'cabinet.practice.replace': 'Заменить ссылку',
 	'cabinet.practice.status.pending': 'На проверке',

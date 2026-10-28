@@ -10,7 +10,7 @@ export const enCabinetPractice = {
 	'cabinet.practice.empty': 'No tasks yet.',
 	'cabinet.practice.link': 'Video link (YouTube or Google Drive)',
 	'cabinet.practice.hint':
-		'Upload the video with access by link (YouTube “Unlisted” or Google Drive “Anyone with the link”) and paste the link. Files are not accepted.',
+		'Upload the video so that it opens by link: on YouTube, set the visibility to “Unlisted” (only people with the link can watch); on Google Drive, share it with “Anyone with the link”. Then paste the link here. Files are not accepted.',
 	'cabinet.practice.send': 'Send for review',
 	'cabinet.practice.replace': 'Replace the link',
 	'cabinet.practice.status.pending': 'Under review',

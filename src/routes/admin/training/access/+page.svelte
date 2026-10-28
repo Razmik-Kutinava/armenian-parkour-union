@@ -96,7 +96,11 @@
 				: t('training.access.none')}
 		{:else if column.key === 'paidUntil'}{date(row.paidUntil)}
 		{:else if column.key === 'actions'}
-			<div class="flex flex-wrap gap-2">
+			<div class="flex flex-wrap items-center gap-2">
+				<a
+					class="font-bold text-navy-700 underline-offset-2 hover:underline"
+					href="/admin/training/access/{row.id}">{t('training.access.open')}</a
+				>
 				{#if row.status === 'pending'}
 					<form method="POST" action="?/approve" use:enhance>
 						<input type="hidden" name="accessId" value={row.id} />

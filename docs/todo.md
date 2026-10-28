@@ -50,6 +50,6 @@
 ## Фазы
 
 - [x] SPEC
-- [ ] RED
-- [ ] GREEN
+- [x] RED `e84864b`
+- [x] GREEN
 - [ ] REVIEW (этапа 9)

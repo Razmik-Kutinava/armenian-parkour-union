@@ -12,7 +12,7 @@ export const hyCabinetPractice: Partial<Messages> = {
 	'cabinet.practice.empty': 'Առաջադրանքներ դեռ չկան։',
 	'cabinet.practice.link': 'Տեսանյութի հղում (YouTube կամ Google Drive)',
 	'cabinet.practice.hint':
-		'Վերբեռնեք տեսանյութը հղումով հասանելիությամբ (YouTube «Unlisted» կամ Google Drive «Anyone with the link») և տեղադրեք հղումը։ Ֆայլեր չեն ընդունվում։',
+		'Վերբեռնեք տեսանյութն այնպես, որ այն բացվի հղումով․ YouTube-ում՝ «հղումով» հասանելիություն, Google Drive-ում՝ «հղումն ունեցող բոլորը» հասանելիություն։ Այնուհետև տեղադրեք հղումն այստեղ։ Ֆայլեր չեն ընդունվում։',
 	'cabinet.practice.send': 'Ուղարկել ստուգման',
 	'cabinet.practice.replace': 'Փոխել հղումը',
 	'cabinet.practice.status.pending': 'Ստուգման մեջ է',
