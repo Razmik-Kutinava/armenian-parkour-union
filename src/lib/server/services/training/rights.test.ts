@@ -84,7 +84,9 @@ type Action = (tx: LimitDb, actor: Actor, f: Fixture) => Promise<unknown>;
 
 const task = { title: { en: 'Roll' }, description: { ru: '<p>Перекат</p>' }, sortOrder: 0 };
 const content = courseContentSchema(null).parse({
-	topics: [{ title: { ru: 'Тема' }, lessons: [{ title: { ru: 'Урок' }, body: { ru: '<p>Т</p>' } }] }],
+	topics: [
+		{ title: { ru: 'Тема' }, lessons: [{ title: { ru: 'Урок' }, body: { ru: '<p>Т</p>' } }] }
+	],
 	practiceTasks: []
 });
 const pdf = { mime: 'application/pdf' as const, size: PDF.length };
@@ -112,11 +114,11 @@ const ACTIONS: Record<keyof typeof DOC04, Record<string, Action>> = {
 		updateCourse: (tx, a, f) =>
 			updateCourse(tx, a, f.draft.id, courseValues({ slug: f.draft.slug }), IP),
 		createTopic: (tx, a, f) => createTopic(tx, a, f.course.id, { title: { en: 'X' } }, IP),
-		updateTopic: (tx, a, f) => updateTopic(tx, a, f.course.id, f.topicId, { title: { en: 'Y' } }, IP),
+		updateTopic: (tx, a, f) =>
+			updateTopic(tx, a, f.course.id, f.topicId, { title: { en: 'Y' } }, IP),
 		moveTopic: (tx, a, f) => moveTopic(tx, a, f.course.id, f.topicId, 'down', IP),
 		hideTopic: (tx, a, f) => setTopicHidden(tx, a, f.course.id, f.topicId, true, IP),
-		createQuestion: (tx, a, f) =>
-			createQuestion(tx, a, f.course.id, questionValues(f.topicId), IP),
+		createQuestion: (tx, a, f) => createQuestion(tx, a, f.course.id, questionValues(f.topicId), IP),
 		updateQuestion: (tx, a, f) =>
 			updateQuestion(tx, a, f.course.id, f.questionId, questionValues(f.topicId), IP),
 		hideQuestion: (tx, a, f) => setQuestionHidden(tx, a, f.course.id, f.questionId, true, IP),

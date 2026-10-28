@@ -66,7 +66,12 @@ describe.skipIf(!testDbUrl)('training quiz: the correct answers never leave the 
 		await inRollback(async (tx) => {
 			const ctx = await quizCourse(tx);
 			const past = new Date(Date.now() - 2 * 3_600_000);
-			const started = await startAttempt(tx, ctx.member, ctx.course.slug, quizDeps(undefined, past));
+			const started = await startAttempt(
+				tx,
+				ctx.member,
+				ctx.course.slug,
+				quizDeps(undefined, past)
+			);
 			if (!started.ok) throw new Error(started.reason);
 			const page = await views(tx, ctx);
 			expect(page?.running).toBeNull();

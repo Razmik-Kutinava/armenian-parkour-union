@@ -77,7 +77,10 @@ describe.skipIf(!testDbUrl)('training portal: simultaneous clicks', () => {
 		const answers = rightAnswers((await attemptRow(db.main, started.id)).questions);
 		const box = mailbox();
 		const submit = (tx: LimitDb) =>
-			submitAttempt(tx, member, course.slug, started.id, answers, { ...quizDeps(box.send), ip: IP });
+			submitAttempt(tx, member, course.slug, started.id, answers, {
+				...quizDeps(box.send),
+				ip: IP
+			});
 		const [first, second] = await db.race(submit, submit);
 		expect(first).toEqual({ ok: true, correct: 4, total: 4, passed: true, expired: false });
 		expect(second).toEqual(first);
@@ -163,7 +166,10 @@ describe.skipIf(!testDbUrl)('training portal: simultaneous clicks', () => {
 		);
 		expect(x).toEqual({ ok: true });
 		expect(y).toEqual({ ok: false, reason: 'bad_state' });
-		expect(await submissionRow(db.main, id)).toMatchObject({ status: 'approved', reviewedBy: a.id });
+		expect(await submissionRow(db.main, id)).toMatchObject({
+			status: 'approved',
+			reviewedBy: a.id
+		});
 		expect(box.sent).toHaveLength(1);
 		expect(await examsOf(member.id)).toHaveLength(0);
 	});
