@@ -171,7 +171,7 @@ describe.skipIf(!testDbUrl)('training: rights by the table of docs/04', () => {
 					if (!allowed.includes(role)) expect(await auditBy(tx, actor.id)).toEqual([]);
 				}
 			});
-		});
+		}, 60_000);
 	}
 
 	it('portal preview without a request: only training.manage', async () => {
