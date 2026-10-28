@@ -6,6 +6,12 @@ import { courseAccess } from '../../db/schema/training-progress';
 import { insertUser, testDb, testDbUrl } from '../../db/test-db';
 import { bornYearsAgo, insertConsent } from '../consents/test-support';
 import { daysFromNow } from '../memberships/test-support';
+import {
+	insertSubmission,
+	insertTask,
+	practiceCourse,
+	YT
+} from '../training/practice-test-support';
 import { insertOpenCourse } from '../training/test-support';
 import { getCabinetOverview } from './overview';
 
@@ -129,12 +135,28 @@ describe.skipIf(!testDbUrl)('cabinet: overview', () => {
 			]);
 			const o = await getCabinetOverview(tx, user.id);
 			expect(o?.portals).toEqual([
-				{ slug: open.slug, title: { ru: 'Курс тренера', en: 'Coach course' } }
+				{ slug: open.slug, title: { ru: 'Курс тренера', en: 'Coach course' }, retake: false }
 			]);
 			expect(o?.actions).toEqual([]);
 
 			const other = await insertUser(tx, { emailVerified: true });
 			expect((await getCabinetOverview(tx, other.id))?.portals).toEqual([]);
+		});
+	});
+
+	it('a returned practice video without a new one on a visible task: "retake the task"', async () => {
+		await inRollback(async (tx) => {
+			const { course, user, tasks } = await practiceCourse(tx);
+			const retake = async () => (await getCabinetOverview(tx, user.id))?.portals[0]?.retake;
+			const returned = { status: 'rejected' as const, reviewedAt: new Date(), reviewNote: 'Нет' };
+			expect(await retake()).toBe(false);
+			await insertSubmission(tx, tasks[0], user.id, returned);
+			expect(await retake()).toBe(true);
+			await insertSubmission(tx, tasks[0], user.id, { url: YT(2) });
+			expect(await retake()).toBe(false);
+			const hidden = await insertTask(tx, course.id, 7, { hiddenAt: new Date() });
+			await insertSubmission(tx, hidden, user.id, returned);
+			expect(await retake()).toBe(false);
 		});
 	});
 
