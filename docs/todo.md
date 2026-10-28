@@ -5,56 +5,53 @@
 
 ## Задача
 
-9.13 (доделки этапа 9 после REVIEW, решения владельца 2026-10-28): скрытие практического задания завершает курс у одобренных участников, у которых скрытое было последним непринятым (тест сдан, все остальные видимые задания приняты). Сейчас курс у них висит до следующего события (`zone-notes.md` § «Обучающий портал», 9.8 «Известное»).
+9.14 (доделки этапа 9 после REVIEW, решения владельца 2026-10-28): «Принять» видео — только если ссылка не менялась с момента показа карточки проверяющему; иначе отказ «ссылка изменилась, обновите страницу». Сейчас участник может заменить ссылку `pending`-отправки, пока проверяющий смотрит карточку, — и тот примет уже новую, не просмотренную (`zone-notes.md` § «Обучающий портал», 9.7 «Известное»).
 
 Решения (чего нет в документах — помечено «решение агента»):
-1. Только скрытие (`hidden = true`). Возврат задания ничего не завершает и не отменяет: завершённый курс от заданий не зависит (`03` § 18.5 п. 5).
-2. Кандидаты — все `course_access` этого курса со статусом `approved` и пустым `exam_id`; каждый проходит через `completeCourse` (он сам проверяет сданный тест и «принято = видимых»). Новой формулы завершения нет.
-3. Порядок блокировок портала (`zone-notes` 9.8): при скрытии сначала `course_access` кандидатов (`FOR UPDATE`, по `id`), потом строка задания (`lockTask`). Иначе взаимная блокировка с `submitPractice` (держит заявку, вставка отправки берёт ключевую блокировку задания). Возврат — как сейчас.
-4. Актор экзамена и журнала `exam.course_complete` — админ, скрывший задание (`03` § 18.6 п. 1: «тот, чьё действие завершило курс»); `examiner_id` — как в `completeCourse` (кто принял последнее видимое). `hidden_at` и `now` экзамена — одно время.
-5. Письма «курс завершён» (участнику и на `contacts.email`) — после коммита; ошибка отправки — `console.warn`, экзамен остаётся (как в `reviewPractice`).
-6. Статус курса и участника не проверяется — как у остальных событий завершения (решение агента).
-7. Ответ админу не меняется (`'ok'`), сообщения «завершено у N» нет — в `05` его нет (решение агента).
-8. Сигнатура: `setTaskHidden(db, actor, courseId, taskId, hidden, deps)`, `deps = { send, siteUrl, ip, now? }` вместо `ip`.
-
-Хвост документов (на закрытие этапа, владельцу): `03` § 18.5 п. 1 — добавить третье событие проверки «скрытие задания админом».
+1. Сравнивается сама ссылка: карточка отдаёт в форму решения показанную `url` (скрытое поле `url` через `fields` у `ConfirmDialog`), сервис сравнивает её со `practice_submissions.url` строки под блокировкой. Хранимая ссылка уже нормализована (`normalizePracticeUrl`), карточка показывает её же — сравнение строгое, без повторной нормализации. Замена A → B → A — ссылка та же, принимать можно (ровно то, что видел проверяющий). Миграции нет.
+2. Проверка и для «Вернуть» (решение агента): комментарий написан про показанное видео; вернуть не просмотренную ссылку — участник теряет отправку и пересдаёт без причины. Владелец может сузить до «Принять».
+3. Новый отказ `changed` у `reviewPractice`; порядок проверок: права → комментарий → `id` → (блокировки) → нет строки `not_found` → `own` → не `pending` — `bad_state` → ссылка не та — `changed`. Решение уже есть — важнее, чем «ссылка изменилась».
+4. Поле `url` пустое или его нет — `changed` (наша форма шлёт его всегда; запрос в обход формы не принимает непоказанное).
+5. При `changed` ничего не пишется: статус `pending`, журнала и писем нет, курс не завершается.
+6. Сравнение — после `accessOf(..., true)` и `FOR UPDATE` строки отправки: `submitPractice` держит тот же порядок (заявка → строка), поэтому замена и решение строго по очереди — либо замена раньше (решение видит новую ссылку → `changed`), либо решение раньше (замена видит `approved` → `bad_state`, после `rejected` — новая строка).
+7. Маршрут: `url` из формы → `ReviewInput.url`; `changed` → `fail(400, { message: 'training.practice.error.changed' })`; тексты en / hy / ru — «Участник заменил ссылку. Обновите страницу и посмотрите новое видео.» (по смыслу; hy — по глоссарию `zone-notes` шаг 4).
+8. `ReviewInput = { action, comment, url }` — `url` обязателен (необязательный открыл бы обход проверки). В тестах сервиса — `url: YT(1)` (ссылка `insertSubmission` по умолчанию).
 
 ## Файлы (ожидаемо)
 
-- `src/lib/server/services/training/practice-tasks.ts` — `setTaskHidden`: `deps`, блокировка заявок до задания, завершение кандидатов, письма после коммита.
-- `src/lib/server/services/training/course-complete-hide.ts` (новый, если `practice-tasks.ts` уходит за 120 строк) — `lockOpenAccess(tx, courseId)` и цикл `completeCourse` по кандидатам.
-- `src/lib/server/services/training/practice-task-hide.test.ts` (новый) — RED: скрыли последнее непринятое → экзамен, `exam_id`, журнал с админом, два письма; не последнее / тест не сдан / доступ закрыт / курс уже завершён → ничего; возврат → ничего; другой курс не задет.
-- `src/lib/server/services/training/race.test.ts` (+ `race-support.ts` при нужде) — скрытие и отправка видео параллельно: без `40P01`, экзамен не больше одного.
-- `src/routes/admin/training/[id]/tasks/+page.server.ts` — `send: sendMail`, `siteUrl: PUBLIC_SITE_URL`, `ip`.
-- `practice-tasks.test.ts`, `rights.test.ts` — новая сигнатура (`deps` вместо `IP`).
+- `src/lib/server/services/training/practice-review.ts` — `ReviewInput.url`, отказ `changed`, сравнение под блокировкой (сейчас 122 строки, станет ~127 — в норме до 200).
+- `src/lib/server/services/training/practice-review.test.ts` — RED: другая ссылка → `changed`, строка `pending`, журнала и писем нет (и для «Вернуть»); пустая → `changed`; та же → `ok`; решённая + другая ссылка → `bad_state`.
+- `src/lib/server/services/training/practice-review-race.test.ts` (новый; `race.test.ts` уже 200 строк — не дописывать) — замена ссылки (`submitPractice`) и «Принять» по старой параллельно через `portalRaceDb`: либо `changed` и строка `pending` с новой ссылкой, либо принята старая и замена — `bad_state`; принятой непоказанной ссылки нет.
+- `src/routes/admin/training/practice/[id]/+page.server.ts` — поле `url`, `REFUSED.changed`.
+- `src/routes/admin/training/practice/[id]/+page.svelte` — скрытое `url` в `ConfirmDialog` (`fields`).
+- `src/lib/i18n/messages/{en,hy,ru}-training-practice.ts` — `training.practice.error.changed`.
+- Сигнатура в тестах: `course-complete.test.ts`, `race.test.ts`, `rights.test.ts` (константа `approve` / вызов — `url: YT(1)`, строк не добавлять: первые два > 200); e2e `tests/e2e/admin-audit-practice.ts` — `url` в `?/approve` и `?/reject` (иначе аудит-e2e получит 400).
 
 ## Не ломать
 
-- Скрытие и возврат: журнал `practice_task.hide|restore`, повтор — `bad_state`, чужой курс — `not_found`, editor и moderator — `not_allowed` (`practice-tasks.test.ts`, `rights.test.ts`).
-- Экзамен по курсу — не больше одного (`exam_id` unique, двойная блокировка `race.test.ts`); завершённый курс не завершается снова.
-- Завершение при «Принять» и сдаче теста (`course-complete.test.ts`) — как раньше.
-- Участник без сданного теста или с непринятым видимым заданием курс не получает.
+- «Принять» и «Вернуть» по показанной ссылке — как раньше: статус, журнал `practice_submission.approve|reject`, письмо участнику, завершение курса после последнего принятого (`practice-review.test.ts`, `course-complete.test.ts`).
+- Отказы `own`, `bad_state`, `not_allowed`, `not_found`, `invalid` — прежние (`practice-review.test.ts`, `rights.test.ts`).
+- Двойное «Принять» двумя проверяющими и завершение курса — один экзамен (`race.test.ts`).
+- Отправка и замена ссылки участником (`practice-submit.test.ts`) — не меняются.
 
 ## Проверка
 
-- `npx vitest run src/lib/server/services/training/practice-task-hide.test.ts src/lib/server/services/training/practice-tasks.test.ts src/lib/server/services/training/course-complete.test.ts src/lib/server/services/training/rights.test.ts src/lib/server/services/training/race.test.ts`
-- `npm run check`, `npm run lint`; e2e — CI.
+- `npx vitest run src/lib/server/services/training/practice-review.test.ts src/lib/server/services/training/practice-review-race.test.ts src/lib/server/services/training/course-complete.test.ts src/lib/server/services/training/race.test.ts src/lib/server/services/training/rights.test.ts`
+- `npm run check`, `npm run lint`; e2e (`admin-audit` практики) — CI.
 
 ## Риск
 
-`high` — создаёт экзамен `passed` (путь к сертификату и степени), журнал, новый порядок блокировок в транзакции; прав и миграций не меняет.
+`high` — «Принять» ведёт к экзамену `passed` (путь к сертификату и степени), журнал, порядок блокировок в транзакции решения; прав и миграций не меняет.
 
 ## Читать
 
-- `03` § 18.5 (п. 1 — условия и транзакция; п. 5 — скрытие после завершения не влияет), § 18.6 п. 1 (актор экзамена) — выписано выше.
-- `zone-notes.md` § «Обучающий портал»: 9.7 (`practice-tasks.ts`), 9.8 (`completeCourse`, порядок блокировок, «Известное» про скрытие), 9.10 (`race.test.ts`, уборка по курсу).
-- Образец зависимостей и писем — `practice-review.ts` (`ReviewDeps`, отправка после коммита), маршрут `admin/training/practice/[id]/+page.server.ts`.
+- `03` § 18.4 п. 4–5 (решение проверяющего) — только если в RED понадобится формулировка; остальное выписано выше.
+- `zone-notes.md` § «Обучающий портал»: 9.7 (`practice-submit`, `practice-review`, «Известное» про замену), 9.8 (порядок блокировок), 9.10 (`race-support.ts`, уборка по курсу) — уже прочитано.
+- Код: `practice-review.ts`, `practice-submit.ts`, `practice-queue.ts` (`practiceDetail` — `url` в карточке), `ConfirmDialog.svelte` (`fields`), `race.test.ts` (образец гонки).
 
 ## Фазы
 
 - [x] SPEC
-- [x] RED `8571b5e`
-- [x] GREEN
-
-Итог: кандидаты и цикл завершения — `course-complete-hide.ts` (`lockOpenAccess`, `completeAfterHide`). Гонка в `race.test.ts` — только «скрытие первым, отправка ждёт» (`race` не даёт перемежать шаги, взаимную блокировку не воспроизвести — порядок держит код); в RED она показала, что отправка видео проходила на только что скрытое задание (читала его до коммита скрытия), теперь — `finished`.
+- [ ] RED
+- [ ] GREEN
 - [ ] REVIEW (этапа 9)
