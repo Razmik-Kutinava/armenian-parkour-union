@@ -1,10 +1,12 @@
 import type { Messages } from '../translate';
+import { hyCabinetPractice } from './hy-cabinet-practice';
 import { hyCabinetQuiz } from './hy-cabinet-quiz';
 import { hyCabinetTraining } from './hy-cabinet-training';
 
 export const hyCabinet: Partial<Messages> = {
 	...hyCabinetTraining,
 	...hyCabinetQuiz,
+	...hyCabinetPractice,
 	'cabinet.nav.label': 'Անձնական էջ',
 	'cabinet.nav.overview': 'Ակնարկ',
 	'cabinet.nav.profile': 'Պրոֆիլ',

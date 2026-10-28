@@ -6,6 +6,7 @@ import { examActions } from './admin-audit-exams';
 import type { AdminAction } from './admin-audit-map';
 import { moneyActions } from './admin-audit-money';
 import { pointsActions } from './admin-audit-points';
+import { practiceActions } from './admin-audit-practice';
 import { registrationActions } from './admin-audit-registrations';
 import { shopActions } from './admin-audit-shop';
 import { trainingActions } from './admin-audit-training';
@@ -214,7 +215,8 @@ export async function adminActions(page: Page, sql: postgres.Sql, adminId: strin
 		...paymentSettingsAction(page, post),
 		...videoActions(sql, post, page, target),
 		...shopActions(sql, post, postRedirect, target),
-		...trainingActions(sql, post, postRedirect, raw)
+		...trainingActions(sql, post, postRedirect, raw),
+		...practiceActions(sql, post, postRedirect)
 	};
 	return perform;
 }

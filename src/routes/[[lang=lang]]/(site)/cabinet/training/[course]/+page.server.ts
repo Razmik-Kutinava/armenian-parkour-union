@@ -4,6 +4,7 @@ import { requireUser } from '#lib/server/auth/guard.ts';
 import { db } from '#lib/server/db/index.ts';
 import { sendMail } from '#lib/server/mail/index.ts';
 import { portalOverview } from '#lib/server/services/training/portal.ts';
+import { practiceStatus } from '#lib/server/services/training/practice-read.ts';
 import { quizStatus } from '#lib/server/services/training/quiz-read.ts';
 import type { PageServerLoad } from './$types';
 
@@ -13,6 +14,7 @@ export const load: PageServerLoad = async ({ locals, params, setHeaders }) => {
 	const portal = await portalOverview(db, user, params.course);
 	if (!portal) error(404, 'Not found');
 	const quiz = await quizStatus(db, portal, user.id, { send: sendMail, siteUrl: PUBLIC_SITE_URL });
+	const practice = await practiceStatus(db, portal, user.id);
 	setHeaders({ 'cache-control': 'no-store' });
-	return { portal, quiz };
+	return { portal, quiz, practice };
 };

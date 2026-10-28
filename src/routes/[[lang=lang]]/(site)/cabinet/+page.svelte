@@ -49,6 +49,16 @@
 						>{t('cabinet.training.open')}</a
 					>
 				</li>
+				{#if portal.retake}
+					<li class="flex flex-col gap-2">
+						<p>
+							{t('cabinet.action.retake', { course: pickPortal(portal.title, currentLocale()) })}
+						</p>
+						<a class={button} href={href(`/cabinet/training/${portal.slug}/practice`)}
+							>{t('cabinet.practice.retakeGo')}</a
+						>
+					</li>
+				{/if}
 			{/each}
 			{#each o.actions as action (action)}
 				<li class="flex flex-col gap-2">

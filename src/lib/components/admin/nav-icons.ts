@@ -1,6 +1,7 @@
 import type { LucideIcon } from '@lucide/svelte';
 import Award from '@lucide/svelte/icons/award';
 import CalendarDays from '@lucide/svelte/icons/calendar-days';
+import Clapperboard from '@lucide/svelte/icons/clapperboard';
 import ClipboardCheck from '@lucide/svelte/icons/clipboard-check';
 import Coins from '@lucide/svelte/icons/coins';
 import CreditCard from '@lucide/svelte/icons/credit-card';
@@ -39,6 +40,7 @@ export const navIcons: Record<AdminIcon, LucideIcon> = {
 	consents: FileCheck,
 	training: GraduationCap,
 	trainingAccess: UserCheck,
+	trainingPractice: Clapperboard,
 	videos: Video,
 	registrations: ListChecks,
 	points: Coins,

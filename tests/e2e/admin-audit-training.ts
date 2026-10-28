@@ -1,8 +1,9 @@
 import { expect } from '@playwright/test';
 import type postgres from 'postgres';
 import type { AdminAction } from './admin-audit-map';
+import type { PracticeAction } from './admin-audit-practice';
 
-type TrainingAction = Extract<AdminAction, `/admin/training${string}`>;
+type TrainingAction = Exclude<Extract<AdminAction, `/admin/training${string}`>, PracticeAction>;
 type Post = (path: string, form?: Record<string, string>) => Promise<void>;
 type Raw = (path: string, form?: Record<string, string>) => Promise<number>;
 

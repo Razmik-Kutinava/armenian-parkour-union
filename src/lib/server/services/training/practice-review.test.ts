@@ -50,7 +50,9 @@ describe.skipIf(!testDbUrl)('training practice: the review', () => {
 			const admin = await staff(tx);
 			const box = mailbox();
 			const blank = { action: 'reject' as const, comment: '   ' };
-			expect(await reviewPractice(tx, admin, id, blank, deps(box.send))).toEqual(refused('invalid'));
+			expect(await reviewPractice(tx, admin, id, blank, deps(box.send))).toEqual(
+				refused('invalid')
+			);
 			const long = { action: 'reject' as const, comment: 'x'.repeat(1001) };
 			expect(await reviewPractice(tx, admin, id, long, deps(box.send))).toEqual(refused('invalid'));
 			expect((await submissionRow(tx, id)).status).toBe('pending');

@@ -13,7 +13,8 @@
 			{ href: base, label: t('training.tab.course'), admin: true },
 			{ href: `${base}/topics`, label: t('training.tab.topics'), admin: true },
 			{ href: `${base}/lessons`, label: t('training.tab.lessons'), admin: false },
-			{ href: `${base}/questions`, label: t('training.tab.questions'), admin: true }
+			{ href: `${base}/questions`, label: t('training.tab.questions'), admin: true },
+			{ href: `${base}/tasks`, label: t('training.tab.tasks'), admin: true }
 		].filter((tab) => data.canManage || !tab.admin)
 	);
 	const current = $derived(

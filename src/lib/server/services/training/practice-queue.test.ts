@@ -65,7 +65,11 @@ describe.skipIf(!testDbUrl)('training practice: the review queue', () => {
 				url: YT(2),
 				status: 'pending',
 				own: false,
-				task: { id: tasks[0], title: { ru: 'Задание 0' }, description: { ru: '<p>Манки, конг</p>' } }
+				task: {
+					id: tasks[0],
+					title: { ru: 'Задание 0' },
+					description: { ru: '<p>Манки, конг</p>' }
+				}
 			});
 			expect(card?.history.map((h) => h.id)).toEqual([first]);
 			expect(card?.history[0]).toMatchObject({ status: 'rejected', note: 'Плохо видно' });

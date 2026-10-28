@@ -1,4 +1,4 @@
-import { and, asc, eq, isNull, or } from 'drizzle-orm';
+import { and, asc, eq, isNull, or, sql } from 'drizzle-orm';
 import type { PortalText } from '#lib/i18n/localized.ts';
 import { isMinor } from '#lib/validation/auth.ts';
 import type { LimitDb } from '../../auth/rate-limit';
@@ -26,13 +26,22 @@ export type CabinetOverview = {
 	membership: MembershipOverview;
 	reminder: MembershipReminder;
 	actions: CabinetAction[];
-	/** docs/06 section 5.11: approved, not finished — "open the portal". */
-	portals: { slug: string; title: PortalText }[];
+	/** docs/06 section 5.11: approved, not finished — "open the portal"; `retake` — a video was
+	 * returned and nothing new is sent on that visible task. */
+	portals: { slug: string; title: PortalText; retake: boolean }[];
 };
+
+/* Plain SQL: the outer course id must not bind to the subquery tables. */
+const retake = (userId: string) => sql<boolean>`exists (select 1 from practice_submissions r
+	join practice_tasks t on t.id = r.task_id
+	where t.course_id = ${courses.id} and t.hidden_at is null and r.user_id = ${userId}
+		and r.status = 'rejected'
+		and not exists (select 1 from practice_submissions l where l.task_id = r.task_id
+			and l.user_id = r.user_id and l.status in ('pending', 'approved')))`;
 
 async function openPortals(db: LimitDb, userId: string) {
 	const rows = await db
-		.select({ slug: courses.slug, title: courses.title })
+		.select({ slug: courses.slug, title: courses.title, retake: retake(userId) })
 		.from(courseAccess)
 		.innerJoin(courses, eq(courses.id, courseAccess.courseId))
 		.where(
@@ -44,7 +53,7 @@ async function openPortals(db: LimitDb, userId: string) {
 			)
 		)
 		.orderBy(asc(courses.createdAt));
-	return rows.map((r) => ({ slug: r.slug, title: r.title as PortalText }));
+	return rows.map((r) => ({ slug: r.slug, title: r.title as PortalText, retake: r.retake }));
 }
 
 /** docs/03 section 13 p. 2: a minor needs a parental consent in force; one under review is enough here. */

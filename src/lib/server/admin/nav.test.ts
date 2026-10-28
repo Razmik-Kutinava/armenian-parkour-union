@@ -36,7 +36,7 @@ describe('adminNav', () => {
 		]);
 	});
 
-	it('moderator: dashboard, members, moderation, points, point rules (read) and orders', () => {
+	it('moderator: dashboard, members, practice review, moderation, points, point rules (read) and orders', () => {
 		expect(hrefs('moderator')).toEqual([
 			'/admin',
 			'/admin/users',
@@ -44,6 +44,7 @@ describe('adminNav', () => {
 			'/admin/certificates',
 			'/admin/staff',
 			'/admin/consents',
+			'/admin/training/practice',
 			'/admin/videos',
 			'/admin/registrations',
 			'/admin/points',
@@ -54,8 +55,9 @@ describe('adminNav', () => {
 
 	it('admin: every section, system group last', () => {
 		const all = hrefs('admin');
-		expect(all).toHaveLength(24);
+		expect(all).toHaveLength(25);
 		expect(all).toContain('/admin/training/access');
+		expect(all).toContain('/admin/training/practice');
 		expect(all.slice(-3)).toEqual(['/admin/settings', '/admin/audit', '/admin/roles']);
 		expect(groups('admin')).toEqual([
 			'admin.group.overview',

@@ -37,7 +37,10 @@ describe.skipIf(!testDbUrl)('training: practice tasks in the admin', () => {
 				sortOrder: 2
 			});
 			const entries = await auditOf(tx, 'practice_task', a.id);
-			expect(entries.map((e) => e.action)).toEqual(['practice_task.create', 'practice_task.update']);
+			expect(entries.map((e) => e.action)).toEqual([
+				'practice_task.create',
+				'practice_task.update'
+			]);
 			expect(entries[0]).toMatchObject({ actorId: admin.id, ip: IP, after: { courseId } });
 			expect(entries[1]).toMatchObject({
 				before: { title: { en: 'Kong' } },
@@ -68,7 +71,11 @@ describe.skipIf(!testDbUrl)('training: practice tasks in the admin', () => {
 			expect((await getTask(tx, courseId, task.id))?.hiddenAt).toBeInstanceOf(Date);
 			expect(await setTaskHidden(tx, admin, courseId, task.id, false, IP)).toBe('ok');
 			const actions = (await auditOf(tx, 'practice_task', task.id)).map((e) => e.action);
-			expect(actions).toEqual(['practice_task.create', 'practice_task.hide', 'practice_task.restore']);
+			expect(actions).toEqual([
+				'practice_task.create',
+				'practice_task.hide',
+				'practice_task.restore'
+			]);
 			const one = await applicant(tx);
 			const two = await applicant(tx);
 			await insertSubmission(tx, task.id, one.id);
@@ -90,9 +97,7 @@ describe.skipIf(!testDbUrl)('training: practice tasks in the admin', () => {
 			for (const role of ['editor', 'moderator'] as const) {
 				const actor = await staff(tx, role);
 				expect(await createTask(tx, actor, courseId, values('X'), IP)).toBe('not_allowed');
-				expect(await updateTask(tx, actor, courseId, task.id, values('X'), IP)).toBe(
-					'not_allowed'
-				);
+				expect(await updateTask(tx, actor, courseId, task.id, values('X'), IP)).toBe('not_allowed');
 				expect(await setTaskHidden(tx, actor, courseId, task.id, true, IP)).toBe('not_allowed');
 			}
 			expect(await updateTask(tx, admin, other, task.id, values('X'), IP)).toBe('not_found');

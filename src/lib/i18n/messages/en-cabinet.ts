@@ -1,3 +1,4 @@
+import { enCabinetPractice } from './en-cabinet-practice';
 import { enCabinetQuiz } from './en-cabinet-quiz';
 import { enCabinetTraining } from './en-cabinet-training';
 
@@ -5,6 +6,7 @@ import { enCabinetTraining } from './en-cabinet-training';
 export const enCabinet = {
 	...enCabinetTraining,
 	...enCabinetQuiz,
+	...enCabinetPractice,
 	'cabinet.nav.label': 'Cabinet',
 	'cabinet.nav.overview': 'Overview',
 	'cabinet.nav.profile': 'Profile',

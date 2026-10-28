@@ -1,10 +1,12 @@
 import type { Messages } from '../translate';
 import { hyTrainingAccess } from './hy-training-access';
+import { hyTrainingPractice } from './hy-training-practice';
 import { hyTrainingQuestions } from './hy-training-questions';
 
 export const hyTrainingAdmin: Partial<Messages> = {
 	...hyTrainingQuestions,
 	...hyTrainingAccess,
+	...hyTrainingPractice,
 	'admin.group.training': 'Ուսուցում',
 	'admin.nav.training': 'Դասընթացներ',
 	'media.usage.course_lesson': 'Դասընթացի դաս',

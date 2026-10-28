@@ -102,7 +102,13 @@ export const ADMIN_AUDIT = {
 	'/admin/training/access?/approve': ['course_access.approve'],
 	'/admin/training/access?/reject': ['course_access.reject'],
 	'/admin/training/access?/revoke': ['course_access.revoke'],
-	'/admin/training/access?/extra': ['course_access.extra_attempt']
+	'/admin/training/access?/extra': ['course_access.extra_attempt'],
+	'/admin/training/[id]/tasks/new?/default': ['practice_task.create'],
+	'/admin/training/[id]/tasks/[taskId]?/update': ['practice_task.update'],
+	'/admin/training/[id]/tasks?/hide': ['practice_task.hide'],
+	'/admin/training/[id]/tasks?/restore': ['practice_task.restore'],
+	'/admin/training/practice/[id]?/approve': ['practice_submission.approve'],
+	'/admin/training/practice/[id]?/reject': ['practice_submission.reject']
 } as const;
 
 export type AdminAction = keyof typeof ADMIN_AUDIT;

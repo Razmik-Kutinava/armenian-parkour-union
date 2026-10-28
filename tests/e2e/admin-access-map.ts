@@ -86,7 +86,12 @@ export const ADMIN_READS = {
 	'/admin/training/[id]/questions': 'training.manage',
 	'/admin/training/[id]/questions/new': 'training.manage',
 	'/admin/training/[id]/questions/[questionId]': 'training.manage',
-	'/admin/training/access': 'training.manage'
+	'/admin/training/[id]/tasks': 'training.manage',
+	'/admin/training/[id]/tasks/new': 'training.manage',
+	'/admin/training/[id]/tasks/[taskId]': 'training.manage',
+	'/admin/training/access': 'training.manage',
+	'/admin/training/practice': 'training.review',
+	'/admin/training/practice/[id]': 'training.review'
 } as const satisfies Record<string, Access>;
 
 export const ADMIN_WRITES = {
@@ -191,5 +196,11 @@ export const ADMIN_WRITES = {
 	'/admin/training/access?/reject': 'training.manage',
 	'/admin/training/access?/revoke': 'training.manage',
 	'/admin/training/access?/extra': 'training.manage',
+	'/admin/training/[id]/tasks/new?/default': 'training.manage',
+	'/admin/training/[id]/tasks/[taskId]?/update': 'training.manage',
+	'/admin/training/[id]/tasks?/hide': 'training.manage',
+	'/admin/training/[id]/tasks?/restore': 'training.manage',
+	'/admin/training/practice/[id]?/approve': 'training.review',
+	'/admin/training/practice/[id]?/reject': 'training.review',
 	'POST /admin/locale': 'staff'
 } as const satisfies Record<AdminAction | NotAuditedAction, Access>;

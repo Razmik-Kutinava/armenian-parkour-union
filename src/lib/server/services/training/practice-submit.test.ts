@@ -56,7 +56,10 @@ describe.skipIf(!testDbUrl)('training practice: the member sends a link', () => 
 				platform: 'google_drive',
 				url: 'https://drive.google.com/file/d/1AbCdEfGhIjKlMnOp/view'
 			});
-			await insertSubmission(tx, tasks[1], member.id, { status: 'approved', reviewedAt: new Date() });
+			await insertSubmission(tx, tasks[1], member.id, {
+				status: 'approved',
+				reviewedAt: new Date()
+			});
 			expect(await submitPractice(tx, member, course.slug, tasks[1], LINK)).toEqual(
 				refused('bad_state')
 			);
@@ -86,11 +89,14 @@ describe.skipIf(!testDbUrl)('training practice: the member sends a link', () => 
 	it('closed before the quiz is passed, after the course is finished, for a bad link', async () => {
 		await inRollback(async (tx) => {
 			const fresh = await practiceCourse(tx, { passed: false });
-			expect(await submitPractice(tx, fresh.member, fresh.course.slug, fresh.tasks[0], LINK)).toEqual(
-				refused('quiz')
-			);
+			expect(
+				await submitPractice(tx, fresh.member, fresh.course.slug, fresh.tasks[0], LINK)
+			).toEqual(refused('quiz'));
 			const { course, member, tasks, accessId } = await practiceCourse(tx);
-			for (const bad of ['https://vimeo.com/1', 'https://drive.google.com/drive/folders/1AbCdEfGhIj']) {
+			for (const bad of [
+				'https://vimeo.com/1',
+				'https://drive.google.com/drive/folders/1AbCdEfGhIj'
+			]) {
 				expect(await submitPractice(tx, member, course.slug, tasks[0], bad)).toEqual(
 					refused('bad_url')
 				);
