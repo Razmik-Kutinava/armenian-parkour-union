@@ -55,9 +55,16 @@ describe.skipIf(!testDbUrl)('training portal: lessons by topic', () => {
 			const first = await insertTopic(tx, course.id, 0);
 			const hidden = await insertTopic(tx, course.id, 2);
 			const empty = await insertTopic(tx, course.id, 3);
-			await tx.update(courseTopics).set({ hiddenAt: new Date() }).where(eq(courseTopics.id, hidden));
+			await tx
+				.update(courseTopics)
+				.set({ hiddenAt: new Date() })
+				.where(eq(courseTopics.id, hidden));
 			const b = await lesson(tx, course.id, first, { sortOrder: 1 });
-			const a = await lesson(tx, course.id, first, { sortOrder: 0, fileKey: 'k', fileName: 'a.pdf' });
+			const a = await lesson(tx, course.id, first, {
+				sortOrder: 0,
+				fileKey: 'k',
+				fileName: 'a.pdf'
+			});
 			const c = await lesson(tx, course.id, second);
 			const loose = await lesson(tx, course.id, null);
 			await lesson(tx, course.id, hidden);
@@ -87,7 +94,10 @@ describe.skipIf(!testDbUrl)('training portal: lessons by topic', () => {
 				.insert(exams)
 				.values({ userId: user.id, kind: 'trainer', result: 'passed', decidedAt: new Date() })
 				.returning({ id: exams.id });
-			await tx.update(courseAccess).set({ examId: exam.id }).where(eq(courseAccess.userId, user.id));
+			await tx
+				.update(courseAccess)
+				.set({ examId: exam.id })
+				.where(eq(courseAccess.userId, user.id));
 			expect(await portalOverview(tx, user, course.slug)).not.toBeNull();
 		});
 	});
@@ -203,7 +213,10 @@ describe.skipIf(!testDbUrl)('training portal: one lesson and its PDF', () => {
 	it('no access — no lesson and no key; a lesson without a file — no key', async () => {
 		await inRollback(async (tx) => {
 			const course = await insertOpenCourse(tx);
-			const withFile = await lesson(tx, course.id, null, { fileKey: 'training/y.pdf', fileName: 'y.pdf' });
+			const withFile = await lesson(tx, course.id, null, {
+				fileKey: 'training/y.pdf',
+				fileName: 'y.pdf'
+			});
 			const noFile = await lesson(tx, course.id, null);
 			const outsider = await member(tx);
 			await grant(tx, course.id, outsider.id, 'pending');
@@ -221,7 +234,10 @@ describe.skipIf(!testDbUrl)('training portal: one lesson and its PDF', () => {
 		await inRollback(async (tx) => {
 			const open = await insertOpenCourse(tx);
 			const closed = await insertOpenCourse(tx);
-			const id = await lesson(tx, closed.id, null, { fileKey: 'training/z.pdf', fileName: 'z.pdf' });
+			const id = await lesson(tx, closed.id, null, {
+				fileKey: 'training/z.pdf',
+				fileName: 'z.pdf'
+			});
 			const user = await member(tx);
 			await grant(tx, open.id, user.id);
 			expect(await portalLesson(tx, user, open.slug, id)).toBeNull();

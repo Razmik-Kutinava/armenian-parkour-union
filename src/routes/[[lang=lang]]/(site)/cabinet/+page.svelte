@@ -3,6 +3,7 @@
 	import Avatar from '#lib/components/site/Avatar.svelte';
 	import { newsDate } from '#lib/components/site/news-date.ts';
 	import { currentLocale, localizePath, t } from '#lib/i18n/index.svelte.ts';
+	import { pickPortal } from '#lib/i18n/localized.ts';
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
@@ -37,10 +38,18 @@
 		<h2 id="actions-title" class="text-xl font-bold text-ink-900">
 			{t('cabinet.overview.actions')}
 		</h2>
-		{#if o.actions.length === 0}
+		{#if o.actions.length === 0 && o.portals.length === 0}
 			<p class="text-ink-700">{t('cabinet.overview.allDone')}</p>
 		{/if}
 		<ul class="flex flex-col gap-3">
+			{#each o.portals as portal (portal.slug)}
+				<li class="flex flex-col gap-2">
+					<p>{t('cabinet.action.portal', { course: pickPortal(portal.title, currentLocale()) })}</p>
+					<a class={button} href={href(`/cabinet/training/${portal.slug}`)}
+						>{t('cabinet.training.open')}</a
+					>
+				</li>
+			{/each}
 			{#each o.actions as action (action)}
 				<li class="flex flex-col gap-2">
 					<p>{t(`cabinet.action.${action}`)}</p>

@@ -20,5 +20,14 @@ export const enCabinetTraining = {
 	'cabinet.training.error.state': 'The request has already been sent or decided. Reload the page.',
 	'cabinet.training.error.blocked': 'Your account is blocked.',
 	'cabinet.training.error.gone': 'This course is no longer available.',
-	'cabinet.training.error.conditions': 'The course conditions are not met.'
+	'cabinet.training.error.conditions': 'The course conditions are not met.',
+	'cabinet.training.allCourses': 'All courses',
+	'cabinet.training.preview':
+		'Preview: you see the portal as members do. The quiz and practice are taken only with a request.',
+	'cabinet.training.noLessons': 'No lessons yet.',
+	'cabinet.training.otherLessons': 'Other lessons',
+	'cabinet.training.withPdf': 'PDF',
+	'cabinet.training.downloadPdf': 'Download PDF',
+	'cabinet.training.backToCourse': 'Back to the course',
+	'cabinet.action.portal': 'Your access to the course “{course}” is open.'
 } as const;

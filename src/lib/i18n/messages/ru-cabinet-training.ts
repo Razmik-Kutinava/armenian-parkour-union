@@ -22,5 +22,14 @@ export const ruCabinetTraining: Partial<Messages> = {
 	'cabinet.training.error.state': 'Заявка уже подана или по ней есть решение. Обновите страницу.',
 	'cabinet.training.error.blocked': 'Ваш аккаунт заблокирован.',
 	'cabinet.training.error.gone': 'Курс больше недоступен.',
-	'cabinet.training.error.conditions': 'Условия курса не выполнены.'
+	'cabinet.training.error.conditions': 'Условия курса не выполнены.',
+	'cabinet.training.allCourses': 'Все курсы',
+	'cabinet.training.preview':
+		'Предпросмотр: вы видите портал так же, как участники. Тест и практику сдают только через заявку.',
+	'cabinet.training.noLessons': 'Уроков пока нет.',
+	'cabinet.training.otherLessons': 'Другие уроки',
+	'cabinet.training.withPdf': 'PDF',
+	'cabinet.training.downloadPdf': 'Скачать PDF',
+	'cabinet.training.backToCourse': 'К курсу',
+	'cabinet.action.portal': 'Доступ к курсу «{course}» открыт.'
 };

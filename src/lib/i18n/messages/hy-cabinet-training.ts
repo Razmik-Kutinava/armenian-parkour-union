@@ -22,5 +22,14 @@ export const hyCabinetTraining: Partial<Messages> = {
 	'cabinet.training.error.state': 'Հայտն արդեն ներկայացված է կամ որոշում կա։ Թարմացրեք էջը։',
 	'cabinet.training.error.blocked': 'Ձեր հաշիվն արգելափակված է։',
 	'cabinet.training.error.gone': 'Դասընթացն այլևս հասանելի չէ։',
-	'cabinet.training.error.conditions': 'Դասընթացի պայմանները չեն կատարված։'
+	'cabinet.training.error.conditions': 'Դասընթացի պայմանները չեն կատարված։',
+	'cabinet.training.allCourses': 'Բոլոր դասընթացները',
+	'cabinet.training.preview':
+		'Նախադիտում․ պորտալը տեսնում եք այնպես, ինչպես մասնակիցները։ Թեստն ու պրակտիկան հանձնում են միայն հայտով։',
+	'cabinet.training.noLessons': 'Դասեր դեռ չկան։',
+	'cabinet.training.otherLessons': 'Այլ դասեր',
+	'cabinet.training.withPdf': 'PDF',
+	'cabinet.training.downloadPdf': 'Ներբեռնել PDF',
+	'cabinet.training.backToCourse': 'Դեպի դասընթաց',
+	'cabinet.action.portal': '«{course}» դասընթացի մուտքը բաց է։'
 };

@@ -1,8 +1,11 @@
-import { and, eq, isNull, or } from 'drizzle-orm';
+import { and, asc, eq, isNull, or } from 'drizzle-orm';
+import type { PortalText } from '#lib/i18n/localized.ts';
 import { isMinor } from '#lib/validation/auth.ts';
 import type { LimitDb } from '../../auth/rate-limit';
 import type { MembershipLevel } from '../../auth/session';
 import { consents } from '../../db/schema/consents';
+import { courses } from '../../db/schema/training';
+import { courseAccess } from '../../db/schema/training-progress';
 import { users } from '../../db/schema/users';
 import { inForce } from '../consents/valid';
 import { getMembershipOverview, type MembershipOverview } from '../memberships/overview';
@@ -23,7 +26,26 @@ export type CabinetOverview = {
 	membership: MembershipOverview;
 	reminder: MembershipReminder;
 	actions: CabinetAction[];
+	/** docs/06 section 5.11: approved, not finished — "open the portal". */
+	portals: { slug: string; title: PortalText }[];
 };
+
+async function openPortals(db: LimitDb, userId: string) {
+	const rows = await db
+		.select({ slug: courses.slug, title: courses.title })
+		.from(courseAccess)
+		.innerJoin(courses, eq(courses.id, courseAccess.courseId))
+		.where(
+			and(
+				eq(courseAccess.userId, userId),
+				eq(courseAccess.status, 'approved'),
+				isNull(courseAccess.examId),
+				eq(courses.status, 'published')
+			)
+		)
+		.orderBy(asc(courses.createdAt));
+	return rows.map((r) => ({ slug: r.slug, title: r.title as PortalText }));
+}
 
 /** docs/03 section 13 p. 2: a minor needs a parental consent in force; one under review is enough here. */
 async function needsParentalConsent(db: LimitDb, userId: string, now: Date) {
@@ -72,5 +94,5 @@ export async function getCabinetOverview(
 	if (birthDate && isMinor(birthDate, now) && (await needsParentalConsent(db, userId, now))) {
 		actions.push('consent_parental');
 	}
-	return { ...own, membership, reminder, actions };
+	return { ...own, membership, reminder, actions, portals: await openPortals(db, userId) };
 }
