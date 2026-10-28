@@ -7,6 +7,8 @@ import { courseAccess, quizAttempts } from '../../db/schema/training-progress';
 import { testDbUrl } from '../../db/test-db';
 import type { Mail } from '../../mail/resend';
 import { reviewPractice } from './practice-review';
+import { submitPractice } from './practice-submit';
+import { setTaskHidden } from './practice-tasks';
 import { insertSubmission, submissionRow, YT } from './practice-test-support';
 import { quizPage } from './quiz-read';
 import { startAttempt } from './quiz-start';
@@ -153,6 +155,28 @@ describe.skipIf(!testDbUrl)('training portal: simultaneous clicks', () => {
 		expect(made).toHaveLength(1);
 		expect(await completions(made.map((e) => e.id))).toHaveLength(1);
 		expect(to(box.sent, user.email)).toHaveLength(3);
+	});
+
+	it('the last task hidden while the member sends a video for it: one exam, the video is refused', async () => {
+		const { course, user, member, tasks } = await db.practice();
+		const [moderator, admin] = await Promise.all([db.staff('moderator'), db.staff('admin')]);
+		await insertSubmission(db.main, tasks[0], member.id, {
+			status: 'approved',
+			reviewedBy: moderator.id,
+			reviewedAt: new Date(Date.now() - 60_000)
+		});
+		const box = mailbox();
+		const [hidden, sent] = await db.race(
+			(tx) => setTaskHidden(tx, admin, course.id, tasks[1], true, reviewDeps(box.send)),
+			(tx) => submitPractice(tx, member, course.slug, tasks[1], YT(2))
+		);
+		expect(hidden).toBe('ok');
+		expect(sent).toEqual({ ok: false, reason: 'finished' });
+		const made = await examsOf(member.id);
+		expect(made).toHaveLength(1);
+		expect(made[0].examinerId).toBe(moderator.id);
+		expect(await completions(made.map((e) => e.id))).toHaveLength(1);
+		expect(to(box.sent, user.email)).toHaveLength(1);
 	});
 
 	it('one video accepted by two moderators at once: one decision, the second is refused', async () => {

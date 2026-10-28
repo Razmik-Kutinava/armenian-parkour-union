@@ -124,7 +124,8 @@ const ACTIONS: Record<keyof typeof DOC04, Record<string, Action>> = {
 		hideQuestion: (tx, a, f) => setQuestionHidden(tx, a, f.course.id, f.questionId, true, IP),
 		createTask: (tx, a, f) => createTask(tx, a, f.course.id, task, IP),
 		updateTask: (tx, a, f) => updateTask(tx, a, f.course.id, f.taskId, task, IP),
-		hideTask: (tx, a, f) => setTaskHidden(tx, a, f.course.id, f.taskId, true, IP),
+		hideTask: (tx, a, f) =>
+			setTaskHidden(tx, a, f.course.id, f.taskId, true, accessDeps(mailbox().send)),
 		importContent: (tx, a, f) =>
 			importCourseContent(tx, a, f.course.slug, content, { dry: true, ip: IP }),
 		decideAccess: (tx, a, f) =>

@@ -4,11 +4,12 @@ import { testDb, testDbUrl } from '../../db/test-db';
 import { getTask, listTasks } from './practice-task-list';
 import { createTask, setTaskHidden, updateTask } from './practice-tasks';
 import { insertSubmission } from './practice-test-support';
-import { applicant, auditOf, insertCourse, IP, staff } from './test-support';
+import { accessDeps, applicant, auditOf, insertCourse, IP, mailbox, staff } from './test-support';
 
 /* docs/05 section 27 "Practice tasks" (admin), docs/04 `training.manage`; decisions —
  * docs/todo.md 9.7 (1). Tasks are never deleted. */
 
+const DEPS = accessDeps(mailbox().send);
 const values = (en: string, sortOrder = 0) => ({
 	title: { en } as PortalText,
 	description: { ru: '<p>Конг через препятствие</p>' },
@@ -66,10 +67,10 @@ describe.skipIf(!testDbUrl)('training: practice tasks in the admin', () => {
 			const courseId = await insertCourse(tx);
 			const task = await createTask(tx, admin, courseId, values('Precision'), IP);
 			if (typeof task === 'string') throw new Error(task);
-			expect(await setTaskHidden(tx, admin, courseId, task.id, true, IP)).toBe('ok');
-			expect(await setTaskHidden(tx, admin, courseId, task.id, true, IP)).toBe('bad_state');
+			expect(await setTaskHidden(tx, admin, courseId, task.id, true, DEPS)).toBe('ok');
+			expect(await setTaskHidden(tx, admin, courseId, task.id, true, DEPS)).toBe('bad_state');
 			expect((await getTask(tx, courseId, task.id))?.hiddenAt).toBeInstanceOf(Date);
-			expect(await setTaskHidden(tx, admin, courseId, task.id, false, IP)).toBe('ok');
+			expect(await setTaskHidden(tx, admin, courseId, task.id, false, DEPS)).toBe('ok');
 			const actions = (await auditOf(tx, 'practice_task', task.id)).map((e) => e.action);
 			expect(actions).toEqual([
 				'practice_task.create',
@@ -98,10 +99,10 @@ describe.skipIf(!testDbUrl)('training: practice tasks in the admin', () => {
 				const actor = await staff(tx, role);
 				expect(await createTask(tx, actor, courseId, values('X'), IP)).toBe('not_allowed');
 				expect(await updateTask(tx, actor, courseId, task.id, values('X'), IP)).toBe('not_allowed');
-				expect(await setTaskHidden(tx, actor, courseId, task.id, true, IP)).toBe('not_allowed');
+				expect(await setTaskHidden(tx, actor, courseId, task.id, true, DEPS)).toBe('not_allowed');
 			}
 			expect(await updateTask(tx, admin, other, task.id, values('X'), IP)).toBe('not_found');
-			expect(await setTaskHidden(tx, admin, other, task.id, true, IP)).toBe('not_found');
+			expect(await setTaskHidden(tx, admin, other, task.id, true, DEPS)).toBe('not_found');
 			expect(await createTask(tx, admin, crypto.randomUUID(), values('X'), IP)).toBe('not_found');
 			expect(await getTask(tx, other, task.id)).toBeNull();
 			expect(await getTask(tx, courseId, 'nope')).toBeNull();

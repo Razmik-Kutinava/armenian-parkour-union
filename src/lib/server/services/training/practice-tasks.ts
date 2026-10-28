@@ -5,6 +5,7 @@ import { roleCan } from '../../auth/permissions';
 import type { LimitDb } from '../../auth/rate-limit';
 import { courses } from '../../db/schema/training';
 import { practiceTasks } from '../../db/schema/training-progress';
+import type { Mail } from '../../mail/resend';
 import { writeAudit } from '../audit';
 import { isUuid, type Actor } from '../users/target';
 
@@ -89,15 +90,23 @@ export async function updateTask(
 	});
 }
 
+export type HideDeps = {
+	send: (mail: Mail) => Promise<void>;
+	siteUrl: string | undefined;
+	ip: string | null;
+	now?: Date;
+};
+
 export async function setTaskHidden(
 	db: LimitDb,
 	actor: Actor,
 	courseId: string,
 	taskId: string,
 	hidden: boolean,
-	ip: string | null
+	deps: HideDeps
 ): Promise<'ok' | 'bad_state' | Refusal> {
 	if (!roleCan(actor.role, 'training.manage')) return 'not_allowed';
+	const { ip } = deps;
 	return db.transaction(async (tx) => {
 		const task = await lockTask(tx, courseId, taskId);
 		if (!task) return 'not_found' as const;
