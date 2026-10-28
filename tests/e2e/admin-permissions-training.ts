@@ -1,6 +1,6 @@
 import type postgres from 'postgres';
 
-/* A course with a topic, a lesson, a question, a practice task and a pending video for
+/* A course with a topic, a lesson, a question, a practice task, a pending video and a failed attempt for
  * admin-permissions.spec.ts: every training action could really run on them. */
 export type TrainingIds = {
 	courseId: string;
@@ -10,11 +10,13 @@ export type TrainingIds = {
 	accessId: string;
 	taskId: string;
 	submissionId: string;
+	attemptId: string;
 };
 
 export const trainingPath = (path: string, ids: TrainingIds) =>
 	path
 		.replace('/training/practice/[id]', `/training/practice/${ids.submissionId}`)
+		.replace('/training/attempts/[id]', `/training/attempts/${ids.attemptId}`)
 		.replace('/training/[id]', `/training/${ids.courseId}`)
 		.replace('/lessons/[lessonId]', `/lessons/${ids.lessonId}`)
 		.replace('/questions/[questionId]', `/questions/${ids.questionId}`)
@@ -45,6 +47,10 @@ export function trainingFixtures(sql: postgres.Sql) {
 					(task_id, user_id, url, platform)
 				values (${task.id}, ${applicant.id}, 'https://www.youtube.com/watch?v=e2ePermVid1',
 					'youtube') returning id`;
+			const [attempt] = await sql`insert into quiz_attempts (course_id, user_id, questions, total,
+					pass_count, correct_count, passed, started_at, expires_at, submitted_at)
+				values (${course.id}, ${applicant.id}, ${sql.json([])}, 1, 1, 0, false,
+					now() - interval '1 hour', now(), now()) returning id`;
 			return {
 				courseId: course.id,
 				topicId: topic.id,
@@ -52,7 +58,8 @@ export function trainingFixtures(sql: postgres.Sql) {
 				questionId: question.id,
 				accessId: access.id,
 				taskId: task.id,
-				submissionId: submission.id
+				submissionId: submission.id,
+				attemptId: attempt.id
 			};
 		},
 		trainingRows: async (ids: TrainingIds) => ({
