@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { CERTIFICATE_DEFAULTS, parseCertificateSettings } from './settings';
 
-/* docs/03 section 4.6, 16: coach and judge certificates are valid 2 years unless the owner sets
+/* docs/03 section 4.6, 16: coach and judge certificates are valid 3 years unless the owner sets
  * `site_settings.certificates.staff_valid_months`; docs/08 section 10: Russian in the PDF — by
  * `pdf_russian` (on by default, questions.md stage 6); letters before the end — 30 and 7 days
  * by `staff_remind_days` (questions.md stage 6, 6.9); the signer under the line — `signer`
@@ -14,9 +14,9 @@ const SIGNER = {
 };
 
 describe('certificates: settings', () => {
-	it('defaults: 24 months, Russian in the PDF, letters 30 and 7 days ahead, no signer', () => {
+	it('defaults: 36 months, Russian in the PDF, letters 30 and 7 days ahead, no signer', () => {
 		expect(CERTIFICATE_DEFAULTS).toEqual({
-			staffValidMonths: 24,
+			staffValidMonths: 36,
 			pdfRussian: true,
 			staffRemindDays: REMIND,
 			signer: null
@@ -47,7 +47,7 @@ describe('certificates: settings', () => {
 
 	it('each broken field falls back on its own', () => {
 		expect(parseCertificateSettings({ staff_valid_months: 0, pdf_russian: false })).toEqual({
-			staffValidMonths: 24,
+			staffValidMonths: 36,
 			pdfRussian: false,
 			staffRemindDays: REMIND,
 			signer: null
