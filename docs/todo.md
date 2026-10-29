@@ -54,6 +54,6 @@
 ## Фазы
 
 - [x] SPEC
-- [ ] RED
-- [ ] GREEN
+- [x] RED
+- [x] GREEN
 - [ ] REVIEW (этапа)
