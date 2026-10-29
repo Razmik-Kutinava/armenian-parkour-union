@@ -30,6 +30,7 @@ describe.skipIf(!testDbUrl)('listPublicStaff', () => {
 			firstName: 'Aram',
 			lastName: `Staff-${tag}`,
 			avatarKey: `avatars/${tag}.webp`,
+			showAvatar: true,
 			phone: '+37499000555',
 			...p.user
 		});
@@ -108,6 +109,26 @@ describe.skipIf(!testDbUrl)('listPublicStaff', () => {
 			expect(find(trainers, consented.name)).toMatchObject({
 				avatarKey: `avatars/${consented.tag}.webp`,
 				bio: `Bio ${consented.tag}`
+			});
+		});
+	});
+
+	/* decisions.md 2026-10-22: no photo in public until the member allows it (`show_avatar`). */
+	it('the photo only with show_avatar, also for a consented minor; the description stays', async () => {
+		await inRollback(async (tx) => {
+			const adult = await person(tx, { user: { showAvatar: false } });
+			const minor = await person(tx, {
+				user: { showAvatar: false, birthDate: bornYearsAgo(16, NOW) }
+			});
+			await insertConsent(tx, minor.id, { kind: 'privacy', status: 'approved' });
+			const { trainers } = await listPublicStaff(tx, 'en', NOW);
+			expect(find(trainers, adult.name)).toMatchObject({
+				avatarKey: null,
+				bio: `Bio ${adult.tag}`
+			});
+			expect(find(trainers, minor.name)).toMatchObject({
+				avatarKey: null,
+				bio: `Bio ${minor.tag}`
 			});
 		});
 	});

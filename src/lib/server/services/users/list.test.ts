@@ -1,6 +1,8 @@
+import { eq } from 'drizzle-orm';
 import { afterAll, describe, expect, it } from 'vitest';
 import { readListState } from '#lib/components/admin/list-state.ts';
 import type { LimitDb } from '../../auth/rate-limit';
+import { users } from '../../db/schema/users';
 import { insertUser, testDb, testDbUrl } from '../../db/test-db';
 import { listUsers, userListOptions } from './list';
 
@@ -24,7 +26,11 @@ describe.skipIf(!testDbUrl)('listUsers (docs/05 section 6, docs/04 sections 4 an
 			adult: await add({ firstName: 'Adult', city: 'Gyumri', phone: '+37491000001' }),
 			minor: await add({ firstName: 'Minor', birthDate: '2015-05-05', level: 'novice' }),
 			editor: await add({ firstName: 'Editor', role: 'editor' }),
-			blocked: await add({ firstName: 'Blocked', status: 'blocked' }),
+			blocked: await add({
+				firstName: 'Blocked',
+				status: 'blocked',
+				deletionRequestedAt: new Date('2026-10-01T10:00:00Z')
+			}),
 			deleted: await add({ firstName: 'Deleted', deletedAt: new Date() })
 		};
 	}
@@ -60,6 +66,20 @@ describe.skipIf(!testDbUrl)('listUsers (docs/05 section 6, docs/04 sections 4 an
 			expect(ids(byEmail.rows)).toEqual([g.adult.id]);
 			const byPhone = await listUsers(tx, asAdmin, state('q=%2B37491000001'), TODAY);
 			expect(ids(byPhone.rows)).toContain(g.adult.id);
+		});
+	});
+
+	it('filter "asked for deletion" (decisions.md 2026-10-22); the deleted one is gone', async () => {
+		await inRollback(async (tx) => {
+			const g = await group(tx);
+			await tx
+				.update(users)
+				.set({ deletionRequestedAt: new Date() })
+				.where(eq(users.id, g.deleted.id));
+			const run = async (filter: string) =>
+				ids((await listUsers(tx, asAdmin, state(`q=${g.tag}&${filter}`), TODAY)).rows);
+			expect(await run('deletion=requested')).toEqual([g.blocked.id]);
+			expect(await run('deletion=other')).toHaveLength(4);
 		});
 	});
 

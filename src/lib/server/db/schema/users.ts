@@ -38,6 +38,11 @@ export const users = pgTable(
 		guardianPhone: text('guardian_phone'),
 		guardianEmail: text('guardian_email'),
 		termsAcceptedAt: timestamp('terms_accepted_at', { withTimezone: true }),
+		/** docs/06 section 5.2 "Privacy": shown publicly only when the member allows it. */
+		showCity: boolean('show_city').notNull().default(false),
+		showAvatar: boolean('show_avatar').notNull().default(false),
+		/** The member asked to delete the account; an admin deletes (soft) or declines. */
+		deletionRequestedAt: timestamp('deletion_requested_at', { withTimezone: true }),
 		deletedAt: timestamp('deleted_at', { withTimezone: true }),
 		createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 		updatedAt: timestamp('updated_at', { withTimezone: true })

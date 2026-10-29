@@ -43,6 +43,16 @@ describe.skipIf(!testDbUrl)('getUserCard (docs/04 section 4)', () => {
 		});
 	});
 
+	it('the date of a deletion request is on the card, none — null', async () => {
+		await inRollback(async (tx) => {
+			const asked = new Date('2026-10-28T10:00:00Z');
+			const u = await insertUser(tx, { deletionRequestedAt: asked });
+			expect((await getUserCard(tx, asAdmin, u.id, TODAY))?.deletionRequestedAt).toEqual(asked);
+			const quiet = await insertUser(tx);
+			expect((await getUserCard(tx, asAdmin, quiet.id, TODAY))?.deletionRequestedAt).toBeNull();
+		});
+	});
+
 	it('moderator cannot open staff accounts (404)', async () => {
 		await inRollback(async (tx) => {
 			for (const role of ['editor', 'moderator', 'admin'] as const) {

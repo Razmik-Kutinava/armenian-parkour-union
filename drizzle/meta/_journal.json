@@ -120,6 +120,13 @@
       "when": 1793090411193,
       "tag": "0016_training",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1793250699630,
+      "tag": "0017_users_privacy_deletion",
+      "breakpoints": true
     }
   ]
 }
