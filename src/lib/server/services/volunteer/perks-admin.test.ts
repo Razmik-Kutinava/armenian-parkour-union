@@ -2,6 +2,7 @@ import { afterAll, describe, expect, it } from 'vitest';
 import type { LimitDb } from '../../auth/rate-limit';
 import { testDb, testDbUrl } from '../../db/test-db';
 import { auditFor } from '../memberships/test-support';
+import type { Actor } from '../users/target';
 import { createPartner } from './partners-admin';
 import { createPerk, getPerk, listPerks, updatePerk } from './perks-admin';
 import { partnerValues, perkValues, staff } from './test-support';
@@ -9,7 +10,7 @@ import { partnerValues, perkValues, staff } from './test-support';
 /* docs/05 section 28 "Perks" tab: title and terms ×3, reusable or single with a limit, dates,
  * status, order; never deleted. docs/03 section 19.9: creation and edits are audited. */
 
-async function newPartner(tx: LimitDb, actor: { id: string; role: 'admin' }) {
+async function newPartner(tx: LimitDb, actor: Actor) {
 	const created = await createPartner(tx, actor, partnerValues(), null);
 	if (typeof created === 'string') throw new Error(created);
 	return created.id;

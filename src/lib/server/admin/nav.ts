@@ -26,6 +26,7 @@ export type AdminIcon =
 	| 'orders'
 	| 'payments'
 	| 'donations'
+	| 'volunteerPartners'
 	| 'settings'
 	| 'audit'
 	| 'roles';
@@ -91,6 +92,10 @@ const sections: [MessageKey, Section[]][] = [
 			section('products', 'products', 'shop.items_write'),
 			section('orders', 'orders', 'shop.orders_manage')
 		]
+	],
+	[
+		'admin.group.volunteer',
+		[section('volunteerPartners', 'volunteer/partners', 'volunteer.manage')]
 	],
 	[
 		'admin.group.money',

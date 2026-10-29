@@ -4,6 +4,7 @@ import { insertUser, testDb, testDbUrl } from '../../db/test-db';
 import { partnerCashiers, volunteerPerks } from '../../db/schema/volunteer-partners';
 import { perkRedemptions, volunteerCards } from '../../db/schema/volunteer-cards';
 import { auditFor } from '../memberships/test-support';
+import type { Actor } from '../users/target';
 import { listPartnersAdmin } from './partner-list';
 import { movePartner } from './partner-order';
 import { createPartner } from './partners-admin';
@@ -14,7 +15,7 @@ import { partnerValues, perkValues, staff } from './test-support';
 
 const DAY = 24 * 60 * 60 * 1000;
 
-async function newPartner(tx: LimitDb, actor: { id: string; role: 'admin' }) {
+async function newPartner(tx: LimitDb, actor: Actor) {
 	const created = await createPartner(tx, actor, partnerValues(), null);
 	if (typeof created === 'string') throw new Error(created);
 	return created.id;

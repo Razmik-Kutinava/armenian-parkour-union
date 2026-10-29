@@ -94,7 +94,13 @@ export const ADMIN_READS = {
 	'/admin/training/practice': 'training.review',
 	'/admin/training/practice/[id]': 'training.review',
 	'/admin/training/attempts': 'training.review',
-	'/admin/training/attempts/[id]': 'training.review'
+	'/admin/training/attempts/[id]': 'training.review',
+	'/admin/volunteer/partners': 'volunteer.manage',
+	'/admin/volunteer/partners/new': 'volunteer.manage',
+	'/admin/volunteer/partners/[id]': 'volunteer.manage',
+	'/admin/volunteer/partners/[id]/perks': 'volunteer.manage',
+	'/admin/volunteer/partners/[id]/perks/new': 'volunteer.manage',
+	'/admin/volunteer/partners/[id]/perks/[perkId]': 'volunteer.manage'
 } as const satisfies Record<string, Access>;
 
 export const ADMIN_WRITES = {
@@ -207,5 +213,10 @@ export const ADMIN_WRITES = {
 	'/admin/training/[id]/tasks?/restore': 'training.manage',
 	'/admin/training/practice/[id]?/approve': 'training.review',
 	'/admin/training/practice/[id]?/reject': 'training.review',
+	'/admin/volunteer/partners?/move': 'volunteer.manage',
+	'/admin/volunteer/partners/new?/default': 'volunteer.manage',
+	'/admin/volunteer/partners/[id]?/update': 'volunteer.manage',
+	'/admin/volunteer/partners/[id]/perks/new?/default': 'volunteer.manage',
+	'/admin/volunteer/partners/[id]/perks/[perkId]?/update': 'volunteer.manage',
 	'POST /admin/locale': 'staff'
 } as const satisfies Record<AdminAction | NotAuditedAction, Access>;

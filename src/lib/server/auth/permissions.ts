@@ -39,7 +39,8 @@ export const permissions = {
 	'audit.read': ['admin'],
 	'training.lessons': ['editor', 'admin'],
 	'training.manage': ['admin'],
-	'training.review': ['moderator', 'admin']
+	'training.review': ['moderator', 'admin'],
+	'volunteer.manage': ['admin']
 } as const satisfies Record<string, readonly UserRole[]>;
 
 export type Permission = keyof typeof permissions;

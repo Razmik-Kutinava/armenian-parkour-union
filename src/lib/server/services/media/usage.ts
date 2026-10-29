@@ -7,6 +7,7 @@ import { shopItems } from '../../db/schema/shop';
 import { courseLessons } from '../../db/schema/training';
 import { practiceTasks } from '../../db/schema/training-progress';
 import { users } from '../../db/schema/users';
+import { volunteerPartners } from '../../db/schema/volunteer-partners';
 
 /*
  * docs/05 section 20: "where a file is used". Every table that stores a media key adds its finder
@@ -22,7 +23,8 @@ export type MediaUsage = {
 		| 'hero'
 		| 'shop_item'
 		| 'course_lesson'
-		| 'practice_task';
+		| 'practice_task'
+		| 'volunteer_partner';
 	id: string;
 	/** A lesson or a practice task opens inside its course. */
 	courseId?: string;
@@ -123,6 +125,15 @@ const taskDescriptions: Finder = async (db, key) => {
 	return rows.map((r) => ({ kind: 'practice_task' as const, id: r.id, courseId: r.courseId }));
 };
 
+/** Archived partners too: they can be published again with their logo. */
+const partnerLogos: Finder = async (db, key) => {
+	const rows = await db
+		.select({ id: volunteerPartners.id })
+		.from(volunteerPartners)
+		.where(eq(volunteerPartners.logoKey, key));
+	return rows.map((r) => ({ kind: 'volunteer_partner' as const, id: r.id }));
+};
+
 const finders: Finder[] = [
 	avatars,
 	pageBodies,
@@ -131,7 +142,8 @@ const finders: Finder[] = [
 	heroBackgrounds,
 	itemPhotosAndDescriptions,
 	lessonBodies,
-	taskDescriptions
+	taskDescriptions,
+	partnerLogos
 ];
 
 export async function findUsages(db: LimitDb, key: string): Promise<MediaUsage[]> {

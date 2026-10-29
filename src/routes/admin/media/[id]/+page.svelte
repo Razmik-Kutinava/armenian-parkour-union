@@ -127,6 +127,12 @@
 									href="/admin/training/{usage.courseId}/tasks/{usage.id}"
 									>{t('media.usage.practice_task')}</a
 								>
+							{:else if usage.kind === 'volunteer_partner'}
+								{#if data.canOpenVolunteer}
+									<a class="text-navy-700 underline" href="/admin/volunteer/partners/{usage.id}"
+										>{t('media.usage.volunteer_partner')}</a
+									>
+								{:else}{t('media.usage.volunteer_partner')}{/if}
 							{:else if data.canOpenUsers}
 								<a class="text-navy-700 underline" href="/admin/users/{usage.id}"
 									>{t(`media.usage.${usage.kind}`)}</a

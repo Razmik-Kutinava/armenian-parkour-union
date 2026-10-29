@@ -12,6 +12,7 @@ import { registrationActions } from './admin-audit-registrations';
 import { shopActions } from './admin-audit-shop';
 import { trainingActions } from './admin-audit-training';
 import { videoActions } from './admin-audit-videos';
+import { volunteerActions } from './admin-audit-volunteer';
 import { paymentSettingsAction } from './payment-settings-form';
 
 const ORIGIN = { origin: 'http://localhost:4173' };
@@ -218,7 +219,8 @@ export async function adminActions(page: Page, sql: postgres.Sql, adminId: strin
 		...shopActions(sql, post, postRedirect, target),
 		...trainingActions(sql, post, postRedirect, raw),
 		...practiceActions(sql, post, postRedirect),
-		...deletionActions(sql, post, postRedirect, target)
+		...deletionActions(sql, post, postRedirect, target),
+		...volunteerActions(sql, post, postRedirect)
 	};
 	return perform;
 }

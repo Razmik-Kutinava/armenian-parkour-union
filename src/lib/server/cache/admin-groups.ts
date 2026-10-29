@@ -30,6 +30,8 @@ const BY_SECTION: Record<string, CacheGroup[]> = {
 	orders: ['shop'],
 	/* the portal is behind a sign-in and not cached (9.2) */
 	training: [],
+	/* the check page, the card PDF and the cabinet are not cached (10.2) */
+	volunteer: [],
 	media: ALL_GROUPS,
 	audit: [],
 	roles: [],

@@ -10,6 +10,7 @@ import FileText from '@lucide/svelte/icons/file-text';
 import GalleryHorizontal from '@lucide/svelte/icons/gallery-horizontal';
 import GraduationCap from '@lucide/svelte/icons/graduation-cap';
 import HandHeart from '@lucide/svelte/icons/hand-heart';
+import Handshake from '@lucide/svelte/icons/handshake';
 import IdCard from '@lucide/svelte/icons/id-card';
 import Image from '@lucide/svelte/icons/image';
 import LayoutDashboard from '@lucide/svelte/icons/layout-dashboard';
@@ -51,6 +52,7 @@ export const navIcons: Record<AdminIcon, LucideIcon> = {
 	orders: Package,
 	payments: CreditCard,
 	donations: HandHeart,
+	volunteerPartners: Handshake,
 	settings: Settings,
 	audit: ScrollText,
 	roles: ShieldCheck

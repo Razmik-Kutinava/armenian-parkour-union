@@ -62,18 +62,18 @@ describe('volunteer perk form', () => {
 	const base = { title: { en: '10% off' }, kind: 'reusable', status: 'draft' };
 
 	it('reusable: no limit kept even if typed; empty dates and terms are null; order 0', () => {
-		expect(perkFormSchema.parse({ ...base, usesLimit: '3', validFrom: '', validUntil: '' })).toEqual(
-			{
-				title: { en: '10% off' },
-				terms: null,
-				kind: 'reusable',
-				usesLimit: null,
-				validFrom: null,
-				validUntil: null,
-				status: 'draft',
-				sortOrder: 0
-			}
-		);
+		expect(
+			perkFormSchema.parse({ ...base, usesLimit: '3', validFrom: '', validUntil: '' })
+		).toEqual({
+			title: { en: '10% off' },
+			terms: null,
+			kind: 'reusable',
+			usesLimit: null,
+			validFrom: null,
+			validUntil: null,
+			status: 'draft',
+			sortOrder: 0
+		});
 	});
 
 	it('single: limit 1…100 required; terms ×3; a date range', () => {

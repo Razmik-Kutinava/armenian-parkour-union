@@ -110,7 +110,12 @@ export const ADMIN_AUDIT = {
 	'/admin/training/[id]/tasks?/hide': ['practice_task.hide'],
 	'/admin/training/[id]/tasks?/restore': ['practice_task.restore'],
 	'/admin/training/practice/[id]?/approve': ['practice_submission.approve'],
-	'/admin/training/practice/[id]?/reject': ['practice_submission.reject']
+	'/admin/training/practice/[id]?/reject': ['practice_submission.reject'],
+	'/admin/volunteer/partners?/move': ['volunteer_partner.reorder'],
+	'/admin/volunteer/partners/new?/default': ['volunteer_partner.create'],
+	'/admin/volunteer/partners/[id]?/update': ['volunteer_partner.update'],
+	'/admin/volunteer/partners/[id]/perks/new?/default': ['volunteer_perk.create'],
+	'/admin/volunteer/partners/[id]/perks/[perkId]?/update': ['volunteer_perk.update']
 } as const;
 
 export type AdminAction = keyof typeof ADMIN_AUDIT;

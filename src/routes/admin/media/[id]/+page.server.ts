@@ -17,7 +17,8 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 	return {
 		file: { ...file, url: publicUrl(file.key) },
 		usages: await findUsages(db, file.key),
-		canOpenUsers: can(viewer, 'users.read_limited')
+		canOpenUsers: can(viewer, 'users.read_limited'),
+		canOpenVolunteer: can(viewer, 'volunteer.manage')
 	};
 };
 

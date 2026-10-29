@@ -36,6 +36,7 @@ import { hyUsers } from './hy-users';
 import { hyShop } from './hy-shop';
 import { hyShopAdmin } from './hy-shop-admin';
 import { hyTrainingAdmin } from './hy-training-admin';
+import { hyVolunteerAdmin } from './hy-volunteer-admin';
 import { hyVideosAdmin } from './hy-videos-admin';
 
 export const hy: Partial<Messages> = {
@@ -68,6 +69,7 @@ export const hy: Partial<Messages> = {
 	...hyDashboard,
 	...hyShopAdmin,
 	...hyTrainingAdmin,
+	...hyVolunteerAdmin,
 	...hyShop,
 	...hyConsents,
 	...hyRegistrations,
