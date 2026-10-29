@@ -16,7 +16,8 @@
 - `src/lib/server/db/schema/index.ts` — экспорт трёх файлов
 - `drizzle/0018_volunteer.sql` + `drizzle/meta` — `db:generate`, руками дописан триггер append-only
 - `scripts/rollback/0018_down.sql`
-- `src/lib/server/db/volunteer-schema.test.ts` — RED
+- `src/lib/server/db/volunteer-cards-schema.test.ts`, `volunteer-requests-schema.test.ts` — RED (два файла из-за лимита длины)
+- `src/lib/validation/admin-points.ts` + `i18n/messages/{en,ru,hy}-points-admin.ts` — две новые причины в фильтре баллов (тест сверяет список с enum)
 
 ## Не ломать
 
@@ -74,7 +75,7 @@
 ## Фазы
 
 - [x] SPEC
-- [ ] «go» на миграцию
-- [ ] RED
-- [ ] GREEN
+- [x] «go» на миграцию (владелец 2026-10-29)
+- [x] RED — `7e428b4`, 8/8 падают на отсутствии таблиц и значений enum
+- [x] GREEN — 0018 на dev; тесты задачи и зоны 25/25, check 0
 - [ ] REVIEW (этапа)

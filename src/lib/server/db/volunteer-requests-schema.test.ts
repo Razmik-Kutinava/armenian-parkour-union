@@ -23,7 +23,11 @@ describe.skipIf(!url)('volunteer requests schema (migration 0018)', () => {
 			});
 	}
 
-	async function expectCode(tx: postgres.TransactionSql, code: string, query: () => Promise<unknown>) {
+	async function expectCode(
+		tx: postgres.TransactionSql,
+		code: string,
+		query: () => Promise<unknown>
+	) {
 		const error = await tx.savepoint(() => query()).catch((e: unknown) => e);
 		expect((error as postgres.PostgresError).code).toBe(code);
 	}
@@ -58,11 +62,7 @@ describe.skipIf(!url)('volunteer requests schema (migration 0018)', () => {
 			const row = await request(tx, { respond_by: hours(10), ends_at: hours(10) });
 			expect(row).toMatchObject({ status: 'draft', event_id: null, published_at: null });
 			for (const key of ['created_at', 'updated_at']) expect(row[key]).toBeInstanceOf(Date);
-			for (const values of [
-				{ ends_at: hours(9) },
-				{ places: 0 },
-				{ respond_by: hours(11) }
-			]) {
+			for (const values of [{ ends_at: hours(9) }, { places: 0 }, { respond_by: hours(11) }]) {
 				await expectCode(tx, '23514', () => request(tx, values));
 			}
 			await expectCode(tx, '23502', () => request(tx, { places: null }));

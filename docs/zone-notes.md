@@ -6,7 +6,14 @@
 
 ## Оглавление
 
-Обучающий портал (этап 9) · Видео и магазин (этап 7) · Экзамены и сертификаты (этап 6) · Регистрации и события (этап 5) · Согласия и приватные файлы · Баллы · Платежи · Кабинет · Контент и админка · Деплой и прод
+Волонтёрство (этап 10) · Обучающий портал (этап 9) · Видео и магазин (этап 7) · Экзамены и сертификаты (этап 6) · Регистрации и события (этап 5) · Согласия и приватные файлы · Баллы · Платежи · Кабинет · Контент и админка · Деплой и прод
+
+## Волонтёрство (этап 10)
+
+- Схема (10.1, миграция 0018): `schema/volunteer-partners.ts` (партнёры, плюшки, кассиры), `volunteer-cards.ts` (книжки, `perk_redemptions`), `volunteer-requests.ts` (запросы, приглашения, отчёты). Откат — `scripts/rollback/0018_down.sql`; значения `points_reason` откатом не удаляются.
+- `perk_redemptions` — append-only (триггер, `23001`): отмена — только новой строкой с `reversal_of_id`, `comment`, `created_by` и без `cashier_id`; у отметки кассира — наоборот (check `perk_redemptions_kind`). Одна обратная запись на отметку — unique `reversal_of_id`.
+- `volunteer_cards.applied_at` без default — сервис ставит при каждой подаче. `number` и `public_token` в базе не обязательны при `active` — выдача (10.3) заполняет их сама.
+- Баллы (10.9–10.10): `reason` `volunteer_participation` с `source_type = 'volunteer_invitation'`, `volunteer_report` с `source_type = 'volunteer_report'`; повтор по источнику ловит `points_ledger_source_once_key`. Правила баллов и ключ `site_settings.volunteer` — в seed, ещё не добавлены.
 
 ## Обучающий портал (этап 9)
 

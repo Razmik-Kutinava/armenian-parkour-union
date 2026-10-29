@@ -36,7 +36,9 @@ export const pointsReason = pgEnum('points_reason', [
 	'manual',
 	'shop_order',
 	'shop_refund',
-	'reversal'
+	'reversal',
+	'volunteer_participation',
+	'volunteer_report'
 ]);
 export const registrationStatus = pgEnum('registration_status', [
 	'registered',
@@ -73,3 +75,25 @@ export const trainingAccessStatus = pgEnum('training_access_status', [
 	'revoked'
 ]);
 export const practiceStatus = pgEnum('practice_status', ['pending', 'approved', 'rejected']);
+export const volunteerCardStatus = pgEnum('volunteer_card_status', [
+	'pending',
+	'active',
+	'rejected',
+	'revoked'
+]);
+export const perkKind = pgEnum('perk_kind', ['reusable', 'single']);
+export const volunteerRequestStatus = pgEnum('volunteer_request_status', [
+	'draft',
+	'open',
+	'finished',
+	'cancelled'
+]);
+export const volunteerAnswer = pgEnum('volunteer_answer', [
+	'invited',
+	'accepted',
+	'declined',
+	'expired',
+	'excused',
+	'attended',
+	'no_show'
+]);

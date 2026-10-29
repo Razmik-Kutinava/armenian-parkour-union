@@ -13,7 +13,9 @@ export const POINTS_REASONS = [
 	'manual',
 	'shop_order',
 	'shop_refund',
-	'reversal'
+	'reversal',
+	'volunteer_participation',
+	'volunteer_report'
 ] as const;
 export type PointsReason = (typeof POINTS_REASONS)[number];
 

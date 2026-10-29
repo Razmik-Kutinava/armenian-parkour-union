@@ -21,6 +21,8 @@ export const ruPointsAdmin: Partial<Messages> = {
 	'points.reason.shop_order': 'Заказ в магазине',
 	'points.reason.shop_refund': 'Возврат заказа',
 	'points.reason.reversal': 'Отмена',
+	'points.reason.volunteer_participation': 'Волонтёрство',
+	'points.reason.volunteer_report': 'Фотоотчёт волонтёра',
 	'points.filter.from': 'С',
 	'points.filter.to': 'По',
 	'points.filter.manual': 'Ручные операции',

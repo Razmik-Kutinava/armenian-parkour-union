@@ -23,7 +23,11 @@ describe.skipIf(!url)('volunteer cards schema (migration 0018)', () => {
 			});
 	}
 
-	async function expectCode(tx: postgres.TransactionSql, code: string, query: () => Promise<unknown>) {
+	async function expectCode(
+		tx: postgres.TransactionSql,
+		code: string,
+		query: () => Promise<unknown>
+	) {
 		const error = await tx.savepoint(() => query()).catch((e: unknown) => e);
 		expect((error as postgres.PostgresError).code).toBe(code);
 		return error as postgres.PostgresError;
@@ -56,7 +60,11 @@ describe.skipIf(!url)('volunteer cards schema (migration 0018)', () => {
 			for (const key of ['created_at', 'updated_at']) expect(p[key]).toBeInstanceOf(Date);
 			await expectCode(tx, '23502', () => partner(tx, { name: null }));
 			await expectCode(tx, '22P02', () => partner(tx, { status: 'hidden' }));
-			expect(await perk(tx, p.id)).toMatchObject({ status: 'draft', uses_limit: null, terms: null });
+			expect(await perk(tx, p.id)).toMatchObject({
+				status: 'draft',
+				uses_limit: null,
+				terms: null
+			});
 			await perk(tx, p.id, { kind: 'single', uses_limit: 1, valid_from: '2026-11-01' });
 			await perk(tx, p.id, { valid_from: '2026-11-01', valid_until: '2026-11-01' });
 			for (const values of [
@@ -113,7 +121,11 @@ describe.skipIf(!url)('volunteer cards schema (migration 0018)', () => {
 	it('redemptions: a mark by a cashier, a reversal by an admin once, nothing else', async () => {
 		await inRollback(async (tx) => {
 			const [p, admin, u] = [await partner(tx), await newUser(tx), await newUser(tx)];
-			const [pk, c, cs] = [await perk(tx, p.id), await card(tx, u.id), await cashier(tx, p.id, admin.id)];
+			const [pk, c, cs] = [
+				await perk(tx, p.id),
+				await card(tx, u.id),
+				await cashier(tx, p.id, admin.id)
+			];
 			const base = { card_id: c.id, perk_id: pk.id, partner_id: p.id };
 			const redeem = (values: Record<string, unknown>) =>
 				insert(tx, 'perk_redemptions', { ...base, ...values });

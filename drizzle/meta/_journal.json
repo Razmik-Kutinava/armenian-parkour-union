@@ -127,6 +127,13 @@
       "when": 1793250699630,
       "tag": "0017_users_privacy_deletion",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1793262725063,
+      "tag": "0018_volunteer",
+      "breakpoints": true
     }
   ]
 }

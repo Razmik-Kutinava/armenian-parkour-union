@@ -20,6 +20,8 @@ export const hyPointsAdmin: Partial<Messages> = {
 	'points.reason.shop_order': 'Պատվեր խանութում',
 	'points.reason.shop_refund': 'Վերադարձ խանութից',
 	'points.reason.reversal': 'Չեղարկում',
+	'points.reason.volunteer_participation': 'Կամավորություն',
+	'points.reason.volunteer_report': 'Կամավորի ֆոտոհաշվետվություն',
 	'points.filter.from': 'Սկսած',
 	'points.filter.to': 'Մինչև',
 	'points.filter.manual': 'Ձեռքով գործողություններ',

@@ -19,6 +19,8 @@ export const enPointsAdmin = {
 	'points.reason.shop_order': 'Shop order',
 	'points.reason.shop_refund': 'Shop refund',
 	'points.reason.reversal': 'Reversal',
+	'points.reason.volunteer_participation': 'Volunteering',
+	'points.reason.volunteer_report': 'Volunteer report',
 	'points.filter.from': 'From',
 	'points.filter.to': 'To',
 	'points.filter.manual': 'Manual operations',
