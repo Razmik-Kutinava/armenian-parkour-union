@@ -4,6 +4,7 @@ import p2Large from '#lib/assets/placeholders/parkour-2-1600.webp';
 import p2Small from '#lib/assets/placeholders/parkour-2-800.webp';
 import p3Large from '#lib/assets/placeholders/parkour-3-1600.webp';
 import p3Small from '#lib/assets/placeholders/parkour-3-800.webp';
+import { mediaPhoto } from './media-photo';
 
 /*
  * Temporary stand-in photos (CC0, lib/assets/placeholders/CREDITS.txt) until the federation uploads
@@ -26,6 +27,6 @@ export function placeholderPhoto(key: string): Photo {
 	return PHOTOS[hash % PHOTOS.length];
 }
 
-/** The picture chosen in the admin panel as it is, or the stand-in for the key. */
+/** The picture chosen in the admin panel in several sizes, or the stand-in for the key. */
 export const coverOrPlaceholder = (url: string | null | undefined, key: string): Partial<Photo> =>
-	url ? { src: url } : placeholderPhoto(key);
+	url ? mediaPhoto(url) : placeholderPhoto(key);

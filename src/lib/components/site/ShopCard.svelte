@@ -2,6 +2,8 @@
 	import { currentLocale, t } from '#lib/i18n/index.svelte.ts';
 	import { localizePath } from '#lib/i18n/locales.ts';
 	import type { ShopCardView } from '#lib/server/services/shop/view.ts';
+	import { mediaPhoto } from './media-photo';
+	import { CARD_SIZES } from './placeholder-photo';
 
 	/* docs/06 section 4.7: photo, title, price in points, "out of stock". */
 	let { item, eager = false }: { item: ShopCardView; eager?: boolean } = $props();
@@ -11,7 +13,8 @@
 	<div class="flex aspect-square items-center justify-center bg-navy-100">
 		{#if item.imageUrl}
 			<img
-				src={item.imageUrl}
+				{...mediaPhoto(item.imageUrl)}
+				sizes={CARD_SIZES}
 				alt={item.imageAlt}
 				loading={eager ? 'eager' : 'lazy'}
 				width="800"

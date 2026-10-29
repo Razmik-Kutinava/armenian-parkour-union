@@ -3,6 +3,7 @@
 	import { localizePath } from '#lib/i18n/locales.ts';
 	import type { HeroSlideView } from '#lib/server/services/hero/view.ts';
 	import { eventDates } from '../event-date';
+	import { mediaThumb } from '../media-photo';
 	import { coverOrPlaceholder } from '../placeholder-photo';
 	import HeroVideo from './HeroVideo.svelte';
 
@@ -61,7 +62,7 @@
 				<p class="flex items-center gap-3 font-bold text-accent-500">
 					{#if slide.person.avatarUrl}
 						<img
-							src={slide.person.avatarUrl}
+							src={mediaThumb(slide.person.avatarUrl, 160)}
 							alt=""
 							width="56"
 							height="56"

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { mediaPhoto, mediaThumb } from '#lib/components/site/media-photo.ts';
 	import { t } from '#lib/i18n/index.svelte.ts';
 
 	/* docs/06 section 4.7: the photos in the editor's order; thumbnails switch the big one. */
@@ -13,7 +14,8 @@
 	>
 		{#if current}
 			<img
-				src={current.url}
+				{...mediaPhoto(current.url)}
+				sizes="(min-width: 64rem) 30rem, (min-width: 48rem) 50vw, 100vw"
 				alt={current.alt}
 				width="800"
 				height="800"
@@ -36,7 +38,13 @@
 						aria-pressed={i === shown}
 						onclick={() => (shown = i)}
 					>
-						<img src={image.url} alt="" width="64" height="64" class="size-full object-cover" />
+						<img
+							src={mediaThumb(image.url, 160)}
+							alt=""
+							width="64"
+							height="64"
+							class="size-full object-cover"
+						/>
 					</button>
 				</li>
 			{/each}

@@ -8,6 +8,7 @@
 	import { ageLabel } from './event-age';
 	import { eventDates } from './event-date';
 	import { mapLink } from './event-map';
+	import { mediaPhoto } from './media-photo';
 
 	/* docs/06 section 4.3: cover, title, dates, place and map, description, price, categories,
 	 * registration block (the site page passes it; the admin preview has none), share. HTML was
@@ -43,7 +44,8 @@
 	<h1 class="text-3xl font-bold text-ink-900 sm:text-4xl">{event.title}</h1>
 	{#if event.coverUrl}
 		<img
-			src={event.coverUrl}
+			{...mediaPhoto(event.coverUrl)}
+			sizes="(min-width: 64rem) 64rem, 100vw"
 			alt={event.coverAlt}
 			width="1280"
 			height="720"

@@ -4,6 +4,7 @@
 	import type { PublicPost } from '#lib/server/services/posts/public.ts';
 	import type { CardView } from '#lib/server/services/posts/view.ts';
 	import NewsCard from './NewsCard.svelte';
+	import { mediaPhoto } from './media-photo';
 	import ShareButton from './ShareButton.svelte';
 	import { newsDate } from './news-date';
 
@@ -28,7 +29,8 @@
 	</header>
 	{#if post.coverUrl}
 		<img
-			src={post.coverUrl}
+			{...mediaPhoto(post.coverUrl)}
+			sizes="(min-width: 48rem) 48rem, 100vw"
 			alt={post.coverAlt}
 			width="1200"
 			height="630"
