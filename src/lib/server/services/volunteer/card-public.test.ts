@@ -123,7 +123,10 @@ describe.skipIf(!testDbUrl)('volunteer card check page', () => {
 
 			await tx.update(users).set({ status: 'blocked' }).where(eq(users.id, userId));
 			expect(await findPublicCard(tx, token)).toEqual(notValid(row.number));
-			await tx.update(users).set({ status: 'active', deletedAt: new Date() }).where(eq(users.id, userId));
+			await tx
+				.update(users)
+				.set({ status: 'active', deletedAt: new Date() })
+				.where(eq(users.id, userId));
 			expect(await findPublicCard(tx, token)).toEqual(notValid(row.number));
 			await tx.update(users).set({ deletedAt: null }).where(eq(users.id, userId));
 			expect((await findPublicCard(tx, token))?.valid).toBe(true);

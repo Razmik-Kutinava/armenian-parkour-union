@@ -14,6 +14,7 @@
 - `src/routes/[[lang=lang]]/(site)/volunteer/[token]/+page.svelte` — ✅ / ❌, фото, имя, номер, «действительна до», партнёры (логотип, плюшка, условия), `<meta name="robots" content="noindex">`
 - `src/lib/i18n/messages/{en,hy,ru}-volunteer-cards.ts` — ключи `volunteerCards.check.*` (~8; файлы 105–107 строк → ≤ 116)
 - `tests/e2e/volunteer-check.spec.ts` (новый) — действительная, отозванная, неизвестный токен, заголовки
+- `src/lib/seo/robots.ts` (+ test) — `Disallow: /volunteer` на каждом языке (`06` § 7.2; `/partner` — с 10.6)
 
 ## Решения агента (в пределах документов)
 
@@ -50,6 +51,6 @@
 ## Фазы
 
 - [x] SPEC
-- [ ] RED
-- [ ] GREEN
+- [x] RED `4fa0310`
+- [x] GREEN
 - [ ] REVIEW (этапа)

@@ -3,7 +3,7 @@ import { localizePath, locales } from '#lib/i18n/locales.ts';
 /* docs/06 section 7.2. Sign-in pages stay crawlable: they carry noindex, which a closed page hides. */
 
 const UNPREFIXED = ['/admin', '/api'];
-const PER_LANGUAGE = ['/cabinet', '/certificate'];
+const PER_LANGUAGE = ['/cabinet', '/certificate', '/volunteer'];
 
 export function renderRobots(siteUrl: string): string {
 	const closed = [
