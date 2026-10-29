@@ -7,7 +7,14 @@ import { testDb, testDbUrl } from '../../db/test-db';
 import { applyForCard } from './card-apply';
 import { decideCard, type CardDecisionInput } from './card-decision';
 import { cardDetail, cardFilter, cardListOptions, listCards } from './cards-admin';
-import { cardDeps as deps, cardRow, insertPrivacy, mailbox, staff, volunteer } from './test-support';
+import {
+	cardDeps as deps,
+	cardRow,
+	insertPrivacy,
+	mailbox,
+	staff,
+	volunteer
+} from './test-support';
 
 /* docs/05 section 28 "Cards": the queue (pending, oldest first), filters by status, flag and
  * validity, search by name, number and email; the card for the decision. */
@@ -34,7 +41,10 @@ describe.skipIf(!testDbUrl)('volunteer cards in the admin panel', () => {
 			flagged: true,
 			valid: 'no'
 		});
-		expect(filterOf('status=revoked&valid=maybe')).toMatchObject({ status: 'revoked', valid: null });
+		expect(filterOf('status=revoked&valid=maybe')).toMatchObject({
+			status: 'revoked',
+			valid: null
+		});
 	});
 
 	it('the queue: pending only, oldest first; search by name, number and email', async () => {
@@ -82,9 +92,17 @@ describe.skipIf(!testDbUrl)('volunteer cards in the admin panel', () => {
 			expect(byId.get(kidCard.id)?.validity).toEqual({ valid: false, reasons: ['privacy'] });
 			expect(byId.get(kidCard.id)?.age).toBeLessThan(18);
 			expect(byId.get(gone.id)?.validity).toEqual({ valid: false, reasons: ['status'] });
-			const yes = await listCards(tx, { ...filterOf('status=all&valid=yes'), q: `Vol ${tag}` }, later);
+			const yes = await listCards(
+				tx,
+				{ ...filterOf('status=all&valid=yes'), q: `Vol ${tag}` },
+				later
+			);
 			expect(yes.rows.map((r) => r.id)).toEqual([good.id]);
-			const no = await listCards(tx, { ...filterOf('status=all&valid=no'), q: `Vol ${tag}` }, later);
+			const no = await listCards(
+				tx,
+				{ ...filterOf('status=all&valid=no'), q: `Vol ${tag}` },
+				later
+			);
 			expect(no.rows.map((r) => r.id).sort()).toEqual([kidCard.id, gone.id].sort());
 		});
 	});

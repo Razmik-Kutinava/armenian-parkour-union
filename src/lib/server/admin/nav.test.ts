@@ -56,10 +56,11 @@ describe('adminNav', () => {
 
 	it('admin: every section, system group last', () => {
 		const all = hrefs('admin');
-		expect(all).toHaveLength(27);
+		expect(all).toHaveLength(28);
 		expect(all).toContain('/admin/training/access');
 		expect(all).toContain('/admin/training/practice');
 		expect(all).toContain('/admin/training/attempts');
+		expect(all).toContain('/admin/volunteer/cards');
 		expect(all).toContain('/admin/volunteer/partners');
 		expect(all.slice(-3)).toEqual(['/admin/settings', '/admin/audit', '/admin/roles']);
 		expect(groups('admin')).toEqual([

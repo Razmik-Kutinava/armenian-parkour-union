@@ -33,7 +33,10 @@ describe.skipIf(!testDbUrl)('volunteer card: issue, reject, revoke', () => {
 				ok: true
 			});
 			const row = await cardRow(tx, id);
-			const year = new Date().toLocaleString('en-US', { year: 'numeric', timeZone: 'Asia/Yerevan' });
+			const year = new Date().toLocaleString('en-US', {
+				year: 'numeric',
+				timeZone: 'Asia/Yerevan'
+			});
 			expect(row).toMatchObject({ status: 'active', reviewedBy: admin.id, reviewNote: null });
 			expect(row.number).toMatch(NUMBER);
 			expect(row.number?.slice(6, 10)).toBe(year);
@@ -98,9 +101,13 @@ describe.skipIf(!testDbUrl)('volunteer card: issue, reject, revoke', () => {
 			const admin = await staff(tx);
 			const { user, id } = await pending(tx);
 			const mail = mailbox();
-			const decide = (input: CardDecisionInput) => decideCard(tx, admin, id, input, deps(mail.send));
+			const decide = (input: CardDecisionInput) =>
+				decideCard(tx, admin, id, input, deps(mail.send));
 			for (const reason of ['', '   ', 'x'.repeat(1001)]) {
-				expect(await decide({ action: 'reject', reason })).toEqual({ ok: false, reason: 'invalid' });
+				expect(await decide({ action: 'reject', reason })).toEqual({
+					ok: false,
+					reason: 'invalid'
+				});
 			}
 			expect(await decide({ action: 'reject', reason: ' Нужно фото без очков ' })).toEqual({
 				ok: true
@@ -160,12 +167,16 @@ describe.skipIf(!testDbUrl)('volunteer card: issue, reject, revoke', () => {
 			const admin = await staff(tx);
 			const notFound = { ok: false, reason: 'not_found' };
 			const send = mailbox(true).send;
-			expect(await decideCard(tx, admin, crypto.randomUUID(), { action: 'issue' }, deps(send))).toEqual(
+			expect(
+				await decideCard(tx, admin, crypto.randomUUID(), { action: 'issue' }, deps(send))
+			).toEqual(notFound);
+			expect(await decideCard(tx, admin, 'nope', { action: 'issue' }, deps(send))).toEqual(
 				notFound
 			);
-			expect(await decideCard(tx, admin, 'nope', { action: 'issue' }, deps(send))).toEqual(notFound);
 			expect((await cardRow(tx, id)).status).toBe('pending');
-			expect(await decideCard(tx, admin, id, { action: 'issue' }, deps(send))).toEqual({ ok: true });
+			expect(await decideCard(tx, admin, id, { action: 'issue' }, deps(send))).toEqual({
+				ok: true
+			});
 			expect((await cardRow(tx, id)).status).toBe('active');
 		});
 	});

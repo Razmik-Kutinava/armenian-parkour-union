@@ -15,6 +15,7 @@
 		['cabinet.nav.points', '/cabinet/points'],
 		['cabinet.nav.videos', '/cabinet/videos'],
 		['cabinet.nav.training', '/cabinet/training'],
+		['cabinet.nav.volunteer', '/cabinet/volunteer'],
 		['cabinet.nav.orders', '/cabinet/orders'],
 		['cabinet.nav.payments', '/cabinet/payments'],
 		['cabinet.nav.documents', '/cabinet/documents']
