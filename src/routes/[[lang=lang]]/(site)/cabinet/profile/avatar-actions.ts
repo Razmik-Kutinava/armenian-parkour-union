@@ -1,6 +1,7 @@
 import { error, fail, type RequestEvent } from '@sveltejs/kit';
 import type { MessageKey } from '#lib/i18n/translate.ts';
 import { requireUser } from '#lib/server/auth/guard.ts';
+import { publicCache } from '#lib/server/cache/index.ts';
 import { db } from '#lib/server/db/index.ts';
 import {
 	completeAvatarUpload,
@@ -53,6 +54,7 @@ export const avatarActions = {
 			const result = await completeAvatarUpload(db, r2, user.id, key);
 			if (result === 'not_found') error(404);
 			if (result !== 'ok') return refuse(400, refusals[result]);
+			publicCache.invalidate(['hero', 'staff']);
 			return { avatar: { message: 'cabinet.avatar.saved' as MessageKey } };
 		});
 	},
@@ -61,6 +63,8 @@ export const avatarActions = {
 		const user = requireUser(locals.user);
 		return withStorage(async () => {
 			if ((await removeAvatar(db, r2, user.id)) === 'not_found') error(404);
+			/* a public hero person or team card may show it (show_avatar) */
+			publicCache.invalidate(['hero', 'staff']);
 			return { avatar: { message: 'cabinet.avatar.removed' as MessageKey } };
 		});
 	}

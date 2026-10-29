@@ -1,5 +1,6 @@
 import { error, type RequestEvent } from '@sveltejs/kit';
 import { requireUser } from '#lib/server/auth/guard.ts';
+import { publicCache } from '#lib/server/cache/index.ts';
 import { db } from '#lib/server/db/index.ts';
 import { cancelOwnDeletion, requestOwnDeletion } from '#lib/server/services/cabinet/deletion.ts';
 import { updateOwnPrivacy } from '#lib/server/services/cabinet/privacy.ts';
@@ -13,6 +14,8 @@ export const privacyActions = {
 		const form = await request.formData();
 		const privacy = { showCity: form.has('showCity'), showAvatar: form.has('showAvatar') };
 		if ((await updateOwnPrivacy(db, user.id, privacy)) === 'not_found') error(404);
+		/* a hero person or a team card may show the photo: a withdrawn consent applies at once */
+		publicCache.invalidate(['hero', 'staff']);
 		return { privacy: { saved: true } };
 	},
 
