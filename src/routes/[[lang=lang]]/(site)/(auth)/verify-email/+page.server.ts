@@ -7,5 +7,6 @@ export const load: PageServerLoad = async ({ url, locals }) => {
 	const token = url.searchParams.get('token');
 	const result = token ? await verifyEmail(token) : 'invalid';
 	if (result === 'invalid') error(400, translate(locals.locale, 'auth.linkInvalid'));
-	return {};
+	/* The layout read the viewer before this load verified the email. */
+	return { emailJustVerified: true };
 };

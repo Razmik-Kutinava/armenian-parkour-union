@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { page } from '$app/state';
 	import SiteFooter from '#lib/components/site/SiteFooter.svelte';
 	import SiteHeader from '#lib/components/site/SiteHeader.svelte';
 	import StatusBanner from '#lib/components/site/StatusBanner.svelte';
@@ -19,7 +20,10 @@
 	<SiteHeader viewer={data.viewer} siteName={data.footer.siteName} />
 	<main id="content" class="flex-1" tabindex="-1">
 		{#if data.viewer}
-			<StatusBanner emailVerified={data.viewer.emailVerified} reminder={data.viewer.reminder} />
+			<StatusBanner
+				emailVerified={data.viewer.emailVerified || page.data.emailJustVerified === true}
+				reminder={data.viewer.reminder}
+			/>
 		{/if}
 		{@render children()}
 	</main>

@@ -39,6 +39,7 @@ export function journeyActors(sql: postgres.Sql) {
 		const res = await page.goto(`/verify-email?token=${verificationToken(person.email)}`);
 		expect(res?.status()).toBe(200);
 		await expect(page.getByText('Email confirmed. Thank you!')).toBeVisible();
+		await expect(page.getByText('Confirm your email to pay the fee')).toHaveCount(0);
 	}
 
 	return {

@@ -51,6 +51,12 @@ for (const path of ['/login', '/register']) {
 	});
 }
 
+test('a POST to /google without a form body is not a server error', async ({ request }) => {
+	const res = await request.post('/google', { maxRedirects: 0 });
+	expect(res.status()).toBe(303);
+	expect(res.headers().location).toMatch(/^https:\/\/accounts\.google\.com\//);
+});
+
 test('broken Google callback ends on the login page with a message', async ({ page }) => {
 	await page.goto('/api/auth/callback/google?code=x');
 	await expect(page).toHaveURL(/\/login\?error=/);

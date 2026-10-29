@@ -12,7 +12,8 @@ export const POST: RequestHandler = async (event) => {
 	const cabinet = cabinetPath(locale);
 	if (event.locals.user) redirect(303, cabinet);
 
-	const form = await event.request.formData();
+	/* A bot's POST without a form body must not become a 500 in Sentry. */
+	const form = await event.request.formData().catch(() => new FormData());
 	const returnTo = safeReturnTo(String(form.get('returnTo') ?? ''), cabinet);
 	const url = await startGoogle(returnTo, locale, event.getClientAddress(), event.request.headers);
 	if (!url) redirect(303, `${localizePath('/login', locale)}?error=limited`);
