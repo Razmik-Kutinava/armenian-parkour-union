@@ -1,56 +1,75 @@
-﻿# todo — текущая задача (SBR)
+# todo — текущая задача (SBR)
 
 > Один живой файл на текущую задачу. Ведётся по `.cursor/rules/sbr.mdc`. После REVIEW очищается до шаблона, итог — в `PROGRESS.md` («Сделано»).
 > Памятки прошлых задач (`git show <хеш>:docs/todo.md`) — `docs/archive/todo-index.md`; закрыл задачу — дописать туда строку.
 
 ## Задача
 
-10.5 — публичная страница проверки книжки по QR `/volunteer/{public_token}` (`06` 4.12; `03` 19.2, 19.3, 13 п. 5; `04` § 3 — строка «Книжка волонтёра»): `noindex`, без кеша, минимум персональных данных. Миграции нет. Кассир и кнопка «Отметить» — 10.6, здесь только место под них.
+10.6 — доступ кассиров и отметка плюшки (`03` § 19.4, `04` § 2, § 5.2 п. 7, § 7, § 8; `05` § 28 «Кассиры»; `06` § 4.12, 4.13; `02` `partner_cashiers`, `perk_redemptions`). Миграции нет (таблицы — 0018). Файлов ~15 — две части, каждая своим RED → GREEN:
+- **10.6a** — вкладка «Кассиры» в админке (создать доступ, новая ссылка, отключить), привязка телефона `/partner/join/{token}`, `/partner`.
+- **10.6b** — на странице проверки `/volunteer/{token}`: блок кассира, «Отметить» с подтверждением, списание разовых, двойной клик.
 
-## Файлы (ожидаемо)
+## Файлы 10.6a (ожидаемо)
 
-- `src/lib/server/services/volunteer/card-public.ts` (+ test) — `findPublicCard(db, token, now)`: `null` (404) | `{ valid: false, number }` | `{ valid: true, number, holder, avatarKey, validUntil, partners }`. Запрос — как `cardPdfData` (`paidUntilSql`, `privacySql`, `cardValidity`, `holderName`), но по `public_token` и без отсева удалённых: удалённый владелец — недействительна
-- `src/routes/[[lang=lang]]/(site)/volunteer/[token]/+page.server.ts` — 404, `cache-control: no-store`, `x-robots-tag: noindex`; ключи фото и логотипов → `publicUrl` (как `federation/team`)
-- `src/routes/[[lang=lang]]/(site)/volunteer/[token]/+page.svelte` — ✅ / ❌, фото, имя, номер, «действительна до», партнёры (логотип, плюшка, условия), `<meta name="robots" content="noindex">`
-- `src/lib/i18n/messages/{en,hy,ru}-volunteer-cards.ts` — ключи `volunteerCards.check.*` (~8; файлы 105–107 строк → ≤ 116)
-- `tests/e2e/volunteer-check.spec.ts` (новый) — действительная, отозванная, неизвестный токен, заголовки
-- `src/lib/seo/robots.ts` (+ test) — `Disallow: /volunteer` на каждом языке (`06` § 7.2; `/partner` — с 10.6)
+- `src/lib/server/services/volunteer/cashiers-admin.ts` (+ test) — `listCashiers`, `createCashier`, `newCashierLink`, `disableCashier`: actor admin, журнал, ссылка возвращается один раз
+- `src/lib/server/services/volunteer/cashier-access.ts` (+ test) — токены (`randomBytes(32)` base64url, SHA-256 hex), `bindCashier(db, inviteToken, now)` → device token | `null`, `findCashier(db, deviceToken)` → `{ id, partnerId, partnerName, label }` | `null`; имя cookie и срок
+- `src/lib/server/services/volunteer/settings.ts` (+ test) — `site_settings.volunteer.cashier_invite_hours`, нет или битый — 72 (по образцу `certificates/settings.ts`)
+- `src/routes/admin/volunteer/partners/[id]/cashiers/+page.server.ts`, `+page.svelte`; вкладка в `[id]/+layout.svelte`
+- `src/routes/[[lang=lang]]/(site)/partner/+page.server.ts`, `+page.svelte`; `partner/join/[token]/+page.server.ts`, `+page.svelte`
+- `src/lib/i18n/messages/{en,hy,ru}-volunteer-cashier.ts` (новые, подключить в `en.ts` / `hy.ts` / `ru.ts`; `*-volunteer-cards.ts` уже 110 строк) + ключи вкладки в `*-volunteer-admin.ts` (70 строк)
+- `src/lib/seo/robots.ts` (+ test) — `/partner` на всех языках; `tests/e2e/admin-audit-map.ts`, `admin-audit-volunteer.ts`, `admin-permissions-volunteer.ts` — новые действия; `tests/e2e/volunteer-cashier.spec.ts` (новый)
+
+## Файлы 10.6b (ожидаемо)
+
+- `src/lib/server/services/volunteer/perk-redeem.ts` (+ test) — `redeemPerk(db, { deviceToken, cardToken, perkId }, now)`; `cashierPerks(db, cardToken, partnerId, now)` — плюшки своего партнёра с остатком (через `visiblePartners`, исчерпанные не отсеиваются)
+- `src/routes/[[lang=lang]]/(site)/volunteer/[token]/+page.server.ts` — cookie → `findCashier`, блок кассира в `load`, `?mark={perkId}` → подтверждение, action `redeem`
+- `src/routes/[[lang=lang]]/(site)/volunteer/[token]/CashierPerks.svelte` (новый; `+page.svelte` уже 100 строк — только подключить)
+- `src/lib/i18n/messages/{en,hy,ru}-volunteer-cashier.ts` — тексты блока, подтверждения, отказов
+- `tests/e2e/volunteer-cashier.spec.ts` — сценарии отметки
 
 ## Решения агента (в пределах документов)
 
-1. 404 — токен не base64url или длиннее 64 (как `certificates/public.ts`), неизвестный токен (в т. ч. старый после перевыдачи — токен новый на каждую выдачу). У книжки с токеном номер всегда есть; нет — тоже 404.
-2. Недействительна (`cardValidity` не `valid` или владелец удалён — `06` 4.12): отдаётся только `{ valid: false, number }`; имя, фото, причины, партнёры не возвращаются из сервиса вовсе.
-3. Действительна: фото — `users.avatar_key` независимо от `show_avatar` (`04` § 3); до 18 — только при `privacy`, а без неё книжка и так недействительна (`cardValidity`). Фото удалено после выдачи — рамка-заглушка без ошибки.
-4. Партнёры — `visiblePartners(db, cardId, now)`; исчерпанная разовая (остаток 0) и партнёр без плюшек не показываются — как в PDF (10.4, решение 5). Остаток не печатается — его видит только кассир своего партнёра (10.6). Логотипа нет — только название.
-5. Язык — `[[lang]]` страницы (QR ведёт на `/hy`), тексты плюшек — `pickLocalized` (нет перевода — EN); дата — `newsDate`, как на проверке сертификата.
-6. Без лимита запросов и журнала, как проверка сертификата (6.5): токен 32 символа base64url, подбор невозможен; просмотр не опасное действие. Не через `cached()` (группа `volunteer: []`).
-7. В данные страницы не попадают `id` книжки и участника; `id` партнёров и плюшек — да (нужны 10.6 для кнопок).
+1. **Привязка — по кнопке, не при открытии.** `GET /partner/join/{token}` только проверяет ссылку: действует — «Привязать этот телефон к {партнёр}» (POST); иначе общая «Ссылка недействительна…». Превью ссылок в мессенджерах (Telegram, WhatsApp, Viber) открывают GET и сожгли бы одноразовую ссылку до кассира. Отступ от буквы `06` § 4.13 — в `questions.md` (этап 10) «ждёт подтверждения».
+2. Привязка — один `UPDATE … WHERE invite_token_hash = $1 AND disabled_at IS NULL AND invite_expires_at > now RETURNING`: ссылка срабатывает ровно раз и при двух одновременных открытиях. `invite_token_hash` → `null`, `device_token_hash`, `bound_at`. В `audit_log` не пишется (`03` § 19.9 не перечисляет; admin видит `bound_at`).
+3. Cookie `apu_cashier`: httpOnly, Secure, `sameSite: lax` (QR открывается переходом извне), `path: /`, 400 дней (потолок браузеров, ≥ года по `03` 19.4 п. 1). В базе только SHA-256; токены и хеши — не в журнал и не в логи.
+4. Ссылка — `{PUBLIC_SITE_URL}/hy/partner/join/{token}` (как QR — армянская версия), показывается один раз после «Создать доступ» / «Новая ссылка» с «Копировать»; срок — `cashier_invite_hours` (ключа `volunteer` в seed нет — 72 из кода; seed — с 10.9 вместе с порогом отказов).
+5. «Новая ссылка» — привязанному или ждущему доступу (сбрасывает телефон, `02` правило); отключённому — нет: отключение окончательно, новый кассир — «Создать доступ». Подпись 1–80 символов.
+6. Журнал: `partner_cashier.create | relink | disable`, `entity_type = 'partner_cashier'`, в `after` — `partner_id`, `label`, `invite_expires_at`. Права — `volunteer.manage` в `load` и каждом action + проверка актора в сервисе; чужой `id` доступа (другого партнёра) — 404.
+7. `/partner`, `/partner/join/*` — `no-store`, `x-robots-tag` + `<meta robots>` `noindex`, `robots.txt` `Disallow: /partner`. Кассир — не пользователь: ни в кабинет, ни в админку cookie не пускает.
+8. (10.6b) Кассир определяется по cookie и в `load`, и в action заново (`04` § 5.2 п. 7); отключённый, перепривязанный, неизвестный — как гость, без кнопок. Блок кассира — только у действительной книжки; над списком «Вы — {партнёр}, {подпись}».
+9. (10.6b) Свои плюшки — все видимые (`03` 19.3), разовая с остатком 0 — «Использовано», без кнопки. Чужие партнёры — как у всех, без кнопок.
+10. (10.6b) Подтверждение без JS: «Отметить» — ссылка `?mark={perkId}` → блок «Отметить «…»?» с POST «Да, отметить» (`?/redeem`) и «Отмена». После отметки — «Отмечено в {ЧЧ:ММ}» (Ереван).
+11. (10.6b) `redeemPerk` — транзакция: книжка по `public_token` `FOR UPDATE` → действительна (`card-sql` + `cardValidity`, владелец не удалён) → доступ по хешу (не отключён, привязан) → плюшка видна и её `partner_id` = партнёр доступа → у `single` остаток > 0 (под блокировкой) → та же книжка + плюшка + доступ за последние 60 с — вернуть ту отметку, новой не создавать → insert (`partner_id` из плюшки) + `last_used_at`. Ответ `{ at, repeat }` | `not_cashier | card_invalid | perk_unavailable | used_up`; неизвестный токен книжки — 404. Только `id` плюшки из формы; книжка — из адреса.
+12. (10.6b) Отметка не в `audit_log` (`03` § 19.9: она сама запись). Лимита запросов нет — нужен привязанный телефон.
 
 ## Не ломать
 
-- Личные данные (K4): на странице нет email, телефона, даты рождения, баллов, истории, причины отзыва; у недействительной — только номер (ни имени, ни фото), в т. ч. у заблокированного, удалённого и несовершеннолетнего без `privacy`.
-- Отзыв, конец членства, блокировка видны сразу (`no-store`); старый QR после перевыдачи — 404.
-- `/certificate/[token]` (образец, без правок); кабинет `/cabinet/volunteer` и PDF — адрес `cardCheckUrl` не меняется.
-- Плюшки: только `published` у партнёра и плюшки, даты по Еревану (`03` 19.3).
+- Права (K1): без cookie, с отключённым, перепривязанным или чужим доступом кнопки нет и прямой POST отклоняется; подмена токена книжки и `id` плюшки; admin без cookie не отмечает; модератор и редактор не открывают «Кассиры».
+- Баллы-подобный счётчик (K3): разовая не уходит ниже 0 при двух одновременных отметках; двойной клик — одна запись; `perk_redemptions` только insert.
+- Ссылка-приглашение: срабатывает один раз, не после срока, не у отключённого; новая ссылка гасит старый телефон.
+- Страница проверки 10.5: гость и недействительная книжка — как сейчас (никаких новых данных), `no-store`, `noindex`.
 
 ## Проверка
 
-- `npx vitest run src/lib/server/services/volunteer/card-public.test.ts`; `npm run check`, `npm run lint`
-- `npx playwright test tests/e2e/volunteer-check.spec.ts`
+- 10.6a: `npx vitest run src/lib/server/services/volunteer/cashiers-admin.test.ts src/lib/server/services/volunteer/cashier-access.test.ts src/lib/server/services/volunteer/settings.test.ts src/lib/seo/robots.test.ts`; `npx playwright test tests/e2e/volunteer-cashier.spec.ts tests/e2e/admin-volunteer-partners.spec.ts`
+- 10.6b: `npx vitest run src/lib/server/services/volunteer/perk-redeem.test.ts` (в т. ч. две одновременные отметки разовой с лимитом 1 → одна запись); `npx playwright test tests/e2e/volunteer-cashier.spec.ts tests/e2e/volunteer-check.spec.ts`
+- обе: `npm run check`, `npm run lint`
 
 ## Риск
 
-`high` — публичная страница с фото и именем владельца, в т. ч. до 18 (K4).
+`high` — новый субъект прав (кассир по cookie), одноразовые ссылки, списание разовых, журнал действий (K1, K3).
 
 ## Читать
 
-- `03` § 19.2, 19.3, 13 п. 5; `06` § 4.12, § 4.10; `04` § 3 строка «Книжка волонтёра» — выписано выше
-- `zone-notes.md` § «Волонтёрство» (10.3 правила, 10.4 PDF), § «Экзамены и сертификаты» (6.5)
-- образцы: `certificates/public.ts` (+ test), `certificate/[token]/+page.server.ts` и `+page.svelte`; `volunteer/card-pdf.ts` (`cardPdfData`), `card-sql.ts`, `perks-visible.ts`; `federation/team/+page.server.ts` (`publicUrl`); `tests/e2e/certificate.spec.ts`, `admin-permissions-volunteer.ts` (вставка выданной книжки)
+- `03` § 19.4, § 19.9 — выписано выше; `02` `partner_cashiers`, `perk_redemptions` (строки 721–778) — выписано; `04` § 2 (строка 38), § 5.2 п. 7, § 8 (строка 253); `05` § 28 «Партнёры» (строки 442–446); `06` § 4.12 (кассир), § 4.13 — выписано
+- `zone-notes.md` § «Волонтёрство» (10.2 вкладки и фикстуры, 10.5 «Для 10.6»)
+- образцы: `volunteer/partners-admin.ts` (+ test, журнал), `perks-admin.ts`, `card-public.ts`, `perks-visible.ts`, `card-sql.ts`, `card-rules.ts`, `test-support.ts`; `certificates/settings.ts`; `certificates/number.ts` (`newPublicToken`); `routes/admin/volunteer/partners/[id]/perks/*`; `volunteer/[token]/*`; `tests/e2e/admin-audit-map.ts`, `admin-permissions-volunteer.ts`, `volunteer-check.spec.ts`
 
 ## Фазы
 
 - [x] SPEC
-- [x] RED `4fa0310`
-- [x] GREEN
+- [ ] 10.6a RED
+- [ ] 10.6a GREEN
+- [ ] 10.6b RED
+- [ ] 10.6b GREEN
 - [ ] REVIEW (этапа)
