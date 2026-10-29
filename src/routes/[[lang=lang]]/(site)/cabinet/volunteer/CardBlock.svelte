@@ -2,11 +2,20 @@
 	import { enhance } from '$app/forms';
 	import Button from '#lib/components/ui/Button.svelte';
 	import { currentLocale, localizePath, t, type MessageKey } from '#lib/i18n/index.svelte.ts';
+	import type { QrSvg } from '#lib/server/services/certificates/qr-svg.ts';
 	import type { OwnCard } from '#lib/server/services/volunteer/card-own.ts';
 
-	/* docs/06 section 5.12 "Card": every state; the server re-checks the conditions on apply. */
-	let { own, result }: { own: OwnCard; result: { applied?: true; message?: MessageKey } | null } =
-		$props();
+	/* docs/06 section 5.12 "Card": every state; the server re-checks the conditions on apply.
+	 * QR and PDF — a valid card only (`qr` is null otherwise). */
+	let {
+		own,
+		qr,
+		result
+	}: {
+		own: OwnCard;
+		qr: QrSvg | null;
+		result: { applied?: true; message?: MessageKey } | null;
+	} = $props();
 
 	const FIX: Partial<Record<OwnCard['missing'][number], string>> = {
 		membership: '/cabinet/membership',
@@ -43,6 +52,24 @@
 		<p class="text-ink-900">
 			{t('cabinet.volunteer.validUntil', { date: day(own.validity.until) })}
 		</p>
+		{#if qr}
+			<svg
+				role="img"
+				aria-label={t('cabinet.volunteer.qr')}
+				viewBox="-4 -4 {qr.size + 8} {qr.size + 8}"
+				shape-rendering="crispEdges"
+				class="size-48"
+			>
+				<rect x="-4" y="-4" width={qr.size + 8} height={qr.size + 8} fill="#fff" />
+				<path d={qr.d} fill="#000" />
+			</svg>
+			<p class="text-sm text-ink-700">{t('cabinet.volunteer.qrHint')}</p>
+			<a
+				class={link}
+				href={localizePath('/cabinet/volunteer/pdf', currentLocale())}
+				data-sveltekit-reload>{t('cabinet.volunteer.pdf')}</a
+			>
+		{/if}
 	{:else if card?.status === 'active' && own.validity && !own.validity.valid}
 		<div class="rounded-md bg-warning-bg p-3 text-sm text-warning-fg">
 			<p>{t('cabinet.volunteer.invalid')}</p>

@@ -6,7 +6,7 @@ import type { Photo } from './placeholder-photo';
  * WebP by the browser's Accept, `scale-down` — never larger than the original. The host is also in
  * csp.config.ts. Any other host is left as it is.
  */
-const MEDIA = 'https://media.parkour.am/';
+export const MEDIA = 'https://media.parkour.am/';
 const WIDTHS = [400, 800, 1200, 1600];
 
 const resized = (path: string, width: number) =>

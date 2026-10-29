@@ -7,7 +7,16 @@ import { volunteerPartners, volunteerPerks } from '../../db/schema/volunteer-par
 import { applyForCard } from './card-apply';
 import { decideCard } from './card-decision';
 import { cardPdfData, cardPdfFile } from './card-pdf';
-import { cardRow, cardDeps as deps, mailbox, partnerValues, perkValues, SITE, staff, volunteer } from './test-support';
+import {
+	cardRow,
+	cardDeps as deps,
+	mailbox,
+	partnerValues,
+	perkValues,
+	SITE,
+	staff,
+	volunteer
+} from './test-support';
 
 /* docs/03 sections 19.2 p. 3, 19.8: a PDF of a valid card only — for the owner (id from the session)
  * and for an admin from the card page; the QR leads to the Armenian check page. */
@@ -80,12 +89,20 @@ describe.skipIf(!testDbUrl)('volunteer card PDF', () => {
 	it('the file: a PDF named by the number; another one refused', async () => {
 		await inRollback(async (tx) => {
 			const { userId, row } = await issued(tx);
-			const file = await cardPdfFile(tx, { userId }, { actorId: userId, locale: 'hy', siteUrl: SITE, ...noImages });
+			const file = await cardPdfFile(
+				tx,
+				{ userId },
+				{ actorId: userId, locale: 'hy', siteUrl: SITE, ...noImages }
+			);
 			if (!file.ok) throw new Error(file.reason);
 			expect(file.number).toBe(row.number);
 			expect(new TextDecoder().decode(file.bytes.slice(0, 5))).toBe('%PDF-');
 			const other = await volunteer(tx);
-			const refused = await cardPdfFile(tx, { userId: other.id }, { actorId: other.id, locale: 'en', siteUrl: SITE, ...noImages });
+			const refused = await cardPdfFile(
+				tx,
+				{ userId: other.id },
+				{ actorId: other.id, locale: 'en', siteUrl: SITE, ...noImages }
+			);
 			expect(refused).toEqual({ ok: false, reason: 'not_found' });
 		});
 	});
@@ -96,7 +113,11 @@ describe.skipIf(!testDbUrl)('volunteer card PDF', () => {
 			for (let i = 0; i < limits.volunteerPdfPerUser.max; i++) {
 				await consume(tx, `volunteer-pdf:user:${admin.id}`, limits.volunteerPdfPerUser);
 			}
-			const refused = await cardPdfFile(tx, { userId }, { actorId: admin.id, locale: 'en', siteUrl: SITE, ...noImages });
+			const refused = await cardPdfFile(
+				tx,
+				{ userId },
+				{ actorId: admin.id, locale: 'en', siteUrl: SITE, ...noImages }
+			);
 			expect(refused).toEqual({ ok: false, reason: 'limited' });
 		});
 	});

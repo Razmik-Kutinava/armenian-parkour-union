@@ -1,3 +1,4 @@
+import { localizePath } from '#lib/i18n/locales.ts';
 import { isMinor } from '#lib/validation/auth.ts';
 import type { users } from '../../db/schema/users';
 import type { volunteerCards } from '../../db/schema/volunteer-cards';
@@ -49,3 +50,7 @@ export function cardValidity(status: CardStatus, f: ValidityFacts, now: Date): C
 
 export const formatCardNumber = (year: number, sequence: number) =>
 	`APU-V-${year}-${String(sequence).padStart(4, '0')}`;
+
+/** docs/06 section 4.12: the QR of the PDF and the cabinet opens the Armenian check page. */
+export const cardCheckUrl = (siteUrl: string, token: string) =>
+	`${siteUrl.replace(/\/+$/, '')}${localizePath(`/volunteer/${token}`, 'hy')}`;

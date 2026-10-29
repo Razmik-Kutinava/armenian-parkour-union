@@ -108,6 +108,13 @@
 				</dd>
 			{/if}
 		</dl>
+		{#if card.validity.valid}
+			<a
+				class="self-start text-navy-700 underline"
+				href="/admin/volunteer/cards/{card.id}/pdf"
+				data-sveltekit-reload>{t('volunteerCards.card.pdf')}</a
+			>
+		{/if}
 	</section>
 
 	<CardActions status={card.status} />

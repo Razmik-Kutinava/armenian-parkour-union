@@ -1,6 +1,5 @@
 import { error, fail, type RequestEvent } from '@sveltejs/kit';
 import { PUBLIC_SITE_URL } from '$app/env/private';
-import { localizePath } from '#lib/i18n/locales.ts';
 import type { MessageKey } from '#lib/i18n/translate.ts';
 import { requirePermission } from '#lib/server/auth/guard.ts';
 import { db } from '#lib/server/db/index.ts';
@@ -9,6 +8,7 @@ import {
 	decideCard,
 	type CardDecisionInput
 } from '#lib/server/services/volunteer/card-decision.ts';
+import { cardCheckUrl } from '#lib/server/services/volunteer/card-rules.ts';
 import { cardDetail } from '#lib/server/services/volunteer/cards-admin.ts';
 import { publicUrl } from '#lib/server/storage/r2.ts';
 import type { Actions, PageServerLoad } from './$types';
@@ -22,9 +22,7 @@ export const load: PageServerLoad = async ({ locals, params, setHeaders }) => {
 	const { avatarKey, ...member } = card.member;
 	return {
 		card: { ...card, member: { ...member, photoUrl: avatarKey ? publicUrl(avatarKey) : null } },
-		checkUrl: card.publicToken
-			? `${PUBLIC_SITE_URL ?? ''}${localizePath(`/volunteer/${card.publicToken}`, 'hy')}`
-			: null
+		checkUrl: card.publicToken ? cardCheckUrl(PUBLIC_SITE_URL ?? '', card.publicToken) : null
 	};
 };
 

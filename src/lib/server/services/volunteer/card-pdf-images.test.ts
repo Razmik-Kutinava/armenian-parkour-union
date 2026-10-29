@@ -8,7 +8,8 @@ const JPEG = new Uint8Array([0xff, 0xd8, 0xff, 0xe0, 0, 0x10]);
 const PNG = new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0]);
 const WEBP = new Uint8Array([...'RIFF\0\0\0\0WEBPVP8 '].map((c) => c.charCodeAt(0)));
 const MEDIA = 'https://media.parkour.am/avatars/u/a.webp';
-const RESIZED = 'https://media.parkour.am/cdn-cgi/image/width=600,fit=scale-down,format=jpeg,background=white/avatars/u/a.webp';
+const RESIZED =
+	'https://media.parkour.am/cdn-cgi/image/width=600,fit=scale-down,format=jpeg,background=white/avatars/u/a.webp';
 
 function server(files: Record<string, Uint8Array | 'fail' | 'hang'>) {
 	const asked: string[] = [];
@@ -17,9 +18,11 @@ function server(files: Record<string, Uint8Array | 'fail' | 'hang'>) {
 		const file = files[url];
 		if (file === 'fail') throw new Error('network');
 		if (file === 'hang') {
-			return new Promise((_, reject) => signal.addEventListener('abort', () => reject(signal.reason)));
+			return new Promise((_, reject) =>
+				signal.addEventListener('abort', () => reject(signal.reason))
+			);
 		}
-		return file ? new Response(file) : new Response('missing', { status: 404 });
+		return file ? new Response(file.slice()) : new Response('missing', { status: 404 });
 	};
 	return { asked, fetcher };
 }
@@ -51,7 +54,9 @@ describe('volunteer card PDF images', () => {
 		expect(await loadPdfImage(null, 600, fetcher)).toBeNull();
 		expect(asked).toEqual([]);
 		expect(await loadPdfImage(MEDIA, 600, fetcher, 20)).toBeNull();
-		expect(await loadPdfImage(MEDIA, 600, server({ [RESIZED]: 'fail', [MEDIA]: 'fail' }).fetcher)).toBeNull();
+		expect(
+			await loadPdfImage(MEDIA, 600, server({ [RESIZED]: 'fail', [MEDIA]: 'fail' }).fetcher)
+		).toBeNull();
 	});
 
 	it('too large a file is not embedded', async () => {
@@ -67,7 +72,10 @@ describe('volunteer card PDF images', () => {
 			'https://dev-media.example/media/logo.png': PNG
 		});
 		const images = await loadCardImages(
-			{ avatarKey: 'avatars/me.jpg', logoKeys: ['media/logo.png', 'media/logo.png', 'media/gone.png'] },
+			{
+				avatarKey: 'avatars/me.jpg',
+				logoKeys: ['media/logo.png', 'media/logo.png', 'media/gone.png']
+			},
 			toUrl,
 			fetcher
 		);
