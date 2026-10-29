@@ -56,10 +56,11 @@ describe('adminNav', () => {
 
 	it('admin: every section, system group last', () => {
 		const all = hrefs('admin');
-		expect(all).toHaveLength(26);
+		expect(all).toHaveLength(27);
 		expect(all).toContain('/admin/training/access');
 		expect(all).toContain('/admin/training/practice');
 		expect(all).toContain('/admin/training/attempts');
+		expect(all).toContain('/admin/volunteer/partners');
 		expect(all.slice(-3)).toEqual(['/admin/settings', '/admin/audit', '/admin/roles']);
 		expect(groups('admin')).toEqual([
 			'admin.group.overview',
@@ -68,6 +69,7 @@ describe('adminNav', () => {
 			'admin.group.training',
 			'admin.group.moderation',
 			'admin.group.shop',
+			'admin.group.volunteer',
 			'admin.group.money',
 			'admin.group.system'
 		]);
@@ -75,7 +77,9 @@ describe('adminNav', () => {
 
 	it('no section of money or system for non-admins', () => {
 		for (const role of ['editor', 'moderator'] as const) {
-			expect(hrefs(role).some((h) => /payments|donation|settings|audit|roles/.test(h))).toBe(false);
+			expect(
+				hrefs(role).some((h) => /payments|donation|settings|audit|roles|volunteer/.test(h))
+			).toBe(false);
 		}
 	});
 

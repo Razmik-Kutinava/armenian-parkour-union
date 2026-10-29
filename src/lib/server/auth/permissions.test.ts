@@ -38,7 +38,8 @@ const expected: Record<string, UserRole[]> = {
 	'audit.read': ['admin'],
 	'training.lessons': ['editor', 'admin'],
 	'training.manage': ['admin'],
-	'training.review': ['moderator', 'admin']
+	'training.review': ['moderator', 'admin'],
+	'volunteer.manage': ['admin']
 };
 
 const user = (role: UserRole): LocalsUser => ({
