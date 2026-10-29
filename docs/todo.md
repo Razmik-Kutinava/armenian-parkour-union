@@ -5,55 +5,57 @@
 
 ## Задача
 
-10.3 — заявка на книжку из кабинета; выдача, отказ, отзыв в админке; журнал действий; письма (`03` 19.1, 19.2, 19.9; `05` 28 «Книжки»; `06` 5.12 — только блок «Книжка»). Миграции нет: `volunteer_cards` из 0018.
+10.4 — PDF книжки и раздел «Волонтёрство» в кабинете: QR, «Скачать PDF», блок «Плюшки» (`03` 19.2 п. 3, 19.3, 19.8; `06` 5.12 — блоки «Книжка» (`active`) и «Плюшки»; `05` 28 — «Скачать PDF» в карточке). Миграции нет. «Мои использования» — 10.7, приглашения — 10.8, страница проверки — 10.5.
 
 ## Файлы (ожидаемо)
 
-- `src/lib/server/services/volunteer/card-rules.ts` (+ test) — чистые функции: чего не хватает для заявки (`email`, `membership`, `photo`, `privacy`), действительность (`03` 19.2) и почему нет, формат номера `APU-V-{год}-{0001}`
-- `src/lib/server/services/volunteer/card-facts.ts` — чтение в транзакции: участник под блокировкой, членство (`paidUntil`), согласие `privacy` в силе; `federationEmail`
-- `src/lib/server/services/volunteer/card-apply.ts` (+ test) — подача и повторная подача (та же строка → `pending`), письмо админу после коммита
-- `src/lib/server/services/volunteer/card-decision.ts` (+ test) — выдать / отказать / отозвать: блокировка строки, условия заново при выдаче, номер под advisory lock, новый `public_token`, журнал, письмо участнику после коммита
-- `src/lib/server/services/volunteer/card-mail.ts` — письма: заявка (админу, en), выдана, отказ, отзыв (участнику, его язык)
-- `src/lib/server/services/volunteer/cards-admin.ts` (+ test) — список (фильтры, поиск, действительность в SQL), карточка; `card-own.ts` (+ test) — состояние для кабинета
-- маршруты: `src/routes/admin/volunteer/cards/` (список, `[id]` с действиями `issue` / `reject` / `revoke`), `src/routes/[[lang=lang]]/(site)/cabinet/volunteer/` (блок «Книжка», действие `apply`); меню админки (`nav.ts`) и кабинета (`+layout.svelte`)
-- переводы `{en,hy,ru}-volunteer-cards.ts` (админка, кабинет, письма); e2e-карты `admin-access-map.ts`, `admin-audit-map.ts`, `admin-audit-volunteer.ts`, `admin-permissions-volunteer.ts`; `tests/e2e/volunteer-cards.spec.ts`
+- `src/lib/server/services/volunteer/perks-visible.ts` (+ test) — видимые партнёры и плюшки (`03` 19.3): партнёр и плюшка `published`, сегодня по Еревану внутри `valid_from…valid_until`; у `single` — остаток по книжке (лимит − отметки + обратные, не меньше 0). Одна функция для кабинета, PDF и 10.5
+- `src/lib/server/services/volunteer/card-pdf.ts` (+ test) — содержимое PDF: книжка по `userId` (кабинет) или `id` (admin), `active` и действительна (`cardValidity`), иначе `null`; номер, имя (`holderName`), `avatarKey`, «действительна до», адрес проверки `/hy/volunteer/{token}`, партнёры, «актуально на»; язык — параметр
+- `src/lib/server/services/volunteer/card-pdf-images.ts` (+ test) — байты фото и логотипов для pdf-lib (только JPEG / PNG): из `media.parkour.am` — через Cloudflare Image Transformations `format=jpeg`, иначе оригинал по `publicUrl`; тип по сигнатуре; ошибка, таймаут, WebP без преобразования — `null`
+- `src/lib/server/services/volunteer/card-pdf-render.ts` (+ test) — pdf-lib, A4 книжная: логотип, заголовок, фото, имя, номер, «действительна до», QR, список партнёров (логотип, плюшка, условия; перенос строк и страниц), «актуально на». Шрифты, QR, цвета — из `certificates/pdf-draw.ts`
+- маршруты: `[[lang=lang]]/(site)/cabinet/volunteer/pdf/+server.ts` (своя книжка, язык страницы), `admin/volunteer/cards/[id]/pdf/+server.ts` (`volunteer.manage`, язык админки); `cabinet/volunteer/+page.server.ts` + `CardBlock.svelte` (QR, «Скачать PDF») + новый `PerksBlock.svelte`; `admin/volunteer/cards/[id]/+page.svelte` (кнопка); `card-own.ts` (+ test) — адрес проверки и плюшки только у действительной
+- `src/lib/server/auth/rate-limit.ts` — лимит `volunteerPdfPerUser`; переводы `{en,hy,ru}-volunteer-cards.ts` (PDF, «Плюшки»)
+- e2e: `tests/e2e/volunteer-cards.spec.ts` (скачать свою, чужая и недействительная — 404, admin из карточки), `tests/e2e/admin-access-map.ts` — строка `GET /admin/volunteer/cards/[id]/pdf` (файл 227 строк — см. «Открыто»)
 
 ## Решения агента (в пределах документов)
 
-1. Действия «Выдать» / «Отказать» / «Отозвать» — в карточке книжки, а не в строке списка: фото (оно идёт в книжку) admin видит до выдачи. Список — очередь со ссылками.
-2. Журнал: `volunteer_card.issue|reject|revoke`, `entity_type = 'volunteer_card'`; в `after` — статус, `userId`, номер, причина. Токен страницы проверки в журнал не пишется. Подача заявки в журнал не идёт (`03` 19.9 перечисляет только решения — как у доступа к курсу).
-3. Условия заявки в порядке показа: `email` (подтверждён), `membership` (действующее), `photo` (`avatar_key`), `privacy` (до 18 — согласие в силе). Заблокированный — отказ `blocked`; удалённый — `not_found`. Без даты рождения — как взрослый (так же, как `consents/valid.ts` `kindsFor`).
-4. Действительность (`03` 19.2): причины `status` (не `active`), `membership`, `blocked`, `privacy`; «действительна до» — `paidUntil` из `memberships/overview` (с оплаченным продлением). В SQL списка — то же выражение для фильтра «действительна».
-5. Повторная подача (после `rejected` / `revoked`): `applied_at = now`, `reviewed_*` и `review_note` — `null`; номер и старый токен остаются до новой выдачи (книжка не `active` — страница проверки всё равно ❌). Подача при `pending` / `active` — `bad_state`; две одновременные первые подачи — unique `user_id` → `bad_state`.
-6. Номер — при первой выдаче: год выдачи по Еревану, `pg_advisory_xact_lock(hashtext('volunteer_card_number'))`, max+1 по году (как `certificates/number.ts`). Токен — `newPublicToken()` (24 байта).
-7. Письмо админу — на `site_settings.contacts.email`, по-английски, ссылка на карточку; адреса нет — предупреждение в лог, заявка создана. Письма участнику — его язык, ссылка на `/cabinet/volunteer`; у выдачи — номер и «действительна до». Ошибка почты решение не откатывает.
-8. Карточка в 10.3: участник (ссылка на `/admin/users/{id}`), фото, возраст, email, статус, номер, даты, кто решил, причина, «действительна до» / почему нет, ссылка на страницу проверки (страница — 10.5). PDF — 10.4; приглашения, использования, фотоотчёты — 10.7–10.10; «Снять пометку» — 10.9.
-9. Кабинет в 10.3: только блок «Книжка» (`06` 5.12, все состояния); у `active` и действительной — номер и «действительна до»; QR и PDF — 10.4. Недействительная из-за членства — кнопка «Продлить» → `/cabinet/membership`.
+1. PDF не хранится (`03` 19.8): собирается на каждый запрос, ответ `application/pdf`, `Content-Disposition: attachment; filename="{номер}.pdf"`, `cache-control: no-store`. Журнал не пишется — скачивания нет в `03` 19.9.
+2. Скачать — только действительная книжка, и admin тоже (`03` 19.2 п. 3: недействительной PDF недоступен): иначе 404, кнопка не показывается. Чужая книжка в кабинете — невозможно (id из сессии).
+3. Язык: кабинет — язык страницы (`[[lang]]`, без префикса — английский); admin — язык админки (`user.locale`, как `admin/+layout.server.ts`). Тексты плюшек — язык, иначе EN. QR и адрес под ним — всегда `PUBLIC_SITE_URL` + `/hy/volunteer/{token}` (`06` 4.12).
+4. Фото и логотипы: pdf-lib не встраивает WebP / AVIF, библиотек не добавляем — сервер берёт вариант `cdn-cgi/image/width=…,fit=scale-down,format=jpeg[,background=white]/…` с `media.parkour.am` (Transformations владелец включил, 8.4). Не наш хост (dev) — оригинал, если JPEG / PNG. Таймаут 5 с на картинку, загрузка параллельно. Фото не загрузилось — рамка-заглушка и предупреждение в лог; логотип — только название партнёра. PDF не отменяется.
+5. Видимость плюшек: исчерпанная разовая (остаток 0) в PDF не попадает, в кабинете видна с остатком 0. В PDF остаток не печатается (документ статичный).
+6. Кабинет: QR — `qrSvg(url)` на сервере (как 6.8), адрес и плюшки отдаются только действительной книжке; у недействительной — ни QR, ни PDF, ни плюшек (`06` 5.12).
+7. Лимит генерации — `volunteerPdfPerUser` 30 в час на пользователя (и admin): PDF тянет картинки и грузит CPU. Превышен — 429.
+8. Страница `/hy/volunteer/{token}` — 10.5; до неё QR ведёт на 404 (как ссылка в карточке после 10.3).
 
 ## Не ломать
 
-- Права: модератор и редактор не открывают `/admin/volunteer/**` (403), участник — 404; участник видит и подаёт только свою книжку (id из сессии).
-- Партнёры и плюшки (10.2), карты e2e остальных разделов, меню кабинета и админки.
-- Согласия и членство: только чтение, их сервисы не меняются.
+- Права: участник скачивает только свою действительную книжку; модератор и редактор — 403 на `/admin/volunteer/**`, включая `pdf`; гость — на вход.
+- Личные данные: в PDF и кабинете нет email, телефона, даты рождения; фото до 18 — только при действительной книжке (она уже требует `privacy`).
+- Блок «Книжка» 10.3 во всех остальных состояниях, заявка, решения admin; PDF сертификатов (`certificates/pdf-*` — только импорт, без правок).
 
 ## Проверка
 
-- `npx vitest run src/lib/server/services/volunteer src/lib/server/admin/nav.test.ts src/routes/admin/access-coverage.test.ts src/routes/admin/audit-coverage.test.ts`
-- `npx playwright test tests/e2e/volunteer-cards.spec.ts`; `npm run check`, `npm run lint`
+- `npx vitest run src/lib/server/services/volunteer src/routes/admin/access-coverage.test.ts`; `npm run check`, `npm run lint`
+- `npx playwright test tests/e2e/volunteer-cards.spec.ts`
 
 ## Риск
 
-`high` — права, личные данные (фото, возраст, email, данные до 18), журнал действий.
+`high` — `+server.ts` (выдача файла), личные данные (фото, имя, данные до 18), права, `auth/rate-limit.ts`.
 
 ## Читать
 
-- `03` § 19.1, 19.2, 19.9; `02` § 12 `volunteer_cards`; `05` § 28 «Книжки»; `06` § 5.12 (блок «Книжка»); `04` 5.1 (`volunteer.manage`)
-- `zone-notes.md` § «Волонтёрство»
-- образцы: `services/training/access.ts`, `access-decision.ts`, `access-mail.ts`, `access-list.ts` (членство в SQL), `access-facts.ts` (`federationEmail`), `certificates/number.ts`, `consents/valid.ts`; маршруты `admin/training/access`, `admin/consents/[id]`, `cabinet/training`
+- `03` § 19.2 п. 3, 19.3, 19.8 (выписано выше); `06` § 5.12 (блоки «Книжка», «Плюшки»), § 4.12 (адрес QR); `05` § 28 «Карточка»; `08` § 10 (стиль PDF: navy, без градиентов, читается в ч/б)
+- `zone-notes.md` § «Волонтёрство», § «Экзамены и сертификаты» (6.4 PDF, 6.8 QR в кабинете)
+- образцы: `certificates/pdf-render.ts`, `pdf-draw.ts`, `pdf-content.ts` (`holderName`, `yerevanDate`), `qr-svg.ts`; `cabinet/progress/[id]/pdf/+server.ts`; `components/site/media-photo.ts` (адрес Transformations); `cabinet/avatar.ts` (`sniffMime`)
+
+## Открыто
+
+- `tests/e2e/admin-access-map.ts` уже 227 строк (> 200): новая строка — только по ответу владельца (исключение для таблицы или сплит отдельным шагом).
 
 ## Фазы
 
 - [x] SPEC
-- [x] RED
-- [x] GREEN
+- [ ] RED
+- [ ] GREEN
 - [ ] REVIEW (этапа)
