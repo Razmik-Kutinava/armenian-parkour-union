@@ -13,6 +13,10 @@
 - Схема (10.1, миграция 0018): `schema/volunteer-partners.ts` (партнёры, плюшки, кассиры), `volunteer-cards.ts` (книжки, `perk_redemptions`), `volunteer-requests.ts` (запросы, приглашения, отчёты). Откат — `scripts/rollback/0018_down.sql`; значения `points_reason` откатом не удаляются.
 - `perk_redemptions` — append-only (триггер, `23001`): отмена — только новой строкой с `reversal_of_id`, `comment`, `created_by` и без `cashier_id`; у отметки кассира — наоборот (check `perk_redemptions_kind`). Одна обратная запись на отметку — unique `reversal_of_id`.
 - `volunteer_cards.applied_at` без default — сервис ставит при каждой подаче. `number` и `public_token` в базе не обязательны при `active` — выдача (10.3) заполняет их сама.
+- Админка партнёров (10.2): право `volunteer.manage` (admin); сервисы `services/volunteer/partners-admin.ts`, `perks-admin.ts`, `partner-order.ts` (↑ / ↓ нумерует всех 0…n−1), `partner-list.ts` (счётчики). Коды журнала `volunteer_partner.create|update|reorder`, `volunteer_perk.create|update`. Статусы и виды для браузера — `validation/volunteer-enums.ts` (`validation/pages.ts` тянет серверный модуль).
+- Видимость плюшки для 10.4–10.5 ещё не написана: `published` у плюшки и партнёра, дата в `valid_from…valid_until`, у `single` остаток > 0. Смена вида / лимита после отметок разрешена — считать остаток от текущего лимита.
+- Вкладка «Кассиры» (10.6) — добавить в `routes/admin/volunteer/partners/[id]/+layout.svelte`; e2e-фикстуры раздела — `tests/e2e/admin-permissions-volunteer.ts`, исполнитель журнала — `admin-audit-volunteer.ts`. Кеш: группа `volunteer: []` — страница проверки, PDF и кабинет не через `cached()`.
+- Логотип партнёра — поиск использований медиа `volunteer_partner` (и у архивных).
 - Баллы (10.9–10.10): `reason` `volunteer_participation` с `source_type = 'volunteer_invitation'`, `volunteer_report` с `source_type = 'volunteer_report'`; повтор по источнику ловит `points_ledger_source_once_key`. Правила баллов и ключ `site_settings.volunteer` — в seed, ещё не добавлены.
 
 ## Обучающий портал (этап 9)
