@@ -5,54 +5,55 @@
 
 ## Задача
 
-10.2 — админка: партнёры и плюшки (`05` разд. 28 «Партнёры», без вкладки «Кассиры» — она в 10.6). Миграции нет: таблицы из 0018.
+10.3 — заявка на книжку из кабинета; выдача, отказ, отзыв в админке; журнал действий; письма (`03` 19.1, 19.2, 19.9; `05` 28 «Книжки»; `06` 5.12 — только блок «Книжка»). Миграции нет: `volunteer_cards` из 0018.
 
 ## Файлы (ожидаемо)
 
-- `src/lib/server/auth/permissions.ts` (+ test) — `volunteer.manage`: admin (`04` 5.1)
-- `src/lib/validation/volunteer-partners.ts` (+ test) — формы партнёра, плюшки, ↑ / ↓
-- `src/lib/server/services/volunteer/partners-admin.ts` (+ test) — список со счётчиками, карточка, создание, правка, ↑ / ↓
-- `src/lib/server/services/volunteer/perks-admin.ts` (+ test) — плюшки партнёра: список, карточка, создание, правка
-- `src/lib/server/services/media/usage.ts` — логотип партнёра (`volunteer_partner`), ссылка в `admin/media/[id]`
-- `src/routes/admin/volunteer/partners/` — список, `new`, `[id]` (layout с вкладками «Партнёр» / «Плюшки»), `[id]/perks`, `[id]/perks/new`, `[id]/perks/[perkId]`; формы `PartnerForm.svelte`, `PerkForm.svelte`, `form.ts`
-- `src/lib/server/admin/nav.ts` (+ test), `components/admin/nav-icons.ts` — группа «Волонтёрство» перед «Деньгами» (`05` разд. 2)
-- `src/lib/server/cache/admin-groups.ts` — `volunteer: []` (страница проверки, PDF, кабинет не кешируются)
-- `src/lib/i18n/messages/{en,hy,ru}-volunteer-admin.ts`
-- e2e-карты: `admin-access-map.ts`, `admin-audit-map.ts`, `admin-audit-volunteer.ts` (исполнитель), `admin-permissions-volunteer.ts` (фикстуры); `tests/e2e/admin-volunteer-partners.spec.ts`
+- `src/lib/server/services/volunteer/card-rules.ts` (+ test) — чистые функции: чего не хватает для заявки (`email`, `membership`, `photo`, `privacy`), действительность (`03` 19.2) и почему нет, формат номера `APU-V-{год}-{0001}`
+- `src/lib/server/services/volunteer/card-facts.ts` — чтение в транзакции: участник под блокировкой, членство (`paidUntil`), согласие `privacy` в силе; `federationEmail`
+- `src/lib/server/services/volunteer/card-apply.ts` (+ test) — подача и повторная подача (та же строка → `pending`), письмо админу после коммита
+- `src/lib/server/services/volunteer/card-decision.ts` (+ test) — выдать / отказать / отозвать: блокировка строки, условия заново при выдаче, номер под advisory lock, новый `public_token`, журнал, письмо участнику после коммита
+- `src/lib/server/services/volunteer/card-mail.ts` — письма: заявка (админу, en), выдана, отказ, отзыв (участнику, его язык)
+- `src/lib/server/services/volunteer/cards-admin.ts` (+ test) — список (фильтры, поиск, действительность в SQL), карточка; `card-own.ts` (+ test) — состояние для кабинета
+- маршруты: `src/routes/admin/volunteer/cards/` (список, `[id]` с действиями `issue` / `reject` / `revoke`), `src/routes/[[lang=lang]]/(site)/cabinet/volunteer/` (блок «Книжка», действие `apply`); меню админки (`nav.ts`) и кабинета (`+layout.svelte`)
+- переводы `{en,hy,ru}-volunteer-cards.ts` (админка, кабинет, письма); e2e-карты `admin-access-map.ts`, `admin-audit-map.ts`, `admin-audit-volunteer.ts`, `admin-permissions-volunteer.ts`; `tests/e2e/volunteer-cards.spec.ts`
 
 ## Решения агента (в пределах документов)
 
-1. Порядок партнёров — ↑ / ↓ в списке (`05`), меняет места с соседом и нумерует всех 0…n−1 под блокировкой строк партнёров; новый — в конец. Порядок плюшек — числовое поле формы (`05`: «…статус, порядок»).
-2. Статус партнёра и плюшки — поле формы `draft / published / archived`; смена статуса пишется как `*.update` с `before` / `after`. Коды: `volunteer_partner.create|update|reorder`, `volunteer_perk.create|update`.
-3. Логотип — картинка медиатеки, строка `media` берётся `FOR SHARE`; не картинка или удалена — ошибка у поля. Архивные партнёры тоже держат файл (могут вернуться).
-4. Сайт — только `http(s)` (попадёт в `href` на странице проверки). Адрес и условия — однострочные поля ×3 (до 300 и 500 символов), английский обязателен, если заполнен любой язык.
-5. Плюшка: у `reusable` лимит не сохраняется; у `single` — 1…100. Даты — `YYYY-MM-DD`, «по» не раньше «с». Смена вида и лимита после отметок разрешена (`03` 19.3 п. 2).
-6. Счётчики списка: плюшек `published`; доступов кассиров — привязан и не отключён; использований за 30 дней — отметки без обратной записи.
+1. Действия «Выдать» / «Отказать» / «Отозвать» — в карточке книжки, а не в строке списка: фото (оно идёт в книжку) admin видит до выдачи. Список — очередь со ссылками.
+2. Журнал: `volunteer_card.issue|reject|revoke`, `entity_type = 'volunteer_card'`; в `after` — статус, `userId`, номер, причина. Токен страницы проверки в журнал не пишется. Подача заявки в журнал не идёт (`03` 19.9 перечисляет только решения — как у доступа к курсу).
+3. Условия заявки в порядке показа: `email` (подтверждён), `membership` (действующее), `photo` (`avatar_key`), `privacy` (до 18 — согласие в силе). Заблокированный — отказ `blocked`; удалённый — `not_found`. Без даты рождения — как взрослый (так же, как `consents/valid.ts` `kindsFor`).
+4. Действительность (`03` 19.2): причины `status` (не `active`), `membership`, `blocked`, `privacy`; «действительна до» — `paidUntil` из `memberships/overview` (с оплаченным продлением). В SQL списка — то же выражение для фильтра «действительна».
+5. Повторная подача (после `rejected` / `revoked`): `applied_at = now`, `reviewed_*` и `review_note` — `null`; номер и старый токен остаются до новой выдачи (книжка не `active` — страница проверки всё равно ❌). Подача при `pending` / `active` — `bad_state`; две одновременные первые подачи — unique `user_id` → `bad_state`.
+6. Номер — при первой выдаче: год выдачи по Еревану, `pg_advisory_xact_lock(hashtext('volunteer_card_number'))`, max+1 по году (как `certificates/number.ts`). Токен — `newPublicToken()` (24 байта).
+7. Письмо админу — на `site_settings.contacts.email`, по-английски, ссылка на карточку; адреса нет — предупреждение в лог, заявка создана. Письма участнику — его язык, ссылка на `/cabinet/volunteer`; у выдачи — номер и «действительна до». Ошибка почты решение не откатывает.
+8. Карточка в 10.3: участник (ссылка на `/admin/users/{id}`), фото, возраст, email, статус, номер, даты, кто решил, причина, «действительна до» / почему нет, ссылка на страницу проверки (страница — 10.5). PDF — 10.4; приглашения, использования, фотоотчёты — 10.7–10.10; «Снять пометку» — 10.9.
+9. Кабинет в 10.3: только блок «Книжка» (`06` 5.12, все состояния); у `active` и действительной — номер и «действительна до»; QR и PDF — 10.4. Недействительная из-за членства — кнопка «Продлить» → `/cabinet/membership`.
 
 ## Не ломать
 
-- Медиатека: удаление файла, который где-то используется, по-прежнему запрещено; поиск использований остальных разделов не меняется.
-- Права: модератор и редактор не открывают `/admin/volunteer/**` (403), участник — 404 (`04` раздел 8, п. «Волонтёрство»).
-- Меню и карты e2e остальных разделов.
+- Права: модератор и редактор не открывают `/admin/volunteer/**` (403), участник — 404; участник видит и подаёт только свою книжку (id из сессии).
+- Партнёры и плюшки (10.2), карты e2e остальных разделов, меню кабинета и админки.
+- Согласия и членство: только чтение, их сервисы не меняются.
 
 ## Проверка
 
-- `npx vitest run src/lib/validation/volunteer-partners.test.ts src/lib/server/services/volunteer src/lib/server/auth/permissions.test.ts src/lib/server/admin/nav.test.ts src/routes/admin/access-coverage.test.ts src/routes/admin/audit-coverage.test.ts src/lib/server/cache`
-- `npx playwright test tests/e2e/admin-volunteer-partners.spec.ts`; `npm run check`, `npm run lint`
+- `npx vitest run src/lib/server/services/volunteer src/lib/server/admin/nav.test.ts src/routes/admin/access-coverage.test.ts src/routes/admin/audit-coverage.test.ts`
+- `npx playwright test tests/e2e/volunteer-cards.spec.ts`; `npm run check`, `npm run lint`
 
 ## Риск
 
-`high` — права (`permissions.ts`), новые разделы админки с журналом действий.
+`high` — права, личные данные (фото, возраст, email, данные до 18), журнал действий.
 
 ## Читать
 
-- `05` § 2 (группа «Волонтёрство» перед «Деньгами»), § 28 «Партнёры»; `02` § 12 `volunteer_partners`, `volunteer_perks`; `03` § 19.3, 19.9 п. 1; `04` 5.1 (`volunteer.manage` — admin)
-- `zone-notes.md` § «Волонтёрство», § «Контент и админка» (карты e2e, кеш, медиа `FOR SHARE`)
-- образцы: `services/donations/purposes-admin.ts`, `services/training/topics.ts` (↑ / ↓), `services/shop/items.ts` (дифф в журнал), `routes/admin/training/[id]/+layout.svelte` (вкладки)
+- `03` § 19.1, 19.2, 19.9; `02` § 12 `volunteer_cards`; `05` § 28 «Книжки»; `06` § 5.12 (блок «Книжка»); `04` 5.1 (`volunteer.manage`)
+- `zone-notes.md` § «Волонтёрство»
+- образцы: `services/training/access.ts`, `access-decision.ts`, `access-mail.ts`, `access-list.ts` (членство в SQL), `access-facts.ts` (`federationEmail`), `certificates/number.ts`, `consents/valid.ts`; маршруты `admin/training/access`, `admin/consents/[id]`, `cabinet/training`
 
 ## Фазы
 
 - [x] SPEC
-- [x] RED
-- [x] GREEN
+- [ ] RED
+- [ ] GREEN
 - [ ] REVIEW (этапа)
