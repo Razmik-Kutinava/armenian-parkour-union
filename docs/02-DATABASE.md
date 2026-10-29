@@ -4,7 +4,7 @@
 > Правила работы агента — `.cursor/rules/main.mdc` (раздел «База данных (Migration Gate)»).
 > Бизнес-логика (когда и почему что меняется) — `03-BUSINESS-RULES.md`. Права — `04-ROLES-PERMISSIONS.md`.
 
-**Оглавление** (раздел искать по заголовку `## …`, читать только его): Общие соглашения · Enum-типы · 1. Пользователи и авторизация · 2. Членство, экзамены, сертификаты · 3. События · 4. Платежи · 5. Баллы · 6. Видео · 7. Магазин · 8. Контент и главная · 9. Согласия и документы · 10. Служебные · 11. Обучающий портал · Карта связей · Начальные данные (seed) · Что нужно уточнить у владельца
+**Оглавление** (раздел искать по заголовку `## …`, читать только его): Общие соглашения · Enum-типы · 1. Пользователи и авторизация · 2. Членство, экзамены, сертификаты · 3. События · 4. Платежи · 5. Баллы · 6. Видео · 7. Магазин · 8. Контент и главная · 9. Согласия и документы · 10. Служебные · 11. Обучающий портал · 12. Волонтёрство · Карта связей · Начальные данные (seed) · Что нужно уточнить у владельца
 
 Источник правды по структуре БД. Любое отклонение сначала вносится сюда (с согласия владельца), потом в код.
 СУБД: PostgreSQL. ORM: Drizzle. Схема лежит в `src/lib/server/db/schema/`, миграции только через `db:generate`.
@@ -23,7 +23,7 @@
 - **Многоязычные тексты:** `jsonb` вида `{"en": "...", "hy": "...", "ru": "..."}`. Язык `en` обязателен, при отсутствии перевода сайт показывает `en` (решение 2026-10-07).
 - **Имена:** таблицы и поля `snake_case`, английский. Таблицы во множественном числе.
 - **Файлы:** в БД хранится только ключ в хранилище (`*_key`), не полный URL.
-- **Append-only таблицы:** `points_ledger`, `audit_log`, `payment_webhook_events`. Записи не обновляются и не удаляются. Запретить `UPDATE` и `DELETE` триггером.
+- **Append-only таблицы:** `points_ledger`, `audit_log`, `payment_webhook_events`, `perk_redemptions`. Записи не обновляются и не удаляются. Запретить `UPDATE` и `DELETE` триггером.
 - **Автор изменений:** поля `created_by`, `reviewed_by` и т. п. ссылаются на `users.id`. `null` означает «система».
 - **Транзакции:** всё, что меняет несколько таблиц сразу (баллы + баланс, сертификат + степень + баллы, заказ + списание + остаток), выполняется одной транзакцией в сервисе.
 
@@ -47,13 +47,17 @@
 | `payment_kind` | `membership`, `donation`, `event_fee` |
 | `payment_status` | `pending`, `paid`, `failed`, `cancelled`, `refunded` |
 | `video_status` | `pending`, `approved`, `rejected` |
-| `points_reason` | `certificate`, `event_registration`, `event_participation`, `event_place`, `video`, `manual`, `shop_order`, `shop_refund`, `reversal` |
+| `points_reason` | `certificate`, `event_registration`, `event_participation`, `event_place`, `video`, `manual`, `shop_order`, `shop_refund`, `reversal`, `volunteer_participation`, `volunteer_report` (два последних — этап 10) |
 | `order_status` | `new`, `confirmed`, `shipped`, `delivered`, `cancelled` |
 | `hero_type` | `event`, `presentation`, `video`, `person`, `custom` |
 | `consent_kind` | `parental`, `medical`, `privacy` |
 | `consent_status` | `pending`, `approved`, `rejected`, `expired` |
 | `training_access_status` | `pending`, `approved`, `rejected`, `revoked` (этап 9) |
-| `practice_status` | `pending`, `approved`, `rejected` (этап 9) |
+| `practice_status` | `pending`, `approved`, `rejected` (этап 9; с этапа 10 — и фотоотчёты волонтёров) |
+| `volunteer_card_status` | `pending`, `active`, `rejected`, `revoked` (этап 10) |
+| `perk_kind` | `reusable`, `single` (этап 10) |
+| `volunteer_request_status` | `draft`, `open`, `finished`, `cancelled` (этап 10) |
+| `volunteer_answer` | `invited`, `accepted`, `declined`, `expired`, `excused`, `attended`, `no_show` (этап 10) |
 
 Роль `user_role` это системный доступ. **Тренер и судья не роли:** это участник, у которого есть профиль в `staff_profiles` и действующий сертификат. Права по ролям описаны в `04-ROLES-PERMISSIONS.md`.
 
@@ -312,7 +316,7 @@
 | updated_by | uuid FK users null | |
 | updated_at | timestamptz | |
 
-Коды правил (создаются seed-скриптом): `certificate_level_advanced`, `certificate_level_pro`, `certificate_trainer`, `certificate_judge`, `event_registration`, `event_participation`, `event_place_1`, `event_place_2`, `event_place_3`, `video_approved`. Стартовые значения — `03`, раздел 6.1.
+Коды правил (создаются seed-скриптом): `certificate_level_advanced`, `certificate_level_pro`, `certificate_trainer`, `certificate_judge`, `event_registration`, `event_participation`, `event_place_1`, `event_place_2`, `event_place_3`, `video_approved`, `volunteer_participation`, `volunteer_report` (два последних — этап 10). Стартовые значения — `03`, раздел 6.1.
 
 ### `points_ledger`
 Журнал начислений. **Append-only.**
@@ -323,7 +327,7 @@
 | delta | integer not null, check <> 0 | плюс начисление, минус списание |
 | reason | points_reason | |
 | rule_id | uuid FK points_rules null | |
-| source_type | text null | `certificate`, `event_registration`, `video`, `shop_order` |
+| source_type | text null | `certificate`, `event_registration`, `video`, `shop_order`, `volunteer_invitation`, `volunteer_report` |
 | source_id | uuid null | ID источника |
 | comment | text null | обязателен при `reason='manual'` и `'reversal'` |
 | reversal_of_id | uuid FK points_ledger null | для отмены ошибочной записи |
@@ -504,7 +508,7 @@
 | updated_by | uuid FK users null | |
 | updated_at | timestamptz | |
 
-Ключи (создаются seed-скриптом): `membership_fee` (`{"amount_minor":..., "currency":"AMD", "period_months":12}`), `contacts`, `socials`, `footer`, `requisites` (реквизиты федерации), `feature_flags`.
+Ключи (создаются seed-скриптом): `membership_fee` (`{"amount_minor":..., "currency":"AMD", "period_months":12}`), `contacts`, `socials`, `footer`, `requisites` (реквизиты федерации), `feature_flags`; с этапа 10 — `volunteer` (`{"decline_threshold":3, "cashier_invite_hours":72}`, `03` раздел 19).
 
 ### `media`
 Библиотека загруженных файлов для админки.
@@ -677,6 +681,158 @@
 
 ---
 
+## 12. Волонтёрство
+
+Этап 10 (`09`). Логика — `03` раздел 19, права — `04` (`volunteer.manage`, кассир партнёра — раздел 2), админка — `05` раздел 28, сайт и кабинет — `06` разделы 4.12, 4.13, 5.12. Таблицы создаются одной миграцией через Migration Gate (задача 10.1). Многоязычные поля — по общему соглашению (`en` обязателен).
+
+### `volunteer_partners`
+Компания-партнёр: даёт владельцам книжки волонтёра скидки и подарки («плюшки»).
+| Поле | Тип | Описание |
+|---|---|---|
+| id | uuid PK | |
+| name | text not null | название (бренд, не переводится) |
+| logo_key | text null | логотип в публичном бакете (медиатека) |
+| website | text null | |
+| address | jsonb null | где действует, многоязычное |
+| status | content_status default 'draft' | на странице проверки, в PDF и кабинете — только `published` |
+| sort_order | integer default 0 | |
+| created_by | uuid FK users | |
+| created_at, updated_at | timestamptz | |
+
+Индексы: (`status`, `sort_order`). Удаления нет — `archived`.
+
+### `volunteer_perks`
+Плюшка партнёра.
+| Поле | Тип | Описание |
+|---|---|---|
+| id | uuid PK | |
+| partner_id | uuid FK volunteer_partners not null | |
+| title | jsonb not null | например «Скидка 10 %» |
+| terms | jsonb null | условия: на что действует, как получить |
+| kind | perk_kind not null | `reusable` — сколько угодно раз; `single` — ограниченное число раз на книжку |
+| uses_limit | smallint null | только у `single`, ≥ 1; проверка: `kind = 'single'` ⇔ `uses_limit is not null` |
+| valid_from, valid_until | date null | срок плюшки (дни по Еревану); пусто — без ограничения; проверка: `valid_from <= valid_until` |
+| status | content_status default 'draft' | |
+| sort_order | integer default 0 | |
+| created_at, updated_at | timestamptz | |
+
+Индексы: (`partner_id`, `status`). Удаления нет — `archived` (на плюшку ссылаются использования).
+
+### `partner_cashiers`
+Доступ кассира партнёра: один телефон (браузер), привязанный по ссылке-приглашению. Аккаунта на сайте у кассира нет.
+| Поле | Тип | Описание |
+|---|---|---|
+| id | uuid PK | |
+| partner_id | uuid FK volunteer_partners not null | |
+| label | text not null | кто или где, например «Касса 1, Комитас» |
+| invite_token_hash | text unique null | SHA-256 токена из ссылки-приглашения; после привязки `null` |
+| invite_expires_at | timestamptz null | до какого времени ссылка действует |
+| device_token_hash | text unique null | SHA-256 токена из cookie телефона; заполняется при привязке |
+| bound_at | timestamptz null | когда телефон привязан |
+| last_used_at | timestamptz null | последняя отметка |
+| disabled_at | timestamptz null | отключён — не работают ни ссылка, ни телефон |
+| disabled_by | uuid FK users null | |
+| created_by | uuid FK users not null | |
+| created_at, updated_at | timestamptz | |
+
+Индексы: `partner_id`. Сами токены в базе не хранятся — только хеши.
+Правило: новая ссылка тому же доступу (кассир сменил телефон) — та же строка: новый `invite_token_hash`, `device_token_hash` и `bound_at` очищаются, старый телефон перестаёт работать.
+
+### `volunteer_cards`
+Заявка на книжку волонтёра и сама книжка. Одна строка на участника; повторная заявка после отказа или отзыва возвращает ту же строку в `pending`.
+| Поле | Тип | Описание |
+|---|---|---|
+| id | uuid PK | |
+| user_id | uuid FK users unique not null | |
+| status | volunteer_card_status default 'pending' | |
+| number | text unique null | `APU-V-{год}-{0001}`, присваивается при первой выдаче и не меняется |
+| public_token | text unique null | случайный токен страницы проверки и QR; новый при каждой выдаче (старый QR после отзыва и повторной выдачи не работает) |
+| applied_at | timestamptz not null | последняя подача заявки |
+| issued_at | timestamptz null | последняя выдача |
+| reviewed_by | uuid FK users null | |
+| reviewed_at | timestamptz null | |
+| review_note | text null | причина отказа или отзыва, видна участнику; обязательна при `rejected` и `revoked` |
+| decline_streak | smallint not null default 0, check >= 0 | отказов подряд (`03` 19.6) |
+| flagged_at | timestamptz null | порог отказов достигнут: предупреждение участнику, пометка у admin |
+| created_at, updated_at | timestamptz | |
+
+Индексы: unique(`user_id`), unique(`number`), unique(`public_token`), (`status`, `applied_at`), `flagged_at` where `flagged_at is not null`.
+Срока в книжке нет: она действительна, пока у владельца действующее членство (`03` 19.2).
+
+### `perk_redemptions`
+Использование плюшки. **Append-only.** Ошибка исправляется обратной записью.
+| Поле | Тип | Описание |
+|---|---|---|
+| id | uuid PK | |
+| card_id | uuid FK volunteer_cards not null | |
+| perk_id | uuid FK volunteer_perks not null | |
+| partner_id | uuid FK volunteer_partners not null | партнёр плюшки — для сводки по партнёрам |
+| cashier_id | uuid FK partner_cashiers null | кто отметил; `null` у обратной записи |
+| reversal_of_id | uuid FK perk_redemptions null unique | обратная запись: какую отметку отменяет |
+| comment | text null | обязателен у обратной записи |
+| created_by | uuid FK users null | admin, сделавший обратную запись; `null` у отметки кассира |
+| created_at | timestamptz | |
+
+Индексы: (`card_id`, `perk_id`), (`partner_id`, `created_at` desc), (`cashier_id`, `created_at` desc).
+Проверка: обратная запись ⇔ заполнены `reversal_of_id`, `comment`, `created_by` и пуст `cashier_id`; у отметки — наоборот.
+Правило: остаток разовой плюшки = `uses_limit` − (отметки по книжке − их обратные записи), не меньше 0.
+
+### `volunteer_requests`
+Запрос федерации на волонтёров.
+| Поле | Тип | Описание |
+|---|---|---|
+| id | uuid PK | |
+| title | jsonb not null | |
+| description | jsonb null | что делать, где и во сколько сбор (очищенный HTML) |
+| event_id | uuid FK events null | если запрос к событию |
+| starts_at, ends_at | timestamptz not null | проверка: `ends_at >= starts_at` |
+| location | text null | |
+| places | smallint not null, check >= 1 | сколько волонтёров нужно |
+| respond_by | timestamptz not null | срок ответа; проверка: `respond_by <= starts_at` |
+| status | volunteer_request_status default 'draft' | |
+| published_at | timestamptz null | время рассылки |
+| closed_at | timestamptz null | итоги ответов подведены по сроку (`03` 19.5 п. 4) |
+| created_by | uuid FK users | |
+| created_at, updated_at | timestamptz | |
+
+Индексы: (`status`, `respond_by`), `event_id`. Удаления нет: черновик можно отменить (`cancelled`).
+
+### `volunteer_invitations`
+Приглашение участнику и его ответ. Создаётся при рассылке запроса.
+| Поле | Тип | Описание |
+|---|---|---|
+| id | uuid PK | |
+| request_id | uuid FK volunteer_requests not null | |
+| user_id | uuid FK users not null | |
+| status | volunteer_answer default 'invited' | |
+| answered_at | timestamptz null | последний ответ участника |
+| marked_by | uuid FK users null | кто отметил явку или освободил |
+| marked_at | timestamptz null | |
+| counted_at | timestamptz null | итог учтён в счётчике отказов (один раз на приглашение) |
+| created_at, updated_at | timestamptz | |
+
+Ограничения: unique(`request_id`, `user_id`). Индексы: (`user_id`, `created_at` desc), (`request_id`, `status`).
+
+### `volunteer_reports`
+Фото или ссылка с мероприятия от участника, отмеченного «пришёл». Повторная отправка после отказа — новая строка, история остаётся.
+| Поле | Тип | Описание |
+|---|---|---|
+| id | uuid PK | |
+| invitation_id | uuid FK volunteer_invitations not null | |
+| user_id | uuid FK users not null | |
+| file_key | text null | фото в **приватном** бакете (`volunteer/<user id>/<uuid>.<ext>`) |
+| url | text null | нормализованная ссылка (Instagram, YouTube, Google Drive) |
+| note | text null | комментарий участника |
+| status | practice_status default 'pending' | |
+| reviewed_by | uuid FK users null | |
+| reviewed_at | timestamptz null | |
+| review_note | text null | причина отказа, видна участнику; обязательна при `rejected` |
+| created_at, updated_at | timestamptz | |
+
+Проверка: заполнено ровно одно из `file_key`, `url`. Ограничения: одна живая отправка на приглашение — unique(`invitation_id`) where `status in ('pending', 'approved')`. Индексы: (`status`, `created_at`), `user_id`.
+
+---
+
 ## Карта связей
 
 - `users` 1—N `memberships`, `exams`, `certificates`, `event_registrations`, `payments`, `videos`, `points_ledger`, `shop_orders`, `consents`
@@ -692,10 +848,14 @@
 - `courses` 1—N `course_topics`, `course_lessons`, `quiz_questions`, `course_access`, `quiz_attempts`, `practice_tasks`; `course_topics` 1—N `course_lessons`, `quiz_questions`
 - `practice_tasks` 1—N `practice_submissions`; `users` 1—N `course_access`, `quiz_attempts`, `practice_submissions`
 - `course_access` 1—1 `exams` (экзамен по итогам курса)
+- `users` 1—1 `volunteer_cards`; `users` 1—N `volunteer_invitations`, `volunteer_reports`
+- `volunteer_partners` 1—N `volunteer_perks`, `partner_cashiers`, `perk_redemptions`
+- `volunteer_cards` 1—N `perk_redemptions` N—1 `volunteer_perks`; `perk_redemptions` N—1 `partner_cashiers`
+- `volunteer_requests` N—1 `events` (необязательно); `volunteer_requests` 1—N `volunteer_invitations` 1—N `volunteer_reports`
 
 ## Начальные данные (seed)
 
-Скрипт `scripts/seed.ts` создаёт: правила баллов (коды выше), ключи `site_settings`, несколько `donation_purposes`, системные страницы `pages` (`about`, `rules`, `contacts`, `privacy`, `offer`, `refund-policy`), первого админа (из `SEED_ADMIN_EMAIL`, `SEED_ADMIN_PASSWORD`, `01-STACK.md`). Тестовые события, участников и товары скрипт создаёт только в `development`. Фальшивые данные в рабочем коде запрещены — только здесь.
+Скрипт `scripts/seed.ts` создаёт: правила баллов (коды выше), ключи `site_settings` (с этапа 10 — и `volunteer`), несколько `donation_purposes`, системные страницы `pages` (`about`, `rules`, `contacts`, `privacy`, `offer`, `refund-policy`), первого админа (из `SEED_ADMIN_EMAIL`, `SEED_ADMIN_PASSWORD`, `01-STACK.md`). Тестовые события, участников и товары скрипт создаёт только в `development`. Фальшивые данные в рабочем коде запрещены — только здесь.
 
 ## Что нужно уточнить у владельца
 1. Значения баллов за каждое правило.
