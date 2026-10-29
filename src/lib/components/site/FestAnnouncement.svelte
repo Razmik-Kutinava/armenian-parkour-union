@@ -1,8 +1,14 @@
 <script lang="ts">
 	import backLarge from '#lib/assets/fest/yerevan-parkour-fest-2027-1280.webp';
 	import backSmall from '#lib/assets/fest/yerevan-parkour-fest-2027-800.webp';
+	import posterEn256 from '#lib/assets/fest/yerevan-parkour-fest-2027-poster-en-256.webp';
+	import posterEn512 from '#lib/assets/fest/yerevan-parkour-fest-2027-poster-en-512.webp';
 	import posterEn from '#lib/assets/fest/yerevan-parkour-fest-2027-poster-en.webp';
+	import posterHy256 from '#lib/assets/fest/yerevan-parkour-fest-2027-poster-hy-256.webp';
+	import posterHy512 from '#lib/assets/fest/yerevan-parkour-fest-2027-poster-hy-512.webp';
 	import posterHy from '#lib/assets/fest/yerevan-parkour-fest-2027-poster-hy.webp';
+	import posterRu256 from '#lib/assets/fest/yerevan-parkour-fest-2027-poster-256.webp';
+	import posterRu512 from '#lib/assets/fest/yerevan-parkour-fest-2027-poster-512.webp';
 	import posterRu from '#lib/assets/fest/yerevan-parkour-fest-2027-poster.webp';
 	import { currentLocale, t, type Locale, type MessageKey } from '#lib/i18n/index.svelte.ts';
 	import LanguageSwitcher from './LanguageSwitcher.svelte';
@@ -10,7 +16,11 @@
 
 	const phone = '+374 77 253039';
 	const email = 'info@parkour.am';
-	const posters: Record<Locale, string> = { en: posterEn, hy: posterHy, ru: posterRu };
+	const posters: Record<Locale, [string, string, string]> = {
+		en: [posterEn256, posterEn512, posterEn],
+		hy: [posterHy256, posterHy512, posterHy],
+		ru: [posterRu256, posterRu512, posterRu]
+	};
 	const poster = $derived(posters[currentLocale()]);
 	const lists: { title: MessageKey; items: MessageKey[] }[] = [
 		{ title: 'fest.goalsTitle', items: ['fest.goal1', 'fest.goal2', 'fest.goal3', 'fest.goal4'] },
@@ -52,9 +62,11 @@
 				{t('fest.draftNote')}
 			</p>
 		</div>
-		<a href={poster} target="_blank" rel="noopener" class="mx-auto block w-64 md:w-full">
+		<a href={poster[2]} target="_blank" rel="noopener" class="mx-auto block w-64 md:w-full">
 			<img
-				src={poster}
+				src={poster[2]}
+				srcset="{poster[0]} 256w, {poster[1]} 512w, {poster[2]} 571w"
+				sizes="16rem"
 				alt={t('fest.posterAlt')}
 				width="571"
 				height="1024"

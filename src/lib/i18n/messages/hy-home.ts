@@ -4,7 +4,7 @@ export const hyHome: Partial<Messages> = {
 	'home.events': 'Մոտակա միջոցառումներ',
 	'home.eventsAll': 'Բոլոր միջոցառումները',
 	'home.about': 'Ֆեդերացիայի մասին',
-	'home.aboutMore': 'Կարդալ ավելին',
+	'home.aboutMore': 'Ավելին ֆեդերացիայի մասին',
 	'home.join': 'Միանալ ֆեդերացիային',
 	'home.news': 'Նորություններ',
 	'home.newsAll': 'Բոլոր նորությունները',

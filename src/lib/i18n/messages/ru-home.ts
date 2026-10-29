@@ -4,7 +4,7 @@ export const ruHome: Partial<Messages> = {
 	'home.events': 'Ближайшие события',
 	'home.eventsAll': 'Все события',
 	'home.about': 'О федерации',
-	'home.aboutMore': 'Подробнее',
+	'home.aboutMore': 'Подробнее о федерации',
 	'home.join': 'Вступить в федерацию',
 	'home.news': 'Новости',
 	'home.newsAll': 'Все новости',

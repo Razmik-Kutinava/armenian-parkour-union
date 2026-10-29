@@ -3,7 +3,7 @@ export const enHome = {
 	'home.events': 'Upcoming events',
 	'home.eventsAll': 'All events',
 	'home.about': 'About the federation',
-	'home.aboutMore': 'Read more',
+	'home.aboutMore': 'More about the federation',
 	'home.join': 'Join the federation',
 	'home.news': 'News',
 	'home.newsAll': 'All news',
