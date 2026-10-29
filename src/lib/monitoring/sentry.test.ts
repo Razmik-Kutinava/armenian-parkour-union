@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { ErrorEvent } from '@sentry/sveltekit';
-import { scrubBreadcrumb, scrubEmails, scrubEvent } from './sentry.ts';
+import { isMissingChunk, scrubBreadcrumb, scrubEmails, scrubEvent } from './sentry.ts';
 
 describe('scrubEmails', () => {
 	it('replaces every address and keeps the rest', () => {
@@ -55,7 +55,7 @@ describe('scrubEvent', () => {
 		expect(logged?.exception?.values?.[0].type).toBe('TypeError');
 	});
 
-	it('drops the Better Auth wrong-password warning, keeps its other warnings', () => {
+	it('drops the Better Auth sign-in mistakes, keeps its other warnings', () => {
 		const warn = (text: string) =>
 			({
 				type: undefined,
@@ -68,12 +68,47 @@ describe('scrubEvent', () => {
 
 		expect(scrubEvent(warn(`${at}Invalid password`))).toBeNull();
 		expect(scrubEvent(warn('\x1b[1m[Better Auth]:\x1b[0m Invalid password'))).toBeNull();
+		expect(scrubEvent(warn(`${at}User not found`))).toBeNull();
+		expect(scrubEvent(warn(`${at}Password not found`))).toBeNull();
+		expect(scrubEvent(warn(`${at}Reset Password: User not found`))).toBeNull();
 		expect(scrubEvent(warn(`${at}Invalid email or password`))).not.toBeNull();
+		expect(scrubEvent(warn(`${at}User not found for member 7`))).not.toBeNull();
 		expect(scrubEvent(warn('order 7: Invalid password field in letter'))).not.toBeNull();
+	});
+
+	it('drops a connection lost on the visitor side, keeps other fetch errors', () => {
+		const thrown = (type: string, value: string) =>
+			({ type: undefined, exception: { values: [{ type, value }] } }) as ErrorEvent;
+
+		expect(scrubEvent(thrown('TypeError', 'Failed to fetch'))).toBeNull();
+		expect(scrubEvent(thrown('TypeError', 'Failed to fetch (parkour.am)'))).toBeNull();
+		expect(scrubEvent(thrown('TypeError', 'Load failed'))).toBeNull();
+		expect(
+			scrubEvent(thrown('TypeError', 'NetworkError when attempting to fetch resource.'))
+		).toBeNull();
+		expect(scrubEvent(thrown('Error', 'aborted'))).toBeNull();
+		expect(scrubEvent(thrown('TypeError', 'fetch failed'))).not.toBeNull();
+		expect(scrubEvent(thrown('Error', 'Failed to fetch'))).not.toBeNull();
+		expect(scrubEvent(thrown('Error', 'upload aborted by quota'))).not.toBeNull();
 	});
 
 	it('accepts an event without optional parts', () => {
 		expect(scrubEvent({ type: undefined } as ErrorEvent)).toEqual({ type: undefined });
+	});
+});
+
+describe('isMissingChunk', () => {
+	it('knows a failed chunk load in every browser and nothing else', () => {
+		const chunk = 'https://parkour.am/_app/immutable/nodes/56.Bg7RUYGi.js';
+		expect(
+			isMissingChunk(new TypeError(`Failed to fetch dynamically imported module: ${chunk}`))
+		).toBe(true);
+		expect(
+			isMissingChunk(new TypeError(`error loading dynamically imported module: ${chunk}`))
+		).toBe(true);
+		expect(isMissingChunk(new TypeError('Importing a module script failed.'))).toBe(true);
+		expect(isMissingChunk(new TypeError('Failed to fetch'))).toBe(false);
+		expect(isMissingChunk('dynamically imported module')).toBe(false);
 	});
 });
 

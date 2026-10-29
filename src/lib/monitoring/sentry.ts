@@ -30,15 +30,40 @@ function nameConsoleCapture(event: ErrorEvent) {
 	}
 }
 
-/* A wrong password is the user's mistake, yet Better Auth logs it with console.warn. */
-function isWrongPassword(event: ErrorEvent) {
+/* A wrong email or password is the user's mistake, yet Better Auth logs it with console.warn. */
+const SIGN_IN_MISTAKES = ['Invalid password', 'User not found', 'Password not found'];
+
+function isSignInMistake(event: ErrorEvent) {
 	const texts = [event.message, ...(event.exception?.values ?? []).map((e) => e.value)];
-	return texts.some((text) => text?.includes('[Better Auth]') && text.includes('Invalid password'));
+	return texts.some(
+		(text) =>
+			text?.includes('[Better Auth]') &&
+			SIGN_IN_MISTAKES.some((mistake) => text.trimEnd().endsWith(mistake))
+	);
+}
+
+/* The visitor's network, not the site: a browser fetch that never got a response (the SDK adds the
+ * host in brackets), or a client that closed the connection before the server read the request. */
+const BROWSER_OFFLINE =
+	/^(Failed to fetch|NetworkError when attempting to fetch resource\.|Load failed)( \(.+\))?$/;
+
+function isDroppedConnection(event: ErrorEvent) {
+	return (event.exception?.values ?? []).some(
+		({ type, value = '' }) =>
+			(type === 'TypeError' && BROWSER_OFFLINE.test(value)) ||
+			(type === 'Error' && value === 'aborted')
+	);
+}
+
+/** Chromium, Firefox and Safari wording for a code chunk that failed to load. */
+export function isMissingChunk(error: unknown) {
+	const message = error instanceof Error ? error.message : '';
+	return /dynamically imported module|Importing a module script failed/.test(message);
 }
 
 /** Log lines name letter recipients (`certificate letter to a@b.c not sent`). */
 export function scrubEvent(event: ErrorEvent): ErrorEvent | null {
-	if (isWrongPassword(event)) return null;
+	if (isSignInMistake(event) || isDroppedConnection(event)) return null;
 	nameConsoleCapture(event);
 	if (event.message) event.message = scrubEmails(event.message);
 	for (const exception of event.exception?.values ?? []) {
