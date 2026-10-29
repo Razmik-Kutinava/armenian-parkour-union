@@ -5,7 +5,7 @@ export const enCabinetPrivacy = {
 		'Choose what visitors of the site may see. Contacts and the birth date are never shown.',
 	'cabinet.privacy.showCity': 'Show my city publicly',
 	'cabinet.privacy.showAvatar': 'Show my photo publicly',
-	'cabinet.privacy.submit': 'Save',
+	'cabinet.privacy.submit': 'Save privacy settings',
 	'cabinet.privacy.saved': 'Saved.',
 	'cabinet.deletion.title': 'Delete account',
 	'cabinet.deletion.hint':

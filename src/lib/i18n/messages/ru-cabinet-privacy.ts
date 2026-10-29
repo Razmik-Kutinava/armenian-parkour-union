@@ -6,7 +6,7 @@ export const ruCabinetPrivacy: Partial<Messages> = {
 		'Выберите, что видят посетители сайта. Контакты и дата рождения не показываются никогда.',
 	'cabinet.privacy.showCity': 'Показывать мой город публично',
 	'cabinet.privacy.showAvatar': 'Показывать моё фото публично',
-	'cabinet.privacy.submit': 'Сохранить',
+	'cabinet.privacy.submit': 'Сохранить настройки приватности',
 	'cabinet.privacy.saved': 'Сохранено.',
 	'cabinet.deletion.title': 'Удаление аккаунта',
 	'cabinet.deletion.hint':

@@ -61,10 +61,10 @@ test('profile form with a forged level: saved, the level and role unchanged', as
 	await page.goto('/cabinet/profile');
 	await hydrated(page);
 	const main = page.locator('main');
-	await main.getByLabel('City').fill('Vanadzor');
-	const save = page.getByRole('button', { name: 'Save' });
+	await main.getByLabel('City', { exact: true }).fill('Vanadzor');
+	const save = page.getByRole('button', { name: 'Save', exact: true });
 	await forge(main.locator('form', { has: save }));
-	await main.getByRole('button', { name: 'Save' }).click();
+	await save.click();
 	await expect(main.getByText('Profile saved.')).toBeVisible();
 	expect(await accountOf(email)).toMatchObject({ level: null, role: 'member', points_balance: 0 });
 });

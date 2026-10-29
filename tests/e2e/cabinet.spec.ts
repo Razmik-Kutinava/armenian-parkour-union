@@ -107,10 +107,10 @@ test('profile: save the fields; birth date is shown, not edited', async ({ page 
 		main.getByText('To change the date of birth, contact the federation.')
 	).toBeVisible();
 	await expect(main.locator('input[name="birthDate"]')).toHaveCount(0);
-	await main.getByLabel('City').fill('Gyumri');
+	await main.getByLabel('City', { exact: true }).fill('Gyumri');
 	await main.getByLabel('About me').fill('Traceur from Gyumri');
 	await main.getByLabel('Phone').fill('+374 91 123456');
-	await main.getByRole('button', { name: 'Save' }).click();
+	await main.getByRole('button', { name: 'Save', exact: true }).click();
 	await expect(main.getByText('Profile saved.')).toBeVisible();
 	const [row] =
 		await sql`select city, bio, phone, birth_date::text as birth from users where id = ${user.id}`;

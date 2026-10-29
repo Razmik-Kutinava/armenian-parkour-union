@@ -6,7 +6,7 @@ export const hyCabinetPrivacy: Partial<Messages> = {
 		'Ընտրեք, թե ինչ կարող են տեսնել կայքի այցելուները։ Կոնտակտները և ծննդյան ամսաթիվը երբեք չեն ցուցադրվում։',
 	'cabinet.privacy.showCity': 'Հանրայնորեն ցուցադրել իմ քաղաքը',
 	'cabinet.privacy.showAvatar': 'Հանրայնորեն ցուցադրել իմ լուսանկարը',
-	'cabinet.privacy.submit': 'Պահպանել',
+	'cabinet.privacy.submit': 'Պահպանել գաղտնիության կարգավորումները',
 	'cabinet.privacy.saved': 'Պահպանված է։',
 	'cabinet.deletion.title': 'Հաշվի ջնջում',
 	'cabinet.deletion.hint':
