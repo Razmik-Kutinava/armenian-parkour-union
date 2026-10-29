@@ -1,7 +1,8 @@
 import type postgres from 'postgres';
 
-/* A draft partner with a draft perk, a pending card of a member who meets the conditions and an
- * issued card (its PDF) for admin-permissions.spec.ts: every volunteering action could really run. */
+/* A draft partner with a draft perk and a waiting cashier access, a pending card of a member who
+ * meets the conditions and an issued card (its PDF) for admin-permissions.spec.ts: every volunteering
+ * action could really run. */
 export type VolunteerIds = { partnerId: string; perkId: string; cardId: string; issuedId: string };
 
 export const volunteerPath = (path: string, ids: VolunteerIds) =>
@@ -30,10 +31,14 @@ export function volunteerFixtures(sql: postgres.Sql) {
 			};
 			const [card] = await sql`insert into volunteer_cards (user_id, applied_at)
 				values (${await member('')}, now()) returning id`;
+			const holder = await member('i-');
 			const [issued] = await sql`insert into volunteer_cards
 				(user_id, applied_at, status, number, public_token, issued_at)
-				values (${await member('i-')}, now(), 'active', ${`E2E-V-${tag}`}, ${`e2e-${tag}`}, now())
+				values (${holder}, now(), 'active', ${`E2E-V-${tag}`}, ${`e2e-${tag}`}, now())
 				returning id`;
+			await sql`insert into partner_cashiers (partner_id, label, invite_token_hash,
+				invite_expires_at, created_by) values (${partner.id}, 'E2e perm till', ${`e2e-${tag}`},
+				now() + interval '1 day', ${holder})`;
 			return { partnerId: partner.id, perkId: perk.id, cardId: card.id, issuedId: issued.id };
 		},
 		/* Without the order: admin-audit.spec.ts moves partners in parallel and renumbers them all. */
@@ -45,6 +50,8 @@ export function volunteerFixtures(sql: postgres.Sql) {
 			perks:
 				await sql`select * from volunteer_perks where partner_id = ${ids.partnerId} order by id`,
 			card: (await sql`select * from volunteer_cards where id = ${ids.cardId}`)[0],
+			cashiers:
+				await sql`select * from partner_cashiers where partner_id = ${ids.partnerId} order by id`,
 			audit:
 				await sql`select 1 from audit_log where entity_id in (${ids.partnerId}, ${ids.perkId}, ${ids.cardId})`
 		})

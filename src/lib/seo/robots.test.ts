@@ -5,7 +5,7 @@ describe('seo: robots.txt (docs/06 section 7.2)', () => {
 	const text = renderRobots('https://parkour.am/');
 	const disallowed = [...text.matchAll(/^Disallow: (.+)$/gm)].map((m) => m[1]);
 
-	it('closes the cabinet, admin, api, certificates and volunteer cards, in every language', () => {
+	it('closes the cabinet, admin, api, certificates, volunteer cards and cashier pages, in every language', () => {
 		expect(text.startsWith('User-agent: *\n')).toBe(true);
 		expect(disallowed.sort()).toEqual(
 			[
@@ -14,12 +14,15 @@ describe('seo: robots.txt (docs/06 section 7.2)', () => {
 				'/cabinet',
 				'/certificate',
 				'/volunteer',
+				'/partner',
 				'/hy/cabinet',
 				'/hy/certificate',
 				'/hy/volunteer',
+				'/hy/partner',
 				'/ru/cabinet',
 				'/ru/certificate',
-				'/ru/volunteer'
+				'/ru/volunteer',
+				'/ru/partner'
 			].sort()
 		);
 	});

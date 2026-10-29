@@ -4,8 +4,8 @@ import type { AdminAction } from './admin-audit-map';
 type VolunteerAction = Extract<AdminAction, `/admin/volunteer${string}`>;
 type Post = (path: string, form?: Record<string, string>) => Promise<void>;
 
-/** Cards, partners and perks for admin-audit.spec.ts; partner steps in this order: each needs the
- * previous. Drafts: nothing reaches the check page. */
+/** Cards, partners, perks and cashier accesses for admin-audit.spec.ts; partner steps in this order:
+ * each needs the previous. Drafts: nothing reaches the check page. */
 export function volunteerActions(
 	sql: postgres.Sql,
 	post: Post,
@@ -20,6 +20,11 @@ export function volunteerActions(
 		const [row] = await sql`select p.id from volunteer_perks p
 			join volunteer_partners v on v.id = p.partner_id where v.name = ${name}`;
 		return `${await partner()}/perks/${row.id}`;
+	};
+	const cashier = async () => {
+		const [row] = await sql`select c.id from partner_cashiers c
+			join volunteer_partners v on v.id = c.partner_id where v.name = ${name}`;
+		return row.id as string;
 	};
 	/* Each card action on its own card of a fresh member who meets the conditions (docs/03 19.1). */
 	const cardOf = async (status: 'pending' | 'active') => {
@@ -56,6 +61,12 @@ export function volunteerActions(
 		'/admin/volunteer/partners/[id]/perks/new?/default': async () =>
 			postRedirect(`${await partner()}/perks/new`, perkForm),
 		'/admin/volunteer/partners/[id]/perks/[perkId]?/update': async () =>
-			post(`${await perk()}?/update`, { ...perkForm, usesLimit: '3' })
+			post(`${await perk()}?/update`, { ...perkForm, usesLimit: '3' }),
+		'/admin/volunteer/partners/[id]/cashiers?/create': async () =>
+			post(`${await partner()}/cashiers?/create`, { label: 'Audit till' }),
+		'/admin/volunteer/partners/[id]/cashiers?/link': async () =>
+			post(`${await partner()}/cashiers?/link`, { cashierId: await cashier() }),
+		'/admin/volunteer/partners/[id]/cashiers?/disable': async () =>
+			post(`${await partner()}/cashiers?/disable`, { cashierId: await cashier() })
 	};
 }
