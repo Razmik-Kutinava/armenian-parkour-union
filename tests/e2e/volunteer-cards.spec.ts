@@ -68,7 +68,48 @@ test('member applies for a card, an admin issues it, the member sees the number'
 	const [entry] = await sql`select action from audit_log where actor_id = ${adminId}`;
 	expect(entry.action).toBe('volunteer_card.issue');
 
-	await member.reload();
-	await expect(block.getByText(card.number)).toBeVisible();
-	await expect(block.getByText(/Valid until/)).toBeVisible();
+	const [partner] = await sql`insert into volunteer_partners (name, status)
+		values (${`E2e partner ${tag}`}, 'published') returning id`;
+	await sql`insert into volunteer_perks (partner_id, title, kind, uses_limit, status)
+		values (${partner.id}, ${sql.json({ en: `E2e perk ${tag}` })}, 'single', 2, 'published')`;
+	try {
+		await member.reload();
+		await expect(block.getByText(card.number)).toBeVisible();
+		await expect(block.getByText(/Valid until/)).toBeVisible();
+		await expect(block.getByRole('img', { name: 'QR code of the card' })).toBeVisible();
+		await expect(block.getByRole('link', { name: 'Download PDF' })).toHaveAttribute(
+			'href',
+			'/cabinet/volunteer/pdf'
+		);
+		const perks = member.getByRole('region', { name: 'Partner perks' });
+		await expect(perks.getByText(`E2e perk ${tag}`)).toBeVisible();
+		await expect(perks.getByText('2 of 2 left')).toBeVisible();
+
+		for (const path of ['/cabinet/volunteer/pdf', '/hy/cabinet/volunteer/pdf']) {
+			const res = await member.request.get(path);
+			expect(res.status(), path).toBe(200);
+			expect(res.headers()['content-type']).toBe('application/pdf');
+			expect(res.headers()['content-disposition']).toContain(`${card.number}.pdf`);
+			expect(res.headers()['cache-control']).toBe('no-store');
+			expect((await res.body()).subarray(0, 5).toString()).toBe('%PDF-');
+		}
+		expect((await admin.request.get('/cabinet/volunteer/pdf')).status()).toBe(404);
+
+		await admin.reload();
+		const adminPdf = admin.getByRole('link', { name: 'Download PDF' });
+		const href = (await adminPdf.getAttribute('href')) ?? '';
+		expect(href).toMatch(/^\/admin\/volunteer\/cards\/[0-9a-f-]{36}\/pdf$/);
+		expect((await admin.request.get(href)).status()).toBe(200);
+		expect((await member.request.get(href, { maxRedirects: 0 })).status()).not.toBe(200);
+
+		await sql`update memberships set ends_at = now() - interval '1 minute' where user_id = ${memberId}`;
+		expect((await member.request.get('/cabinet/volunteer/pdf')).status()).toBe(404);
+		expect((await admin.request.get(href)).status()).toBe(404);
+		await member.reload();
+		await expect(block.getByRole('link', { name: 'Download PDF' })).toHaveCount(0);
+		await expect(block.getByRole('img', { name: 'QR code of the card' })).toHaveCount(0);
+		await expect(member.getByRole('region', { name: 'Partner perks' })).toHaveCount(0);
+	} finally {
+		await sql`update volunteer_partners set status = 'archived' where id = ${partner.id}`;
+	}
 });

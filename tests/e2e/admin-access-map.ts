@@ -97,6 +97,7 @@ export const ADMIN_READS = {
 	'/admin/training/attempts/[id]': 'training.review',
 	'/admin/volunteer/cards': 'volunteer.manage',
 	'/admin/volunteer/cards/[id]': 'volunteer.manage',
+	'GET /admin/volunteer/cards/[id]/pdf': 'volunteer.manage',
 	'/admin/volunteer/partners': 'volunteer.manage',
 	'/admin/volunteer/partners/new': 'volunteer.manage',
 	'/admin/volunteer/partners/[id]': 'volunteer.manage',
