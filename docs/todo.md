@@ -15,7 +15,7 @@
 - `src/lib/server/services/volunteer/card-pdf-render.ts` (+ test) — pdf-lib, A4 книжная: логотип, заголовок, фото, имя, номер, «действительна до», QR, список партнёров (логотип, плюшка, условия; перенос строк и страниц), «актуально на». Шрифты, QR, цвета — из `certificates/pdf-draw.ts`
 - маршруты: `[[lang=lang]]/(site)/cabinet/volunteer/pdf/+server.ts` (своя книжка, язык страницы), `admin/volunteer/cards/[id]/pdf/+server.ts` (`volunteer.manage`, язык админки); `cabinet/volunteer/+page.server.ts` + `CardBlock.svelte` (QR, «Скачать PDF») + новый `PerksBlock.svelte`; `admin/volunteer/cards/[id]/+page.svelte` (кнопка); `card-own.ts` (+ test) — адрес проверки и плюшки только у действительной
 - `src/lib/server/auth/rate-limit.ts` — лимит `volunteerPdfPerUser`; переводы `{en,hy,ru}-volunteer-cards.ts` (PDF, «Плюшки»)
-- e2e: `tests/e2e/volunteer-cards.spec.ts` (скачать свою, чужая и недействительная — 404, admin из карточки), `tests/e2e/admin-access-map.ts` — строка `GET /admin/volunteer/cards/[id]/pdf` (файл 227 строк — см. «Открыто»)
+- e2e: `tests/e2e/volunteer-cards.spec.ts` (скачать свою, чужая и недействительная — 404, admin из карточки), `tests/e2e/admin-access-map.ts` — строка `GET /admin/volunteer/cards/[id]/pdf` (см. «Решено владельцем»)
 
 ## Решения агента (в пределах документов)
 
@@ -49,9 +49,9 @@
 - `zone-notes.md` § «Волонтёрство», § «Экзамены и сертификаты» (6.4 PDF, 6.8 QR в кабинете)
 - образцы: `certificates/pdf-render.ts`, `pdf-draw.ts`, `pdf-content.ts` (`holderName`, `yerevanDate`), `qr-svg.ts`; `cabinet/progress/[id]/pdf/+server.ts`; `components/site/media-photo.ts` (адрес Transformations); `cabinet/avatar.ts` (`sniffMime`)
 
-## Открыто
+## Решено владельцем
 
-- `tests/e2e/admin-access-map.ts` уже 227 строк (> 200): новая строка — только по ответу владельца (исключение для таблицы или сплит отдельным шагом).
+- `tests/e2e/admin-access-map.ts` (227 строк): дописать строку — таблица маршрутов, лимит 200 строк к ней не применяется (2026-10-29).
 
 ## Фазы
 
