@@ -51,8 +51,14 @@ for (const path of ['/login', '/register']) {
 	});
 }
 
-test('a POST to /google without a form body is not a server error', async ({ request }) => {
-	const res = await request.post('/google', { maxRedirects: 0 });
+test('a POST to /google without a form body is not a server error', async ({
+	request,
+	baseURL
+}) => {
+	const res = await request.post('/google', {
+		maxRedirects: 0,
+		headers: { origin: new URL(baseURL ?? '').origin }
+	});
 	expect(res.status()).toBe(303);
 	expect(res.headers().location).toMatch(/^https:\/\/accounts\.google\.com\//);
 });
