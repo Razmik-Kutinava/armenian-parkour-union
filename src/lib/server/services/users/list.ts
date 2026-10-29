@@ -30,12 +30,13 @@ export const userFilterValues = {
 	level: membershipLevel.enumValues,
 	role: userRole.enumValues,
 	status: userStatus.enumValues,
-	age: ['minor', 'adult']
+	age: ['minor', 'adult'],
+	deletion: ['requested']
 } as const;
 
 export const userListOptions: ListOptions = {
 	sortable: ['name', 'createdAt', 'points'],
-	filters: ['level', 'role', 'status', 'age', 'city'],
+	filters: ['level', 'role', 'status', 'age', 'city', 'deletion'],
 	defaultSort: { key: 'createdAt', dir: 'desc' }
 };
 
@@ -91,6 +92,7 @@ function conditions(viewer: Actor, state: ListState, full: boolean, today: Date)
 	if (age === 'minor') where.push(gt(users.birthDate, adultCutoff(today)));
 	if (age === 'adult') where.push(lte(users.birthDate, adultCutoff(today)));
 	if (f.city) where.push(ilike(users.city, escapeLike(f.city)));
+	if (allowed('deletion', f.deletion)) where.push(isNotNull(users.deletionRequestedAt));
 	return where.filter((c): c is SQL => !!c);
 }
 

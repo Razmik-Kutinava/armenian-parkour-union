@@ -10,6 +10,8 @@ export const ADMIN_AUDIT = {
 	'/admin/users/[id]?/unblock': ['user.unblock'],
 	'/admin/users/[id]?/confirmEmail': ['user.email_confirm'],
 	'/admin/users/[id]?/passwordLink': ['user.password_link'],
+	'/admin/users/[id]?/deleteAccount': ['user.delete'],
+	'/admin/users/[id]?/declineDeletion': ['user.deletion_reject'],
 	'/admin/users/new?/default': ['user.create'],
 	'/admin/roles?/grant': ['user.role_change'],
 	'/admin/roles?/revoke': ['user.role_change'],

@@ -32,7 +32,8 @@ export async function lockTarget(tx: LimitDb, id: string) {
 			id: users.id,
 			role: users.role,
 			status: users.status,
-			emailVerified: users.emailVerified
+			emailVerified: users.emailVerified,
+			deletionRequestedAt: users.deletionRequestedAt
 		})
 		.from(users)
 		.where(and(eq(users.id, id), isNull(users.deletedAt)))

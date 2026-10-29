@@ -43,7 +43,12 @@
 			label: t('users.filter.age'),
 			options: opts(['minor', 'adult'], (v) => t(`users.age.${v}`))
 		},
-		{ key: 'city', label: t('users.filter.city'), options: opts(data.cities, (v) => v) }
+		{ key: 'city', label: t('users.filter.city'), options: opts(data.cities, (v) => v) },
+		{
+			key: 'deletion',
+			label: t('users.filter.deletion'),
+			options: [{ value: 'requested', label: t('users.deletion.requested') }]
+		}
 	]);
 	const date = (d: Date) => d.toLocaleDateString(currentLocale());
 </script>

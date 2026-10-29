@@ -1,6 +1,7 @@
 import { enCabinet } from './en-cabinet';
 import { enCabinetAvatar } from './en-cabinet-avatar';
 import { enCabinetEvents } from './en-cabinet-events';
+import { enCabinetPrivacy } from './en-cabinet-privacy';
 import { enCabinetOrders } from './en-cabinet-orders';
 import { enCabinetPoints } from './en-cabinet-points';
 import { enCabinetProgress } from './en-cabinet-progress';
@@ -59,6 +60,7 @@ export const en = {
 	...enCabinetPoints,
 	...enCabinetProgress,
 	...enCabinetAvatar,
+	...enCabinetPrivacy,
 	...enCabinetEvents,
 	...enCabinetVideos,
 	...enCabinetOrders,

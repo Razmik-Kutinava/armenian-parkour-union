@@ -11,7 +11,8 @@ import { inForce } from '../consents/valid';
 import { liveCertificateOf } from './profile';
 
 /* docs/06 section 4.6: photo, name, category, description. A minor — or an unknown birth date —
- * shows the photo and the description only with the `privacy` consent (docs/03 section 13 p. 3).
+ * shows the photo and the description only with the `privacy` consent (docs/03 section 13 p. 3);
+ * the photo also needs the member's own `show_avatar` (decisions.md 2026-10-22).
  * Contacts, the birth date and ids never leave this function. */
 
 export type StaffCard = {
@@ -50,6 +51,7 @@ export async function listPublicStaff(
 			firstName: users.firstName,
 			lastName: users.lastName,
 			avatarKey: users.avatarKey,
+			showAvatar: users.showAvatar,
 			birthDate: users.birthDate,
 			privacy: exists(privacy).mapWith(Boolean)
 		})
@@ -71,7 +73,7 @@ export async function listPublicStaff(
 		const card = {
 			name: holderName(r),
 			category: r.category,
-			avatarKey: shown ? r.avatarKey : null,
+			avatarKey: shown && r.showAvatar ? r.avatarKey : null,
 			bio: shown ? bioText(r.bio, locale) : null
 		};
 		(r.kind === 'trainer' ? team.trainers : team.judges).push(card);

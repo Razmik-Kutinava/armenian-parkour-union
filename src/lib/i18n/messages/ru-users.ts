@@ -53,6 +53,17 @@ export const ruUsers: Record<keyof typeof enUsers, string> = {
 	'users.error.lastAdmin': 'Это последний активный администратор.',
 	'users.error.role': 'Выберите роль из списка.',
 	'users.error.reason': 'Укажите причину.',
+	'users.error.notRequested': 'Участник не запрашивал удаление аккаунта.',
+	'users.filter.deletion': 'Удаление',
+	'users.deletion.requested': 'Запросил удаление',
+	'users.deletion.asked': 'Запросил удаление аккаунта {date}',
+	'users.delete': 'Удалить аккаунт',
+	'users.deleteTitle': 'Удалить аккаунт?',
+	'users.deleteText':
+		'Человек сразу выйдет из системы и больше не сможет войти; аккаунт пропадёт из списков. Баллы, платежи и сертификаты останутся.',
+	'users.declineDeletion': 'Отклонить запрос',
+	'users.declineTitle': 'Отклонить запрос на удаление?',
+	'users.declineText': 'Запрос снимается, аккаунт остаётся как есть.',
 
 	'roles.staff': 'Сотрудники',
 	'roles.lastLogin': 'Последний вход',

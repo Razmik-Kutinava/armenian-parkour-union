@@ -2,6 +2,7 @@ import type { Messages } from '../translate';
 import { ruCabinet } from './ru-cabinet';
 import { ruCabinetAvatar } from './ru-cabinet-avatar';
 import { ruCabinetEvents } from './ru-cabinet-events';
+import { ruCabinetPrivacy } from './ru-cabinet-privacy';
 import { ruCabinetOrders } from './ru-cabinet-orders';
 import { ruCabinetPoints } from './ru-cabinet-points';
 import { ruCabinetProgress } from './ru-cabinet-progress';
@@ -59,6 +60,7 @@ export const ru: Partial<Messages> = {
 	...ruCabinetPoints,
 	...ruCabinetProgress,
 	...ruCabinetAvatar,
+	...ruCabinetPrivacy,
 	...ruCabinetEvents,
 	...ruCabinetVideos,
 	...ruCabinetOrders,

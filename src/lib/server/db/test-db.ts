@@ -1,5 +1,5 @@
 import { existsSync } from 'node:fs';
-import { and, eq, ne } from 'drizzle-orm';
+import { and, asc, eq, ne } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 import type { LimitDb } from '../auth/rate-limit';
@@ -51,8 +51,13 @@ export async function insertUser(tx: LimitDb, values: NewTestUser = {}) {
 
 /** Leaves `keep` as the only active admin inside the rolled-back transaction. */
 export async function onlyAdmin(tx: LimitDb, keepId: string) {
+	const others = and(eq(users.role, 'admin'), ne(users.id, keepId));
+	// the update's own lock, taken in id order first: parallel test files wait instead of deadlocking
 	await tx
-		.update(users)
-		.set({ role: 'member' })
-		.where(and(eq(users.role, 'admin'), ne(users.id, keepId)));
+		.select({ id: users.id })
+		.from(users)
+		.where(others)
+		.orderBy(asc(users.id))
+		.for('no key update');
+	await tx.update(users).set({ role: 'member' }).where(others);
 }

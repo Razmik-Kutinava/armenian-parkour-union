@@ -23,7 +23,7 @@ export type HeroSlide = {
 	video: VideoLink | null;
 	cta: { label: string; url: string } | null;
 	event: { slug: string; title: string; startsAt: Date; endsAt: Date; city: string | null } | null;
-	/** Only the name of an adult (K4); the avatar only with the member's consent. */
+	/** Only the name of an adult (K4); the avatar only with the member's `show_avatar`. */
 	person: { name: string; avatarKey: string | null } | null;
 };
 
@@ -64,7 +64,7 @@ export function heroRows(db: LimitDb, where: SQL | undefined, limit: number) {
 				city: events.city,
 				coverKey: events.coverKey
 			},
-			person: { name: users.name, avatarKey: users.avatarKey }
+			person: { name: users.name, avatarKey: users.avatarKey, showAvatar: users.showAvatar }
 		})
 		.from(heroBlocks)
 		.leftJoin(events, eq(events.id, heroBlocks.eventId))
@@ -132,7 +132,10 @@ export function toSlide({ block, event, person }: HeroRowJoined, locale: Locale)
 				}
 			: null,
 		/* decisions.md 2026-10-22: no photo in public until the member allows it (`show_avatar`). */
-		person: block.type === 'person' && person ? { name: person.name, avatarKey: null } : null
+		person:
+			block.type === 'person' && person
+				? { name: person.name, avatarKey: person.showAvatar ? person.avatarKey : null }
+				: null
 	};
 }
 

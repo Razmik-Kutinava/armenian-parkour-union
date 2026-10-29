@@ -61,7 +61,7 @@ ALTER TABLE "users" ADD COLUMN "deletion_requested_at" timestamp with time zone;
 ## Фазы
 
 - [x] SPEC
-- [ ] Migration Gate — «go»
-- [ ] RED
-- [ ] GREEN
-- [ ] REVIEW (одиночная задача)
+- [x] Migration Gate — «go» 2026-10-29, 0017 на dev
+- [x] RED `c334d82`
+- [x] GREEN (сервисы, кабинет, админка, переводы, карты e2e; `onlyAdmin` в `test-db.ts` блокирует строки по id — два файла с ним давали deadlock)
+- [ ] REVIEW (одиночная задача, база `72a71cd`)

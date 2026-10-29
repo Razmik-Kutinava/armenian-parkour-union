@@ -54,6 +54,17 @@ export const hyUsers: Partial<Messages> = {
 	'users.error.lastAdmin': 'Սա վերջին ակտիվ ադմինիստրատորն է։',
 	'users.error.role': 'Ընտրեք դերը ցանկից։',
 	'users.error.reason': 'Նշեք պատճառը։',
+	'users.error.notRequested': 'Մասնակիցը հաշվի ջնջում չի խնդրել։',
+	'users.filter.deletion': 'Ջնջում',
+	'users.deletion.requested': 'Խնդրել է ջնջել',
+	'users.deletion.asked': 'Խնդրել է ջնջել հաշիվը {date}',
+	'users.delete': 'Ջնջել հաշիվը',
+	'users.deleteTitle': 'Ջնջե՞լ հաշիվը',
+	'users.deleteText':
+		'Մարդն անմիջապես դուրս կգա համակարգից և այլևս չի կարողանա մուտք գործել. հաշիվը կանհետանա ցանկերից։ Միավորները, վճարումները և վկայականները կմնան։',
+	'users.declineDeletion': 'Մերժել հայտը',
+	'users.declineTitle': 'Մերժե՞լ ջնջման հայտը',
+	'users.declineText': 'Հայտը հանվում է, հաշիվը մնում է նույնը։',
 
 	'roles.staff': 'Աշխատակազմ',
 	'roles.lastLogin': 'Վերջին մուտքը',

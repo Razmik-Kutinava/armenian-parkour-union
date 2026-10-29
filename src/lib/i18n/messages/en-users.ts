@@ -52,6 +52,17 @@ export const enUsers = {
 	'users.error.lastAdmin': 'This is the last active administrator.',
 	'users.error.role': 'Choose a role from the list.',
 	'users.error.reason': 'Give the reason.',
+	'users.error.notRequested': 'The member has not asked to delete the account.',
+	'users.filter.deletion': 'Deletion',
+	'users.deletion.requested': 'Asked for deletion',
+	'users.deletion.asked': 'Asked to delete the account on {date}',
+	'users.delete': 'Delete account',
+	'users.deleteTitle': 'Delete the account?',
+	'users.deleteText':
+		'The person is signed out at once and can no longer log in; the account disappears from the lists. Points, payments and certificates stay.',
+	'users.declineDeletion': 'Decline the request',
+	'users.declineTitle': 'Decline the deletion request?',
+	'users.declineText': 'The request is cleared; the account stays as it is.',
 
 	'roles.staff': 'Staff',
 	'roles.lastLogin': 'Last sign-in',

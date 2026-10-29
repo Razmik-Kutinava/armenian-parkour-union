@@ -2,7 +2,8 @@ import type { Messages } from '../translate';
 
 export const hyCabinetAvatar: Partial<Messages> = {
 	'cabinet.avatar.title': 'Լուսանկար',
-	'cabinet.avatar.hint': 'JPEG, PNG կամ WebP, մինչև 5 ՄԲ։ Այն չի ցուցադրվում հանրային կայքում։',
+	'cabinet.avatar.hint':
+		'JPEG, PNG կամ WebP, մինչև 5 ՄԲ։ Հանրային կայքում այն ցուցադրվում է միայն, եթե թույլատրեք «Գաղտնիություն» բաժնում։',
 	'cabinet.avatar.alt': 'Ձեր լուսանկարը',
 	'cabinet.avatar.upload': 'Վերբեռնել լուսանկար',
 	'cabinet.avatar.change': 'Փոխել լուսանկարը',

@@ -1,4 +1,4 @@
-import { error, fail } from '@sveltejs/kit';
+import { error, fail, redirect } from '@sveltejs/kit';
 import { can } from '#lib/server/auth/permissions.ts';
 import { requirePermission } from '#lib/server/auth/guard.ts';
 import { mailPasswordLink } from '#lib/server/auth/password.ts';
@@ -6,6 +6,7 @@ import { db } from '#lib/server/db/index.ts';
 import { userHistory, writeAudit } from '#lib/server/services/audit.ts';
 import { changeRole, confirmEmail, setBlocked } from '#lib/server/services/users/account.ts';
 import { getUserCard } from '#lib/server/services/users/card.ts';
+import { declineDeletion, deleteAccount } from '#lib/server/services/users/deletion.ts';
 import { updateProfile } from '#lib/server/services/users/edit.ts';
 import { blockSchema, profileSchema, roleSchema } from '#lib/validation/admin-users.ts';
 import { fieldErrors, keepValues } from '#lib/validation/form.ts';
@@ -75,6 +76,19 @@ export const actions: Actions = {
 		const actor = requirePermission(event.locals.user, 'users.block');
 		const ip = event.getClientAddress();
 		return accountOutcome(await setBlocked(db, actor, event.params.id, false, null, ip));
+	},
+	/* decisions.md 2026-10-22: only an admin, only on the member's request (the service checks). */
+	deleteAccount: async (event) => {
+		const actor = requirePermission(event.locals.user, 'users.block');
+		const result = await deleteAccount(db, actor, event.params.id, event.getClientAddress());
+		if (result === 'ok') redirect(303, '/admin/users');
+		return accountOutcome(result);
+	},
+	declineDeletion: async (event) => {
+		const actor = requirePermission(event.locals.user, 'users.block');
+		return accountOutcome(
+			await declineDeletion(db, actor, event.params.id, event.getClientAddress())
+		);
 	},
 	confirmEmail: async (event) => {
 		const actor = requirePermission(event.locals.user, 'users.write');

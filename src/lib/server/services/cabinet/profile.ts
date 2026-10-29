@@ -20,6 +20,9 @@ export type OwnProfile = {
 	guardianName: string | null;
 	guardianPhone: string | null;
 	guardianEmail: string | null;
+	showCity: boolean;
+	showAvatar: boolean;
+	deletionRequestedAt: Date | null;
 	/** Under 18 by the stored birth date: parent data is required (docs/03 section 13). */
 	minor: boolean;
 	/** A Google-only account has none: the form offers to set one by mail. */
@@ -49,7 +52,10 @@ export async function getOwnProfile(
 			locale: users.locale,
 			guardianName: users.guardianName,
 			guardianPhone: users.guardianPhone,
-			guardianEmail: users.guardianEmail
+			guardianEmail: users.guardianEmail,
+			showCity: users.showCity,
+			showAvatar: users.showAvatar,
+			deletionRequestedAt: users.deletionRequestedAt
 		})
 		.from(users)
 		.where(own(userId));

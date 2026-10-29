@@ -2,6 +2,7 @@ import { expect, type Page } from '@playwright/test';
 import type postgres from 'postgres';
 import { certificateActions } from './admin-audit-certificates';
 import { consentActions } from './admin-audit-consents';
+import { deletionActions } from './admin-audit-deletion';
 import { examActions } from './admin-audit-exams';
 import type { AdminAction } from './admin-audit-map';
 import { moneyActions } from './admin-audit-money';
@@ -216,7 +217,8 @@ export async function adminActions(page: Page, sql: postgres.Sql, adminId: strin
 		...videoActions(sql, post, page, target),
 		...shopActions(sql, post, postRedirect, target),
 		...trainingActions(sql, post, postRedirect, raw),
-		...practiceActions(sql, post, postRedirect)
+		...practiceActions(sql, post, postRedirect),
+		...deletionActions(sql, post, postRedirect, target)
 	};
 	return perform;
 }

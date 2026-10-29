@@ -2,6 +2,8 @@
 	import { t } from '#lib/i18n/index.svelte.ts';
 	import AccountForms from './AccountForms.svelte';
 	import AvatarForm from './AvatarForm.svelte';
+	import DeletionForm from './DeletionForm.svelte';
+	import PrivacyForm from './PrivacyForm.svelte';
 	import ProfileForm from './ProfileForm.svelte';
 	import type { PageProps } from './$types';
 
@@ -22,11 +24,20 @@
 		result={form?.avatar}
 	/>
 	<ProfileForm profile={data.profile} countries={data.countries} result={form?.profile} />
+	<PrivacyForm
+		showCity={data.profile.showCity}
+		showAvatar={data.profile.showAvatar}
+		saved={!!form?.privacy?.saved}
+	/>
 	<AccountForms
 		email={data.profile.email}
 		hasPassword={data.profile.hasPassword}
 		emailResult={form?.email}
 		passwordResult={form?.password}
 		setupResult={form?.setup}
+	/>
+	<DeletionForm
+		requestedAt={data.profile.deletionRequestedAt}
+		cancelled={!!form?.deletion?.cancelled}
 	/>
 </div>

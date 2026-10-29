@@ -23,6 +23,8 @@ export type UserCard = {
 	guardianPhone: string | null;
 	guardianEmail: string | null;
 	createdAt: Date;
+	/** The member asked to delete the account (decisions.md 2026-10-22). */
+	deletionRequestedAt: Date | null;
 	/* only with users.read_full (docs/04 section 4) */
 	email?: string;
 	phone?: string | null;
@@ -57,7 +59,8 @@ export async function getUserCard(
 		guardianName: row.guardianName,
 		guardianPhone: row.guardianPhone,
 		guardianEmail: row.guardianEmail,
-		createdAt: row.createdAt
+		createdAt: row.createdAt,
+		deletionRequestedAt: row.deletionRequestedAt
 	};
 	if (!roleCan(viewer.role, 'users.read_full')) return card;
 	return { ...card, email: row.email, phone: row.phone, birthDate: row.birthDate };

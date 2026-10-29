@@ -2,7 +2,8 @@ import type { Messages } from '../translate';
 
 export const ruCabinetAvatar: Partial<Messages> = {
 	'cabinet.avatar.title': 'Фото',
-	'cabinet.avatar.hint': 'JPEG, PNG или WebP, до 5 МБ. На публичном сайте не показывается.',
+	'cabinet.avatar.hint':
+		'JPEG, PNG или WebP, до 5 МБ. На публичном сайте показывается, только если вы разрешите это в «Приватности».',
 	'cabinet.avatar.alt': 'Ваше фото',
 	'cabinet.avatar.upload': 'Загрузить фото',
 	'cabinet.avatar.change': 'Сменить фото',

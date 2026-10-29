@@ -15,6 +15,7 @@ import {
 import { fieldErrors, keepValues } from '#lib/validation/form.ts';
 import type { Actions, PageServerLoad } from './$types';
 import { avatarActions } from './avatar-actions';
+import { privacyActions } from './privacy-actions';
 
 /* docs/06 section 5.2: own profile only (docs/04 section 5.3); birth date is shown, not edited. */
 
@@ -41,6 +42,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 
 export const actions: Actions = {
 	...avatarActions,
+	...privacyActions,
 
 	save: async ({ locals, request }) => {
 		const user = requireUser(locals.user);

@@ -104,6 +104,8 @@ export const ADMIN_WRITES = {
 	'/admin/users/[id]?/unblock': 'users.block',
 	'/admin/users/[id]?/confirmEmail': 'users.write',
 	'/admin/users/[id]?/passwordLink': 'users.write',
+	'/admin/users/[id]?/deleteAccount': 'users.block',
+	'/admin/users/[id]?/declineDeletion': 'users.block',
 	'/admin/users/new?/default': 'users.write',
 	'/admin/roles?/grant': 'users.set_role',
 	'/admin/roles?/revoke': 'users.set_role',

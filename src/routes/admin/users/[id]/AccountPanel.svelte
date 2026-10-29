@@ -4,7 +4,7 @@
 	import Badge from '#lib/components/ui/Badge.svelte';
 	import Button from '#lib/components/ui/Button.svelte';
 	import Select from '#lib/components/ui/Select.svelte';
-	import { t } from '#lib/i18n/index.svelte.ts';
+	import { currentLocale, t } from '#lib/i18n/index.svelte.ts';
 	import type { UserCard } from '#lib/server/services/users/card.ts';
 
 	/* docs/05 section 6: account actions of an admin; dangerous ones go through ConfirmDialog. */
@@ -19,6 +19,8 @@
 	let role = $derived<string>(card.role);
 	let roleOpen = $state(false);
 	let blockOpen = $state(false);
+	let deleteOpen = $state(false);
+	let declineOpen = $state(false);
 </script>
 
 <FormSection title={t('users.section.account')}>
@@ -84,5 +86,38 @@
 			danger={card.status === 'active'}
 			comment={card.status === 'active' ? 'required' : 'none'}
 		/>
+	{/if}
+
+	{#if card.deletionRequestedAt}
+		<div class="flex flex-col gap-3">
+			<Badge tone="warning">
+				{t('users.deletion.asked', {
+					date: card.deletionRequestedAt.toLocaleDateString(currentLocale())
+				})}
+			</Badge>
+			{#if can.block && !isSelf}
+				<div class="flex flex-wrap gap-3">
+					<Button variant="danger" onclick={() => (deleteOpen = true)}>{t('users.delete')}</Button>
+					<Button variant="secondary" onclick={() => (declineOpen = true)}>
+						{t('users.declineDeletion')}
+					</Button>
+				</div>
+				<ConfirmDialog
+					bind:open={deleteOpen}
+					title={t('users.deleteTitle')}
+					text={t('users.deleteText')}
+					action="?/deleteAccount"
+					confirmLabel={t('users.delete')}
+					danger
+				/>
+				<ConfirmDialog
+					bind:open={declineOpen}
+					title={t('users.declineTitle')}
+					text={t('users.declineText')}
+					action="?/declineDeletion"
+					confirmLabel={t('users.declineDeletion')}
+				/>
+			{/if}
+		</div>
 	{/if}
 </FormSection>
