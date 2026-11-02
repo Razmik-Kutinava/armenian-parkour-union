@@ -34,7 +34,10 @@ describe.skipIf(!testDbUrl)('cashier phone binding', () => {
 	it('the link binds the phone once: the device token is returned, only its hash stored', async () => {
 		await inRollback(async (tx) => {
 			const { id, token, partnerId } = await invite(tx);
-			expect(await findInvite(tx, token)).toEqual({ partnerName: 'Komitas Coffee', label: 'Till 1' });
+			expect(await findInvite(tx, token)).toEqual({
+				partnerName: 'Komitas Coffee',
+				label: 'Till 1'
+			});
 			const device = await bindCashier(tx, token);
 			expect(device).toMatch(/^[A-Za-z0-9_-]{43}$/);
 			const bound = await row(tx, id);

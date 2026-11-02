@@ -66,5 +66,34 @@ export const enVolunteerAdmin = {
 	'volunteer.error.dateRange': 'The end date cannot be before the start date.',
 	'volunteer.error.usesLimit': 'Enter a whole number from 1 to 100.',
 	'volunteer.error.kind': 'Choose the kind.',
-	'volunteer.error.logo': 'Choose an image from the media library.'
+	'volunteer.error.logo': 'Choose an image from the media library.',
+	'volunteer.tab.cashiers': 'Cashiers',
+	'volunteer.cashiers.intro':
+		'A cashier is a partner phone, not a site account. Create an access and send the link to the cashier: they open it on their phone in the browser that opens QR codes from the camera. One access — one phone.',
+	'volunteer.cashiers.label': 'Who or where',
+	'volunteer.cashiers.labelHint': 'For example "Till 1, Komitas"; up to 80 characters.',
+	'volunteer.cashiers.create': 'Create access',
+	'volunteer.cashiers.empty': 'No cashier accesses yet',
+	'volunteer.cashiers.col.label': 'Who or where',
+	'volunteer.cashiers.col.state': 'State',
+	'volunteer.cashiers.col.lastUsed': 'Last mark',
+	'volunteer.cashiers.col.actions': 'Actions',
+	'volunteer.cashiers.state.waiting': 'Waiting for the phone until {date}',
+	'volunteer.cashiers.state.expired': 'The link expired {date}',
+	'volunteer.cashiers.state.bound': 'Bound {date}',
+	'volunteer.cashiers.state.disabled': 'Disabled {date}',
+	'volunteer.cashiers.relink': 'New link',
+	'volunteer.cashiers.relinkText':
+		'"{label}" gets a new link; the phone bound now stops working at once.',
+	'volunteer.cashiers.disable': 'Disable',
+	'volunteer.cashiers.disableText':
+		'"{label}" stops working at once: neither the link nor the phone. This cannot be undone — for a new cashier create a new access.',
+	'volunteer.cashiers.invite.title': 'Invite link for "{label}"',
+	'volunteer.cashiers.invite.hint':
+		'Shown only now: copy it and send it to the cashier. It works once, until {date}.',
+	'volunteer.cashiers.invite.link': 'Invite link',
+	'volunteer.cashiers.invite.copy': 'Copy',
+	'volunteer.cashiers.invite.copied': 'Copied.',
+	'volunteer.cashiers.error.label': 'Enter who or where: 1 to 80 characters.',
+	'volunteer.cashiers.error.disabled': 'The access is disabled: create a new one.'
 } as const;

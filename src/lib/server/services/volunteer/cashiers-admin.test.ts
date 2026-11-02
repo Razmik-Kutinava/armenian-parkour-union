@@ -29,7 +29,14 @@ describe.skipIf(!testDbUrl)('cashier accesses in the admin panel', () => {
 		await inRollback(async (tx) => {
 			const { admin, partnerId } = await partnerOf(tx);
 			const now = new Date('2026-11-02T10:00:00Z');
-			const created = await createCashier(tx, admin, partnerId, '  Till 1, Komitas ', '10.0.0.9', now);
+			const created = await createCashier(
+				tx,
+				admin,
+				partnerId,
+				'  Till 1, Komitas ',
+				'10.0.0.9',
+				now
+			);
 			if (typeof created === 'string') throw new Error(created);
 			expect(created.token).toMatch(/^[A-Za-z0-9_-]{43}$/);
 			expect(created.expiresAt).toEqual(new Date(now.getTime() + 72 * HOUR));
@@ -86,12 +93,18 @@ describe.skipIf(!testDbUrl)('cashier accesses in the admin panel', () => {
 			if (typeof link === 'string') throw new Error(link);
 			expect(link.token).not.toBe(created.token);
 			expect(await findCashier(tx, oldPhone)).toBeNull();
-			expect((await listCashiers(tx, partnerId))[0]).toMatchObject({ state: 'waiting', boundAt: null });
+			expect((await listCashiers(tx, partnerId))[0]).toMatchObject({
+				state: 'waiting',
+				boundAt: null
+			});
 			expect(await bindCashier(tx, created.token)).toBeNull();
 			const newPhone = await bindCashier(tx, link.token);
 			expect((await findCashier(tx, newPhone))?.id).toBe(created.id);
 			const audit = await auditFor(tx, 'partner_cashier', created.id);
-			expect(audit.map((a) => a.action)).toEqual(['partner_cashier.create', 'partner_cashier.relink']);
+			expect(audit.map((a) => a.action)).toEqual([
+				'partner_cashier.create',
+				'partner_cashier.relink'
+			]);
 			expect(JSON.stringify(audit)).not.toContain(link.token);
 		});
 	});
@@ -108,7 +121,10 @@ describe.skipIf(!testDbUrl)('cashier accesses in the admin panel', () => {
 			expect(listed.state).toBe('disabled');
 			expect(listed.disabledAt).toBeInstanceOf(Date);
 			const audit = await auditFor(tx, 'partner_cashier', created.id);
-			expect(audit.map((a) => a.action)).toEqual(['partner_cashier.create', 'partner_cashier.disable']);
+			expect(audit.map((a) => a.action)).toEqual([
+				'partner_cashier.create',
+				'partner_cashier.disable'
+			]);
 		});
 	});
 

@@ -38,6 +38,7 @@ import { ruShopAdmin } from './ru-shop-admin';
 import { ruTrainingAdmin } from './ru-training-admin';
 import { ruVolunteerAdmin } from './ru-volunteer-admin';
 import { ruVolunteerCards } from './ru-volunteer-cards';
+import { ruVolunteerCashier } from './ru-volunteer-cashier';
 import { ruVideosAdmin } from './ru-videos-admin';
 
 export const ru: Partial<Messages> = {
@@ -72,6 +73,7 @@ export const ru: Partial<Messages> = {
 	...ruTrainingAdmin,
 	...ruVolunteerAdmin,
 	...ruVolunteerCards,
+	...ruVolunteerCashier,
 	...ruShop,
 	...ruConsents,
 	...ruRegistrations,

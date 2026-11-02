@@ -53,14 +53,16 @@ test('cashier access: created by the admin, binds one phone once, disabled at on
 	await hydrated(page);
 	await page.getByLabel('Who or where').fill('Till 1');
 	await page.getByRole('button', { name: 'Create access' }).click();
-	const link = await page.getByLabel('Invite link').inputValue();
+	const link = await page.getByRole('textbox', { name: 'Invite link' }).inputValue();
 	expect(link).toMatch(/\/hy\/partner\/join\/[A-Za-z0-9_-]{43}$/);
 	const row = page.getByRole('row', { name: /Till 1/ });
 	await expect(row).toContainText('Waiting for the phone');
 	const token = link.split('/').pop()!;
-	expect(await sql`select 1 from partner_cashiers where invite_token_hash = ${token}`).toHaveLength(0);
+	expect(await sql`select 1 from partner_cashiers where invite_token_hash = ${token}`).toHaveLength(
+		0
+	);
 	await page.reload();
-	await expect(page.getByLabel('Invite link')).toHaveCount(0);
+	await expect(page.getByRole('textbox', { name: 'Invite link' })).toHaveCount(0);
 
 	const phone = await browser.newContext();
 	const cashier = await phone.newPage();
@@ -94,5 +96,54 @@ test('cashier access: created by the admin, binds one phone once, disabled at on
 	await expect(row.getByRole('button')).toHaveCount(0);
 	await cashier.goto('/hy/partner');
 	await expect(cashier.locator('main')).toContainText('Հեռախոսը կապված չէ');
+	await phone.close();
+});
+
+test('bound cashier marks a perk on the volunteer check page', async ({ page, browser }) => {
+	test.setTimeout(120_000);
+	const cardToken = crypto.randomUUID().replaceAll('-', '');
+	const perkTitle = `E2e mark perk ${TAG}`;
+	const [holder] = await sql`insert into users (email, name, first_name, last_name, birth_date,
+		email_verified, avatar_key) values (${`e2e-mark-${TAG}@example.com`}, 'Mark', 'Mark', 'Holder',
+		'1991-03-03', true, ${`avatars/mark-${TAG}.jpg`}) returning id`;
+	await sql`insert into memberships (user_id, status, starts_at, ends_at)
+		values (${holder.id}, 'active', now() - interval '1 day', now() + interval '300 days')`;
+	const [card] = await sql`insert into volunteer_cards (user_id, applied_at, status, number,
+		public_token, issued_at) values (${holder.id}, now(), 'active', ${`E2E-M-${TAG}`},
+		${cardToken}, now()) returning id`;
+	await sql`insert into volunteer_perks (partner_id, title, kind, status) values (${partnerId},
+		${sql.json({ en: perkTitle, hy: perkTitle })}, 'reusable', 'published')`;
+
+	await registerAdmin(page);
+	await page.goto(`/admin/volunteer/partners/${partnerId}/cashiers`);
+	await hydrated(page);
+	await page.getByLabel('Who or where').fill('Mark till');
+	await page.getByRole('button', { name: 'Create access' }).click();
+	const link = await page.getByRole('textbox', { name: 'Invite link' }).inputValue();
+
+	const phone = await browser.newContext();
+	const cashier = await phone.newPage();
+	await cashier.goto(new URL(link).pathname);
+	await cashier.getByRole('button', { name: 'Կապել այս հեռախոսը' }).click();
+	await expect(cashier).toHaveURL('/hy/partner');
+
+	await cashier.goto(`/hy/volunteer/${cardToken}`);
+	await expect(cashier.locator('main')).toContainText(PARTNER);
+	await expect(cashier.locator('main')).toContainText('Mark till');
+	await expect(cashier.locator('main')).toContainText(perkTitle);
+	await cashier.getByRole('button', { name: 'Նշել' }).click();
+	await hydrated(cashier);
+	await cashier.getByRole('button', { name: 'Հաստատել նշումը' }).click();
+	await expect(cashier.locator('main')).toContainText('Mark Holder');
+
+	expect(
+		await sql`select count(*)::int from perk_redemptions where card_id = ${card.id} and partner_id = ${partnerId}`
+	).toEqual([{ count: 1 }]);
+
+	const guest = await browser.newContext();
+	const stranger = await guest.newPage();
+	await stranger.goto(`/hy/volunteer/${cardToken}`);
+	await expect(stranger.getByRole('button', { name: 'Նշել' })).toHaveCount(0);
+	await guest.close();
 	await phone.close();
 });

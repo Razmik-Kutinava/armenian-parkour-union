@@ -68,5 +68,34 @@ export const hyVolunteerAdmin: Partial<Messages> = {
 	'volunteer.error.dateRange': 'Ավարտի ամսաթիվը չի կարող լինել սկզբից առաջ։',
 	'volunteer.error.usesLimit': 'Մուտքագրեք ամբողջ թիվ 1-ից 100։',
 	'volunteer.error.kind': 'Ընտրեք տեսակը։',
-	'volunteer.error.logo': 'Ընտրեք պատկեր մեդիադարանից։'
+	'volunteer.error.logo': 'Ընտրեք պատկեր մեդիադարանից։',
+	'volunteer.tab.cashiers': 'Գանձապահներ',
+	'volunteer.cashiers.intro':
+		'Գանձապահը գործընկերոջ հեռախոսն է, ոչ թե կայքի հաշիվ։ Ստեղծեք մուտք և ուղարկեք հղումը գանձապահին. նա այն բացում է իր հեռախոսում այն դիտարկիչով, որով բացվում են տեսախցիկի QR կոդերը։ Մեկ մուտք՝ մեկ հեռախոս։',
+	'volunteer.cashiers.label': 'Ով կամ որտեղ',
+	'volunteer.cashiers.labelHint': 'Օրինակ՝ «Դրամարկղ 1, Կոմիտաս», մինչև 80 նիշ։',
+	'volunteer.cashiers.create': 'Ստեղծել մուտք',
+	'volunteer.cashiers.empty': 'Գանձապահների մուտքեր դեռ չկան',
+	'volunteer.cashiers.col.label': 'Ով կամ որտեղ',
+	'volunteer.cashiers.col.state': 'Վիճակ',
+	'volunteer.cashiers.col.lastUsed': 'Վերջին նշում',
+	'volunteer.cashiers.col.actions': 'Գործողություններ',
+	'volunteer.cashiers.state.waiting': 'Սպասում է հեռախոսին մինչև {date}',
+	'volunteer.cashiers.state.expired': 'Հղման ժամկետն անցել է {date}',
+	'volunteer.cashiers.state.bound': 'Կապված է {date}',
+	'volunteer.cashiers.state.disabled': 'Անջատված է {date}',
+	'volunteer.cashiers.relink': 'Նոր հղում',
+	'volunteer.cashiers.relinkText':
+		'«{label}»-ը կստանա նոր հղում, իսկ հիմա կապված հեռախոսն անմիջապես կդադարի աշխատել։',
+	'volunteer.cashiers.disable': 'Անջատել',
+	'volunteer.cashiers.disableText':
+		'«{label}»-ն անմիջապես կդադարի աշխատել՝ ոչ հղումը, ոչ հեռախոսը։ Սա հնարավոր չէ հետ շրջել. նոր գանձապահի համար ստեղծեք նոր մուտք։',
+	'volunteer.cashiers.invite.title': 'Հրավերի հղում «{label}»-ի համար',
+	'volunteer.cashiers.invite.hint':
+		'Ցուցադրվում է միայն հիմա. պատճենեք և ուղարկեք գանձապահին։ Աշխատում է մեկ անգամ՝ մինչև {date}։',
+	'volunteer.cashiers.invite.link': 'Հրավերի հղում',
+	'volunteer.cashiers.invite.copy': 'Պատճենել',
+	'volunteer.cashiers.invite.copied': 'Պատճենված է։',
+	'volunteer.cashiers.error.label': 'Նշեք՝ ով կամ որտեղ. 1-ից 80 նիշ։',
+	'volunteer.cashiers.error.disabled': 'Մուտքն անջատված է. ստեղծեք նորը։'
 };

@@ -4,13 +4,16 @@
 	import Badge from '#lib/components/ui/Badge.svelte';
 	import { currentLocale, t } from '#lib/i18n/index.svelte.ts';
 	import { pickLocalized } from '#lib/i18n/localized.ts';
+	import MarkPerk from './MarkPerk.svelte';
 	import type { PageProps } from './$types';
 
-	/* docs/06 section 4.12: a valid card — photo, name, number, "valid until", partner perks; not
-	 * valid — the number only. The cashier's buttons come in 10.6. */
-	let { data }: PageProps = $props();
+	/* docs/06 section 4.12: a valid card — photo, name, number, "valid until", partner perks; a
+	 * bound cashier sees mark buttons for their partner only. */
+	let { data, form }: PageProps = $props();
 	const card = $derived(data.card);
 	const local = (text: Parameters<typeof pickLocalized>[0]) => pickLocalized(text, currentLocale());
+	const confirm = $derived(form && 'confirm' in form ? (form.confirm ?? null) : null);
+	const markError = $derived(form && 'error' in form ? form.error : null);
 </script>
 
 <svelte:head>
@@ -28,6 +31,19 @@
 			</Badge>
 		</span>
 	</div>
+
+	{#if data.cashier}
+		<p class="border-navy-200 rounded-md border bg-navy-50 px-4 py-3 text-sm text-ink-900">
+			{t('volunteerCashier.check.banner', {
+				partner: data.cashier.partnerName,
+				label: data.cashier.label
+			})}
+		</p>
+	{/if}
+
+	{#if markError}
+		<p class="text-error-700 text-sm font-bold" role="alert">{t(markError)}</p>
+	{/if}
 
 	{#if card.valid}
 		<div class="flex flex-col gap-5 rounded-md border border-line bg-surface p-5 sm:flex-row">
@@ -73,12 +89,23 @@
 							{/if}
 							<div class="flex flex-col gap-2">
 								<h3 class="font-bold text-ink-900">{partner.name}</h3>
-								<ul class="flex flex-col gap-2">
+								<ul class="flex flex-col gap-3">
 									{#each partner.perks as perk (perk.id)}
 										<li>
 											<p class="text-ink-900">{local(perk.title)}</p>
 											{#if perk.terms}
 												<p class="text-sm text-ink-700">{local(perk.terms)}</p>
+											{/if}
+											{#if data.cashier?.partnerId === partner.id && perk.mark}
+												<MarkPerk
+													partnerId={partner.id}
+													perkId={perk.id}
+													remaining={perk.mark.remaining}
+													kind={perk.mark.kind}
+													canMark={perk.mark.canMark}
+													markedAt={perk.mark.markedAt}
+													{confirm}
+												/>
 											{/if}
 										</li>
 									{/each}

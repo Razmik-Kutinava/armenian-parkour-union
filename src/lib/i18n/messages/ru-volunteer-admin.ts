@@ -68,5 +68,34 @@ export const ruVolunteerAdmin: Partial<Messages> = {
 	'volunteer.error.dateRange': 'Дата окончания не может быть раньше даты начала.',
 	'volunteer.error.usesLimit': 'Введите целое число от 1 до 100.',
 	'volunteer.error.kind': 'Выберите вид.',
-	'volunteer.error.logo': 'Выберите картинку из медиатеки.'
+	'volunteer.error.logo': 'Выберите картинку из медиатеки.',
+	'volunteer.tab.cashiers': 'Кассиры',
+	'volunteer.cashiers.intro':
+		'Кассир — это телефон партнёра, а не аккаунт на сайте. Создайте доступ и отправьте ссылку кассиру: он открывает её на своём телефоне в том браузере, который открывает QR-коды с камеры. Один доступ — один телефон.',
+	'volunteer.cashiers.label': 'Кто или где',
+	'volunteer.cashiers.labelHint': 'Например, «Касса 1, Комитас»; до 80 символов.',
+	'volunteer.cashiers.create': 'Создать доступ',
+	'volunteer.cashiers.empty': 'Доступов кассиров пока нет',
+	'volunteer.cashiers.col.label': 'Кто или где',
+	'volunteer.cashiers.col.state': 'Состояние',
+	'volunteer.cashiers.col.lastUsed': 'Последняя отметка',
+	'volunteer.cashiers.col.actions': 'Действия',
+	'volunteer.cashiers.state.waiting': 'Ждёт привязки до {date}',
+	'volunteer.cashiers.state.expired': 'Ссылка истекла {date}',
+	'volunteer.cashiers.state.bound': 'Привязан {date}',
+	'volunteer.cashiers.state.disabled': 'Отключён {date}',
+	'volunteer.cashiers.relink': 'Новая ссылка',
+	'volunteer.cashiers.relinkText':
+		'«{label}» получит новую ссылку, а привязанный сейчас телефон сразу перестанет работать.',
+	'volunteer.cashiers.disable': 'Отключить',
+	'volunteer.cashiers.disableText':
+		'«{label}» сразу перестанет работать: ни ссылка, ни телефон. Отменить нельзя — для нового кассира создайте новый доступ.',
+	'volunteer.cashiers.invite.title': 'Ссылка-приглашение для «{label}»',
+	'volunteer.cashiers.invite.hint':
+		'Показывается только сейчас: скопируйте и отправьте кассиру. Срабатывает один раз, до {date}.',
+	'volunteer.cashiers.invite.link': 'Ссылка-приглашение',
+	'volunteer.cashiers.invite.copy': 'Копировать',
+	'volunteer.cashiers.invite.copied': 'Скопировано.',
+	'volunteer.cashiers.error.label': 'Укажите, кто или где: от 1 до 80 символов.',
+	'volunteer.cashiers.error.disabled': 'Доступ отключён: создайте новый.'
 };

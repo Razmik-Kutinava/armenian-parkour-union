@@ -4,12 +4,13 @@
 	import StatusBadge from '../StatusBadge.svelte';
 	import type { LayoutProps } from './$types';
 
-	/* docs/05 section 28: partner card tabs (the cashiers tab comes with roadmap 10.6). */
+	/* docs/05 section 28: partner card tabs. */
 	let { data, children }: LayoutProps = $props();
 	const base = $derived(`/admin/volunteer/partners/${data.partner.id}`);
 	const tabs = $derived([
 		{ href: base, label: t('volunteer.tab.partner') },
-		{ href: `${base}/perks`, label: t('volunteer.tab.perks') }
+		{ href: `${base}/perks`, label: t('volunteer.tab.perks') },
+		{ href: `${base}/cashiers`, label: t('volunteer.tab.cashiers') }
 	]);
 	const current = $derived(
 		[...tabs].reverse().find((tab) => page.url.pathname.startsWith(tab.href))?.href
