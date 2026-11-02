@@ -136,5 +136,30 @@ export const enVolunteerCards = {
 		'Hello, {name}!\n\nYou are invited as a volunteer: {title}.\n\nReply in your cabinet: {url}',
 	'volunteerRequests.mail.cancel.subject': 'Volunteer request cancelled: {title}',
 	'volunteerRequests.mail.cancel.text':
-		'Hello, {name}!\n\nThe volunteer request "{title}" was cancelled.\n\nYour cabinet: {url}'
+		'Hello, {name}!\n\nThe volunteer request "{title}" was cancelled.\n\nYour cabinet: {url}',
+	'volunteerReports.mail.approved.subject': 'Your volunteer photo report was accepted',
+	'volunteerReports.mail.approved.text':
+		'Hello, {name}!\n\nYour photo report from the volunteer event was accepted.\n\nYour cabinet: {url}',
+	'volunteerReports.mail.approved.textPoints':
+		'Hello, {name}!\n\nYour photo report from the volunteer event was accepted. You received {points} points.\n\nYour cabinet: {url}',
+	'volunteerReports.mail.rejected.subject': 'Your volunteer photo report was returned',
+	'volunteerReports.mail.rejected.text':
+		'Hello, {name}!\n\nYour photo report was returned. Reason: {reason}\n\nYou can send a new one: {url}',
+	'cabinet.volunteer.report': 'Photo report',
+	'cabinet.volunteer.reportHint':
+		'A photo (JPEG, PNG or WebP, up to 10 MB) or a link to Instagram, YouTube or Google Drive.',
+	'cabinet.volunteer.reportUrl': 'Link',
+	'cabinet.volunteer.reportNote': 'Comment',
+	'cabinet.volunteer.reportSend': 'Send report',
+	'cabinet.volunteer.reportReplace': 'Replace report',
+	'cabinet.volunteer.reportPending': 'On review',
+	'cabinet.volunteer.reportApproved': 'Accepted, {points} points awarded',
+	'cabinet.volunteer.reportApprovedZero': 'Accepted',
+	'cabinet.volunteer.reportRejected': 'Returned: {reason}',
+	'cabinet.volunteer.report.type': 'Choose a JPEG, PNG or WebP photo.',
+	'cabinet.volunteer.report.empty': 'The file is empty.',
+	'cabinet.volunteer.report.size': 'The photo must be at most 10 MB.',
+	'cabinet.volunteer.report.sent': 'Report sent.',
+	'cabinet.volunteer.report.error': 'Could not send the report. Check the link or the photo.',
+	'cabinet.volunteer.report.hasFile': 'Photo ready to send.'
 } as const;

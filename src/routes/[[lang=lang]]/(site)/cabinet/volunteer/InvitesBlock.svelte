@@ -3,16 +3,20 @@
 	import { currentLocale, t } from '#lib/i18n/index.svelte.ts';
 	import { pickLocalized } from '#lib/i18n/localized.ts';
 	import type { OwnInvite } from '#lib/server/services/volunteer/invite-own.ts';
+	import type { OwnReport } from '#lib/server/services/volunteer/report-own.ts';
 	import type { MessageKey } from '#lib/i18n/translate.ts';
+	import ReportForm from './ReportForm.svelte';
 
 	let {
 		open,
 		past,
+		reports,
 		result
 	}: {
 		open: OwnInvite[];
 		past: OwnInvite[];
-		result?: { answered?: boolean; message?: MessageKey };
+		reports: Record<string, OwnReport>;
+		result?: { answered?: boolean; reportSent?: boolean; message?: MessageKey };
 	} = $props();
 
 	const day = (d: Date) => newsDate(d, currentLocale());
@@ -22,6 +26,8 @@
 	<h2 class="text-xl font-semibold text-ink-900">{t('cabinet.volunteer.invites')}</h2>
 	{#if result?.answered}
 		<p class="text-success-fg" role="status">{t('cabinet.volunteer.inviteAnswered')}</p>
+	{:else if result?.reportSent}
+		<p class="text-success-fg" role="status">{t('cabinet.volunteer.report.sent')}</p>
 	{:else if result?.message}
 		<p class="text-error-fg" role="alert">{t(result.message)}</p>
 	{/if}
@@ -76,11 +82,16 @@
 		{/if}
 		{#if past.length > 0}
 			<h3 class="text-ink-800 font-medium">{t('cabinet.volunteer.invitesPast')}</h3>
-			<ul class="flex flex-col gap-3">
+			<ul class="flex flex-col gap-4">
 				{#each past as invite (invite.id)}
-					<li class="text-sm">
+					<li class="border-ink-100 border-b pb-4 text-sm">
 						<span class="font-medium">{pickLocalized(invite.title, currentLocale())}</span>
 						· {t(`volunteer.requests.answer.${invite.status}`)}
+						{#if invite.status === 'attended'}
+							<div class="mt-2">
+								<ReportForm invitationId={invite.id} report={reports[invite.id]} />
+							</div>
+						{/if}
 					</li>
 				{/each}
 			</ul>

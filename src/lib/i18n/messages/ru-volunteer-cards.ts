@@ -136,5 +136,30 @@ export const ruVolunteerCards: Partial<Messages> = {
 		'Здравствуйте, {name}!\n\nВас приглашают волонтёром: {title}.\n\nОтветьте в кабинете: {url}',
 	'volunteerRequests.mail.cancel.subject': 'Запрос волонтёров отменён: {title}',
 	'volunteerRequests.mail.cancel.text':
-		'Здравствуйте, {name}!\n\nЗапрос волонтёров «{title}» отменён.\n\nКабинет: {url}'
+		'Здравствуйте, {name}!\n\nЗапрос волонтёров «{title}» отменён.\n\nКабинет: {url}',
+	'volunteerReports.mail.approved.subject': 'Фотоотчёт волонтёра принят',
+	'volunteerReports.mail.approved.text':
+		'Здравствуйте, {name}!\n\nВаш фотоотчёт с мероприятия принят.\n\nКабинет: {url}',
+	'volunteerReports.mail.approved.textPoints':
+		'Здравствуйте, {name}!\n\nВаш фотоотчёт с мероприятия принят. Начислено {points} баллов.\n\nКабинет: {url}',
+	'volunteerReports.mail.rejected.subject': 'Фотоотчёт волонтёра вернули',
+	'volunteerReports.mail.rejected.text':
+		'Здравствуйте, {name}!\n\nФотоотчёт вернули. Причина: {reason}\n\nМожно отправить новый: {url}',
+	'cabinet.volunteer.report': 'Фотоотчёт',
+	'cabinet.volunteer.reportHint':
+		'Фото (JPEG, PNG или WebP, до 10 МБ) или ссылка на Instagram, YouTube или Google Drive.',
+	'cabinet.volunteer.reportUrl': 'Ссылка',
+	'cabinet.volunteer.reportNote': 'Комментарий',
+	'cabinet.volunteer.reportSend': 'Отправить отчёт',
+	'cabinet.volunteer.reportReplace': 'Заменить отчёт',
+	'cabinet.volunteer.reportPending': 'На проверке',
+	'cabinet.volunteer.reportApproved': 'Принят, начислено {points} баллов',
+	'cabinet.volunteer.reportApprovedZero': 'Принят',
+	'cabinet.volunteer.reportRejected': 'Вернули: {reason}',
+	'cabinet.volunteer.report.type': 'Выберите фото JPEG, PNG или WebP.',
+	'cabinet.volunteer.report.empty': 'Файл пустой.',
+	'cabinet.volunteer.report.size': 'Фото не больше 10 МБ.',
+	'cabinet.volunteer.report.sent': 'Отчёт отправлен.',
+	'cabinet.volunteer.report.error': 'Не удалось отправить отчёт. Проверьте ссылку или фото.',
+	'cabinet.volunteer.report.hasFile': 'Фото готово к отправке.'
 };

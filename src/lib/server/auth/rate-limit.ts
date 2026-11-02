@@ -25,7 +25,9 @@ export const limits = {
 	avatarUploadPerUser: { windowMs: 60 * 60_000, max: 10 },
 	consentUploadPerUser: { windowMs: 60 * 60_000, max: 10 },
 	/** Each volunteer card PDF is drawn on request and fetches the photo and the partner logos. */
-	volunteerPdfPerUser: { windowMs: 60 * 60_000, max: 30 }
+	volunteerPdfPerUser: { windowMs: 60 * 60_000, max: 30 },
+	/** Photo for a volunteer report: private bucket, JPEG / PNG / WebP up to 10 MB. */
+	volunteerReportUploadPerUser: { windowMs: 60 * 60_000, max: 10 }
 } satisfies Record<string, LimitRule>;
 
 /* Fixed window per key; `last_request` holds the start of the current window (ms). */

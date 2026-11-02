@@ -2,6 +2,7 @@ import type { LucideIcon } from '@lucide/svelte';
 import Award from '@lucide/svelte/icons/award';
 import BookUser from '@lucide/svelte/icons/book-user';
 import CalendarDays from '@lucide/svelte/icons/calendar-days';
+import Camera from '@lucide/svelte/icons/camera';
 import Clapperboard from '@lucide/svelte/icons/clapperboard';
 import ClipboardCheck from '@lucide/svelte/icons/clipboard-check';
 import Coins from '@lucide/svelte/icons/coins';
@@ -58,6 +59,7 @@ export const navIcons: Record<AdminIcon, LucideIcon> = {
 	volunteerCards: BookUser,
 	volunteerPartners: Handshake,
 	volunteerRequests: Megaphone,
+	volunteerReports: Camera,
 	volunteerRedemptions: Ticket,
 	settings: Settings,
 	audit: ScrollText,

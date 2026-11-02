@@ -1,7 +1,11 @@
 import { and, eq } from 'drizzle-orm';
 import { afterAll, describe, expect, it } from 'vitest';
 import type { LimitDb } from '../../auth/rate-limit';
-import { volunteerInvitations, volunteerReports, volunteerRequests } from '../../db/schema/volunteer-requests';
+import {
+	volunteerInvitations,
+	volunteerReports,
+	volunteerRequests
+} from '../../db/schema/volunteer-requests';
 import { testDb, testDbUrl } from '../../db/test-db';
 import { fakeStorage } from '../media/fake-storage';
 import { applyForCard } from './card-apply';
@@ -66,10 +70,7 @@ async function attendedInvite(tx: LimitDb) {
 		.select()
 		.from(volunteerInvitations)
 		.where(
-			and(
-				eq(volunteerInvitations.requestId, created.id),
-				eq(volunteerInvitations.userId, user.id)
-			)
+			and(eq(volunteerInvitations.requestId, created.id), eq(volunteerInvitations.userId, user.id))
 		);
 	if (!mine) throw new Error('no invite');
 	const answered = await answerInvite(tx, user.id, mine.id, 'accepted');
@@ -174,12 +175,12 @@ describe.skipIf(!testDbUrl)('volunteer report: the member sends', { timeout: 60_
 			});
 
 			const other = await attendedInvite(tx);
-			expect(
-				await submitReport(tx, user.id, { invitationId: other.inviteId, url: LINK })
-			).toEqual(refused('not_found'));
-			expect(await submitReport(tx, user.id, { invitationId: inviteId, url: 'https://vimeo.com/1' })).toEqual(
-				refused('bad_url')
+			expect(await submitReport(tx, user.id, { invitationId: other.inviteId, url: LINK })).toEqual(
+				refused('not_found')
 			);
+			expect(
+				await submitReport(tx, user.id, { invitationId: inviteId, url: 'https://vimeo.com/1' })
+			).toEqual(refused('bad_url'));
 			await tx
 				.update(volunteerInvitations)
 				.set({ status: 'accepted' })

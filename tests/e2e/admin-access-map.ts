@@ -109,7 +109,9 @@ export const ADMIN_READS = {
 	'GET /admin/volunteer/redemptions/export': 'volunteer.manage',
 	'/admin/volunteer/requests': 'volunteer.manage',
 	'/admin/volunteer/requests/new': 'volunteer.manage',
-	'/admin/volunteer/requests/[id]': 'volunteer.manage'
+	'/admin/volunteer/requests/[id]': 'volunteer.manage',
+	'/admin/volunteer/reports': 'volunteer.manage',
+	'/admin/volunteer/reports/[id]': 'volunteer.manage'
 } as const satisfies Record<string, Access>;
 
 export const ADMIN_WRITES = {
@@ -225,6 +227,7 @@ export const ADMIN_WRITES = {
 	'/admin/volunteer/cards/[id]?/issue': 'volunteer.manage',
 	'/admin/volunteer/cards/[id]?/reject': 'volunteer.manage',
 	'/admin/volunteer/cards/[id]?/revoke': 'volunteer.manage',
+	'/admin/volunteer/cards/[id]?/unflag': 'volunteer.manage',
 	'/admin/volunteer/partners?/move': 'volunteer.manage',
 	'/admin/volunteer/partners/new?/default': 'volunteer.manage',
 	'/admin/volunteer/partners/[id]?/update': 'volunteer.manage',
@@ -239,5 +242,9 @@ export const ADMIN_WRITES = {
 	'/admin/volunteer/requests/[id]?/publish': 'volunteer.manage',
 	'/admin/volunteer/requests/[id]?/inviteMore': 'volunteer.manage',
 	'/admin/volunteer/requests/[id]?/cancel': 'volunteer.manage',
+	'/admin/volunteer/requests/[id]?/finish': 'volunteer.manage',
+	'/admin/volunteer/requests/[id]?/mark': 'volunteer.manage',
+	'/admin/volunteer/reports/[id]?/approve': 'volunteer.manage',
+	'/admin/volunteer/reports/[id]?/reject': 'volunteer.manage',
 	'POST /admin/locale': 'staff'
 } as const satisfies Record<AdminAction | NotAuditedAction, Access>;

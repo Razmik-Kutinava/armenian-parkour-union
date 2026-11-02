@@ -9,6 +9,7 @@ export type VolunteerIds = {
 	cardId: string;
 	issuedId: string;
 	requestId: string;
+	reportId: string;
 };
 
 export const volunteerPath = (path: string, ids: VolunteerIds) =>
@@ -17,7 +18,8 @@ export const volunteerPath = (path: string, ids: VolunteerIds) =>
 		.replace('/volunteer/cards/[id]', `/volunteer/cards/${ids.cardId}`)
 		.replace('/volunteer/partners/[id]', `/volunteer/partners/${ids.partnerId}`)
 		.replace('/perks/[perkId]', `/perks/${ids.perkId}`)
-		.replace('/volunteer/requests/[id]', `/volunteer/requests/${ids.requestId}`);
+		.replace('/volunteer/requests/[id]', `/volunteer/requests/${ids.requestId}`)
+		.replace('/volunteer/reports/[id]', `/volunteer/reports/${ids.reportId}`);
 
 export function volunteerFixtures(sql: postgres.Sql) {
 	return {
@@ -51,12 +53,20 @@ export function volunteerFixtures(sql: postgres.Sql) {
 				values (${sql.json({ en: `E2e perm req ${tag.slice(0, 8)}` })},
 					now() + interval '7 days', now() + interval '7 days 4 hours', 2,
 					now() + interval '3 days', 'draft') returning id`;
+			const [invite] = await sql`insert into volunteer_invitations
+				(request_id, user_id, status) values (${request.id}, ${holder}, 'attended')
+				returning id`;
+			const [report] = await sql`insert into volunteer_reports
+				(invitation_id, user_id, url, status)
+				values (${invite.id}, ${holder}, ${`https://www.youtube.com/watch?v=e2e${tag.slice(0, 8)}`},
+					'pending') returning id`;
 			return {
 				partnerId: partner.id,
 				perkId: perk.id,
 				cardId: card.id,
 				issuedId: issued.id,
-				requestId: request.id
+				requestId: request.id,
+				reportId: report.id
 			};
 		},
 		/* Without the order: admin-audit.spec.ts moves partners in parallel and renumbers them all. */

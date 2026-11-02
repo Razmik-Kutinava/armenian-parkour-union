@@ -11,6 +11,7 @@ import { courseAccess, practiceSubmissions } from '../../db/schema/training-prog
 import { videos } from '../../db/schema/videos';
 import { awaitingCertificateCount } from '../exams/awaiting';
 import type { Actor } from '../users/target';
+import { pendingReportCount } from '../volunteer/report-list';
 
 /* docs/05 section 3 "Needs action": a counter only for a role with the right to its section
  * (docs/04 section 5.1). A failed payment is an abandoned checkout, not a task: only "needs review". */
@@ -23,7 +24,8 @@ export type AttentionKey =
 	| 'waitlist'
 	| 'training_requests'
 	| 'practice'
-	| 'training_finished';
+	| 'training_finished'
+	| 'volunteer_reports';
 export type AttentionItem = { key: AttentionKey; count: number; href: string };
 
 type Counter = {
@@ -100,6 +102,12 @@ const COUNTERS: Counter[] = [
 		permission: 'certificates.issue',
 		href: '/admin/exams?certificate=course',
 		count: awaitingCertificateCount
+	},
+	{
+		key: 'volunteer_reports',
+		permission: 'volunteer.manage',
+		href: '/admin/volunteer/reports',
+		count: pendingReportCount
 	}
 ];
 

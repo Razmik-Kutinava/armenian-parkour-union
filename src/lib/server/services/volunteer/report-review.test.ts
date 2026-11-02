@@ -1,7 +1,11 @@
 import { and, eq } from 'drizzle-orm';
 import { afterAll, describe, expect, it } from 'vitest';
 import type { LimitDb } from '../../auth/rate-limit';
-import { volunteerInvitations, volunteerReports, volunteerRequests } from '../../db/schema/volunteer-requests';
+import {
+	volunteerInvitations,
+	volunteerReports,
+	volunteerRequests
+} from '../../db/schema/volunteer-requests';
 import { testDb, testDbUrl } from '../../db/test-db';
 import { auditFor } from '../memberships/test-support';
 import { balanceOf, setRules } from '../points/test-support';
@@ -65,10 +69,7 @@ async function pendingReport(tx: LimitDb, locale: 'en' | 'ru' = 'en') {
 		.select()
 		.from(volunteerInvitations)
 		.where(
-			and(
-				eq(volunteerInvitations.requestId, created.id),
-				eq(volunteerInvitations.userId, user.id)
-			)
+			and(eq(volunteerInvitations.requestId, created.id), eq(volunteerInvitations.userId, user.id))
 		);
 	if (!mine) throw new Error('no invite');
 	const answered = await answerInvite(tx, user.id, mine.id, 'accepted');
@@ -108,7 +109,10 @@ describe.skipIf(!testDbUrl)('volunteer report: the review', { timeout: 60_000 },
 					reviewDeps(box.send)
 				)
 			).toEqual({ ok: true });
-			const [row] = await tx.select().from(volunteerReports).where(eq(volunteerReports.id, reportId));
+			const [row] = await tx
+				.select()
+				.from(volunteerReports)
+				.where(eq(volunteerReports.id, reportId));
 			expect(row).toMatchObject({
 				status: 'approved',
 				reviewedBy: admin.id,
@@ -184,7 +188,10 @@ describe.skipIf(!testDbUrl)('volunteer report: the review', { timeout: 60_000 },
 					reviewDeps(box.send)
 				)
 			).toEqual({ ok: true });
-			const [row] = await tx.select().from(volunteerReports).where(eq(volunteerReports.id, reportId));
+			const [row] = await tx
+				.select()
+				.from(volunteerReports)
+				.where(eq(volunteerReports.id, reportId));
 			expect(row).toMatchObject({ status: 'rejected', reviewNote: 'Blurry' });
 			expect(box.sent).toHaveLength(1);
 			expect(box.sent[0].text).toContain('Blurry');

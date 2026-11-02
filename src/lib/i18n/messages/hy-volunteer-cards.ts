@@ -138,5 +138,30 @@ export const hyVolunteerCards: Partial<Messages> = {
 		'Բարև, {name}։\n\nՁեզ հրավիրում են որպես կամավոր՝ {title}։\n\nՊատասխանեք կաբինետում՝ {url}',
 	'volunteerRequests.mail.cancel.subject': 'Կամավորների հարցումը չեղարկված է՝ {title}',
 	'volunteerRequests.mail.cancel.text':
-		'Բարև, {name}։\n\n«{title}» կամավորների հարցումը չեղարկվել է։\n\nԿաբինետ՝ {url}'
+		'Բարև, {name}։\n\n«{title}» կամավորների հարցումը չեղարկվել է։\n\nԿաբինետ՝ {url}',
+	'volunteerReports.mail.approved.subject': 'Կամավորի ֆոտոհաշվետվությունն ընդունված է',
+	'volunteerReports.mail.approved.text':
+		'Բարև, {name}։\n\nՁեր ֆոտոհաշվետվությունն ընդունվել է։\n\nԿաբինետ՝ {url}',
+	'volunteerReports.mail.approved.textPoints':
+		'Բարև, {name}։\n\nՁեր ֆոտոհաշվետվությունն ընդունվել է։ Հաշվեգրվել է {points} միավոր։\n\nԿաբինետ՝ {url}',
+	'volunteerReports.mail.rejected.subject': 'Կամավորի ֆոտոհաշվետվությունը վերադարձվել է',
+	'volunteerReports.mail.rejected.text':
+		'Բարև, {name}։\n\nՖոտոհաշվետվությունը վերադարձվել է։ Պատճառ՝ {reason}\n\nԿարող եք ուղարկել նորը՝ {url}',
+	'cabinet.volunteer.report': 'Ֆոտոհաշվետվություն',
+	'cabinet.volunteer.reportHint':
+		'Լուսանկար (JPEG, PNG կամ WebP, մինչև 10 ՄԲ) կամ Instagram, YouTube կամ Google Drive հղում։',
+	'cabinet.volunteer.reportUrl': 'Հղում',
+	'cabinet.volunteer.reportNote': 'Մեկնաբանություն',
+	'cabinet.volunteer.reportSend': 'Ուղարկել',
+	'cabinet.volunteer.reportReplace': 'Փոխարինել',
+	'cabinet.volunteer.reportPending': 'Ստուգման մեջ',
+	'cabinet.volunteer.reportApproved': 'Ընդունված է, {points} միավոր',
+	'cabinet.volunteer.reportApprovedZero': 'Ընդունված է',
+	'cabinet.volunteer.reportRejected': 'Վերադարձվել է՝ {reason}',
+	'cabinet.volunteer.report.type': 'Ընտրեք JPEG, PNG կամ WebP լուսանկար։',
+	'cabinet.volunteer.report.empty': 'Ֆայլը դատարկ է։',
+	'cabinet.volunteer.report.size': 'Լուսանկարը մինչև 10 ՄԲ։',
+	'cabinet.volunteer.report.sent': 'Հաշվետվությունն ուղարկված է։',
+	'cabinet.volunteer.report.error': 'Չհաջողվեց ուղարկել։ Ստուգեք հղումը կամ լուսանկարը։',
+	'cabinet.volunteer.report.hasFile': 'Լուսանկարը պատրաստ է ուղարկման։'
 };

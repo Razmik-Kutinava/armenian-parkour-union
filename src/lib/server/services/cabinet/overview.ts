@@ -10,11 +10,17 @@ import { users } from '../../db/schema/users';
 import { inForce } from '../consents/valid';
 import { getMembershipOverview, type MembershipOverview } from '../memberships/overview';
 import { isUuid } from '../users/target';
+import { hasReturnedReport } from '../volunteer/report-own';
 import { membershipReminder, type MembershipReminder } from './reminder';
 
 /** Registrations and exams join the list in stages 5–6 (docs/06 section 5.1). */
 export type CabinetAction =
-	'verify_email' | 'membership_expired' | 'membership_ends_soon' | 'join' | 'consent_parental';
+	| 'verify_email'
+	| 'membership_expired'
+	| 'membership_ends_soon'
+	| 'join'
+	| 'consent_parental'
+	| 'volunteer_report';
 
 export type CabinetOverview = {
 	firstName: string | null;
@@ -103,5 +109,6 @@ export async function getCabinetOverview(
 	if (birthDate && isMinor(birthDate, now) && (await needsParentalConsent(db, userId, now))) {
 		actions.push('consent_parental');
 	}
+	if (await hasReturnedReport(db, userId)) actions.push('volunteer_report');
 	return { ...own, membership, reminder, actions, portals: await openPortals(db, userId) };
 }

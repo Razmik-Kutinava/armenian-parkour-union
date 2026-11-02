@@ -31,6 +31,7 @@ export const ruCabinet: Partial<Messages> = {
 		'Членство скоро закончится. Продлите заранее: оплаченные дни сохранятся.',
 	'cabinet.action.join':
 		'Вступите в федерацию, чтобы регистрироваться на события и сдавать экзамены.',
+	'cabinet.action.volunteer_report': 'Фотоотчёт волонтёра вернули. Отправьте новый.',
 	'cabinet.verify.resend': 'Отправить письмо ещё раз',
 	'cabinet.verify.sent': 'Письмо отправлено ещё раз. Проверьте почту.',
 	'cabinet.verify.already': 'Ваш email уже подтверждён.',

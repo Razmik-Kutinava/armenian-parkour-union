@@ -18,10 +18,7 @@
 <div class="flex max-w-3xl flex-col gap-6">
 	<h1 class="text-3xl font-bold text-ink-900">{t('cabinet.volunteer.title')}</h1>
 	{#if data.own.card?.flagged}
-		<p
-			class="rounded-md bg-warning-bg px-4 py-3 text-sm text-warning-fg"
-			role="status"
-		>
+		<p class="rounded-md bg-warning-bg px-4 py-3 text-sm text-warning-fg" role="status">
 			{t('cabinet.volunteer.flag', { n: String(data.own.card.declineStreak) })}
 		</p>
 	{/if}
@@ -35,6 +32,9 @@
 	<InvitesBlock
 		open={data.invites.open}
 		past={data.invites.past}
-		result={form && ('answered' in form || 'message' in form) ? form : undefined}
+		reports={data.reports}
+		result={form && ('answered' in form || 'reportSent' in form || 'message' in form)
+			? form
+			: undefined}
 	/>
 </div>

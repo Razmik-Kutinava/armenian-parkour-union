@@ -114,6 +114,7 @@ export const ADMIN_AUDIT = {
 	'/admin/volunteer/cards/[id]?/issue': ['volunteer_card.issue'],
 	'/admin/volunteer/cards/[id]?/reject': ['volunteer_card.reject'],
 	'/admin/volunteer/cards/[id]?/revoke': ['volunteer_card.revoke'],
+	'/admin/volunteer/cards/[id]?/unflag': ['volunteer_card.unflag'],
 	'/admin/volunteer/partners?/move': ['volunteer_partner.reorder'],
 	'/admin/volunteer/partners/new?/default': ['volunteer_partner.create'],
 	'/admin/volunteer/partners/[id]?/update': ['volunteer_partner.update'],
@@ -127,7 +128,11 @@ export const ADMIN_AUDIT = {
 	'/admin/volunteer/requests/[id]?/update': ['volunteer_request.update'],
 	'/admin/volunteer/requests/[id]?/publish': ['volunteer_request.publish'],
 	'/admin/volunteer/requests/[id]?/inviteMore': ['volunteer_request.invite_more'],
-	'/admin/volunteer/requests/[id]?/cancel': ['volunteer_request.cancel']
+	'/admin/volunteer/requests/[id]?/cancel': ['volunteer_request.cancel'],
+	'/admin/volunteer/requests/[id]?/finish': ['volunteer_request.finish'],
+	'/admin/volunteer/requests/[id]?/mark': ['volunteer_invitation.mark'],
+	'/admin/volunteer/reports/[id]?/approve': ['volunteer_report.approve'],
+	'/admin/volunteer/reports/[id]?/reject': ['volunteer_report.reject']
 } as const;
 
 export type AdminAction = keyof typeof ADMIN_AUDIT;

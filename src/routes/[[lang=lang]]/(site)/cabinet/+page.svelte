@@ -70,6 +70,8 @@
 						{#if form?.verify}<p role="status" class="text-sm text-ink-700">
 								{t(form.verify)}
 							</p>{/if}
+					{:else if action === 'volunteer_report'}
+						<a class={button} href={href('/cabinet/volunteer')}>{t('cabinet.volunteer.report')}</a>
 					{/if}
 				</li>
 			{/each}

@@ -30,6 +30,7 @@ export const enCabinet = {
 	'cabinet.action.membership_ends_soon':
 		'Your membership ends soon. Renew it in advance: the paid days are kept.',
 	'cabinet.action.join': 'Join the federation to register for events and take exams.',
+	'cabinet.action.volunteer_report': 'Your volunteer photo report was returned. Send a new one.',
 	'cabinet.verify.resend': 'Send the letter again',
 	'cabinet.verify.sent': 'We have sent the letter again. Check your inbox.',
 	'cabinet.verify.already': 'Your email is already confirmed.',

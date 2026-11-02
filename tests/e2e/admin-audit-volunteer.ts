@@ -48,6 +48,13 @@ export function volunteerActions(
 			post(`${await cardOf('pending')}?/reject`, { comment: 'Audit reject' }),
 		'/admin/volunteer/cards/[id]?/revoke': async () =>
 			post(`${await cardOf('active')}?/revoke`, { comment: 'Audit revoke' }),
+		'/admin/volunteer/cards/[id]?/unflag': async () => {
+			const path = await cardOf('active');
+			const id = path.split('/').pop()!;
+			await sql`update volunteer_cards set flagged_at = now(), decline_streak = 3
+				where id = ${id}`;
+			await post(`${path}?/unflag`);
+		},
 		'/admin/volunteer/partners/new?/default': () =>
 			postRedirect('/admin/volunteer/partners/new', partnerForm),
 		'/admin/volunteer/partners/[id]?/update': async () =>
@@ -125,6 +132,67 @@ export function volunteerActions(
 				where status = 'open' and title->>'en' like 'E2e audit req %'
 				order by created_at desc limit 1`;
 			await postRedirect(`/admin/volunteer/requests/${row.id}?/cancel`);
+		},
+		'/admin/volunteer/requests/[id]?/finish': async () => {
+			const [row] = await sql`insert into volunteer_requests
+				(title, starts_at, ends_at, places, respond_by, status, closed_at)
+				values (${sql.json({ en: 'E2e audit finish' })}, now() - interval '1 hour',
+					now() + interval '1 hour', 1, now() - interval '2 hours', 'open', now())
+				returning id`;
+			await post(`/admin/volunteer/requests/${row.id}?/finish`);
+		},
+		'/admin/volunteer/requests/[id]?/mark': async () => {
+			const [user] = await sql`insert into users (email, name, first_name, last_name)
+				values (${`e2e-audit-mark-${crypto.randomUUID()}@example.com`}, 'M', 'M', 'M')
+				returning id`;
+			const [req] = await sql`insert into volunteer_requests
+				(title, starts_at, ends_at, places, respond_by, status, closed_at)
+				values (${sql.json({ en: 'E2e audit mark' })}, now() - interval '1 hour',
+					now() + interval '1 hour', 1, now() - interval '2 hours', 'open', now())
+				returning id`;
+			const [inv] = await sql`insert into volunteer_invitations
+				(request_id, user_id, status) values (${req.id}, ${user.id}, 'accepted') returning id`;
+			await post(`/admin/volunteer/requests/${req.id}?/mark`, {
+				invitationId: inv.id,
+				kind: 'attended'
+			});
+		},
+		'/admin/volunteer/reports/[id]?/approve': async () => {
+			const [member] = await sql`insert into users (email, name, first_name, last_name)
+				values (${`e2e-audit-report-a-${crypto.randomUUID()}@example.com`}, 'A', 'A', 'R')
+				returning id`;
+			const [req] = await sql`insert into volunteer_requests
+				(title, starts_at, ends_at, places, respond_by, status)
+				values (${sql.json({ en: 'E2e audit report' })}, now(), now() + interval '1 hour', 1,
+					now() - interval '1 hour', 'finished') returning id`;
+			const [inv] = await sql`insert into volunteer_invitations
+				(request_id, user_id, status) values (${req.id}, ${member.id}, 'attended') returning id`;
+			const [rep] = await sql`insert into volunteer_reports
+				(invitation_id, user_id, url, status)
+				values (${inv.id}, ${member.id}, 'https://www.youtube.com/watch?v=approve01', 'pending')
+				returning id`;
+			await post(`/admin/volunteer/reports/${rep.id}?/approve`, {
+				shown: 'https://www.youtube.com/watch?v=approve01'
+			});
+		},
+		'/admin/volunteer/reports/[id]?/reject': async () => {
+			const [member] = await sql`insert into users (email, name, first_name, last_name)
+				values (${`e2e-audit-report-r-${crypto.randomUUID()}@example.com`}, 'R', 'R', 'R')
+				returning id`;
+			const [req] = await sql`insert into volunteer_requests
+				(title, starts_at, ends_at, places, respond_by, status)
+				values (${sql.json({ en: 'E2e audit report reject' })}, now(), now() + interval '1 hour', 1,
+					now() - interval '1 hour', 'finished') returning id`;
+			const [inv] = await sql`insert into volunteer_invitations
+				(request_id, user_id, status) values (${req.id}, ${member.id}, 'attended') returning id`;
+			const [rep] = await sql`insert into volunteer_reports
+				(invitation_id, user_id, url, status)
+				values (${inv.id}, ${member.id}, 'https://www.youtube.com/watch?v=reject001', 'pending')
+				returning id`;
+			await post(`/admin/volunteer/reports/${rep.id}?/reject`, {
+				shown: 'https://www.youtube.com/watch?v=reject001',
+				comment: 'Blurry'
+			});
 		}
 	};
 }

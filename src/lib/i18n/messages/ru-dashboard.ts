@@ -11,6 +11,7 @@ export const ruDashboard: Partial<Messages> = {
 	'dashboard.attention.training_requests': 'Заявки на курсы',
 	'dashboard.attention.practice': 'Практические видео на проверке',
 	'dashboard.attention.training_finished': 'Курсы пройдены, ждут сертификата',
+	'dashboard.attention.volunteer_reports': 'Фотоотчёты волонтёров на проверке',
 	'dashboard.upcoming': 'Ближайшие события',
 	'dashboard.upcoming.none': 'Ближайших событий нет.',
 	'dashboard.upcoming.seats': 'Зарегистрировано: {seats} / {limit}',

@@ -29,6 +29,7 @@ export type AdminIcon =
 	| 'volunteerCards'
 	| 'volunteerPartners'
 	| 'volunteerRequests'
+	| 'volunteerReports'
 	| 'volunteerRedemptions'
 	| 'settings'
 	| 'audit'
@@ -102,6 +103,7 @@ const sections: [MessageKey, Section[]][] = [
 			section('volunteerCards', 'volunteer/cards', 'volunteer.manage'),
 			section('volunteerPartners', 'volunteer/partners', 'volunteer.manage'),
 			section('volunteerRequests', 'volunteer/requests', 'volunteer.manage'),
+			section('volunteerReports', 'volunteer/reports', 'volunteer.manage'),
 			section('volunteerRedemptions', 'volunteer/redemptions', 'volunteer.manage')
 		]
 	],

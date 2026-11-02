@@ -10,6 +10,7 @@ export const enDashboard = {
 	'dashboard.attention.training_requests': 'Course access requests',
 	'dashboard.attention.practice': 'Practice videos to review',
 	'dashboard.attention.training_finished': 'Courses completed, waiting for a certificate',
+	'dashboard.attention.volunteer_reports': 'Volunteer photo reports to review',
 	'dashboard.upcoming': 'Upcoming events',
 	'dashboard.upcoming.none': 'No upcoming events.',
 	'dashboard.upcoming.seats': 'Registered: {seats} / {limit}',
