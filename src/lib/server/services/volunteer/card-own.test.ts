@@ -89,4 +89,47 @@ describe.skipIf(!testDbUrl)('volunteer card in the cabinet', () => {
 			expect(empty.card).toBeNull();
 		});
 	});
+
+	it('own redemptions: date, partner, perk; reversed marked; other member sees none', async () => {
+		await inRollback(async (tx) => {
+			const { markPerk } = await import('./perk-mark');
+			const { reversePerk } = await import('./perk-reverse');
+			const { createPartner } = await import('./partners-admin');
+			const { createCashier } = await import('./cashiers-admin');
+			const { bindCashier, findCashier } = await import('./cashier-access');
+			const admin = await staff(tx);
+			const user = await volunteer(tx);
+			const applied = await applyForCard(tx, user.id, deps(mailbox().send));
+			if (!applied.ok) throw new Error(applied.reason);
+			await decideCard(tx, admin, applied.id, { action: 'issue' }, deps(mailbox().send));
+			const values = partnerValues({ status: 'published' });
+			const partner = await createPartner(tx, admin, values, null);
+			if (typeof partner === 'string') throw new Error(partner);
+			const [perk] = await tx
+				.insert(volunteerPerks)
+				.values({ ...perkValues({ status: 'published' }), partnerId: partner.id })
+				.returning({ id: volunteerPerks.id });
+			const created = await createCashier(tx, admin, partner.id, 'Till', null);
+			if (typeof created === 'string') throw new Error(created);
+			const cashier = await findCashier(tx, await bindCashier(tx, created.token));
+			if (!cashier) throw new Error('no cashier');
+			const token = (await cardRow(tx, applied.id)).publicToken!;
+			const mark = await markPerk(tx, token, cashier, partner.id, perk.id);
+			if (!mark.ok) throw new Error(mark.reason);
+			const view = await ownCard(tx, user.id);
+			expect(view.redemptions).toEqual([
+				expect.objectContaining({
+					partnerName: values.name,
+					reversed: false,
+					perkTitle: expect.objectContaining({ en: '10% off' })
+				})
+			]);
+			await reversePerk(tx, admin, { redemptionId: mark.redemptionId, comment: 'Mistake' }, {
+				ip: '10.0.0.8'
+			});
+			expect((await ownCard(tx, user.id)).redemptions[0].reversed).toBe(true);
+			const other = await volunteer(tx);
+			expect((await ownCard(tx, other.id)).redemptions).toEqual([]);
+		});
+	});
 });
