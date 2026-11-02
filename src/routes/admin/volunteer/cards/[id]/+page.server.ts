@@ -10,6 +10,7 @@ import {
 } from '#lib/server/services/volunteer/card-decision.ts';
 import { cardCheckUrl } from '#lib/server/services/volunteer/card-rules.ts';
 import { cardDetail } from '#lib/server/services/volunteer/cards-admin.ts';
+import { listCardRedemptions } from '#lib/server/services/volunteer/redemptions-admin.ts';
 import { publicUrl } from '#lib/server/storage/r2.ts';
 import type { Actions, PageServerLoad } from './$types';
 
@@ -22,7 +23,8 @@ export const load: PageServerLoad = async ({ locals, params, setHeaders }) => {
 	const { avatarKey, ...member } = card.member;
 	return {
 		card: { ...card, member: { ...member, photoUrl: avatarKey ? publicUrl(avatarKey) : null } },
-		checkUrl: card.publicToken ? cardCheckUrl(PUBLIC_SITE_URL ?? '', card.publicToken) : null
+		checkUrl: card.publicToken ? cardCheckUrl(PUBLIC_SITE_URL ?? '', card.publicToken) : null,
+		redemptions: await listCardRedemptions(db, card.id)
 	};
 };
 

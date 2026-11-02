@@ -67,6 +67,27 @@ export function volunteerActions(
 		'/admin/volunteer/partners/[id]/cashiers?/link': async () =>
 			post(`${await partner()}/cashiers?/link`, { cashierId: await cashier() }),
 		'/admin/volunteer/partners/[id]/cashiers?/disable': async () =>
-			post(`${await partner()}/cashiers?/disable`, { cashierId: await cashier() })
+			post(`${await partner()}/cashiers?/disable`, { cashierId: await cashier() }),
+		'/admin/volunteer/redemptions?/reverse': async () => {
+			const tag = crypto.randomUUID();
+			const [user] = await sql`insert into users
+				(email, name, first_name, last_name, birth_date, email_verified, avatar_key)
+				values (${`e2e-audit-redeems-${tag}@example.com`}, ${`Audit redeem ${tag.slice(0, 8)}`},
+					'Audit', 'Redeem', '1990-01-01', true, ${`avatars/${tag}.jpg`}) returning id`;
+			const [card] = await sql`insert into volunteer_cards
+				(user_id, status, applied_at, number, public_token, issued_at)
+				values (${user.id}, 'active', now(), ${`E2E-R-${tag.slice(0, 8)}`}, ${tag}, now())
+				returning id`;
+			const [p] = await sql`select id from volunteer_partners where name = ${name}`;
+			const [perk] = await sql`select id from volunteer_perks where partner_id = ${p.id} limit 1`;
+			const [c] = await sql`select id from partner_cashiers where partner_id = ${p.id} limit 1`;
+			const [mark] = await sql`insert into perk_redemptions
+				(card_id, perk_id, partner_id, cashier_id)
+				values (${card.id}, ${perk.id}, ${p.id}, ${c.id}) returning id`;
+			await post('/admin/volunteer/redemptions?/reverse', {
+				redemptionId: mark.id,
+				comment: 'Audit reverse'
+			});
+		}
 	};
 }

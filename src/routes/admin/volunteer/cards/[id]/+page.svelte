@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { newsDate } from '#lib/components/site/news-date.ts';
 	import { currentLocale, t } from '#lib/i18n/index.svelte.ts';
+	import { pickLocalized } from '#lib/i18n/localized.ts';
 	import CardStatus from '../CardStatus.svelte';
 	import CardActions from './CardActions.svelte';
 	import type { PageProps } from './$types';
@@ -114,6 +115,38 @@
 				href="/admin/volunteer/cards/{card.id}/pdf"
 				data-sveltekit-reload>{t('volunteerCards.card.pdf')}</a
 			>
+		{/if}
+	</section>
+
+	<section class="flex flex-col gap-3">
+		<h2 class="text-lg font-bold">{t('volunteer.redemptions.cardBlock')}</h2>
+		{#if data.redemptions.length === 0}
+			<p class="text-sm text-ink-700">{t('volunteer.redemptions.empty')}</p>
+		{:else}
+			<ul class="flex flex-col gap-2 text-sm">
+				{#each data.redemptions as row (row.id)}
+					<li>
+						{row.createdAt.toLocaleString(currentLocale())} —
+						{row.partnerName}: {pickLocalized(row.perkTitle, currentLocale())}
+						{#if row.cashierLabel}
+							({row.cashierLabel})
+						{/if}
+						{#if row.reversalOfId}
+							— {t('volunteer.redemptions.isReversal')}
+						{:else if row.reversedById}
+							— {t('volunteer.redemptions.wasReversed')}
+						{/if}
+						{#if !row.reversalOfId}
+							·
+							<a
+								class="text-navy-700 underline"
+								href="/admin/volunteer/redemptions?q={encodeURIComponent(card.number ?? card.id)}"
+								>{t('admin.nav.volunteerRedemptions')}</a
+							>
+						{/if}
+					</li>
+				{/each}
+			</ul>
 		{/if}
 	</section>
 

@@ -121,7 +121,8 @@ export const ADMIN_AUDIT = {
 	'/admin/volunteer/partners/[id]/perks/[perkId]?/update': ['volunteer_perk.update'],
 	'/admin/volunteer/partners/[id]/cashiers?/create': ['partner_cashier.create'],
 	'/admin/volunteer/partners/[id]/cashiers?/link': ['partner_cashier.relink'],
-	'/admin/volunteer/partners/[id]/cashiers?/disable': ['partner_cashier.disable']
+	'/admin/volunteer/partners/[id]/cashiers?/disable': ['partner_cashier.disable'],
+	'/admin/volunteer/redemptions?/reverse': ['perk_redemption.reverse']
 } as const;
 
 export type AdminAction = keyof typeof ADMIN_AUDIT;

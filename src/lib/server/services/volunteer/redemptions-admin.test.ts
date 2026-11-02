@@ -92,9 +92,14 @@ describe.skipIf(!testDbUrl)('admin redemptions journal', () => {
 				reversedById: null,
 				comment: null
 			});
-			await reversePerk(tx, ctx.admin, { redemptionId: ctx.redemptionId, comment: 'Mistake' }, {
-				ip: IP
-			});
+			await reversePerk(
+				tx,
+				ctx.admin,
+				{ redemptionId: ctx.redemptionId, comment: 'Mistake' },
+				{
+					ip: IP
+				}
+			);
 			const after = await listRedemptions(tx, state({ q: ctx.cardNumber }));
 			const original = after.rows.find((r) => r.id === ctx.redemptionId)!;
 			expect(original.reversedById).toBeTruthy();
@@ -113,9 +118,14 @@ describe.skipIf(!testDbUrl)('admin redemptions journal', () => {
 			const summary = await redemptionsSummary(tx, state({ partner: ctx.partnerId }));
 			const line = summary.find((s) => s.perkId === ctx.perkId);
 			expect(line).toMatchObject({ marks: 1, uniqueCards: 1, partnerId: ctx.partnerId });
-			await reversePerk(tx, ctx.admin, { redemptionId: ctx.redemptionId, comment: 'Undo' }, {
-				ip: IP
-			});
+			await reversePerk(
+				tx,
+				ctx.admin,
+				{ redemptionId: ctx.redemptionId, comment: 'Undo' },
+				{
+					ip: IP
+				}
+			);
 			expect(
 				(await redemptionsSummary(tx, state({ partner: ctx.partnerId }))).find(
 					(s) => s.perkId === ctx.perkId

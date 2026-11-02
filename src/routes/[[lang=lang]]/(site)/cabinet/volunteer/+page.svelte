@@ -2,9 +2,10 @@
 	import { t } from '#lib/i18n/index.svelte.ts';
 	import CardBlock from './CardBlock.svelte';
 	import PerksBlock from './PerksBlock.svelte';
+	import UsesBlock from './UsesBlock.svelte';
 	import type { PageProps } from './$types';
 
-	/* docs/06 section 5.12: the "Card" and "Perks" blocks; uses and invitations come with 10.7–10.8. */
+	/* docs/06 section 5.12: card, perks, uses; invitations come with 10.8. */
 	let { data, form }: PageProps = $props();
 </script>
 
@@ -18,5 +19,8 @@
 	<CardBlock own={data.own} qr={data.qr} result={form} />
 	{#if data.own.checkToken}
 		<PerksBlock partners={data.own.partners} />
+	{/if}
+	{#if data.own.card}
+		<UsesBlock redemptions={data.own.redemptions} />
 	{/if}
 </div>

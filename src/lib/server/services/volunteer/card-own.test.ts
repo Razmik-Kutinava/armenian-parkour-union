@@ -29,7 +29,8 @@ describe.skipIf(!testDbUrl)('volunteer card in the cabinet', () => {
 				missing: [],
 				validity: null,
 				checkToken: null,
-				partners: []
+				partners: [],
+				redemptions: []
 			});
 			const bare = await volunteer(tx, { member: false, avatarKey: null });
 			expect((await ownCard(tx, bare.id)).missing).toEqual(['membership', 'photo']);
@@ -79,7 +80,7 @@ describe.skipIf(!testDbUrl)('volunteer card in the cabinet', () => {
 			const later = new Date(Date.now() + 400 * 86_400_000);
 			const lapsed = await ownCard(tx, user.id, later);
 			expect(lapsed.validity).toEqual({ valid: false, reasons: ['membership'] });
-			expect(lapsed).toMatchObject({ checkToken: null, partners: [] });
+			expect(lapsed).toMatchObject({ checkToken: null, partners: [], redemptions: [] });
 		});
 	});
 
@@ -87,6 +88,7 @@ describe.skipIf(!testDbUrl)('volunteer card in the cabinet', () => {
 		await inRollback(async (tx) => {
 			const empty = await ownCard(tx, 'nope');
 			expect(empty.card).toBeNull();
+			expect(empty.redemptions).toEqual([]);
 		});
 	});
 
@@ -124,9 +126,14 @@ describe.skipIf(!testDbUrl)('volunteer card in the cabinet', () => {
 					perkTitle: expect.objectContaining({ en: '10% off' })
 				})
 			]);
-			await reversePerk(tx, admin, { redemptionId: mark.redemptionId, comment: 'Mistake' }, {
-				ip: '10.0.0.8'
-			});
+			await reversePerk(
+				tx,
+				admin,
+				{ redemptionId: mark.redemptionId, comment: 'Mistake' },
+				{
+					ip: '10.0.0.8'
+				}
+			);
 			expect((await ownCard(tx, user.id)).redemptions[0].reversed).toBe(true);
 			const other = await volunteer(tx);
 			expect((await ownCard(tx, other.id)).redemptions).toEqual([]);

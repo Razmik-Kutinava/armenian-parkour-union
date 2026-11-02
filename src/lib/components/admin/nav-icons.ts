@@ -13,6 +13,7 @@ import GraduationCap from '@lucide/svelte/icons/graduation-cap';
 import HandHeart from '@lucide/svelte/icons/hand-heart';
 import Handshake from '@lucide/svelte/icons/handshake';
 import IdCard from '@lucide/svelte/icons/id-card';
+import Ticket from '@lucide/svelte/icons/ticket';
 import Image from '@lucide/svelte/icons/image';
 import LayoutDashboard from '@lucide/svelte/icons/layout-dashboard';
 import ListChecks from '@lucide/svelte/icons/list-checks';
@@ -55,6 +56,7 @@ export const navIcons: Record<AdminIcon, LucideIcon> = {
 	donations: HandHeart,
 	volunteerCards: BookUser,
 	volunteerPartners: Handshake,
+	volunteerRedemptions: Ticket,
 	settings: Settings,
 	audit: ScrollText,
 	roles: ShieldCheck

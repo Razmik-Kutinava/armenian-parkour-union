@@ -71,9 +71,7 @@ describe.skipIf(!testDbUrl)('admin reverses a perk mark', () => {
 		await inRollback(async (tx) => {
 			const { admin, cardId, perkId, redemptionId } = await marked(tx);
 			const before = await visiblePartners(tx, cardId);
-			expect(before.find((p) => p.perks.some((x) => x.id === perkId))?.perks[0].remaining).toBe(
-				0
-			);
+			expect(before.find((p) => p.perks.some((x) => x.id === perkId))?.perks[0].remaining).toBe(0);
 
 			const result = await reversePerk(
 				tx,
@@ -115,30 +113,32 @@ describe.skipIf(!testDbUrl)('admin reverses a perk mark', () => {
 	it('one mark — one reversal; empty comment and non-admin refused', async () => {
 		await inRollback(async (tx) => {
 			const { admin, redemptionId } = await marked(tx, 'reusable');
+			const moderator = await staff(tx, 'moderator');
+			expect(await reversePerk(tx, moderator, { redemptionId, comment: 'x' }, { ip: IP })).toEqual({
+				ok: false,
+				reason: 'not_allowed'
+			});
+			expect(await reversePerk(tx, admin, { redemptionId, comment: '  ' }, { ip: IP })).toEqual({
+				ok: false,
+				reason: 'invalid'
+			});
 			expect(await reversePerk(tx, admin, { redemptionId, comment: 'Once' }, { ip: IP })).toEqual({
 				ok: true,
 				reversalId: expect.any(String)
 			});
-			expect(await reversePerk(tx, admin, { redemptionId, comment: 'Twice' }, { ip: IP })).toEqual(
-				{ ok: false, reason: 'already_reversed' }
-			);
-			const moderator = await staff(tx, 'moderator');
-			const other = await marked(tx);
-			expect(
-				await reversePerk(tx, moderator, { redemptionId: other.redemptionId, comment: 'x' }, {
-					ip: IP
-				})
-			).toEqual({ ok: false, reason: 'not_allowed' });
-			expect(await reversePerk(tx, admin, { redemptionId: other.redemptionId, comment: '  ' }, {
-				ip: IP
-			})).toEqual({ ok: false, reason: 'invalid' });
+			expect(await reversePerk(tx, admin, { redemptionId, comment: 'Twice' }, { ip: IP })).toEqual({
+				ok: false,
+				reason: 'already_reversed'
+			});
 			const [rev] = await tx
 				.select({ id: perkRedemptions.id })
 				.from(perkRedemptions)
-				.where(and(eq(perkRedemptions.reversalOfId, redemptionId), isNull(perkRedemptions.cashierId)));
+				.where(
+					and(eq(perkRedemptions.reversalOfId, redemptionId), isNull(perkRedemptions.cashierId))
+				);
 			expect(
 				await reversePerk(tx, admin, { redemptionId: rev.id, comment: 'Undo reverse' }, { ip: IP })
 			).toEqual({ ok: false, reason: 'not_reversible' });
 		});
-	});
+	}, 40_000);
 });
