@@ -135,6 +135,13 @@ export const enVolunteerAdmin = {
 	'volunteer.requests.invitedMore': 'New invitations: {n}.',
 	'volunteer.requests.cancel': 'Cancel request',
 	'volunteer.requests.cancelConfirm': 'Cancel the request? Accepted members get a letter.',
+	'volunteer.requests.finish': 'Finish request',
+	'volunteer.requests.finishConfirm': 'Mark the request finished? Attendance stays as set.',
+	'volunteer.requests.finished': 'Request finished.',
+	'volunteer.requests.marked': 'Attendance saved.',
+	'volunteer.requests.mark.attended': 'Came',
+	'volunteer.requests.mark.no_show': 'No-show',
+	'volunteer.requests.mark.excused': 'Excuse',
 	'volunteer.requests.invites': 'Invitations',
 	'volunteer.requests.invitesEmpty': 'No invitations yet.',
 	'volunteer.requests.titleEn': 'Title (EN)',
@@ -155,6 +162,7 @@ export const enVolunteerAdmin = {
 	'volunteer.requests.col.member': 'Member',
 	'volunteer.requests.col.answer': 'Answer',
 	'volunteer.requests.col.answeredAt': 'Answered',
+	'volunteer.requests.col.mark': 'Attendance',
 	'volunteer.requests.status.all': 'All',
 	'volunteer.requests.status.draft': 'Draft',
 	'volunteer.requests.status.open': 'Open',
@@ -171,5 +179,6 @@ export const enVolunteerAdmin = {
 	'volunteer.requests.error.state': 'This action is not available for the current status.',
 	'volunteer.requests.error.places': 'Enter places from 1 to 500 (not below accepted).',
 	'volunteer.requests.error.respondBy': 'Reply-by must be before the start and still open.',
+	'volunteer.requests.error.tooEarly': 'Attendance opens at midnight of the request day (Yerevan).',
 	'volunteer.requests.error.event': 'Choose a valid event or leave empty.'
 } as const;

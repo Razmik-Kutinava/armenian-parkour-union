@@ -65,6 +65,22 @@ export const SEED_POINTS_RULES: Record<string, SeedRule> = {
 			hy: 'Տեսանյութը հաստատվել է մոդերատորի կողմից',
 			ru: 'Видео одобрено модератором'
 		}
+	},
+	volunteer_participation: {
+		points: 20,
+		title: {
+			en: 'Volunteered at a federation request',
+			hy: 'Կամավորություն ֆեդերացիայի հարցումով',
+			ru: 'Волонтёрство по запросу федерации'
+		}
+	},
+	volunteer_report: {
+		points: 10,
+		title: {
+			en: 'Volunteer photo report approved',
+			hy: 'Կամավորի ֆոտոհաշվետվությունը հաստատված է',
+			ru: 'Принят фотоотчёт волонтёра'
+		}
 	}
 };
 

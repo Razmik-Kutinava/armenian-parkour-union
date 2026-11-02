@@ -8,6 +8,7 @@ import {
 	decideCard,
 	type CardDecisionInput
 } from '#lib/server/services/volunteer/card-decision.ts';
+import { clearCardFlag } from '#lib/server/services/volunteer/card-flag.ts';
 import { cardCheckUrl } from '#lib/server/services/volunteer/card-rules.ts';
 import { cardDetail } from '#lib/server/services/volunteer/cards-admin.ts';
 import { listCardRedemptions } from '#lib/server/services/volunteer/redemptions-admin.ts';
@@ -52,5 +53,13 @@ async function decide(event: RequestEvent, action: CardDecisionInput['action']) 
 export const actions: Actions = {
 	issue: (event) => decide(event, 'issue'),
 	reject: (event) => decide(event, 'reject'),
-	revoke: (event) => decide(event, 'revoke')
+	revoke: (event) => decide(event, 'revoke'),
+	unflag: async (event) => {
+		const actor = requirePermission(event.locals.user, 'volunteer.manage');
+		const result = await clearCardFlag(db, actor, event.params.id ?? '', event.getClientAddress());
+		if (result.ok) return { done: true as const };
+		if (result.reason === 'not_allowed') error(403, 'Forbidden');
+		if (result.reason === 'not_found') error(404, 'Not found');
+		return fail(400, { message: 'volunteerCards.error.state' as MessageKey });
+	}
 };

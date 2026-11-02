@@ -150,5 +150,5 @@
 		{/if}
 	</section>
 
-	<CardActions status={card.status} />
+	<CardActions status={card.status} flagged={card.flagged} />
 </div>

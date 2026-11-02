@@ -14,6 +14,9 @@
 	);
 	const open = $derived(row.status === 'open');
 	const day = (d: Date) => newsDate(d, currentLocale());
+	const markable = (status: string) =>
+		status === 'accepted' || status === 'attended' || status === 'no_show' || status === 'excused';
+	const markKinds = ['attended', 'no_show', 'excused'] as const;
 </script>
 
 <svelte:head
@@ -48,6 +51,12 @@
 		{t('volunteer.requests.invitedMore', { n: String(form.invitedMore) })}
 	</p>
 {/if}
+{#if form && 'finished' in form}
+	<p class="text-green-800 mb-4" role="status">{t('volunteer.requests.finished')}</p>
+{/if}
+{#if form && 'marked' in form}
+	<p class="text-green-800 mb-4" role="status">{t('volunteer.requests.marked')}</p>
+{/if}
 
 {#if row.status === 'draft' || row.status === 'open'}
 	<section class="mb-8 flex flex-wrap gap-3">
@@ -80,6 +89,15 @@
 					}}>{t('volunteer.requests.inviteMore')}</button
 				>
 			</form>
+			<form method="POST" action="?/finish">
+				<button
+					type="submit"
+					class="btn btn-primary"
+					onclick={(e) => {
+						if (!confirm(t('volunteer.requests.finishConfirm'))) e.preventDefault();
+					}}>{t('volunteer.requests.finish')}</button
+				>
+			</form>
 		{/if}
 		<form method="POST" action="?/cancel">
 			<button
@@ -110,7 +128,8 @@
 				<tr class="border-ink-200 border-b">
 					<th class="py-2 pr-3">{t('volunteer.requests.col.member')}</th>
 					<th class="py-2 pr-3">{t('volunteer.requests.col.answer')}</th>
-					<th class="py-2">{t('volunteer.requests.col.answeredAt')}</th>
+					<th class="py-2 pr-3">{t('volunteer.requests.col.answeredAt')}</th>
+					{#if data.canMark}<th class="py-2">{t('volunteer.requests.col.mark')}</th>{/if}
 				</tr>
 			</thead>
 			<tbody>
@@ -124,7 +143,29 @@
 							<span class="text-ink-500"> · {invite.email}</span>
 						</td>
 						<td class="py-2 pr-3">{t(`volunteer.requests.answer.${invite.status}`)}</td>
-						<td class="py-2">{invite.answeredAt ? day(invite.answeredAt) : '—'}</td>
+						<td class="py-2 pr-3">{invite.answeredAt ? day(invite.answeredAt) : '—'}</td>
+						{#if data.canMark}
+							<td class="py-2">
+								{#if markable(invite.status)}
+									<div class="flex flex-wrap gap-2">
+										{#each markKinds as kind (kind)}
+											<form method="POST" action="?/mark">
+												<input type="hidden" name="invitationId" value={invite.id} />
+												<input type="hidden" name="kind" value={kind} />
+												<button
+													type="submit"
+													class="btn btn-secondary text-xs"
+													disabled={invite.status === kind}
+													>{t(`volunteer.requests.mark.${kind}`)}</button
+												>
+											</form>
+										{/each}
+									</div>
+								{:else}
+									—
+								{/if}
+							</td>
+						{/if}
 					</tr>
 				{/each}
 			</tbody>

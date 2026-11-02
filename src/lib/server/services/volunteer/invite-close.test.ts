@@ -86,10 +86,7 @@ describe.skipIf(!testDbUrl)('volunteer request close after respond_by', { timeou
 			expect(accepted).toMatchObject({ status: 'accepted', countedAt: null });
 			expect(silent.status).toBe('excused');
 			expect(silent.countedAt).toBeInstanceOf(Date);
-			const [cardB] = await tx
-				.select()
-				.from(volunteerCards)
-				.where(eq(volunteerCards.id, b.cardId));
+			const [cardB] = await tx.select().from(volunteerCards).where(eq(volunteerCards.id, b.cardId));
 			expect(cardB.declineStreak).toBe(0);
 			expect(await closeRequestInvites(tx, requestId, daysFromNow(0))).toMatchObject({
 				ok: true,
@@ -156,10 +153,7 @@ describe.skipIf(!testDbUrl)('volunteer request close after respond_by', { timeou
 			const summary = await closeDueRequests(tx, daysFromNow(0));
 			expect(summary.closed).toBeGreaterThanOrEqual(2);
 			for (const id of [one.requestId, two.requestId]) {
-				const [row] = await tx
-					.select()
-					.from(volunteerRequests)
-					.where(eq(volunteerRequests.id, id));
+				const [row] = await tx.select().from(volunteerRequests).where(eq(volunteerRequests.id, id));
 				expect(row.closedAt).toBeInstanceOf(Date);
 			}
 		});

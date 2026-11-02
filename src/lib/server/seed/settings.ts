@@ -41,7 +41,9 @@ export const SEED_SETTINGS = {
 		}
 	},
 	/** "Suspicious" in the points ledger (docs/03 section 6.4, decisions.md 2026-10-21). */
-	points_suspicious: { manual: true, min_amount: 100, burst_count: 5, burst_hours: 24 }
+	points_suspicious: { manual: true, min_amount: 100, burst_count: 5, burst_hours: 24 },
+	/** Volunteer card cashier invite and decline streak (docs/03 section 19, stage 10). */
+	volunteer: { decline_threshold: 3, cashier_invite_hours: 72 }
 };
 
 /** Adds missing keys only: values changed in the admin panel are never overwritten. */

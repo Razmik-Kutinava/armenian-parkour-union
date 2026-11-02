@@ -150,9 +150,7 @@ describe.skipIf(!testDbUrl)('volunteer invitation attendance', { timeout: 60_000
 				.where(eq(volunteerCards.id, cards[1]));
 			expect(afterExcuse.declineStreak).toBe(0);
 			const mod = await staff(tx, 'moderator');
-			expect(await markInvite(tx, mod, byUser[users[1].id], 'attended', IP)).toBe(
-				'not_allowed'
-			);
+			expect(await markInvite(tx, mod, byUser[users[1].id], 'attended', IP)).toBe('not_allowed');
 			expect(await balanceOf(tx, users[0].id)).toBe(0);
 		});
 	});
@@ -164,9 +162,7 @@ describe.skipIf(!testDbUrl)('volunteer invitation attendance', { timeout: 60_000
 				.update(volunteerRequests)
 				.set({ startsAt: daysFromNow(2), endsAt: daysFromNow(2.1) })
 				.where(eq(volunteerRequests.id, requestId));
-			expect(await markInvite(tx, admin, byUser[users[0].id], 'attended', IP)).toBe(
-				'too_early'
-			);
+			expect(await markInvite(tx, admin, byUser[users[0].id], 'attended', IP)).toBe('too_early');
 			await tx
 				.update(volunteerRequests)
 				.set({ startsAt: daysFromNow(-0.1), endsAt: daysFromNow(0.1) })

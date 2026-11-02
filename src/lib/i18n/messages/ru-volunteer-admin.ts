@@ -138,6 +138,13 @@ export const ruVolunteerAdmin: Partial<Messages> = {
 	'volunteer.requests.invitedMore': 'Новых приглашений: {n}.',
 	'volunteer.requests.cancel': 'Отменить запрос',
 	'volunteer.requests.cancelConfirm': 'Отменить запрос? Принявшим уйдёт письмо.',
+	'volunteer.requests.finish': 'Завершить запрос',
+	'volunteer.requests.finishConfirm': 'Завершить запрос? Отметки явки сохранятся.',
+	'volunteer.requests.finished': 'Запрос завершён.',
+	'volunteer.requests.marked': 'Явка сохранена.',
+	'volunteer.requests.mark.attended': 'Пришёл',
+	'volunteer.requests.mark.no_show': 'Не пришёл',
+	'volunteer.requests.mark.excused': 'Освободить',
 	'volunteer.requests.invites': 'Приглашения',
 	'volunteer.requests.invitesEmpty': 'Пока нет приглашений.',
 	'volunteer.requests.titleEn': 'Название (EN)',
@@ -158,6 +165,7 @@ export const ruVolunteerAdmin: Partial<Messages> = {
 	'volunteer.requests.col.member': 'Участник',
 	'volunteer.requests.col.answer': 'Ответ',
 	'volunteer.requests.col.answeredAt': 'Когда',
+	'volunteer.requests.col.mark': 'Явка',
 	'volunteer.requests.status.all': 'Все',
 	'volunteer.requests.status.draft': 'Черновик',
 	'volunteer.requests.status.open': 'Открыт',
@@ -174,5 +182,6 @@ export const ruVolunteerAdmin: Partial<Messages> = {
 	'volunteer.requests.error.state': 'Для текущего статуса это действие недоступно.',
 	'volunteer.requests.error.places': 'Мест от 1 до 500 (не меньше принявших).',
 	'volunteer.requests.error.respondBy': 'Срок ответа — до начала и ещё не прошёл.',
+	'volunteer.requests.error.tooEarly': 'Явку можно отмечать с полуночи дня запроса (Ереван).',
 	'volunteer.requests.error.event': 'Выберите событие или оставьте пустым.'
 };

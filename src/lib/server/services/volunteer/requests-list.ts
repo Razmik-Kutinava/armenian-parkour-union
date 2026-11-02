@@ -84,6 +84,7 @@ export async function getRequest(db: LimitDb, id: string) {
 			respondBy: volunteerRequests.respondBy,
 			status: volunteerRequests.status,
 			publishedAt: volunteerRequests.publishedAt,
+			closedAt: volunteerRequests.closedAt,
 			accepted: sql<number>`(select count(*)::int from volunteer_invitations a
 				where a.request_id = ${volunteerRequests.id} and a.status = 'accepted')`
 		})
@@ -96,6 +97,7 @@ export async function getRequest(db: LimitDb, id: string) {
 			id: volunteerInvitations.id,
 			status: volunteerInvitations.status,
 			answeredAt: volunteerInvitations.answeredAt,
+			markedAt: volunteerInvitations.markedAt,
 			userId: users.id,
 			name: users.name,
 			email: users.email

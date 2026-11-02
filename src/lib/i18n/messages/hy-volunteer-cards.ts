@@ -52,6 +52,9 @@ export const hyVolunteerCards: Partial<Messages> = {
 		'Պայմանները կստուգվեն կրկին։ Մասնակիցը կստանա համար և նամակ, լուսանկարն ու անունը տեսանելի կդառնան ստուգման էջում։',
 	'volunteerCards.reject': 'Մերժել',
 	'volunteerCards.rejectText': 'Պատճառը մասնակիցը կտեսնի անձնական էջում և նամակում։',
+	'volunteerCards.unflag': 'Հանել մերժումների նշումը',
+	'volunteerCards.unflagText':
+		'Հանե՞լ մերժումների զգուշացումը և զրոյացնել հաշվիչը։ Գրքույկը կմնա տրված։',
 	'volunteerCards.revoke': 'Հետ կանչել գրքույկը',
 	'volunteerCards.revokeText':
 		'Գրքույկն անմիջապես կդադարի գործել՝ ստուգման էջը ցույց կտա, որ այն չի գործում։ Պատճառը մասնակիցը կտեսնի։',
@@ -112,6 +115,11 @@ export const hyVolunteerCards: Partial<Messages> = {
 	'volunteerCards.mail.revoked.subject': 'Կամավորի գրքույկը հետ է կանչվել',
 	'volunteerCards.mail.revoked.text':
 		'Բարև, {name}։\n\nՁեր կամավորի գրքույկը հետ է կանչվել։ Պատճառ՝ {reason}\n\nԿրկին դիմել՝ {url}',
+	'volunteerCards.mail.flag.subject': 'Զգուշացում․ կամավորի հրավերների մերժումներ',
+	'volunteerCards.mail.flag.text':
+		'Բարև, {name}։\n\nԴուք ունեք {n} անընդմեջ մերժում ֆեդերացիայի կամավորության հրավերներից։ Սա խիստ զգուշացում է։ Գրքույկի մասին որոշումը կայացնում է ֆեդերացիան։\n\nԱնձնական էջ՝ {url}',
+	'cabinet.volunteer.flag':
+		'Դուք ունեք {n} անընդմեջ մերժում։ Գրքույկի մասին որոշումը կայացնում է ֆեդերացիան։',
 	'cabinet.volunteer.invites': 'Հրավերներ',
 	'cabinet.volunteer.invitesOpen': 'Բաց',
 	'cabinet.volunteer.invitesPast': 'Անցած',

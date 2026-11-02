@@ -14,7 +14,12 @@ export const RULE_SOURCES = {
 	event_place_1: { reason: 'event_place', sourceType: 'event_registration' },
 	event_place_2: { reason: 'event_place', sourceType: 'event_registration' },
 	event_place_3: { reason: 'event_place', sourceType: 'event_registration' },
-	video_approved: { reason: 'video', sourceType: 'video' }
+	video_approved: { reason: 'video', sourceType: 'video' },
+	volunteer_participation: {
+		reason: 'volunteer_participation',
+		sourceType: 'volunteer_invitation'
+	},
+	volunteer_report: { reason: 'volunteer_report', sourceType: 'volunteer_report' }
 } as const;
 
 export type PointsRuleCode = keyof typeof RULE_SOURCES;

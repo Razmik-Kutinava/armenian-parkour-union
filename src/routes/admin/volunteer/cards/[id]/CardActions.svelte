@@ -6,9 +6,12 @@
 
 	/* docs/05 section 28 "Cards": issue (confirmation) or reject a pending card, revoke an issued one;
 	 * reasons are required. The server re-checks the right, the status and the conditions. */
-	let { status }: { status: 'pending' | 'active' | 'rejected' | 'revoked' } = $props();
+	let {
+		status,
+		flagged = false
+	}: { status: 'pending' | 'active' | 'rejected' | 'revoked'; flagged?: boolean } = $props();
 
-	type Ask = 'issue' | 'reject' | 'revoke';
+	type Ask = 'issue' | 'reject' | 'revoke' | 'unflag';
 	let asked = $state<Ask | null>(null);
 	let open = $state(false);
 	const ask = (action: Ask) => {
@@ -17,14 +20,19 @@
 	};
 </script>
 
-{#if status === 'pending' || status === 'active'}
+{#if status === 'pending' || status === 'active' || flagged}
 	<FormSection title={t('volunteerCards.card.decision')}>
 		<div class="flex flex-wrap gap-3">
 			{#if status === 'pending'}
 				<Button onclick={() => ask('issue')}>{t('volunteerCards.issue')}</Button>
 				<Button variant="danger" onclick={() => ask('reject')}>{t('volunteerCards.reject')}</Button>
-			{:else}
+			{:else if status === 'active'}
 				<Button variant="danger" onclick={() => ask('revoke')}>{t('volunteerCards.revoke')}</Button>
+			{/if}
+			{#if flagged}
+				<Button variant="secondary" onclick={() => ask('unflag')}
+					>{t('volunteerCards.unflag')}</Button
+				>
 			{/if}
 		</div>
 	</FormSection>
@@ -36,7 +44,7 @@
 		text={t(`volunteerCards.${asked}Text`)}
 		action="?/{asked}"
 		confirmLabel={t(`volunteerCards.${asked}`)}
-		danger={asked !== 'issue'}
-		comment={asked === 'issue' ? 'none' : 'required'}
+		danger={asked !== 'issue' && asked !== 'unflag'}
+		comment={asked === 'issue' || asked === 'unflag' ? 'none' : 'required'}
 	/>
 {/if}

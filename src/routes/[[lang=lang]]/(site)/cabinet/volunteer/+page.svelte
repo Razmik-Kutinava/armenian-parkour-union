@@ -17,6 +17,14 @@
 
 <div class="flex max-w-3xl flex-col gap-6">
 	<h1 class="text-3xl font-bold text-ink-900">{t('cabinet.volunteer.title')}</h1>
+	{#if data.own.card?.flagged}
+		<p
+			class="border-amber-300 bg-amber-50 text-amber-950 rounded-md border px-4 py-3"
+			role="status"
+		>
+			{t('cabinet.volunteer.flag', { n: String(data.own.card.declineStreak) })}
+		</p>
+	{/if}
 	<CardBlock own={data.own} qr={data.qr} result={form} />
 	{#if data.own.checkToken}
 		<PerksBlock partners={data.own.partners} />

@@ -137,6 +137,13 @@ export const hyVolunteerAdmin: Partial<Messages> = {
 	'volunteer.requests.invitedMore': 'Նոր հրավերներ՝ {n}։',
 	'volunteer.requests.cancel': 'Չեղարկել հարցումը',
 	'volunteer.requests.cancelConfirm': 'Չեղարկե՞լ հարցումը։ Ընդունածներին կուղարկվի նամակ։',
+	'volunteer.requests.finish': 'Ավարտել հարցումը',
+	'volunteer.requests.finishConfirm': 'Ավարտե՞լ հարցումը։ Ներկայության նշումները կպահպանվեն։',
+	'volunteer.requests.finished': 'Հարցումն ավարտված է։',
+	'volunteer.requests.marked': 'Ներկայությունը պահպանված է։',
+	'volunteer.requests.mark.attended': 'Եկել է',
+	'volunteer.requests.mark.no_show': 'Չի եկել',
+	'volunteer.requests.mark.excused': 'Ազատել',
 	'volunteer.requests.invites': 'Հրավերներ',
 	'volunteer.requests.invitesEmpty': 'Դեռ հրավերներ չկան։',
 	'volunteer.requests.titleEn': 'Վերնագիր (EN)',
@@ -157,6 +164,7 @@ export const hyVolunteerAdmin: Partial<Messages> = {
 	'volunteer.requests.col.member': 'Մասնակից',
 	'volunteer.requests.col.answer': 'Պատասխան',
 	'volunteer.requests.col.answeredAt': 'Երբ',
+	'volunteer.requests.col.mark': 'Ներկայություն',
 	'volunteer.requests.status.all': 'Բոլորը',
 	'volunteer.requests.status.draft': 'Սևագիր',
 	'volunteer.requests.status.open': 'Բաց',
@@ -173,5 +181,7 @@ export const hyVolunteerAdmin: Partial<Messages> = {
 	'volunteer.requests.error.state': 'Այս գործողությունը հասանելի չէ ընթացիկ կարգավիճակի համար։',
 	'volunteer.requests.error.places': 'Տեղեր՝ 1–500 (ոչ պակաս ընդունածներից)։',
 	'volunteer.requests.error.respondBy': 'Պատասխանի ժամկետը՝ մինչև սկիզբը և դեռ բաց։',
+	'volunteer.requests.error.tooEarly':
+		'Ներկայությունը կարելի է նշել հարցման օրվա կեսգիշերից (Երևան)։',
 	'volunteer.requests.error.event': 'Ընտրեք միջոցառում կամ թողեք դատարկ։'
 };

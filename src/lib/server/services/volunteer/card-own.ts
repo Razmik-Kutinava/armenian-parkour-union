@@ -35,6 +35,8 @@ export type OwnCard = {
 		number: string | null;
 		issuedAt: Date | null;
 		reviewNote: string | null;
+		declineStreak: number;
+		flagged: boolean;
 	} | null;
 	/** What applying lacks (docs/03 section 19.1 p. 1). */
 	missing: CardMissing[];
@@ -102,7 +104,9 @@ export async function ownCard(db: LimitDb, userId: string, now = new Date()): Pr
 				status: volunteerCards.status,
 				number: volunteerCards.number,
 				issuedAt: volunteerCards.issuedAt,
-				reviewNote: volunteerCards.reviewNote
+				reviewNote: volunteerCards.reviewNote,
+				declineStreak: volunteerCards.declineStreak,
+				flaggedAt: volunteerCards.flaggedAt
 			})
 			.from(volunteerCards)
 			.where(eq(volunteerCards.userId, userId)),
@@ -116,7 +120,9 @@ export async function ownCard(db: LimitDb, userId: string, now = new Date()): Pr
 					status: row.status,
 					number: row.number,
 					issuedAt: row.issuedAt,
-					reviewNote: row.reviewNote
+					reviewNote: row.reviewNote,
+					declineStreak: row.declineStreak,
+					flagged: row.flaggedAt !== null
 				}
 			: null,
 		missing: missingForCard(facts, now),

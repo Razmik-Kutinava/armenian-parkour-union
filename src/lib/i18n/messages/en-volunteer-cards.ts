@@ -50,6 +50,9 @@ export const enVolunteerCards = {
 		'The conditions are checked again. The member gets a number and a letter; the photo and the name become visible on the check page.',
 	'volunteerCards.reject': 'Reject',
 	'volunteerCards.rejectText': 'The member sees the reason in the cabinet and in the letter.',
+	'volunteerCards.unflag': 'Clear decline mark',
+	'volunteerCards.unflagText':
+		'Clear the decline warning and reset the streak to zero? The card stays issued.',
 	'volunteerCards.revoke': 'Revoke card',
 	'volunteerCards.revokeText':
 		'The card stops working at once: the check page shows it is not valid. The member sees the reason.',
@@ -110,6 +113,11 @@ export const enVolunteerCards = {
 	'volunteerCards.mail.revoked.subject': 'Your volunteer card is revoked',
 	'volunteerCards.mail.revoked.text':
 		'Hello, {name}!\n\nYour volunteer card is revoked. Reason: {reason}\n\nYou can apply again: {url}',
+	'volunteerCards.mail.flag.subject': 'Warning: volunteer invitation declines',
+	'volunteerCards.mail.flag.text':
+		'Hello, {name}!\n\nYou have {n} declines in a row for federation volunteer invitations. This is a strict warning. The federation decides whether to keep your volunteer card.\n\nYour cabinet: {url}',
+	'cabinet.volunteer.flag':
+		'You have {n} declines in a row. The federation decides whether to keep your volunteer card.',
 	'cabinet.volunteer.invites': 'Invitations',
 	'cabinet.volunteer.invitesOpen': 'Open',
 	'cabinet.volunteer.invitesPast': 'Past',

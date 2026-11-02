@@ -16,7 +16,9 @@ const POINTS = {
 	event_place_1: 50,
 	event_place_2: 30,
 	event_place_3: 20,
-	video_approved: 10
+	video_approved: 10,
+	volunteer_participation: 20,
+	volunteer_report: 10
 };
 const CODES = Object.keys(POINTS);
 

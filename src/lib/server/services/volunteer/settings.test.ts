@@ -11,9 +11,7 @@ describe('volunteer settings', () => {
 			expect(parseVolunteerSettings(value)).toEqual(VOLUNTEER_DEFAULTS);
 		}
 		for (const hours of [1.5, -3, '24', 721]) {
-			expect(parseVolunteerSettings({ cashier_invite_hours: hours }).cashierInviteHours).toBe(
-				72
-			);
+			expect(parseVolunteerSettings({ cashier_invite_hours: hours }).cashierInviteHours).toBe(72);
 		}
 		for (const n of [0, 21, 1.5, '3']) {
 			expect(parseVolunteerSettings({ decline_threshold: n }).declineThreshold).toBe(3);

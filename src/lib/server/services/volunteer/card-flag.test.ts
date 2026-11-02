@@ -40,10 +40,7 @@ describe.skipIf(!testDbUrl)('volunteer card flag clear', { timeout: 60_000 }, ()
 				.set({ declineStreak: 4, flaggedAt: new Date() })
 				.where(eq(volunteerCards.id, applied.id));
 			expect(await clearCardFlag(tx, admin, applied.id, IP)).toEqual({ ok: true });
-			const [row] = await tx
-				.select()
-				.from(volunteerCards)
-				.where(eq(volunteerCards.id, applied.id));
+			const [row] = await tx.select().from(volunteerCards).where(eq(volunteerCards.id, applied.id));
 			expect(row).toMatchObject({ declineStreak: 0, flaggedAt: null });
 			expect(await auditFor(tx, 'volunteer_card', applied.id)).toEqual(
 				expect.arrayContaining([

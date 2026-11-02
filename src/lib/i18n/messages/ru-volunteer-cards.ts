@@ -51,6 +51,9 @@ export const ruVolunteerCards: Partial<Messages> = {
 		'Условия проверятся заново. Участник получит номер и письмо; фото и имя станут видны на странице проверки.',
 	'volunteerCards.reject': 'Отказать',
 	'volunteerCards.rejectText': 'Причину участник увидит в кабинете и в письме.',
+	'volunteerCards.unflag': 'Снять пометку отказов',
+	'volunteerCards.unflagText':
+		'Снять предупреждение об отказах и обнулить счётчик? Книжка останется выданной.',
 	'volunteerCards.revoke': 'Отозвать книжку',
 	'volunteerCards.revokeText':
 		'Книжка сразу перестанет действовать: страница проверки покажет, что она недействительна. Причину участник увидит.',
@@ -111,6 +114,10 @@ export const ruVolunteerCards: Partial<Messages> = {
 	'volunteerCards.mail.revoked.subject': 'Книжка волонтёра отозвана',
 	'volunteerCards.mail.revoked.text':
 		'Здравствуйте, {name}!\n\nВаша книжка волонтёра отозвана. Причина: {reason}\n\nПодать снова: {url}',
+	'volunteerCards.mail.flag.subject': 'Предупреждение: отказы от приглашений волонтёра',
+	'volunteerCards.mail.flag.text':
+		'Здравствуйте, {name}!\n\nУ вас {n} отказов подряд от приглашений федерации на волонтёрство. Это строгое предупреждение. Решение о книжке принимает федерация.\n\nКабинет: {url}',
+	'cabinet.volunteer.flag': 'У вас {n} отказов подряд. Решение о книжке принимает федерация.',
 	'cabinet.volunteer.invites': 'Приглашения',
 	'cabinet.volunteer.invitesOpen': 'Открытые',
 	'cabinet.volunteer.invitesPast': 'Прошедшие',

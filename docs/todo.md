@@ -55,6 +55,6 @@
 ## Фазы
 
 - [x] SPEC
-- [ ] RED
-- [ ] GREEN
+- [x] RED `f1af69d`
+- [x] GREEN
 - [ ] REVIEW (этапа)

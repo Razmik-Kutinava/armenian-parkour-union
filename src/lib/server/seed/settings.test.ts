@@ -20,7 +20,8 @@ const KEYS = [
 	'points_suspicious',
 	'requisites',
 	'site_name',
-	'socials'
+	'socials',
+	'volunteer'
 ];
 
 describe('seed: site_settings values', () => {
