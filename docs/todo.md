@@ -5,57 +5,55 @@
 
 ## Задача
 
-10.6 — доступ кассиров и отметка плюшки (`09` п. 10.6; `03` § 19.4; `05` § 28 «Кассиры»; `06` § 4.12–4.13; `04` § 2, § 8): ссылка-приглашение и вкладка в админке, привязка телефона (`/partner/join/{token}`, `/partner`), отключение; на странице проверки книжки — баннер кассира, остаток разовых у **своего** партнёра, кнопка «Отметить» (форма без JS, второе нажатие — подтверждение), списание разовых через `perk_redemptions`. Миграции нет (0018). Отмена обратной записью — 10.7.
+10.7 — учёт использований плюшек (`09` п. 10.7; `03` § 19.4 п. 5, § 19.9 п. 1; `05` § 28 «Использования» + карточка книжки; `06` § 5.12 «Мои использования»; `04` § 3.2, § 5.1 `volunteer.manage`): история в кабинете; журнал и сводка по партнёрам в админке; отмена обратной записью (`perk_redemptions`); экспорт CSV. Миграции нет (0018 уже есть).
 
 ## Файлы (ожидаемо)
 
-- `src/lib/server/services/volunteer/cashier-access.ts` (+ test) — cookie `apu_cashier`, invite/bind/find; хеши токенов в БД
-- `src/lib/server/services/volunteer/cashiers-admin.ts` (+ test) — create / relink / disable / list; журнал `partner_cashier.*`
-- `src/lib/server/services/volunteer/settings.ts` (+ test) — `site_settings.volunteer.cashier_invite_hours` (default 72)
-- `src/lib/server/services/volunteer/perk-mark.ts` (+ test) — транзакция отметки: lock книжки, проверки 19.4, insert `perk_redemptions`, `last_used_at`, идемпотентность 1 мин
-- `src/routes/admin/volunteer/partners/[id]/cashiers/*` — вкладка «Кассиры», ссылка один раз
-- `src/routes/[[lang=lang]]/(site)/partner/*` — join и статус привязки
-- `src/routes/[[lang=lang]]/(site)/volunteer/[token]/+page.server.ts`, `+page.svelte`, `MarkPerk.svelte` — кассир, action `?/mark`, без `cardId` в load
-- `src/lib/i18n/messages/*-volunteer-cashier.ts`, правки `*-volunteer-admin.ts`, `en|ru|hy.ts` (namespace)
-- `src/lib/seo/robots.ts` (+ test) — `Disallow: /partner` на каждом языке
-- `tests/e2e/volunteer-cashier.spec.ts` — админ + bind; сценарий отметки на `/hy/volunteer/{token}`
+- `src/lib/server/services/volunteer/perk-reverse.ts` (+ test) — admin-отмена: lock книжки, insert с `reversal_of_id` / `comment` / `created_by`, без `cashier_id`; журнал `perk_redemption.reverse`; один раз
+- `src/lib/server/services/volunteer/redemptions-admin.ts` (+ test) — список, фильтры, сводка по партнёрам за период, CSV
+- `src/lib/server/services/volunteer/card-own.ts` (+ test, `PerksBlock` / кабинет) — «Мои использования» владельца (дата, партнёр, плюшка, пометка «отменено»)
+- `src/routes/admin/volunteer/redemptions/*` — журнал, сводка, «Отменить», CSV; пункт меню; карты access/audit/permissions
+- `src/lib/server/services/volunteer/card-detail.ts` (+ страница карточки) — блок использований книжки
+- `src/lib/i18n/messages/*-volunteer*.ts` — кабинет и админка (en / ru / hy)
 
 ## Решения агента (в пределах документов)
 
-1. Привязка — POST-кнопка на join (превью мессенджера не сжигает ссылку); одна страница ошибки для used / expired / disabled / unknown.
-2. «Новая ссылка» обнуляет `device_token_hash` — старый телефон перестаёт работать (`03` 19.4 п. 2).
-3. На проверке книжки: гость — как 10.5 (исчерпанные разовые скрыты). Кассир — баннер «Вы — {партнёр}, {подпись}»; у своего партнёра плюшки из `visiblePartners` **без** отсева `remaining === 0`, показывается остаток у `single`; чужие партнёры без кнопок.
-4. Action `mark`: снова `findPublicCard` + `findCashier` по cookie; `perkId` и `partnerId` из формы — только если `partnerId === cashier.partnerId` и плюшка видима; иначе отказ. Книжку — `FOR UPDATE`.
-5. Идемпотентность 1 мин (`03` 19.4 п. 4): повтор card+perk+cashier без `reversal_of_id` за последние 60 с → успех с той же `createdAt`, новой строки нет.
-6. Подтверждение — два submit подряд (`06` 4.12): hidden `confirm=1` после первого «Отметить».
-7. Коды отказа — ключи i18n (`invalid_card`, `no_access`, `wrong_partner`, `perk_unavailable`, `no_uses_left`); в audit отметку не дублировать (`03` 19.9 п. 1).
+1. Образец отмены — `points/reverse.ts`; образец журнала/CSV — `points/admin-list.ts` + `admin-export`; кабинет — как `cabinet/points` (своё по сессии).
+2. «Отменить» только у строки-отметки (`cashier_id` не null, `reversal_of_id` null) без существующей обратной; комментарий обязателен (`03` 19.4 п. 5). Повтор / отмена обратной → отказ.
+3. Сводка (`05` § 28): за период — отметок по каждой плюшке и уникальных книжек; отменённые в счёт не входят (как `uses30Days` в `partner-list.ts`).
+4. Журнал аудита: `perk_redemption.reverse`, `entity_type = 'volunteer_card'`; id отметки / обратной — в after; отметка кассира в audit не дублируется (`03` 19.9 п. 1).
+5. Кабинет показывает все использования своей книжки (и после недействительности — `03` 19.2 п. 3); чужие id не принимаются.
+6. Карточка книжки — тот же список использований (read-only + ссылка/действие «Отменить» через журнал или прямо, если удобнее на карточке — основной UI отмены на `/admin/volunteer/redemptions`).
 
 ## Не ломать
 
-- Страница проверки для гостя (K4): без cookie кассира — как 10.5; `id` книжки и участника не отдавать.
-- Права (K1): без действующего cookie кассира своего партнёра action отклоняется; admin/editor с cookie не отмечает чужой партнёр; подмена `perkId` / `partnerId` / токена книжки.
-- `perk_redemptions` append-only; отметка только insert с `cashier_id`.
-- 10.5: `no-store`, `noindex`, `/certificate`, PDF и `cardCheckUrl` не менять.
+- Append-only `perk_redemptions` (K5): UPDATE/DELETE нет; отмена — только insert; unique `reversal_of_id`.
+- Права (K1): модератор / редактор / участник не открывают журнал и не отменяют; кассир не отменяет.
+- Остаток разовой после отмены возвращается (`03` 19.4 п. 5) — `visiblePartners` / `markPerk` считают через net redemptions.
+- 10.4–10.6: PDF, страница проверки, cookie кассира, `markPerk` без регресса.
 
 ## Проверка
 
-- `npx vitest run src/lib/server/services/volunteer/cashier-access.test.ts src/lib/server/services/volunteer/cashiers-admin.test.ts src/lib/server/services/volunteer/settings.test.ts src/lib/server/services/volunteer/perk-mark.test.ts`
+- `npx vitest run src/lib/server/services/volunteer/perk-reverse.test.ts src/lib/server/services/volunteer/redemptions-admin.test.ts src/lib/server/services/volunteer/card-own.test.ts`
 - `npm run check`, `npm run lint`
-- `npx playwright test tests/e2e/volunteer-cashier.spec.ts`
 
 ## Риск
 
-`high` — cookie кассира, `perk_redemptions`, обход партнёра (K1); публичная страница с кнопками действия.
+`high` — обратная запись и остаток разовых (как баллы), `volunteer.manage`, `audit_log`, персональные данные в журнале (K1 / K4 / K5).
 
 ## Читать
 
-- `03` § 19.3–19.4, 19.9 п. 1; `06` § 4.12–4.13; `05` § 28 (партнёры → кассиры); `04` § 2, § 8 (волонтёрство — кассир)
-- `zone-notes.md` § «Волонтёрство» (схема, `visiblePartners`, страница 10.5 → 10.6)
-- образцы: `perks-visible.ts`, `card-public.ts`, `volunteer-cards-schema.test.ts` (redemptions); e2e `admin-audit-volunteer.ts`, `admin-permissions-volunteer.ts`
+- `03` § 19.2 п. 3, § 19.4 п. 5, § 19.9 п. 1
+- `05` § 28 (карточка книжки — использования; блок «Использования»)
+- `06` § 5.12 («Мои использования»)
+- `04` § 3.2 (журнал / обратная запись), § 5.1 `volunteer.manage`
+- `02` § 12 `perk_redemptions`
+- `zone-notes.md` § «Волонтёрство» (append-only, `markPerk`, отмена — 10.7)
+- образцы: `points/reverse.ts`, `points/admin-list.ts`, `cabinet/points.ts`, `partner-list.ts` (uses30Days)
 
 ## Фазы
 
 - [x] SPEC
-- [x] RED `c836181`
-- [x] GREEN
+- [ ] RED
+- [ ] GREEN
 - [ ] REVIEW (этапа)
