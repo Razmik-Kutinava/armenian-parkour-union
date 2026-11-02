@@ -99,7 +99,8 @@ describe.skipIf(!testDbUrl)('dashboard: needs action', () => {
 				'waitlist',
 				'training_requests',
 				'practice',
-				'training_finished'
+				'training_finished',
+				'volunteer_reports'
 			]);
 		});
 	});
@@ -115,7 +116,8 @@ describe.skipIf(!testDbUrl)('dashboard: needs action', () => {
 				waitlist: '/admin/registrations?period=upcoming',
 				training_requests: '/admin/training/access',
 				practice: '/admin/training/practice',
-				training_finished: '/admin/exams?certificate=course'
+				training_finished: '/admin/exams?certificate=course',
+				volunteer_reports: '/admin/volunteer/reports'
 			});
 		});
 	});
@@ -133,7 +135,8 @@ describe.skipIf(!testDbUrl)('dashboard: needs action', () => {
 				waitlist: before.waitlist + 1,
 				training_requests: before.training_requests + 1,
 				practice: before.practice + 1,
-				training_finished: before.training_finished + 1
+				training_finished: before.training_finished + 1,
+				volunteer_reports: before.volunteer_reports
 			});
 		});
 	});
