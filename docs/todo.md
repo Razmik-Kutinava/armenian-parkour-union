@@ -5,55 +5,56 @@
 
 ## Задача
 
-10.7 — учёт использований плюшек (`09` п. 10.7; `03` § 19.4 п. 5, § 19.9 п. 1; `05` § 28 «Использования» + карточка книжки; `06` § 5.12 «Мои использования»; `04` § 3.2, § 5.1 `volunteer.manage`): история в кабинете; журнал и сводка по партнёрам в админке; отмена обратной записью (`perk_redemptions`); экспорт CSV. Миграции нет (0018 уже есть).
+10.8 — запросы на волонтёров (`09` п. 10.8; `03` § 19.5 п. 1–3, 6–7, § 19.9; `05` § 28 «Запросы»; `06` § 5.12 «Приглашения»; `04` § 3.1, § 5.1 `volunteer.manage`, § 7): создание черновика, рассылка и досылка, «Пойду» / «Не могу», лимит мест, срок ответа, отмена запроса. Миграции нет (0018 уже есть).
 
 ## Файлы (ожидаемо)
 
-- `src/lib/server/services/volunteer/perk-reverse.ts` (+ test) — admin-отмена: lock книжки, insert с `reversal_of_id` / `comment` / `created_by`, без `cashier_id`; журнал `perk_redemption.reverse`; один раз
-- `src/lib/server/services/volunteer/redemptions-admin.ts` (+ test) — список, фильтры, сводка по партнёрам за период, CSV
-- `src/lib/server/services/volunteer/card-own.ts` (+ test, `PerksBlock` / кабинет) — «Мои использования» владельца (дата, партнёр, плюшка, пометка «отменено»)
-- `src/routes/admin/volunteer/redemptions/*` — журнал, сводка, «Отменить», CSV; пункт меню; карты access/audit/permissions
-- `src/lib/server/services/volunteer/card-detail.ts` (+ страница карточки) — блок использований книжки
-- `src/lib/i18n/messages/*-volunteer*.ts` — кабинет и админка (en / ru / hy)
+- `src/lib/server/services/volunteer/requests-admin.ts` (+ test) — список/карточка, create/update черновика, «Разослать» / «Дослать», правка `places`/`respond_by` после `open`, «Отменить»; audit; письма после коммита
+- `src/lib/server/services/volunteer/invite-answer.ts` (+ test) — «Пойду» / «Не могу» владельца: lock строки запроса, лимит `accepted`, срок `respond_by`, действительная книжка
+- `src/lib/server/services/volunteer/invite-own.ts` (+ test) — приглашения в кабинете (открытые / прошедшие)
+- `src/lib/server/services/volunteer/request-mail.ts` — письмо приглашения и отмены принявшим
+- `src/routes/admin/volunteer/requests/*` — список, `/new`, `/{id}`; пункт меню; карты access/audit/permissions
+- `src/routes/[[lang=lang]]/(site)/cabinet/volunteer/*` — блок приглашений + actions; i18n `*-volunteer*.ts`
 
 ## Решения агента (в пределах документов)
 
-1. Образец отмены — `points/reverse.ts`; образец журнала/CSV — `points/admin-list.ts` + `admin-export`; кабинет — как `cabinet/points` (своё по сессии).
-2. «Отменить» только у строки-отметки (`cashier_id` не null, `reversal_of_id` null) без существующей обратной; комментарий обязателен (`03` 19.4 п. 5). Повтор / отмена обратной → отказ.
-3. Сводка (`05` § 28): за период — отметок по каждой плюшке и уникальных книжек; отменённые в счёт не входят (как `uses30Days` в `partner-list.ts`).
-4. Журнал аудита: `perk_redemption.reverse`, `entity_type = 'volunteer_card'`; id отметки / обратной — в after; отметка кассира в audit не дублируется (`03` 19.9 п. 1).
-5. Кабинет показывает все использования своей книжки (и после недействительности — `03` 19.2 п. 3); чужие id не принимаются.
-6. Карточка книжки — тот же список использований (read-only + ссылка/действие «Отменить» через журнал или прямо, если удобнее на карточке — основной UI отмены на `/admin/volunteer/redemptions`).
+1. Образцы: админка — `partners-admin.ts` / карточки; гонка мест — `registrations` (lock события / запроса первым); письма — `card-mail.ts` после коммита.
+2. Кого звать при рассылке: действительная книжка сейчас (`cardValidity` / `card-sql` из 10.3); досылка — только у кого ещё нет строки приглашения, пока `now < respond_by` и статус `open`.
+3. «Пойду»: `accepted` ≤ `places` в той же транзакции с `FOR UPDATE` строки запроса; мест нет / срок вышел / книжка недействительна — отказ; «Не могу» при полном наборе — да; передумать до срока — да.
+4. Отмена (`cancelled`): все приглашения → `excused`; письмо только принявшим (`03` 19.5 п. 6, 19.9 п. 2). «Завершить» и явка — 10.9.
+5. Фоновая `closed_at` (`invited` → `expired` / `excused` при полном наборе) и учёт `decline_streak` — 10.9 (одна операция с п. 19.6). В 10.8 после `respond_by` ответы сервер отклоняет; статусы `invited`/`accepted`/`declined` до подведения не трогаем.
+6. Журнал: `volunteer_request.create|update|publish|invite_more|cancel` (entity `volunteer_request`); правка мест/срока — `update`. Ответ участника в audit не пишем.
+7. Карточка книжки admin: read-only список приглашений — если влезает без раздувания `card-detail`; иначе отложить (основной UI — `/admin/volunteer/requests/[id]`).
 
 ## Не ломать
 
-- Append-only `perk_redemptions` (K5): UPDATE/DELETE нет; отмена — только insert; unique `reversal_of_id`.
-- Права (K1): модератор / редактор / участник не открывают журнал и не отменяют; кассир не отменяет.
-- Остаток разовой после отмены возвращается (`03` 19.4 п. 5) — `visiblePartners` / `markPerk` считают через net redemptions.
-- 10.4–10.6: PDF, страница проверки, cookie кассира, `markPerk` без регресса.
+- Гонка за последнее место (K5): два «Пойду» одновременно — один `accepted`, второй отказ; без превышения `places`.
+- Права (K1): модератор / редактор / участник не открывают `/admin/volunteer/requests` и не шлют; чужое приглашение в кабинете — отказ (подмена `id`).
+- 10.3–10.7: книжки, PDF, QR, кассир, `markPerk` / `reversePerk`, журнал использований — без регресса.
+- Append-only `perk_redemptions` и схема 0018 — без миграций.
 
 ## Проверка
 
-- `npx vitest run src/lib/server/services/volunteer/perk-reverse.test.ts src/lib/server/services/volunteer/redemptions-admin.test.ts src/lib/server/services/volunteer/card-own.test.ts`
+- `npx vitest run src/lib/server/services/volunteer/requests-admin.test.ts src/lib/server/services/volunteer/invite-answer.test.ts src/lib/server/services/volunteer/invite-own.test.ts`
 - `npm run check`, `npm run lint`
 
 ## Риск
 
-`high` — обратная запись и остаток разовых (как баллы), `volunteer.manage`, `audit_log`, персональные данные в журнале (K1 / K4 / K5).
+`high` — гонка мест (как регистрации), `volunteer.manage`, `audit_log`, письма с персональными данными, чужие приглашения (K1 / K4 / K5).
 
 ## Читать
 
-- `03` § 19.2 п. 3, § 19.4 п. 5, § 19.9 п. 1
-- `05` § 28 (карточка книжки — использования; блок «Использования»)
-- `06` § 5.12 («Мои использования»)
-- `04` § 3.2 (журнал / обратная запись), § 5.1 `volunteer.manage`
-- `02` § 12 `perk_redemptions`
-- `zone-notes.md` § «Волонтёрство» (append-only, `markPerk`, отмена — 10.7)
-- образцы: `points/reverse.ts`, `points/admin-list.ts`, `cabinet/points.ts`, `partner-list.ts` (uses30Days)
+- `03` § 19.5 п. 1–3, 6–7; § 19.9 п. 1–2; § 19.2 (действительность для рассылки и ответа)
+- `05` § 28 блок «Запросы»
+- `06` § 5.12 «Приглашения»; § 6 ссылка писем → `/cabinet/volunteer`
+- `04` § 3.1 (ответ на приглашение), § 5.1 `volunteer.manage`, § 7 строка ответа, § 8 (чужие приглашения)
+- `02` § 12 `volunteer_requests`, `volunteer_invitations`
+- `zone-notes.md` § «Волонтёрство» (`cardValidity`, `card-sql`); § «Регистрации» — образец lock мест
+- образцы: `partners-admin.ts`, `card-mail.ts`, `registrations` (lock + race)
 
 ## Фазы
 
-- [x] SPEC
-- [x] RED `1e5cbdc`
-- [x] GREEN `1fe0676`
+- [ ] SPEC
+- [ ] RED
+- [ ] GREEN
 - [ ] REVIEW (этапа)
