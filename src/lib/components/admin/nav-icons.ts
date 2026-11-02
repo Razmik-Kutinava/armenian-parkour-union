@@ -18,6 +18,7 @@ import Image from '@lucide/svelte/icons/image';
 import LayoutDashboard from '@lucide/svelte/icons/layout-dashboard';
 import ListChecks from '@lucide/svelte/icons/list-checks';
 import ListTodo from '@lucide/svelte/icons/list-todo';
+import Megaphone from '@lucide/svelte/icons/megaphone';
 import Newspaper from '@lucide/svelte/icons/newspaper';
 import Package from '@lucide/svelte/icons/package';
 import Scale from '@lucide/svelte/icons/scale';
@@ -56,6 +57,7 @@ export const navIcons: Record<AdminIcon, LucideIcon> = {
 	donations: HandHeart,
 	volunteerCards: BookUser,
 	volunteerPartners: Handshake,
+	volunteerRequests: Megaphone,
 	volunteerRedemptions: Ticket,
 	settings: Settings,
 	audit: ScrollText,

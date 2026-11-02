@@ -110,5 +110,24 @@ export const ruVolunteerCards: Partial<Messages> = {
 		'Здравствуйте, {name}!\n\nВ заявке на книжку волонтёра отказано. Причина: {reason}\n\nПодать снова: {url}',
 	'volunteerCards.mail.revoked.subject': 'Книжка волонтёра отозвана',
 	'volunteerCards.mail.revoked.text':
-		'Здравствуйте, {name}!\n\nВаша книжка волонтёра отозвана. Причина: {reason}\n\nПодать снова: {url}'
+		'Здравствуйте, {name}!\n\nВаша книжка волонтёра отозвана. Причина: {reason}\n\nПодать снова: {url}',
+	'cabinet.volunteer.invites': 'Приглашения',
+	'cabinet.volunteer.invitesOpen': 'Открытые',
+	'cabinet.volunteer.invitesPast': 'Прошедшие',
+	'cabinet.volunteer.invitesEmpty': 'Пока нет приглашений.',
+	'cabinet.volunteer.placesLeft': 'Осталось мест: {n}',
+	'cabinet.volunteer.respondBy': 'Ответить до {date}',
+	'cabinet.volunteer.accept': 'Пойду',
+	'cabinet.volunteer.decline': 'Не могу',
+	'cabinet.volunteer.inviteAccepted': 'Вы идёте',
+	'cabinet.volunteer.inviteDeclined': 'Вы не можете',
+	'cabinet.volunteer.inviteAnswered': 'Ответ сохранён.',
+	'cabinet.volunteer.inviteFull': 'Мест больше нет.',
+	'cabinet.volunteer.inviteClosed': 'Срок ответа истёк.',
+	'volunteerRequests.mail.invite.subject': 'Приглашение волонтёра: {title}',
+	'volunteerRequests.mail.invite.text':
+		'Здравствуйте, {name}!\n\nВас приглашают волонтёром: {title}.\n\nОтветьте в кабинете: {url}',
+	'volunteerRequests.mail.cancel.subject': 'Запрос волонтёров отменён: {title}',
+	'volunteerRequests.mail.cancel.text':
+		'Здравствуйте, {name}!\n\nЗапрос волонтёров «{title}» отменён.\n\nКабинет: {url}'
 };

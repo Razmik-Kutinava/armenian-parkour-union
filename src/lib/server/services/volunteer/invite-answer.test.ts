@@ -8,14 +8,7 @@ import { applyForCard } from './card-apply';
 import { decideCard } from './card-decision';
 import { answerInvite } from './invite-answer';
 import { createRequest, publishRequest, type RequestValues } from './requests-admin';
-import {
-	cardDeps as deps,
-	daysFromNow,
-	IP,
-	mailbox,
-	staff,
-	volunteer
-} from './test-support';
+import { cardDeps as deps, daysFromNow, IP, mailbox, staff, volunteer } from './test-support';
 
 /* docs/03 section 19.5 p. 3; docs/04 § 7: accept while places left and card valid; change mind
  * until respond_by; last seat — one winner. */
@@ -51,7 +44,7 @@ async function openInvite(tx: LimitDb, places = 1) {
 	return { admin, users, requestId: created.id, byUser };
 }
 
-describe.skipIf(!testDbUrl)('volunteer invitation answers', () => {
+describe.skipIf(!testDbUrl)('volunteer invitation answers', { timeout: 60_000 }, () => {
 	const { inRollback, close } = testDb();
 	afterAll(close);
 

@@ -1,11 +1,12 @@
 <script lang="ts">
 	import { t } from '#lib/i18n/index.svelte.ts';
 	import CardBlock from './CardBlock.svelte';
+	import InvitesBlock from './InvitesBlock.svelte';
 	import PerksBlock from './PerksBlock.svelte';
 	import UsesBlock from './UsesBlock.svelte';
 	import type { PageProps } from './$types';
 
-	/* docs/06 section 5.12: card, perks, uses; invitations come with 10.8. */
+	/* docs/06 section 5.12: card, perks, uses, invitations. */
 	let { data, form }: PageProps = $props();
 </script>
 
@@ -23,4 +24,9 @@
 	{#if data.own.card}
 		<UsesBlock redemptions={data.own.redemptions} />
 	{/if}
+	<InvitesBlock
+		open={data.invites.open}
+		past={data.invites.past}
+		result={form && ('answered' in form || 'message' in form) ? form : undefined}
+	/>
 </div>

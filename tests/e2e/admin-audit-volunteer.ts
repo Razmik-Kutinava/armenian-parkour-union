@@ -88,6 +88,43 @@ export function volunteerActions(
 				redemptionId: mark.id,
 				comment: 'Audit reverse'
 			});
+		},
+		'/admin/volunteer/requests/new?/default': () =>
+			postRedirect('/admin/volunteer/requests/new', {
+				'title.en': `E2e audit req ${crypto.randomUUID().slice(0, 8)}`,
+				startsAt: '2030-06-01T10:00',
+				endsAt: '2030-06-01T14:00',
+				respondBy: '2030-05-20T12:00',
+				places: '2'
+			}),
+		'/admin/volunteer/requests/[id]?/update': async () => {
+			const [row] = await sql`select id from volunteer_requests
+				where title->>'en' like 'E2e audit req %' order by created_at desc limit 1`;
+			await post(`/admin/volunteer/requests/${row.id}?/update`, {
+				'title.en': `E2e audit req ${crypto.randomUUID().slice(0, 8)}`,
+				startsAt: '2030-06-01T10:00',
+				endsAt: '2030-06-01T14:00',
+				respondBy: '2030-05-21T12:00',
+				places: '3'
+			});
+		},
+		'/admin/volunteer/requests/[id]?/publish': async () => {
+			const [row] = await sql`select id from volunteer_requests
+				where status = 'draft' and title->>'en' like 'E2e audit req %'
+				order by created_at desc limit 1`;
+			await post(`/admin/volunteer/requests/${row.id}?/publish`);
+		},
+		'/admin/volunteer/requests/[id]?/inviteMore': async () => {
+			const [row] = await sql`select id from volunteer_requests
+				where status = 'open' and title->>'en' like 'E2e audit req %'
+				order by created_at desc limit 1`;
+			await post(`/admin/volunteer/requests/${row.id}?/inviteMore`);
+		},
+		'/admin/volunteer/requests/[id]?/cancel': async () => {
+			const [row] = await sql`select id from volunteer_requests
+				where status = 'open' and title->>'en' like 'E2e audit req %'
+				order by created_at desc limit 1`;
+			await postRedirect(`/admin/volunteer/requests/${row.id}?/cancel`);
 		}
 	};
 }

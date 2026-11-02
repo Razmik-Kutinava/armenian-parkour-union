@@ -111,5 +111,24 @@ export const hyVolunteerCards: Partial<Messages> = {
 		'Բարև, {name}։\n\nԿամավորի գրքույկի հայտը մերժվել է։ Պատճառ՝ {reason}\n\nԿրկին դիմել՝ {url}',
 	'volunteerCards.mail.revoked.subject': 'Կամավորի գրքույկը հետ է կանչվել',
 	'volunteerCards.mail.revoked.text':
-		'Բարև, {name}։\n\nՁեր կամավորի գրքույկը հետ է կանչվել։ Պատճառ՝ {reason}\n\nԿրկին դիմել՝ {url}'
+		'Բարև, {name}։\n\nՁեր կամավորի գրքույկը հետ է կանչվել։ Պատճառ՝ {reason}\n\nԿրկին դիմել՝ {url}',
+	'cabinet.volunteer.invites': 'Հրավերներ',
+	'cabinet.volunteer.invitesOpen': 'Բաց',
+	'cabinet.volunteer.invitesPast': 'Անցած',
+	'cabinet.volunteer.invitesEmpty': 'Դեռ հրավերներ չկան։',
+	'cabinet.volunteer.placesLeft': 'Մնացել է {n} տեղ',
+	'cabinet.volunteer.respondBy': 'Պատասխանել մինչև {date}',
+	'cabinet.volunteer.accept': 'Կգամ',
+	'cabinet.volunteer.decline': 'Չեմ կարող',
+	'cabinet.volunteer.inviteAccepted': 'Դուք գնում եք',
+	'cabinet.volunteer.inviteDeclined': 'Դուք չեք կարող',
+	'cabinet.volunteer.inviteAnswered': 'Պատասխանը պահված է։',
+	'cabinet.volunteer.inviteFull': 'Տեղեր չեն մնացել։',
+	'cabinet.volunteer.inviteClosed': 'Պատասխանի ժամկետը սպառվել է։',
+	'volunteerRequests.mail.invite.subject': 'Կամավորի հրավեր՝ {title}',
+	'volunteerRequests.mail.invite.text':
+		'Բարև, {name}։\n\nՁեզ հրավիրում են որպես կամավոր՝ {title}։\n\nՊատասխանեք կաբինետում՝ {url}',
+	'volunteerRequests.mail.cancel.subject': 'Կամավորների հարցումը չեղարկված է՝ {title}',
+	'volunteerRequests.mail.cancel.text':
+		'Բարև, {name}։\n\n«{title}» կամավորների հարցումը չեղարկվել է։\n\nԿաբինետ՝ {url}'
 };

@@ -109,5 +109,24 @@ export const enVolunteerCards = {
 		'Hello, {name}!\n\nYour volunteer card request is rejected. Reason: {reason}\n\nYou can apply again: {url}',
 	'volunteerCards.mail.revoked.subject': 'Your volunteer card is revoked',
 	'volunteerCards.mail.revoked.text':
-		'Hello, {name}!\n\nYour volunteer card is revoked. Reason: {reason}\n\nYou can apply again: {url}'
+		'Hello, {name}!\n\nYour volunteer card is revoked. Reason: {reason}\n\nYou can apply again: {url}',
+	'cabinet.volunteer.invites': 'Invitations',
+	'cabinet.volunteer.invitesOpen': 'Open',
+	'cabinet.volunteer.invitesPast': 'Past',
+	'cabinet.volunteer.invitesEmpty': 'No invitations yet.',
+	'cabinet.volunteer.placesLeft': '{n} places left',
+	'cabinet.volunteer.respondBy': 'Reply by {date}',
+	'cabinet.volunteer.accept': "I'll go",
+	'cabinet.volunteer.decline': "I can't",
+	'cabinet.volunteer.inviteAccepted': 'You are going',
+	'cabinet.volunteer.inviteDeclined': "You can't go",
+	'cabinet.volunteer.inviteAnswered': 'Answer saved.',
+	'cabinet.volunteer.inviteFull': 'No places left.',
+	'cabinet.volunteer.inviteClosed': 'The reply window has closed.',
+	'volunteerRequests.mail.invite.subject': 'Volunteer invitation: {title}',
+	'volunteerRequests.mail.invite.text':
+		'Hello, {name}!\n\nYou are invited as a volunteer: {title}.\n\nReply in your cabinet: {url}',
+	'volunteerRequests.mail.cancel.subject': 'Volunteer request cancelled: {title}',
+	'volunteerRequests.mail.cancel.text':
+		'Hello, {name}!\n\nThe volunteer request "{title}" was cancelled.\n\nYour cabinet: {url}'
 } as const;

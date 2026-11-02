@@ -3,14 +3,21 @@ import type postgres from 'postgres';
 /* A draft partner with a draft perk and a waiting cashier access, a pending card of a member who
  * meets the conditions and an issued card (its PDF) for admin-permissions.spec.ts: every volunteering
  * action could really run. */
-export type VolunteerIds = { partnerId: string; perkId: string; cardId: string; issuedId: string };
+export type VolunteerIds = {
+	partnerId: string;
+	perkId: string;
+	cardId: string;
+	issuedId: string;
+	requestId: string;
+};
 
 export const volunteerPath = (path: string, ids: VolunteerIds) =>
 	path
 		.replace('/volunteer/cards/[id]/pdf', `/volunteer/cards/${ids.issuedId}/pdf`)
 		.replace('/volunteer/cards/[id]', `/volunteer/cards/${ids.cardId}`)
 		.replace('/volunteer/partners/[id]', `/volunteer/partners/${ids.partnerId}`)
-		.replace('/perks/[perkId]', `/perks/${ids.perkId}`);
+		.replace('/perks/[perkId]', `/perks/${ids.perkId}`)
+		.replace('/volunteer/requests/[id]', `/volunteer/requests/${ids.requestId}`);
 
 export function volunteerFixtures(sql: postgres.Sql) {
 	return {
@@ -39,7 +46,18 @@ export function volunteerFixtures(sql: postgres.Sql) {
 			await sql`insert into partner_cashiers (partner_id, label, invite_token_hash,
 				invite_expires_at, created_by) values (${partner.id}, 'E2e perm till', ${`e2e-${tag}`},
 				now() + interval '1 day', ${holder})`;
-			return { partnerId: partner.id, perkId: perk.id, cardId: card.id, issuedId: issued.id };
+			const [request] = await sql`insert into volunteer_requests
+				(title, starts_at, ends_at, places, respond_by, status)
+				values (${sql.json({ en: `E2e perm req ${tag.slice(0, 8)}` })},
+					now() + interval '7 days', now() + interval '7 days 4 hours', 2,
+					now() + interval '3 days', 'draft') returning id`;
+			return {
+				partnerId: partner.id,
+				perkId: perk.id,
+				cardId: card.id,
+				issuedId: issued.id,
+				requestId: request.id
+			};
 		},
 		/* Without the order: admin-audit.spec.ts moves partners in parallel and renumbers them all. */
 		volunteerRows: async (ids: VolunteerIds) => ({

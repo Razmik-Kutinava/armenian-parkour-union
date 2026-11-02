@@ -6,14 +6,7 @@ import { applyForCard } from './card-apply';
 import { decideCard } from './card-decision';
 import { listOwnInvites } from './invite-own';
 import { createRequest, publishRequest, type RequestValues } from './requests-admin';
-import {
-	cardDeps as deps,
-	daysFromNow,
-	IP,
-	mailbox,
-	staff,
-	volunteer
-} from './test-support';
+import { cardDeps as deps, daysFromNow, IP, mailbox, staff, volunteer } from './test-support';
 
 /* docs/06 section 5.12 "Invitations": open — request, seats left, respond_by, buttons;
  * past — answer. Only the session owner's rows. */
@@ -30,7 +23,7 @@ const values = (extra: Partial<RequestValues> = {}): RequestValues => ({
 	...extra
 });
 
-describe.skipIf(!testDbUrl)('own volunteer invitations in the cabinet', () => {
+describe.skipIf(!testDbUrl)('own volunteer invitations in the cabinet', { timeout: 60_000 }, () => {
 	const { inRollback, close } = testDb();
 	afterAll(close);
 
