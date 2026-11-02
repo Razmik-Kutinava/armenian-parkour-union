@@ -5,56 +5,56 @@
 
 ## Задача
 
-10.8 — запросы на волонтёров (`09` п. 10.8; `03` § 19.5 п. 1–3, 6–7, § 19.9; `05` § 28 «Запросы»; `06` § 5.12 «Приглашения»; `04` § 3.1, § 5.1 `volunteer.manage`, § 7): создание черновика, рассылка и досылка, «Пойду» / «Не могу», лимит мест, срок ответа, отмена запроса. Миграции нет (0018 уже есть).
+10.9 — после мероприятия: отметка «пришёл» / «не пришёл» / «освободить», подведение итогов по сроку (`closed_at`), счётчик отказов подряд, предупреждение и пометка, порог в настройках, «Завершить» запрос; баллы `volunteer_participation` при `attended` (`09` п. 10.9; `03` § 19.5 п. 4–5, § 19.6, § 19.7 п. 1, § 19.9). Миграции нет (поля 0018 уже есть). Фотоотчёт — 10.10.
 
 ## Файлы (ожидаемо)
 
-- `src/lib/server/services/volunteer/requests-admin.ts` (+ test) — список/карточка, create/update черновика, «Разослать» / «Дослать», правка `places`/`respond_by` после `open`, «Отменить»; audit; письма после коммита
-- `src/lib/server/services/volunteer/invite-answer.ts` (+ test) — «Пойду» / «Не могу» владельца: lock строки запроса, лимит `accepted`, срок `respond_by`, действительная книжка
-- `src/lib/server/services/volunteer/invite-own.ts` (+ test) — приглашения в кабинете (открытые / прошедшие)
-- `src/lib/server/services/volunteer/request-mail.ts` — письмо приглашения и отмены принявшим
-- `src/routes/admin/volunteer/requests/*` — список, `/new`, `/{id}`; пункт меню; карты access/audit/permissions
-- `src/routes/[[lang=lang]]/(site)/cabinet/volunteer/*` — блок приглашений + actions; i18n `*-volunteer*.ts`
+- `src/lib/server/services/volunteer/invite-close.ts` (+ test) — после `respond_by`: `closed_at`, `invited` → `expired` (молчание = отказ) или `excused` при полном наборе; учёт `decline_streak` для `declined`/`expired` (`counted_at`)
+- `src/lib/server/services/volunteer/invite-mark.ts` (+ test) — admin: `attended` / `no_show` / `excused` у `accepted`; баллы `awardPoints(…, volunteer_participation)`; streak (+2 / 0 / reset); «Завершить» (`finished`)
+- `src/lib/server/services/volunteer/card-flag.ts` (+ test) + правка `card-decision` / `settings.ts` — порог `decline_threshold`, `flagged_at`, письмо-предупреждение, «Снять пометку»; seed `site_settings.volunteer` + правила баллов; `RULE_SOURCES`
+- `src/routes/admin/volunteer/requests/[id]/*` — UI явки (как «День события»), «Завершить»; карточка книжки — «Снять пометку»
+- `src/routes/[[lang=lang]]/(site)/cabinet/volunteer/*` + i18n — плашка предупреждения; обзор «требует действия»
+- `src/routes/api/cron/volunteer/+server.ts` (+ `cron.yml`) — фоновое закрытие открытых запросов с истёкшим `respond_by`
 
 ## Решения агента (в пределах документов)
 
-1. Образцы: админка — `partners-admin.ts` / карточки; гонка мест — `registrations` (lock события / запроса первым); письма — `card-mail.ts` после коммита.
-2. Кого звать при рассылке: действительная книжка сейчас (`cardValidity` / `card-sql` из 10.3); досылка — только у кого ещё нет строки приглашения, пока `now < respond_by` и статус `open`.
-3. «Пойду»: `accepted` ≤ `places` в той же транзакции с `FOR UPDATE` строки запроса; мест нет / срок вышел / книжка недействительна — отказ; «Не могу» при полном наборе — да; передумать до срока — да.
-4. Отмена (`cancelled`): все приглашения → `excused`; письмо только принявшим (`03` 19.5 п. 6, 19.9 п. 2). «Завершить» и явка — 10.9.
-5. Фоновая `closed_at` (`invited` → `expired` / `excused` при полном наборе) и учёт `decline_streak` — 10.9 (одна операция с п. 19.6). В 10.8 после `respond_by` ответы сервер отклоняет; статусы `invited`/`accepted`/`declined` до подведения не трогаем.
-6. Журнал: `volunteer_request.create|update|publish|invite_more|cancel` (entity `volunteer_request`); правка мест/срока — `update`. Ответ участника в audit не пишем.
-7. Карточка книжки admin: read-only список приглашений — если влезает без раздувания `card-detail`; иначе отложить (основной UI — `/admin/volunteer/requests/[id]`).
+1. Подведение по сроку — та же логика в cron и лениво при открытии карточки запроса / списке / перед отметкой явки (идемпотентно по `closed_at`).
+2. Счётчик (19.6): один раз на приглашение (`counted_at`); `declined`/`expired` +1 при close; `no_show` +2 и `attended` → 0 при отметке; `excused` без изменений. Порог → `flagged_at` + письмо один раз, пока пометка стоит.
+3. Баллы только при первом `attended` (source = invitation id); смена на `no_show` баллы не снимает (`03` 19.7 п. 1). `RULE_SOURCES.volunteer_participation` → `source_type: volunteer_invitation`. Правило и ключ `volunteer` — в seed (ещё нет).
+4. Явка доступна с начала дня запроса по Еревану (`05` § 28); только у `accepted` после close (или после `respond_by`). Передумать явку до `finished` — да (как day-of у событий).
+5. «Завершить»: статус `open` → `finished`; незакрытые по сроку — сначала close. Отмена уже в 10.8.
+6. Журнал: `volunteer_request.finish`, `volunteer_invitation.mark` (или `attendance`), `volunteer_card.unflag`; настройки — через `writeSettings`.
+7. Образцы: `registrations/staff/attendance.ts` + `points.ts`; close — `quiz-daily.ts` / cron training; streak+флаг — рядом с `card-decision`.
 
 ## Не ломать
 
-- Гонка за последнее место (K5): два «Пойду» одновременно — один `accepted`, второй отказ; без превышения `places`.
-- Права (K1): модератор / редактор / участник не открывают `/admin/volunteer/requests` и не шлют; чужое приглашение в кабинете — отказ (подмена `id`).
-- 10.3–10.7: книжки, PDF, QR, кассир, `markPerk` / `reversePerk`, журнал использований — без регресса.
-- Append-only `perk_redemptions` и схема 0018 — без миграций.
+- Баллы (K3): повтор `attended` не дублирует начисление (`points_ledger_source_once_key`); смена на `no_show` не создаёт reversal автоматически.
+- Права (K1): модератор / редактор / участник не отмечают явку и не снимают пометку; чужое приглашение — отказ.
+- 10.8: ответы до `respond_by`, лимит мест, отмена → `excused` без штрафа — без регресса; close не трогает уже `counted_at`.
+- Append-only `perk_redemptions` / схема 0018 — без миграций.
 
 ## Проверка
 
-- `npx vitest run src/lib/server/services/volunteer/requests-admin.test.ts src/lib/server/services/volunteer/invite-answer.test.ts src/lib/server/services/volunteer/invite-own.test.ts`
+- `npx vitest run src/lib/server/services/volunteer/invite-close.test.ts src/lib/server/services/volunteer/invite-mark.test.ts src/lib/server/services/volunteer/card-flag.test.ts`
 - `npm run check`, `npm run lint`
 
 ## Риск
 
-`high` — гонка мест (как регистрации), `volunteer.manage`, `audit_log`, письма с персональными данными, чужие приглашения (K1 / K4 / K5).
+`high` — баллы (K3), `volunteer.manage`, `audit_log`, cron, письма и пометка с персональными данными (K1 / K4 / K5).
 
 ## Читать
 
-- `03` § 19.5 п. 1–3, 6–7; § 19.9 п. 1–2; § 19.2 (действительность для рассылки и ответа)
-- `05` § 28 блок «Запросы»
-- `06` § 5.12 «Приглашения»; § 6 ссылка писем → `/cabinet/volunteer`
-- `04` § 3.1 (ответ на приглашение), § 5.1 `volunteer.manage`, § 7 строка ответа, § 8 (чужие приглашения)
-- `02` § 12 `volunteer_requests`, `volunteer_invitations`
-- `zone-notes.md` § «Волонтёрство» (`cardValidity`, `card-sql`); § «Регистрации» — образец lock мест
-- образцы: `partners-admin.ts`, `card-mail.ts`, `registrations` (lock + race)
+- `03` § 19.5 п. 4–5; § 19.6; § 19.7 п. 1; § 19.9; § 6.1 (`volunteer_participation`)
+- `05` § 28 «Запросы» (явка, «Завершить»); § 3 дашборд (счётчик помеченных)
+- `06` § 5.12 «Предупреждение», «Приглашения» (явка), обзор кабинета
+- `04` § 3.2 волонтёрство (явка, снять пометку), § 5.1 `volunteer.manage`
+- `02` § 12 `volunteer_requests`/`volunteer_invitations`/`volunteer_cards` (streak, flagged); § 5 `points_rules` / ledger source; `site_settings.volunteer`
+- `zone-notes.md` § «Волонтёрство» (10.8 → 10.9); § «Баллы» (`awardPoints`, `RULE_SOURCES`)
+- образцы: `registrations/staff/attendance.ts`, `quiz-daily.ts`, `card-decision.ts`, `settings.ts`
 
 ## Фазы
 
 - [x] SPEC
-- [x] RED `9d04cd3`
-- [x] GREEN `cb5d2f6`
+- [ ] RED
+- [ ] GREEN
 - [ ] REVIEW (этапа)
