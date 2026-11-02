@@ -7,7 +7,7 @@
 	let {
 		values = {},
 		open = false,
-		action = '?/default'
+		action = ''
 	}: { values?: Values; open?: boolean; action?: string } = $props();
 
 	const field = (name: string, fallback = '') => ({
