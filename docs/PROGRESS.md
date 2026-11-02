@@ -16,7 +16,7 @@
 |---|---|
 | Текущий этап | 10 — ждёт проверки владельцем; 8 — ждёт банк; 9 — на проде, ждёт владельца (3 — ждёт 3.13, остальные закрыты) |
 | Последнее обновление | 2026-11-02, агент — REVIEW этапа 10 |
-| База REVIEW этапа | `PLACEHOLDER_HEAD` (после REVIEW этапа 10; следующий `/review` — от него) |
+| База REVIEW этапа | `6db45d5` (после REVIEW этапа 10; следующий `/review` — от него) |
 | Ветка | `master` (единственная, другие ветки не создаём) |
 | Адрес сайта | https://parkour.am (заглушка; запасной — https://armenian-parkour-union.fly.dev) |
 | Последний `/trim` | 2026-11-02 |
@@ -60,7 +60,7 @@
 
 ## Сделано (последние 5)
 Формат: `дата | задача | итог | коммит`, одной строкой. Полные записи — `docs/archive/done-stage-N.md`.
-- 2026-11-02 | REVIEW этапа 10 (10.0–10.11, `484e637..HEAD`) | bugbot 0, security 0 критичных (Secure cookie кассира исправлен), crit-audit CLEAN; check/lint PASS; e2e volunteer 6/6; owner-checks § «Этап 10»; /trim | PLACEHOLDER_HEAD
+- 2026-11-02 | REVIEW этапа 10 (10.0–10.11, `484e637..HEAD`) | bugbot 0, security 0 критичных (Secure cookie кассира исправлен), crit-audit CLEAN; check/lint PASS; e2e volunteer 6/6; owner-checks § «Этап 10»; /trim | 6db45d5
 - 2026-10-29 | Sentry: все проблемы `parkour-am` | AM-4/5/A фильтр шума; AM-7/9 — новая версия грузит страницу; Vitest фильтра 9/9; Deploy → Fly v29 | `2f3770b`
 - 2026-10-29 | деплой v27 + прогон чек-листов на проде | CI зелёный; Deploy → Fly v27, 0017; письма mail.tm; долг 3.10; фикс POST /google → v28 | `df94c49`
 - 2026-10-29 | долг 3.10 шаги 2–3 (`72a71cd..HEAD`) | миграция 0017; приватность и удаление; REVIEW high, crit-audit CLEAN; CI зелёный | `51b155a`
