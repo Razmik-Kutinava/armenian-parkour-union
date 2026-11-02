@@ -18,12 +18,13 @@ export const load: PageServerLoad = async ({ params, setHeaders }) => {
 };
 
 export const actions: Actions = {
-	default: async ({ params, cookies, locals }) => {
+	default: async ({ params, cookies, locals, url }) => {
 		const device = await bindCashier(db, params.token);
 		if (!device) return fail(400, { invalid: true as const });
 		cookies.set(CASHIER_COOKIE, device, {
 			path: '/',
 			httpOnly: true,
+			secure: url.protocol === 'https:',
 			sameSite: 'lax',
 			maxAge: CASHIER_COOKIE_MAX_AGE
 		});

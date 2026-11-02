@@ -65,3 +65,8 @@
 - 10.4 PDF книжки (не хранится, картинки через Cloudflare `format=jpeg`, лимит 30/ч), QR и плюшки в кабинете — `git show a6807eb:docs/todo.md`
 - 10.5 страница проверки книжки по QR (`noindex`, `no-store`, у недействительной только номер) — `git show 6e73092:docs/todo.md`
 - 10.6 доступ кассиров (invite, bind, админка) и отметка плюшки на странице проверки — `git show b99d9f0:docs/todo.md`
+- 10.7 учёт отметок (кабинет, журнал, reverse) — `git show 1fe0676:docs/todo.md`
+- 10.8 запросы волонтёров (рассылка, Пойду/Не могу, лимит мест) — `git show cb5d2f6:docs/todo.md`
+- 10.9 явка, streak отказов, пометка книжки — `git show e128a44:docs/todo.md`
+- 10.10 фотоотчёты и баллы volunteer_report — `git show 53dd979:docs/todo.md`
+- 10.11 тесты гонок и подмены токена/кассира — `git show 12414b2:docs/todo.md`

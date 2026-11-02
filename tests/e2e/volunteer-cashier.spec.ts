@@ -77,6 +77,7 @@ test('cashier access: created by the admin, binds one phone once, disabled at on
 	await expect(cashier.locator('main')).toContainText(`${PARTNER}, Till 1`);
 	const cookie = (await phone.cookies()).find((c) => c.name === 'apu_cashier');
 	expect(cookie?.httpOnly).toBe(true);
+	expect(cookie?.secure).toBe(cashier.url().startsWith('https:'));
 	expect(cookie!.expires * 1000).toBeGreaterThan(Date.now() + 365 * 86_400_000);
 
 	const other = await browser.newContext();
