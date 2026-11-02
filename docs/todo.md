@@ -55,5 +55,5 @@
 
 - [x] SPEC
 - [x] RED `1e5cbdc`
-- [x] GREEN
+- [x] GREEN `1fe0676`
 - [ ] REVIEW (этапа)
