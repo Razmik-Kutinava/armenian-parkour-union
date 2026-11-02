@@ -16,6 +16,6 @@
 </p>
 <h1 class="mb-6 text-2xl font-bold">{t('volunteer.requests.create')}</h1>
 {#if form?.message}
-	<p class="text-red-700 mb-4" role="alert">{t(form.message)}</p>
+	<p class="mb-4 text-error-fg" role="alert">{t(form.message)}</p>
 {/if}
 <RequestForm {values} />

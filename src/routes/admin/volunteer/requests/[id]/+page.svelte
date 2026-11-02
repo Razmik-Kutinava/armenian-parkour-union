@@ -36,26 +36,26 @@
 </p>
 
 {#if form && 'message' in form && form.message}
-	<p class="text-red-700 mb-4" role="alert">{t(form.message)}</p>
+	<p class="mb-4 text-error-fg" role="alert">{t(form.message)}</p>
 {/if}
 {#if form && 'saved' in form && form.saved}
-	<p class="text-green-800 mb-4" role="status">{t('volunteer.saved')}</p>
+	<p class="mb-4 text-success-fg" role="status">{t('volunteer.saved')}</p>
 {/if}
 {#if form && 'published' in form}
-	<p class="text-green-800 mb-4" role="status">
+	<p class="mb-4 text-success-fg" role="status">
 		{t('volunteer.requests.published', { n: String(form.published) })}
 	</p>
 {/if}
 {#if form && 'invitedMore' in form}
-	<p class="text-green-800 mb-4" role="status">
+	<p class="mb-4 text-success-fg" role="status">
 		{t('volunteer.requests.invitedMore', { n: String(form.invitedMore) })}
 	</p>
 {/if}
 {#if form && 'finished' in form}
-	<p class="text-green-800 mb-4" role="status">{t('volunteer.requests.finished')}</p>
+	<p class="mb-4 text-success-fg" role="status">{t('volunteer.requests.finished')}</p>
 {/if}
 {#if form && 'marked' in form}
-	<p class="text-green-800 mb-4" role="status">{t('volunteer.requests.marked')}</p>
+	<p class="mb-4 text-success-fg" role="status">{t('volunteer.requests.marked')}</p>
 {/if}
 
 {#if row.status === 'draft' || row.status === 'open'}

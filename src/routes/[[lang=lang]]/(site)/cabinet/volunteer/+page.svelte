@@ -19,7 +19,7 @@
 	<h1 class="text-3xl font-bold text-ink-900">{t('cabinet.volunteer.title')}</h1>
 	{#if data.own.card?.flagged}
 		<p
-			class="border-amber-300 bg-amber-50 text-amber-950 rounded-md border px-4 py-3"
+			class="rounded-md bg-warning-bg px-4 py-3 text-sm text-warning-fg"
 			role="status"
 		>
 			{t('cabinet.volunteer.flag', { n: String(data.own.card.declineStreak) })}

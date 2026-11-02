@@ -21,9 +21,9 @@
 <section class="flex flex-col gap-4">
 	<h2 class="text-xl font-semibold text-ink-900">{t('cabinet.volunteer.invites')}</h2>
 	{#if result?.answered}
-		<p class="text-green-800" role="status">{t('cabinet.volunteer.inviteAnswered')}</p>
+		<p class="text-success-fg" role="status">{t('cabinet.volunteer.inviteAnswered')}</p>
 	{:else if result?.message}
-		<p class="text-red-700" role="alert">{t(result.message)}</p>
+		<p class="text-error-fg" role="alert">{t(result.message)}</p>
 	{/if}
 
 	{#if open.length === 0 && past.length === 0}
@@ -44,7 +44,7 @@
 							{t('cabinet.volunteer.respondBy', { date: day(invite.respondBy) })}
 						</p>
 						{#if invite.status === 'accepted'}
-							<p class="text-green-800 text-sm">{t('cabinet.volunteer.inviteAccepted')}</p>
+							<p class="text-sm text-success-fg">{t('cabinet.volunteer.inviteAccepted')}</p>
 						{:else if invite.status === 'declined'}
 							<p class="text-sm text-ink-700">{t('cabinet.volunteer.inviteDeclined')}</p>
 						{/if}
