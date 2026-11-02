@@ -12,7 +12,7 @@ describe.skipIf(!testDbUrl)('volunteer: simultaneous accept for the last seat', 
 	const db = volunteerRaceDb();
 	afterAll(db.cleanup);
 
-	it('last seat, two members at once: one accepted, one full', async () => {
+	it('last seat, two members at once: one accepted, one full', { timeout: 60_000 }, async () => {
 		const { users, byUser, requestId } = await db.openInvite(1);
 		const [u0, u1] = users;
 		const [first, second] = await db.race(

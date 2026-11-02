@@ -7,12 +7,13 @@ import { volunteerPerks } from '../../db/schema/volunteer-partners';
 import { applyForCard } from './card-apply';
 import { bindCashier, findCashier } from './cashier-access';
 import { decideCard } from './card-decision';
-import { createCashier } from './cashiers-admin';
+import { createCashier, disableCashier } from './cashiers-admin';
 import { markPerk } from './perk-mark';
 import { createPartner } from './partners-admin';
 import {
 	cardDeps as deps,
 	cardRow,
+	IP,
 	mailbox,
 	partnerValues,
 	perkValues,
@@ -21,7 +22,8 @@ import {
 } from './test-support';
 
 /* docs/03 section 19.4, docs/04 section 8: only this partner's cashier on a valid card; single
- * perks decrement; double mark within a minute is one row; wrong partner or perk — refused. */
+ * perks decrement; double mark within a minute is one row; wrong partner or perk — refused;
+ * spoofed token / disabled access — refused. */
 
 async function issued(tx: LimitDb) {
 	const admin = await staff(tx);
@@ -153,6 +155,36 @@ describe.skipIf(!testDbUrl)('cashier marks a perk', () => {
 				ok: false,
 				reason: 'invalid_card'
 			});
+		});
+	});
+
+	it('spoofed card token or disabled cashier — refused, no row', async () => {
+		await inRollback(async (tx) => {
+			const { admin, cardId, token } = await issued(tx);
+			const partner = await createPartner(tx, admin, partnerValues({ status: 'published' }), null);
+			if (typeof partner === 'string') throw new Error(partner);
+			const [perk] = await tx
+				.insert(volunteerPerks)
+				.values({ ...perkValues({ status: 'published' }), partnerId: partner.id })
+				.returning({ id: volunteerPerks.id });
+			const cashier = await boundCashier(tx, admin, partner.id);
+
+			expect(
+				await markPerk(tx, crypto.randomUUID().replaceAll('-', ''), cashier, partner.id, perk.id)
+			).toEqual({ ok: false, reason: 'not_found' });
+			expect(await markPerk(tx, `${token}/`, cashier, partner.id, perk.id)).toEqual({
+				ok: false,
+				reason: 'bad_request'
+			});
+
+			expect(await disableCashier(tx, admin, partner.id, cashier.id, IP)).toBe('ok');
+			expect(await markPerk(tx, token, cashier, partner.id, perk.id)).toEqual({
+				ok: false,
+				reason: 'cashier_gone'
+			});
+			expect(
+				await tx.select().from(perkRedemptions).where(eq(perkRedemptions.cardId, cardId))
+			).toHaveLength(0);
 		});
 	});
 });
