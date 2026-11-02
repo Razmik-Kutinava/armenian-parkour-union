@@ -5,55 +5,52 @@
 
 ## Задача
 
-10.10 — фотоотчёт с мероприятия (фото или ссылка), проверка admin, баллы `volunteer_report` через журнал (`09` п. 10.10; `03` § 19.7 п. 2–4, § 19.9). Миграции нет (таблица `volunteer_reports` в 0018).
+10.11 — тесты безопасности и гонок волонтёрства: подмена токена/`id`, кнопка «Отметить» без доступа и при отключённом, одновременные отметки разовой плюшки, гонка за последнее место, права (`09` п. 10.11; `04` § 8; `03` § 19.4 п. 3–4, § 19.5 п. 3). Миграции нет.
 
 ## Файлы (ожидаемо)
 
-- `src/lib/server/services/volunteer/report-submit.ts` (+ test) — участник после `attended`: фото (приватный бакет) или ссылка + комментарий; замена `pending`; после `rejected` — новая строка
-- `src/lib/server/services/volunteer/report-review.ts` (+ test) — admin: принять (`awardPoints` `volunteer_report`, source = отчёт) / вернуть (комментарий); свой — отказ; письмо
-- `src/lib/server/services/volunteer/report-files.ts` + `report-link.ts` (+ test ссылок) — ключ `volunteer/<user>/<uuid>.ext`, sniff JPEG/PNG/WebP ≤ 10 МБ; нормализация Instagram / YouTube / Drive
-- `src/lib/server/services/volunteer/report-list.ts` / `report-own.ts` — очередь admin, карточка + история по приглашению, статус в кабинете; дашборд / обзор
-- `src/routes/admin/volunteer/reports/*` + `cabinet/volunteer` (форма в `InvitesBlock`) + i18n; карты e2e `admin-access-map` / `admin-audit-volunteer` / `admin-permissions-volunteer`
+- `src/lib/server/services/volunteer/race-support.ts` — сессии как `registrations/race-support` / `shop/race-support`: коммит в тест-БД, уборка книжек/отметок/приглашений
+- `src/lib/server/services/volunteer/perk-mark-race.test.ts` — два кассира / две сессии бьются за последнюю отметку `single` (лимит 1) → ровно одна запись
+- `src/lib/server/services/volunteer/invite-answer-race.test.ts` — два «Пойду» на последнее место → один `accepted`, второй `full`
+- `src/lib/server/services/volunteer/perk-mark.test.ts` — добить: подмена токена книжки / `perkId`; отключённый кассир → `cashier_gone` (если ещё нет)
+- `tests/e2e/volunteer-cashier.spec.ts` — уже: гость без cookie без кнопки; при дыре — отключённый доступ без «Նշել» / отказ POST
+- права: уже `tests/e2e/admin-permissions-volunteer.ts` + карты access/audit — не ломать; Vitest подмены `invitationId` / `reportId` уже в `invite-answer` / `report-*`
 
 ## Решения агента (в пределах документов)
 
-1. Ссылка — один хелпер: Instagram (`normalizeVideoUrl`) + YouTube + Google Drive (`normalizePracticeUrl`); иначе отказ.
-2. Фото: ключ `volunteer/<userId>/<uuid>.<ext>` (`02` § 12); type по сигнатуре (`sniffMime`); лимит 10 МБ; rate-limit как у согласий (`volunteerReportUploadPerUser`).
-3. `pending` — обновление той же строки (файл/url/note); `rejected` — insert новой; `approved` — нельзя менять и отзывать.
-4. Принять / вернуть: только `pending`, не своё; журнал `volunteer_report.approve|reject`; баллы один раз (`source_type`/`source_id` = отчёт); письмо после коммита.
-5. Сверка «показанного» при решении (как 9.14): скрытое `url` или `fileKey` с карточки — иначе `changed`.
-6. Порядок блокировок: приглашение → строка отчёта. Фотоотчёты не публичны — admin смотрит по `presignGet` 5 мин.
-7. Дашборд: счётчик `pending` отчётов (`05` § 3); обзор кабинета — вернули отчёт (`06` § 5.12). Образцы: `practice-submit` / `practice-review`, `videos/review` (баллы), `consents/files` (upload).
+1. Гонки коммитят (как регистрации/магазин/практика): `race()` держит lock, пока второй ждёт; уборка по id, ledger/audit не трогать.
+2. Разовая: `usesLimit: 1`, два разных кассира того же партнёра (не idempotency 1 мин одного телефона) — один `ok`, второй `no_uses_left`.
+3. Последнее место: `places: 1`, два приглашённых, параллельный `accepted` — один `ok`, второй `full`.
+4. Подмена: чужой/битый `public_token`, чужой `perkId`/`partnerId`, чужой `invitationId`/`reportId` — отказ без побочных записей.
+5. Без cookie / отключённый: UI без «Отметить»; сервис `markPerk` при `disabled_at` → `cashier_gone`.
+6. Права admin-only `volunteer.manage` — покрыты e2e этапа; в 10.11 не расширять матрицу, только убедиться что сценарии из `04` § 8 зелёные в зоне задачи.
 
 ## Не ломать
 
-- Баллы (K3): повтор «Принять» / второй отчёт на то же приглашение не дублируют `volunteer_report`; `volunteer_participation` при явки — без регресса.
-- Права (K1): модератор / редактор / участник не решают чужие отчёты; чужой `invitationId` / `reportId` в кабинете — отказ; свой отчёт admin — без кнопок.
-- Приватность (K4): `file_key` и сырой бакет не отдаются клиенту; только подписанная ссылка admin; фото не в публичный R2.
-- 10.8–10.9: ответы, явка, streak, finish — без регресса; схема 0018 без миграций.
+- Права (K1): модератор/редактор/участник не открывают `/admin/volunteer/*`; чужие invite/report id в кабинете — отказ.
+- Отметки: идемпотентность 1 мин того же кассира; append-only `perk_redemptions`; отмена — только `reversePerk`.
+- Гонки регистраций/магазина/практики: общий `race-support` регистраций не ломать; волонтёрский — свой или тонкая обёртка.
+- 10.1–10.10 сценарии и схема 0018 без миграций.
 
 ## Проверка
 
-- `npx vitest run src/lib/server/services/volunteer/report-submit.test.ts src/lib/server/services/volunteer/report-review.test.ts src/lib/server/services/volunteer/report-link.test.ts`
+- `npx vitest run src/lib/server/services/volunteer/perk-mark.test.ts src/lib/server/services/volunteer/perk-mark-race.test.ts src/lib/server/services/volunteer/invite-answer-race.test.ts`
 - `npm run check`, `npm run lint`
 
 ## Риск
 
-`high` — баллы (K3), `volunteer.manage`, `audit_log`, приватные фото (K4), письма.
+`high` — права (K1), гонки отметок и мест (K5), cookie кассира / отключение доступа.
 
 ## Читать
 
-- `03` § 19.7 п. 2–4; § 19.9; § 6.1 (`volunteer_report`)
-- `05` § 28 «Фотоотчёты»; § 3 дашборд (счётчик отчётов)
-- `06` § 5.12 «Приглашения» (форма отчёта), обзор кабинета; § 6 письма
-- `04` § 3.1–3.2 (фотоотчёт), § 5.1 `volunteer.manage`
-- `02` § 12 `volunteer_reports`; § 5 ledger `source_type = volunteer_report`
-- `zone-notes.md` § «Волонтёрство» (10.9 → 10.10); § «Баллы» (`awardPoints`, `RULE_SOURCES`)
-- образцы: `practice-submit.ts`, `practice-review.ts`, `videos/review.ts`, `consents/files.ts`, `videos/link.ts`, `practice-link.ts`
+- `03` § 19.4 п. 3–4; § 19.5 п. 3
+- `04` § 8 (минимум тестов волонтёрства); § 3.1–3.2 (кассир / admin-only)
+- `zone-notes.md` § «Волонтёрство» (mark, invite-answer, locks)
+- образцы гонок: `registrations/race.test.ts`, `registrations/race-support.ts`, `shop/race-cancel.test.ts`, `training/practice-review-race.test.ts`
 
 ## Фазы
 
 - [x] SPEC
-- [x] RED `f5b6710`
-- [x] GREEN `53dd979`
+- [ ] RED
+- [ ] GREEN
 - [ ] REVIEW (этапа)
