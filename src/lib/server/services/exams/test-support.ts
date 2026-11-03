@@ -1,16 +1,43 @@
 import { eq } from 'drizzle-orm';
 import type { LimitDb } from '../../auth/rate-limit';
 import type { UserRole } from '../../auth/session';
-import { certificates, exams } from '../../db/schema/certification';
+import { certificates, examApplications, exams } from '../../db/schema/certification';
 import { users } from '../../db/schema/users';
 import { insertUser } from '../../db/test-db';
+import type { Mail } from '../../mail/resend';
 import type { ExamSettings } from './settings';
 
 /* Test support only: exam tests run inside a rolled-back transaction; settings are passed in. */
 
 export const DAY = 86_400_000;
 export const IP = '198.51.100.7';
+export const SITE = 'https://parkour.test';
 export const NO_LIMITS: ExamSettings = { retakeDays: 0, minDaysOnLevel: 0 };
+
+export function mailbox(failing = false) {
+	const sent: Mail[] = [];
+	const send = async (mail: Mail) => {
+		if (failing) throw new Error('mail is down');
+		sent.push(mail);
+	};
+	return { sent, send };
+}
+
+export const applicationDeps = (send: (mail: Mail) => Promise<void>) => ({
+	send,
+	siteUrl: SITE,
+	ip: IP,
+	settings: NO_LIMITS
+});
+
+export async function applicationRow(tx: LimitDb, id: string) {
+	const [row] = await tx.select().from(examApplications).where(eq(examApplications.id, id));
+	return row;
+}
+
+export async function applicationsOf(tx: LimitDb, userId: string) {
+	return tx.select().from(examApplications).where(eq(examApplications.userId, userId));
+}
 
 export const daysFrom = (now: Date, days: number) => new Date(now.getTime() + days * DAY);
 

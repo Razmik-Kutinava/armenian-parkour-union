@@ -15,6 +15,7 @@ import {
 import {
 	certificateKind,
 	certificateStatus,
+	examApplicationStatus,
 	examKind,
 	examResult,
 	membershipLevel,
@@ -73,6 +74,35 @@ export const exams = pgTable(
 	(t) => [
 		index('exams_user_id_idx').on(t.userId),
 		index('exams_result_scheduled_at_idx').on(t.result, t.scheduledAt)
+	]
+);
+
+/** Member request for a level exam; staff schedules via `exams` and links `exam_id`. */
+export const examApplications = pgTable(
+	'exam_applications',
+	{
+		id: uuid('id').primaryKey().defaultRandom(),
+		userId: uuid('user_id')
+			.notNull()
+			.references(() => users.id),
+		kind: examKind('kind').notNull(),
+		status: examApplicationStatus('status').notNull().default('pending'),
+		reviewNote: text('review_note'),
+		reviewedBy: uuid('reviewed_by').references(() => users.id),
+		reviewedAt: timestamp('reviewed_at', { withTimezone: true }),
+		examId: uuid('exam_id').references(() => exams.id),
+		...timestamps
+	},
+	(t) => [
+		uniqueIndex('exam_applications_user_id_kind_key').on(t.userId, t.kind),
+		uniqueIndex('exam_applications_exam_id_key')
+			.on(t.examId)
+			.where(sql`${t.examId} is not null`),
+		index('exam_applications_status_created_at_idx').on(t.status, t.createdAt),
+		check(
+			'exam_applications_review_note',
+			sql`${t.status} <> 'rejected' OR btrim(coalesce(${t.reviewNote}, '')) <> ''`
+		)
 	]
 );
 

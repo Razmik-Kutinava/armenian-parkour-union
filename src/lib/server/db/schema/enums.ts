@@ -53,6 +53,11 @@ export const certificateKind = pgEnum('certificate_kind', ['level', 'trainer', '
 export const certificateStatus = pgEnum('certificate_status', ['active', 'expired', 'revoked']);
 export const examKind = pgEnum('exam_kind', ['level_advanced', 'level_pro', 'trainer', 'judge']);
 export const examResult = pgEnum('exam_result', ['scheduled', 'passed', 'failed', 'cancelled']);
+export const examApplicationStatus = pgEnum('exam_application_status', [
+	'pending',
+	'approved',
+	'rejected'
+]);
 export const videoStatus = pgEnum('video_status', ['pending', 'approved', 'rejected']);
 export const orderStatus = pgEnum('order_status', [
 	'new',
