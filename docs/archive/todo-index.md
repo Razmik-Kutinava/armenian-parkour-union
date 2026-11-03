@@ -70,3 +70,4 @@
 - 10.9 явка, streak отказов, пометка книжки — `git show e128a44:docs/todo.md`
 - 10.10 фотоотчёты и баллы volunteer_report — `git show 53dd979:docs/todo.md`
 - 10.11 тесты гонок и подмены токена/кассира — `git show 12414b2:docs/todo.md`
+- Долг этапа 6 — заявка на экзамен из кабинета (0019) — `git show 722ef47:docs/todo.md`

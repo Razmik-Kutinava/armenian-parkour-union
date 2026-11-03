@@ -5,8 +5,8 @@
 
 | Параметр | Значение |
 |---|---|
-| `last_audited_sha` | `6db45d5` |
-| Дата | 2026-11-02 |
+| `last_audited_sha` | (HEAD после REVIEW-коммита) |
+| Дата | 2026-11-03 |
 | Вердикт | CLEAN |
 
 ## Находки
@@ -37,6 +37,7 @@
 
 | Дата | Scope | Вердикт | Новых | Коммит |
 |---|---|---|---|---|
+| 2026-11-03 | REVIEW долга заявки на экзамен `217ed1c..HEAD`: `exam_applications` (0019), apply/reject, кабинет progress, админ-очередь, dashboard; без bugbot/security (просьба владельца) | CLEAN | 0 (свой проход K1–K5: apply только session userId; reject/list `exams.manage`; email-поиск только `users.read_full`; степень не трогается; миграция additive; гейты: check PASS, prettier PASS, зона exams+coverage+palette PASS, e2e admin-exams 1/1; полный Vitest/eslint локально — таймауты Neon / зависание eslint — известное) | см. HEAD |
 | 2026-11-02 | общий REVIEW этапа 10 (10.0–10.11) `484e637..HEAD` (+ Secure cookie кассира): волонтёрство (миграция 0018, партнёры, книжки, кассиры, отметки, запросы, отчёты, баллы), в том же окне — долг 3.10 (0017) | CLEAN | 0 (bugbot: 0 критичных; security-review: 0 критичных, 1 medium — `apu_cashier` без `Secure`, исправлено `secure: url.protocol === 'https:'`; свой проход: markPerk partnerId+FOR UPDATE, findPublicCard без контактов, cron CRON_SECRET; гейты: check 0, lint чистый; Vitest полный локально — таймауты Neon под параллелью (известное), зона 10.11 и e2e volunteer 6/6 зелёные; e2e cashier после Secure — 2/2) | `6db45d5` |
 | 2026-10-07 | 1.5 авторизация: `src/lib/server/auth`, `validation`, `(auth)` | CLEAN | 0 критичных (C1–C5 не K или приняты) | 1.5 REVIEW |
 | 2026-10-07 | 1.6 сессия: `hooks.server.ts`, `auth/session.ts`, `canonical-host.ts` | CLEAN | 0 | `2d44b3f` |

@@ -64,7 +64,7 @@
 	{#if form?.applied}
 		<p class="text-ink-900" role="status">{t('cabinet.progress.apply.ok')}</p>
 	{:else if form?.message}
-		<p class="text-red-700" role="alert">{t(form.message)}</p>
+		<p class="text-error-fg" role="alert">{t(form.message)}</p>
 	{/if}
 	{#if toMembership}
 		<a
