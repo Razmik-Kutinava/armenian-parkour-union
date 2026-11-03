@@ -82,6 +82,6 @@
 ## Фазы
 
 - [x] SPEC
-- [ ] RED — ждать **go** (Migration Gate)
-- [ ] GREEN
-- [ ] REVIEW (одиночная задача — после GREEN, база = коммит перед RED; **без** bugbot/security-review по просьбе владельца: свой проход по диффу + crit-audit)
+- [x] RED — `feaf8de`
+- [x] GREEN
+- [ ] REVIEW (одиночная задача — после GREEN, база = коммит перед RED `feaf8de^`; **без** bugbot/security-review по просьбе владельца: свой проход по диффу + crit-audit)

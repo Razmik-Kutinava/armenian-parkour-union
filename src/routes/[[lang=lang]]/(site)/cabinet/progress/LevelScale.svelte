@@ -1,17 +1,34 @@
 <script lang="ts">
 	import { newsDate } from '#lib/components/site/news-date.ts';
 	import { currentLocale, localizePath, t } from '#lib/i18n/index.svelte.ts';
+	import type { MessageKey } from '#lib/i18n/translate.ts';
 	import type { MembershipLevel } from '#lib/server/auth/session.ts';
 	import type { NextStep } from '#lib/server/services/cabinet/progress-next.ts';
 
-	/* docs/06 section 5.5: novice → advanced → pro with the current one marked; the next step is
-	 * what docs/03 section 3.3 allows now. Exams are scheduled by the federation. */
-	let { level, next }: { level: MembershipLevel | null; next: NextStep } = $props();
+	/* docs/06 § 5.5 + exam application from the cabinet (docs/04 § 7). */
+	let {
+		level,
+		next,
+		form
+	}: {
+		level: MembershipLevel | null;
+		next: NextStep;
+		form?: { message?: MessageKey; applied?: boolean } | null;
+	} = $props();
 	const LEVELS = ['novice', 'advanced', 'pro'] as const;
 	const rank = (l: MembershipLevel | null) => (l ? LEVELS.indexOf(l) : -1);
 
 	const message = $derived.by(() => {
 		if (next.step !== 'exam') return t(`cabinet.progress.next.${next.step}`);
+		if (next.application?.status === 'pending') {
+			return t('cabinet.progress.next.pending', { exam: t(`exams.kind.${next.kind}`) });
+		}
+		if (next.application?.status === 'rejected') {
+			return t('cabinet.progress.next.rejected', {
+				exam: t(`exams.kind.${next.kind}`),
+				reason: next.application.reviewNote ?? ''
+			});
+		}
 		const params = {
 			exam: t(`exams.kind.${next.kind}`),
 			date: next.availableFrom ? newsDate(next.availableFrom, currentLocale()) : ''
@@ -21,6 +38,7 @@
 	const toMembership = $derived(
 		next.step === 'join' || (next.step === 'exam' && next.refusal === 'no_membership')
 	);
+	const showApply = $derived(next.step === 'exam' && next.canApply);
 </script>
 
 <section
@@ -43,11 +61,25 @@
 	</ol>
 	{#if !level}<p class="text-ink-700">{t('cabinet.progress.noLevel')}</p>{/if}
 	<p class="text-ink-900">{message}</p>
+	{#if form?.applied}
+		<p class="text-ink-900" role="status">{t('cabinet.progress.apply.ok')}</p>
+	{:else if form?.message}
+		<p class="text-red-700" role="alert">{t(form.message)}</p>
+	{/if}
 	{#if toMembership}
 		<a
 			class="font-bold text-navy-700 underline hover:no-underline"
 			href={localizePath('/cabinet/membership', currentLocale())}
 			>{t('cabinet.progress.membership')}</a
 		>
+	{/if}
+	{#if showApply}
+		<form method="POST" action="?/apply" class="mt-1">
+			<button
+				type="submit"
+				class="inline-flex min-h-11 items-center rounded-md bg-navy-700 px-4 font-bold text-surface hover:bg-navy-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy-600 sm:min-h-10"
+				>{t('cabinet.progress.apply')}</button
+			>
+		</form>
 	{/if}
 </section>

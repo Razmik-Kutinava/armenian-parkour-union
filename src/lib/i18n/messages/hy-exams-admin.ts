@@ -74,5 +74,27 @@ export const hyExamsAdmin: Partial<Messages> = {
 	'exams.card.retake': 'Նշանակել վերահանձնում',
 	'exams.card.resultTitle': 'Արդյունք',
 	'exams.card.levelNote': 'Արդյունքը չի փոխում աստիճանը. այն փոխում է միայն վկայականը։',
-	'exams.saved': 'Արդյունքը պահպանված է։'
+	'exams.saved': 'Արդյունքը պահպանված է։',
+	'exams.applications.title': 'Քննության հայտեր',
+	'exams.applications.back': 'Բոլոր քննությունները',
+	'exams.applications.empty': 'Հայտեր չկան։',
+	'exams.applications.col.date': 'Ներկայացված է',
+	'exams.applications.col.status': 'Կարգավիճակ',
+	'exams.applications.col.actions': 'Գործողություններ',
+	'exams.applications.status.pending': 'Քննարկման մեջ',
+	'exams.applications.status.approved': 'Հաստատված',
+	'exams.applications.status.rejected': 'Մերժված',
+	'exams.applications.schedule': 'Նշանակել',
+	'exams.applications.reject': 'Մերժել',
+	'exams.applications.rejectHint': 'Մասնակիցը կտեսնի պատճառը և կկարողանա կրկին դիմել։',
+	'exams.applications.done.rejected': 'Հայտը մերժված է։',
+	'exams.applications.error.forbidden': 'Թույլտվություն չկա։',
+	'exams.applications.error.reason': 'Նշեք պատճառը։',
+	'exams.applications.error.gone': 'Հայտը չի գտնվել։',
+	'exams.applications.error.state': 'Այս հայտն այլևս քննարկման մեջ չէ։',
+	'exams.mail.request.subject': 'Նոր քննության հայտ',
+	'exams.mail.request.text': '{name}-ը դիմել է {exam}-ի համար։ Հերթ․ {url}',
+	'exams.mail.rejected.subject': 'Քննության հայտը մերժված է',
+	'exams.mail.rejected.text':
+		'Բարև, {name}։ Ձեր հայտը {exam}-ի համար մերժվել է․ {reason}։ Առաջընթաց․ {url}'
 };

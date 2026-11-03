@@ -11,6 +11,7 @@ export const hyDashboard: Partial<Messages> = {
 	'dashboard.attention.training_requests': 'Դասընթացների հայտեր',
 	'dashboard.attention.practice': 'Ստուգման սպասող գործնական տեսանյութեր',
 	'dashboard.attention.training_finished': 'Ավարտված դասընթացներ, որոնք սպասում են վկայականի',
+	'dashboard.attention.exam_applications': 'Քննության հայտեր',
 	'dashboard.attention.volunteer_reports': 'Կամավորների ֆոտոհաշվետվություններ ստուգման',
 	'dashboard.upcoming': 'Մոտակա միջոցառումներ',
 	'dashboard.upcoming.none': 'Մոտակա միջոցառումներ չկան։',

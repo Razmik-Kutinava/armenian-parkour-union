@@ -8,7 +8,7 @@
 
 	/* docs/06 section 5.5. Whether a coach profile is public is the admin's (docs/04, staff_profiles.write):
 	 * the member only sees it. */
-	let { data }: PageProps = $props();
+	let { data, form }: PageProps = $props();
 	const h2 = 'text-xl font-bold text-ink-900';
 </script>
 
@@ -20,7 +20,7 @@
 <div class="flex max-w-4xl flex-col gap-6">
 	<h1 class="text-3xl font-bold text-ink-900">{t('cabinet.progress.title')}</h1>
 
-	<LevelScale level={data.level} next={data.next} />
+	<LevelScale level={data.level} next={data.next} {form} />
 
 	<section class="flex flex-col gap-3" aria-labelledby="exams-title">
 		<h2 id="exams-title" class={h2}>{t('cabinet.progress.exams')}</h2>

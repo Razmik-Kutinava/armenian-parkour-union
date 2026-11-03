@@ -46,11 +46,18 @@
 
 <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
 	<h1 class="text-2xl font-bold">{t('admin.nav.exams')}</h1>
-	<a
-		href="/admin/exams/new"
-		class="inline-flex min-h-11 items-center rounded-md bg-navy-700 px-4 font-bold text-surface hover:bg-navy-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy-600 sm:min-h-10"
-		>{t('exams.new')}</a
-	>
+	<div class="flex flex-wrap gap-2">
+		<a
+			href="/admin/exams/applications"
+			class="inline-flex min-h-11 items-center rounded-md border border-line bg-surface px-4 font-bold text-ink-900 hover:bg-navy-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy-600 sm:min-h-10"
+			>{t('exams.applications.title')}</a
+		>
+		<a
+			href="/admin/exams/new"
+			class="inline-flex min-h-11 items-center rounded-md bg-navy-700 px-4 font-bold text-surface hover:bg-navy-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy-600 sm:min-h-10"
+			>{t('exams.new')}</a
+		>
+	</div>
 </div>
 
 <FilterBar {filters} state={data.state} searchLabel={t('exams.search')} />

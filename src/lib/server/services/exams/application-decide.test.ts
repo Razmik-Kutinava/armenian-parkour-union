@@ -5,13 +5,7 @@ import { insertMember } from '../registrations/test-support';
 import { setFederationEmail } from '../training/test-support';
 import { rejectExamApplication } from './application-decide';
 import { applyForExam } from './apply';
-import {
-	applicationDeps,
-	applicationRow,
-	insertStaff,
-	mailbox,
-	SITE
-} from './test-support';
+import { applicationDeps, applicationRow, insertStaff, mailbox, SITE } from './test-support';
 
 /* docs/04 § 7; decisions — docs/todo.md (долг этапа 6). */
 
@@ -78,9 +72,10 @@ describe.skipIf(!testDbUrl)('exams: reject an application', () => {
 					NOW
 				)
 			).toEqual({ ok: false, reason: 'not_allowed' });
-			expect(
-				await rejectExamApplication(tx, moderator, id, { reason: '   ' }, deps, NOW)
-			).toEqual({ ok: false, reason: 'invalid' });
+			expect(await rejectExamApplication(tx, moderator, id, { reason: '   ' }, deps, NOW)).toEqual({
+				ok: false,
+				reason: 'invalid'
+			});
 			expect(
 				await rejectExamApplication(tx, moderator, crypto.randomUUID(), { reason: 'No' }, deps, NOW)
 			).toEqual({ ok: false, reason: 'not_found' });

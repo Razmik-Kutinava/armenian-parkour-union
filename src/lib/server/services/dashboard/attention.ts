@@ -10,6 +10,7 @@ import { shopOrders } from '../../db/schema/shop';
 import { courseAccess, practiceSubmissions } from '../../db/schema/training-progress';
 import { videos } from '../../db/schema/videos';
 import { awaitingCertificateCount } from '../exams/awaiting';
+import { pendingApplicationCount } from '../exams/list-applications';
 import type { Actor } from '../users/target';
 import { pendingReportCount } from '../volunteer/report-list';
 
@@ -25,6 +26,7 @@ export type AttentionKey =
 	| 'training_requests'
 	| 'practice'
 	| 'training_finished'
+	| 'exam_applications'
 	| 'volunteer_reports';
 export type AttentionItem = { key: AttentionKey; count: number; href: string };
 
@@ -102,6 +104,12 @@ const COUNTERS: Counter[] = [
 		permission: 'certificates.issue',
 		href: '/admin/exams?certificate=course',
 		count: awaitingCertificateCount
+	},
+	{
+		key: 'exam_applications',
+		permission: 'exams.manage',
+		href: '/admin/exams/applications',
+		count: pendingApplicationCount
 	},
 	{
 		key: 'volunteer_reports',

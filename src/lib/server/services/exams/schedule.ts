@@ -5,6 +5,7 @@ import { examKind } from '../../db/schema/enums';
 import { writeAudit } from '../audit';
 import type { Actor } from '../users/target';
 import { checkExamAdmission, type ExamKind, type ExamRefusal, type ExamWarning } from './admission';
+import { approvePendingApplication } from './application-close';
 import { eventExists, examinerValid, lockExamMember, readExamFacts } from './facts';
 import type { ExamSettings } from './settings';
 
@@ -114,6 +115,14 @@ export async function scheduleExam(
 				warnings
 			},
 			ip
+		});
+		await approvePendingApplication(tx, {
+			userId: input.userId,
+			kind: input.kind,
+			examId: row.id,
+			actorId: actor.id,
+			ip,
+			now
 		});
 		return { ok: true as const, id: row.id, warnings };
 	});

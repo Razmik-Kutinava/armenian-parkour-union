@@ -153,7 +153,9 @@ describe.skipIf(!testDbUrl)('cabinet: progress', () => {
 				step: 'exam',
 				kind: 'level_advanced',
 				refusal: null,
-				availableFrom: null
+				availableFrom: null,
+				application: null,
+				canApply: true
 			});
 		});
 	});
@@ -184,7 +186,9 @@ describe.skipIf(!testDbUrl)('cabinet: progress', () => {
 				step: 'exam',
 				kind: 'level_advanced',
 				refusal: 'retake_too_soon',
-				availableFrom: new Date(ago(10).getTime() + 30 * DAY)
+				availableFrom: new Date(ago(10).getTime() + 30 * DAY),
+				application: null,
+				canApply: false
 			});
 		});
 	});

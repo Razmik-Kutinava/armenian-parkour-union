@@ -74,5 +74,27 @@ export const ruExamsAdmin: Partial<Messages> = {
 	'exams.card.retake': 'Назначить пересдачу',
 	'exams.card.resultTitle': 'Результат',
 	'exams.card.levelNote': 'Результат не меняет степень: её меняет только сертификат.',
-	'exams.saved': 'Результат сохранён.'
+	'exams.saved': 'Результат сохранён.',
+	'exams.applications.title': 'Заявки на экзамен',
+	'exams.applications.back': 'Все экзамены',
+	'exams.applications.empty': 'Заявок нет.',
+	'exams.applications.col.date': 'Подана',
+	'exams.applications.col.status': 'Статус',
+	'exams.applications.col.actions': 'Действия',
+	'exams.applications.status.pending': 'На рассмотрении',
+	'exams.applications.status.approved': 'Одобрена',
+	'exams.applications.status.rejected': 'Отклонена',
+	'exams.applications.schedule': 'Назначить',
+	'exams.applications.reject': 'Отклонить',
+	'exams.applications.rejectHint': 'Участник увидит причину и сможет подать заявку снова.',
+	'exams.applications.done.rejected': 'Заявка отклонена.',
+	'exams.applications.error.forbidden': 'Недостаточно прав.',
+	'exams.applications.error.reason': 'Укажите причину.',
+	'exams.applications.error.gone': 'Заявка не найдена.',
+	'exams.applications.error.state': 'Эта заявка уже не на рассмотрении.',
+	'exams.mail.request.subject': 'Новая заявка на экзамен',
+	'exams.mail.request.text': '{name} подал(а) заявку на {exam}. Очередь: {url}',
+	'exams.mail.rejected.subject': 'Заявка на экзамен отклонена',
+	'exams.mail.rejected.text':
+		'Здравствуйте, {name}. Заявка на {exam} отклонена: {reason}. Прогресс: {url}'
 };

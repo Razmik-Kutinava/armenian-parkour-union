@@ -74,5 +74,27 @@ export const enExamsAdmin = {
 	'exams.card.retake': 'Schedule a retake',
 	'exams.card.resultTitle': 'Result',
 	'exams.card.levelNote': 'A result never changes the level: only a certificate does.',
-	'exams.saved': 'Result saved.'
+	'exams.saved': 'Result saved.',
+	'exams.applications.title': 'Exam applications',
+	'exams.applications.back': 'All exams',
+	'exams.applications.empty': 'No applications.',
+	'exams.applications.col.date': 'Submitted',
+	'exams.applications.col.status': 'Status',
+	'exams.applications.col.actions': 'Actions',
+	'exams.applications.status.pending': 'Pending',
+	'exams.applications.status.approved': 'Approved',
+	'exams.applications.status.rejected': 'Rejected',
+	'exams.applications.schedule': 'Schedule',
+	'exams.applications.reject': 'Reject',
+	'exams.applications.rejectHint': 'The member will see the reason and can apply again later.',
+	'exams.applications.done.rejected': 'Application rejected.',
+	'exams.applications.error.forbidden': 'Not allowed.',
+	'exams.applications.error.reason': 'Enter a reason.',
+	'exams.applications.error.gone': 'Application not found.',
+	'exams.applications.error.state': 'This application is not pending.',
+	'exams.mail.request.subject': 'New exam application',
+	'exams.mail.request.text': '{name} applied for {exam}. Open the queue: {url}',
+	'exams.mail.rejected.subject': 'Exam application declined',
+	'exams.mail.rejected.text':
+		'Hello, {name}. Your application for {exam} was declined: {reason}. Progress: {url}'
 } as const;

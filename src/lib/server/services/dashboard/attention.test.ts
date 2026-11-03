@@ -89,7 +89,8 @@ describe.skipIf(!testDbUrl)('dashboard: needs action', () => {
 				'consents',
 				'orders',
 				'waitlist',
-				'practice'
+				'practice',
+				'exam_applications'
 			]);
 			expect(await keys(tx, 'admin')).toEqual([
 				'videos',
@@ -100,6 +101,7 @@ describe.skipIf(!testDbUrl)('dashboard: needs action', () => {
 				'training_requests',
 				'practice',
 				'training_finished',
+				'exam_applications',
 				'volunteer_reports'
 			]);
 		});
@@ -117,6 +119,7 @@ describe.skipIf(!testDbUrl)('dashboard: needs action', () => {
 				training_requests: '/admin/training/access',
 				practice: '/admin/training/practice',
 				training_finished: '/admin/exams?certificate=course',
+				exam_applications: '/admin/exams/applications',
 				volunteer_reports: '/admin/volunteer/reports'
 			});
 		});
@@ -136,6 +139,7 @@ describe.skipIf(!testDbUrl)('dashboard: needs action', () => {
 				training_requests: before.training_requests + 1,
 				practice: before.practice + 1,
 				training_finished: before.training_finished + 1,
+				exam_applications: before.exam_applications,
 				volunteer_reports: before.volunteer_reports
 			});
 		});

@@ -15,7 +15,15 @@ export {
 	type ExamEventOption,
 	type ExamMember
 } from './card';
+export { applyForExam, type ApplyExamDeps, type ApplyExamResult } from './apply';
+export { rejectExamApplication } from './application-decide';
 export { examListOptions, listExams, type ExamListRow } from './list';
+export {
+	applicationListOptions,
+	listExamApplications,
+	pendingApplicationCount,
+	type ApplicationListRow
+} from './list-applications';
 export { recordExamResult, type ExamResultInput, type ExamResultOutcome } from './result';
 export { EXAM_NOTES_MAX, type ScheduleExamInput, type ScheduleExamResult } from './schedule';
 
