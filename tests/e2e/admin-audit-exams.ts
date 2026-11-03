@@ -23,6 +23,16 @@ export function examActions(
 		return user.id as string;
 	};
 	return {
+		'/admin/exams/applications?/reject': async () => {
+			const userId = await member();
+			await sql`update users set level = 'novice' where id = ${userId}`;
+			const [app] = await sql`insert into exam_applications (user_id, kind, status)
+				values (${userId}, 'level_advanced', 'pending') returning id`;
+			await post('/admin/exams/applications?/reject', {
+				id: app.id,
+				comment: 'Audit check'
+			});
+		},
 		'/admin/exams/new?/default': async () =>
 			post('/admin/exams/new', {
 				userId: await member(),
