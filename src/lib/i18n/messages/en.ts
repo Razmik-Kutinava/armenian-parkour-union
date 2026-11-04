@@ -29,6 +29,8 @@ import { enPointsAdmin } from './en-points-admin';
 import { enRegistrations } from './en-registrations';
 import { enRegistrationsAdmin } from './en-registrations-admin';
 import { enStaffAdmin } from './en-staff-admin';
+import { enAuditActions } from './en-audit-actions';
+import { enAuditEntities } from './en-audit-entities';
 import { enSystem } from './en-system';
 import { enTeam } from './en-team';
 import { enUsers } from './en-users';
@@ -44,6 +46,8 @@ import { enVolunteerCashier } from './en-volunteer-cashier';
 export const en = {
 	...enUsers,
 	...enSystem,
+	...enAuditActions,
+	...enAuditEntities,
 	...enMedia,
 	...enEditor,
 	...enPages,

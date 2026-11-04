@@ -4,6 +4,7 @@
 	import FilterBar, { type Filter } from '#lib/components/admin/FilterBar.svelte';
 	import Pagination from '#lib/components/admin/Pagination.svelte';
 	import EmptyState from '#lib/components/ui/EmptyState.svelte';
+	import { formatAuditCode } from '#lib/i18n/audit-label.ts';
 	import { currentLocale, t } from '#lib/i18n/index.svelte.ts';
 	import type { PageProps } from './$types';
 
@@ -17,14 +18,25 @@
 		{ key: 'ip', label: 'IP' },
 		{ key: 'open', label: t('audit.col.details') }
 	]);
-	const toOptions = (values: string[]) => values.map((value) => ({ value, label: value }));
+	const toOptions = (kind: 'action' | 'entity', values: string[]) =>
+		values.map((value) => ({ value, label: formatAuditCode(currentLocale(), kind, value) }));
 	const filters = $derived<Filter[]>([
-		{ key: 'action', label: t('audit.col.action'), options: toOptions(data.options.actions) },
-		{ key: 'entity', label: t('audit.col.entity'), options: toOptions(data.options.entities) },
+		{
+			key: 'action',
+			label: t('audit.col.action'),
+			options: toOptions('action', data.options.actions)
+		},
+		{
+			key: 'entity',
+			label: t('audit.col.entity'),
+			options: toOptions('entity', data.options.entities)
+		},
 		{ key: 'from', label: t('audit.filter.from'), type: 'date' },
 		{ key: 'to', label: t('audit.filter.to'), type: 'date' }
 	]);
 	const when = (d: Date) => d.toLocaleString(currentLocale());
+	const actionText = (code: string) => formatAuditCode(currentLocale(), 'action', code);
+	const entityText = (code: string) => formatAuditCode(currentLocale(), 'entity', code);
 </script>
 
 <svelte:head><title>{t('admin.nav.audit')} — {t('admin.title')}</title></svelte:head>
@@ -44,13 +56,13 @@
 	{#snippet cell(row, column)}
 		{#if column.key === 'createdAt'}{when(row.createdAt)}
 		{:else if column.key === 'actor'}{row.actorName ?? t('users.history.system')}
-		{:else if column.key === 'action'}<span class="font-mono text-xs">{row.action}</span>
+		{:else if column.key === 'action'}<span class="text-xs">{actionText(row.action)}</span>
 		{:else if column.key === 'entity'}
 			{#if row.entityType === 'user' && row.entityId}
 				<a class="text-navy-700 hover:underline" href="/admin/users/{row.entityId}"
-					>{row.entityType}</a
+					>{entityText(row.entityType)}</a
 				>
-			{:else}{row.entityType ?? '—'}{/if}
+			{:else}{row.entityType ? entityText(row.entityType) : '—'}{/if}
 		{:else if column.key === 'ip'}{row.ip ?? '—'}
 		{:else if column.key === 'open'}
 			<a class="font-bold text-navy-700 hover:underline" href="/admin/audit/{row.id}"

@@ -30,6 +30,8 @@ import { ruPointsAdmin } from './ru-points-admin';
 import { ruRegistrations } from './ru-registrations';
 import { ruRegistrationsAdmin } from './ru-registrations-admin';
 import { ruStaffAdmin } from './ru-staff-admin';
+import { ruAuditActions } from './ru-audit-actions';
+import { ruAuditEntities } from './ru-audit-entities';
 import { ruSystem } from './ru-system';
 import { ruTeam } from './ru-team';
 import { ruUsers } from './ru-users';
@@ -44,6 +46,8 @@ import { ruVideosAdmin } from './ru-videos-admin';
 export const ru: Partial<Messages> = {
 	...ruUsers,
 	...ruSystem,
+	...ruAuditActions,
+	...ruAuditEntities,
 	...ruMedia,
 	...ruEditor,
 	...ruPages,

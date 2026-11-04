@@ -1,6 +1,7 @@
 <script lang="ts">
 	import ScrollText from '@lucide/svelte/icons/scroll-text';
 	import EmptyState from '#lib/components/ui/EmptyState.svelte';
+	import { formatAuditCode } from '#lib/i18n/audit-label.ts';
 	import { currentLocale, t } from '#lib/i18n/index.svelte.ts';
 	import type { HistoryEntry } from '#lib/server/services/audit.ts';
 
@@ -8,6 +9,7 @@
 	let { entries }: { entries: HistoryEntry[] } = $props();
 	const when = (d: Date) => d.toLocaleString(currentLocale());
 	const show = (v: unknown) => (v == null ? '—' : JSON.stringify(v));
+	const actionText = (code: string) => formatAuditCode(currentLocale(), 'action', code);
 </script>
 
 {#if entries.length === 0}
@@ -30,7 +32,7 @@
 					<tr class="border-t border-line align-top">
 						<td class="px-3 py-2 whitespace-nowrap">{when(e.createdAt)}</td>
 						<td class="px-3 py-2">{e.actorName ?? t('users.history.system')}</td>
-						<td class="font-mono px-3 py-2 text-xs">{e.action}</td>
+						<td class="px-3 py-2 text-xs">{actionText(e.action)}</td>
 						<td class="font-mono px-3 py-2 text-xs break-all">{show(e.before)}</td>
 						<td class="font-mono px-3 py-2 text-xs break-all">{show(e.after)}</td>
 					</tr>

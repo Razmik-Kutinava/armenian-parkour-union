@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { formatAuditCode } from '#lib/i18n/audit-label.ts';
 	import { currentLocale, t } from '#lib/i18n/index.svelte.ts';
 	import type { PageProps } from './$types';
 
@@ -6,20 +7,26 @@
 	let { data }: PageProps = $props();
 	const e = $derived(data.entry);
 	const show = (v: unknown) => (v == null ? '—' : JSON.stringify(v, null, 2));
+	const actionTitle = $derived(formatAuditCode(currentLocale(), 'action', e.action));
+	const entityLine = $derived(
+		[e.entityType ? formatAuditCode(currentLocale(), 'entity', e.entityType) : null, e.entityId]
+			.filter(Boolean)
+			.join(' · ') || '—'
+	);
 	const facts = $derived([
 		[t('audit.col.date'), e.createdAt.toLocaleString(currentLocale())],
 		[t('audit.col.actor'), e.actorName ?? t('users.history.system')],
-		[t('audit.col.entity'), [e.entityType, e.entityId].filter(Boolean).join(' · ') || '—'],
+		[t('audit.col.entity'), entityLine],
 		['IP', e.ip ?? '—']
 	]);
 </script>
 
-<svelte:head><title>{e.action} — {t('admin.nav.audit')}</title></svelte:head>
+<svelte:head><title>{actionTitle} — {t('admin.nav.audit')}</title></svelte:head>
 
 <a href="/admin/audit" class="text-sm font-bold text-navy-700 hover:underline"
 	>← {t('admin.nav.audit')}</a
 >
-<h1 class="font-mono mt-2 mb-4 text-xl font-bold">{e.action}</h1>
+<h1 class="mt-2 mb-4 text-xl font-bold">{actionTitle}</h1>
 
 <dl class="mb-6 grid grid-cols-[auto_1fr] gap-x-6 gap-y-2 text-sm">
 	{#each facts as [label, value] (label)}
