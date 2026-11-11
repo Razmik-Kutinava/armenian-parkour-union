@@ -57,7 +57,7 @@
 
 ## Сделано (последние 5)
 Формат: `дата | задача | итог | коммит`, одной строкой. Полные записи — `docs/archive/done-stage-N.md`.
-- 2026-11-11 | бренд Federation + логотипы | Union→Federation (i18n, mail, seed, pages); лого PNG/favicon/og; PDF на PNG; site_name в dev | (см. HEAD)
+- 2026-11-11 | бренд Federation + логотипы | Union→Federation (i18n, mail, seed, pages); лого PNG/favicon/og; PDF на PNG; site_name в dev | `c11a51b`
 - 2026-11-04 | журнал действий: подписи кодов | перевод + код в фильтре, списке, карточке и истории пользователя; CSV без изменений | `8bcaed1`
 - 2026-11-03 | деплой долга заявки на экзамен | Fly v32, миграция 0019; сайт 200, routes → login; health ok | `f5d836a`
 - 2026-11-03 | долг 6: заявка на экзамен | 0019 + REVIEW (без bugbot/security), crit-audit CLEAN | `cf52732`
