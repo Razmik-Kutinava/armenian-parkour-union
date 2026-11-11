@@ -1,6 +1,4 @@
 import fontkit from '@pdf-lib/fontkit';
-import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
 import {
 	rgb,
 	type Color,
@@ -10,19 +8,20 @@ import {
 	type PDFPage
 } from 'pdf-lib';
 import QRCode from 'qrcode';
+import logoPng from '#lib/assets/brand/logo-square.png?inline';
 import regularFont from '#lib/assets/fonts/apu-sans/apu-sans-400.ttf?inline';
 import boldFont from '#lib/assets/fonts/apu-sans/apu-sans-700.ttf?inline';
 
 /* docs/08 sections 2, 4, 10: the site's own font (Armenian, Cyrillic, Latin) embedded; logo from
- * designer raster in static/brand (no vector source); QR as squares; seal and signature are raster. */
+ * designer raster in lib/assets (bundled — static/ is not in the Fly image); QR as squares;
+ * seal and signature are raster. */
 
-const LOGO_PNG = readFileSync(join(process.cwd(), 'static/brand/logo-square.png'));
+const dataUriBytes = (uri: string) => Buffer.from(uri.slice(uri.indexOf(',') + 1), 'base64');
+const LOGO_PNG = dataUriBytes(logoPng);
 
 export const NAVY = rgb(0x1f / 255, 0x4e / 255, 0x78 / 255);
 export const INK = rgb(0x1c / 255, 0x22 / 255, 0x28 / 255);
 export const MUTED = rgb(0x4a / 255, 0x55 / 255, 0x60 / 255);
-
-const dataUriBytes = (uri: string) => Buffer.from(uri.slice(uri.indexOf(',') + 1), 'base64');
 
 /** TTF copies of the site's woff2, embedded whole: pdf-lib puts woff2 bytes in the PDF as is (viewers
  * reject them), and its subsetting drops glyphs. */
