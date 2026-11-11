@@ -57,6 +57,7 @@
 
 ## Сделано (последние 5)
 Формат: `дата | задача | итог | коммит`, одной строкой. Полные записи — `docs/archive/done-stage-N.md`.
+- 2026-11-11 | 500 `/admin/certificates` | ENOENT лого в Fly; бандл `?inline`; CI+Deploy ok (PARKOUR-AM-J) | `1a19c1c`
 - 2026-11-11 | круглый favicon logo3 | CI green; Deploy ok; `/brand/favicon.svg` 200, углы прозрачные | `53b9854`
 - 2026-11-11 | деплой Federation + логотипы | Fly v33, CI green; prod site_name/pages/requisites; favicon+лого 200 | `d812d75`
 - 2026-11-11 | бренд Federation + логотипы | Union→Federation (i18n, mail, seed, pages); лого PNG/favicon/og; PDF на PNG | `c11a51b`
