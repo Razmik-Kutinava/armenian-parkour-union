@@ -2,7 +2,7 @@
 export const enDonate = {
 	'donate.title': 'Support the federation',
 	'donate.intro':
-		'Your donation helps the Armenian Parkour Union run events, train coaches and build places to practise.',
+		'Your donation helps the Armenian Parkour Federation run events, train coaches and build places to practise.',
 	'donate.amount': 'Amount ({currency})',
 	'donate.range': 'From {min} to {max}',
 	'donate.quick': 'Quick amounts',
@@ -21,10 +21,10 @@ export const enDonate = {
 	'donate.error.invalid': 'Check the form: the chosen purpose may no longer be available.',
 	'donate.error.unavailable': 'Online payment is not available right now. Please try again later.',
 	'donate.error.providerError': 'The payment could not be started. Please try again.',
-	'donate.payment.description': 'Donation to the Armenian Parkour Union',
+	'donate.payment.description': 'Donation to the Armenian Parkour Federation',
 	'donate.mail.subject': 'Thank you for your donation',
 	'donate.mail.text':
-		'Hello, {name}!\n\nThank you for supporting the Armenian Parkour Union.\n\nAmount: {amount}\nDate: {date}\nPurpose: {purpose}\nPayment number: {payment}',
+		'Hello, {name}!\n\nThank you for supporting the Armenian Parkour Federation.\n\nAmount: {amount}\nDate: {date}\nPurpose: {purpose}\nPayment number: {payment}',
 	'donate.mail.generalPurpose': 'general needs of the federation',
 	'donate.mail.requisites': 'Federation details:'
 } as const;

@@ -27,7 +27,7 @@ async function registerAs(page: Page, role: 'member' | 'editor') {
 test('guest sees the site menu, log in and join, footer page links', async ({ page }) => {
 	await page.goto('/');
 	const header = page.getByRole('banner');
-	await expect(header.getByRole('link', { name: 'Armenian Parkour Union' })).toHaveAttribute(
+	await expect(header.getByRole('link', { name: 'Armenian Parkour Federation' })).toHaveAttribute(
 		'href',
 		'/'
 	);

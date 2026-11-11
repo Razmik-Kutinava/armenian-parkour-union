@@ -20,7 +20,7 @@ const content = (holder: string, kind: 'level' | 'judge' = 'level') =>
 		{ name: holder, firstName: null, lastName: null },
 		{
 			languages: pdfLanguages({ pdfRussian: true }),
-			unionNames: ['Armenian Parkour Union'],
+			unionNames: ['Armenian Parkour Federation'],
 			siteUrl: 'https://parkour.test',
 			signer: {
 				name: { hy: 'Ռազմիկ Գյուրջյան', en: 'Razmik Giurdzian', ru: 'Размик Гюрджян' },
@@ -46,7 +46,7 @@ describe('certificates: PDF render', () => {
 		expect(Math.round(height)).toBe(595);
 		expect(doc.getTitle()).toBe('APU-2026-0001');
 		const resources = doc.getPage(0).node.Resources();
-		expect(resources?.lookup(PDFName.of('XObject'), PDFDict).keys()).toHaveLength(2);
+		expect(resources?.lookup(PDFName.of('XObject'), PDFDict).keys()).toHaveLength(3);
 		const fonts = resources?.lookup(PDFName.of('Font'), PDFDict);
 		expect(new Set(fonts?.values().map(String))).toHaveProperty('size', 2);
 		for (const name of fonts?.keys() ?? []) {

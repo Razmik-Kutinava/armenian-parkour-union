@@ -82,5 +82,5 @@ export const enUsers = {
 
 	'mail.setup.subject': 'Set a password for your account',
 	'mail.setup.text':
-		'An account has been created for you on the Armenian Parkour Union site. Open this link to set a password (valid for 1 hour): {url}'
+		'An account has been created for you on the Armenian Parkour Federation site. Open this link to set a password (valid for 1 hour): {url}'
 } as const;

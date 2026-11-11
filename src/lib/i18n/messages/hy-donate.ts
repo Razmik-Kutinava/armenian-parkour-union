@@ -3,7 +3,7 @@ import type { Messages } from '../translate';
 export const hyDonate: Partial<Messages> = {
 	'donate.title': 'Աջակցել ֆեդերացիային',
 	'donate.intro':
-		'Ձեր նվիրատվությունն օգնում է Armenian Parkour Union-ին անցկացնել միջոցառումներ, պատրաստել մարզիչներ և ստեղծել մարզվելու վայրեր։',
+		'Ձեր նվիրատվությունն օգնում է Armenian Parkour Federation-ին անցկացնել միջոցառումներ, պատրաստել մարզիչներ և ստեղծել մարզվելու վայրեր։',
 	'donate.amount': 'Գումար ({currency})',
 	'donate.range': '{min}-ից {max}',
 	'donate.quick': 'Արագ գումարներ',
@@ -23,10 +23,10 @@ export const hyDonate: Partial<Messages> = {
 	'donate.error.unavailable':
 		'Առցանց վճարումն այս պահին հասանելի չէ։ Խնդրում ենք փորձել ավելի ուշ։',
 	'donate.error.providerError': 'Չհաջողվեց սկսել վճարումը։ Խնդրում ենք փորձել կրկին։',
-	'donate.payment.description': 'Նվիրատվություն Armenian Parkour Union-ին',
+	'donate.payment.description': 'Նվիրատվություն Armenian Parkour Federation-ին',
 	'donate.mail.subject': 'Շնորհակալություն նվիրատվության համար',
 	'donate.mail.text':
-		'Բարև ձեզ, {name}։\n\nՇնորհակալություն Armenian Parkour Union-ին աջակցելու համար։\n\nԳումար՝ {amount}\nԱմսաթիվ՝ {date}\nՆպատակ՝ {purpose}\nՎճարման համար՝ {payment}',
+		'Բարև ձեզ, {name}։\n\nՇնորհակալություն Armenian Parkour Federation-ին աջակցելու համար։\n\nԳումար՝ {amount}\nԱմսաթիվ՝ {date}\nՆպատակ՝ {purpose}\nՎճարման համար՝ {payment}',
 	'donate.mail.generalPurpose': 'ֆեդերացիայի ընդհանուր կարիքներ',
 	'donate.mail.requisites': 'Ֆեդերացիայի վավերապայմանները՝'
 };

@@ -50,7 +50,7 @@ export const hyNews: Partial<Messages> = {
 	'news.error.tags': 'Մինչև 10 պիտակ՝ յուրաքանչյուրը մինչև 32 նիշ',
 	'news.error.cover': 'Ընտրեք պատկեր մեդիագրադարանից',
 	'news.error.author': 'Ընտրեք խմբագիր կամ ադմինիստրատոր',
-	'news.list.description': 'Armenian Parkour Union-ի նորությունները',
+	'news.list.description': 'Armenian Parkour Federation-ի նորությունները',
 	'news.list.empty': 'Նորություններ դեռ չկան',
 	'news.list.tag': 'Պիտակ՝ {tag}',
 	'news.list.all': 'Բոլոր նորությունները',

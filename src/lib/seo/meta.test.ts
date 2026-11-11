@@ -3,7 +3,7 @@ import { buildSeo, textFromHtml } from './meta';
 
 const base = {
 	siteUrl: 'https://parkour.am/',
-	siteName: 'Armenian Parkour Union',
+	siteName: 'Armenian Parkour Federation',
 	path: '/ru/news/jam',
 	locale: 'ru' as const,
 	title: 'Джем',
@@ -15,7 +15,7 @@ const og = (meta: ReturnType<typeof buildSeo>, key: string) =>
 describe('seo: page meta (docs/06 section 7)', () => {
 	it('title, description and an absolute canonical address', () => {
 		const meta = buildSeo(base);
-		expect(meta.title).toBe('Джем — Armenian Parkour Union');
+		expect(meta.title).toBe('Джем — Armenian Parkour Federation');
 		expect(meta.description).toBe('Коротко о джеме');
 		expect(meta.canonical).toBe('https://parkour.am/ru/news/jam');
 	});
@@ -25,7 +25,7 @@ describe('seo: page meta (docs/06 section 7)', () => {
 		expect(og(meta, 'og:title')).toBe('Джем');
 		expect(og(meta, 'og:description')).toBe('Коротко о джеме');
 		expect(og(meta, 'og:url')).toBe('https://parkour.am/ru/news/jam');
-		expect(og(meta, 'og:site_name')).toBe('Armenian Parkour Union');
+		expect(og(meta, 'og:site_name')).toBe('Armenian Parkour Federation');
 		expect(og(meta, 'og:locale')).toBe('ru_RU');
 		expect(og(meta, 'og:type')).toBe('website');
 		expect(og(meta, 'og:image')).toBeUndefined();
@@ -70,8 +70,8 @@ describe('seo: page meta (docs/06 section 7)', () => {
 			inLanguage: 'ru',
 			keywords: 'jam, kids',
 			mainEntityOfPage: 'https://parkour.am/ru/news/jam',
-			author: { '@type': 'Organization', name: 'Armenian Parkour Union' },
-			publisher: { '@type': 'Organization', name: 'Armenian Parkour Union' }
+			author: { '@type': 'Organization', name: 'Armenian Parkour Federation' },
+			publisher: { '@type': 'Organization', name: 'Armenian Parkour Federation' }
 		});
 	});
 
@@ -117,7 +117,7 @@ describe('seo: page meta (docs/06 section 7)', () => {
 				priceCurrency: 'AMD',
 				url: 'https://parkour.am/ru/events/jam'
 			},
-			organizer: { '@type': 'Organization', name: 'Armenian Parkour Union' }
+			organizer: { '@type': 'Organization', name: 'Armenian Parkour Federation' }
 		});
 		const cancelled = buildSeo({
 			...base,
@@ -183,18 +183,18 @@ describe('seo: page meta (docs/06 section 7)', () => {
 		const meta = buildSeo({
 			...base,
 			path: '/ru',
-			title: 'Armenian Parkour Union',
+			title: 'Armenian Parkour Federation',
 			organization: {
 				sameAs: ['https://instagram.com/apu'],
 				email: 'info@parkour.am',
 				phone: '+374 10 000000'
 			}
 		});
-		expect(meta.title).toBe('Armenian Parkour Union');
+		expect(meta.title).toBe('Armenian Parkour Federation');
 		expect(JSON.parse(meta.jsonLd!)).toEqual({
 			'@context': 'https://schema.org',
 			'@type': 'Organization',
-			name: 'Armenian Parkour Union',
+			name: 'Armenian Parkour Federation',
 			url: 'https://parkour.am/',
 			description: 'Коротко о джеме',
 			sameAs: ['https://instagram.com/apu'],

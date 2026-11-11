@@ -1,6 +1,6 @@
 import type { Mail } from './resend';
 
-const BRAND = 'Armenian Parkour Union';
+const BRAND = 'Armenian Parkour Federation';
 const FONT = "'Noto Sans', 'Noto Sans Armenian', Arial, Helvetica, sans-serif";
 const ADDRESS = /https?:\/\/[^\s<>"']+/g;
 const NOT_ADDRESS_TAIL = /[.,;:!?)\]]+$/;

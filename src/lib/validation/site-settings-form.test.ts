@@ -12,7 +12,7 @@ const form = (entries: Record<string, string>) => {
 	return data;
 };
 const base = {
-	'site_name.en': 'Armenian Parkour Union',
+	'site_name.en': 'Armenian Parkour Federation',
 	'seo_description.en': 'Parkour in Armenia'
 };
 
@@ -27,7 +27,7 @@ describe('site settings form (docs/05 section 21)', () => {
 			})
 		);
 		expect(obj).toEqual({
-			site_name: { en: 'Armenian Parkour Union' },
+			site_name: { en: 'Armenian Parkour Federation' },
 			seo_description: { en: 'Parkour in Armenia' },
 			contacts: { phone: '+374 10 000000' }
 		});
@@ -36,7 +36,7 @@ describe('site settings form (docs/05 section 21)', () => {
 	it('empty groups are saved as empty objects', () => {
 		const r = settingsFormSchema.safeParse(formToObject(form(base)));
 		expect(r.success && r.data).toEqual({
-			site_name: { en: 'Armenian Parkour Union' },
+			site_name: { en: 'Armenian Parkour Federation' },
 			seo_description: { en: 'Parkour in Armenia' },
 			contacts: {},
 			socials: {},

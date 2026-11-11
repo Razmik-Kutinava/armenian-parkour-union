@@ -88,7 +88,7 @@ describe('createMailer (task 8.2, template and retries)', () => {
 		await send(mail);
 		const body = JSON.parse(String(sent(0)[1].body));
 		expect(body.text).toBe(mail.text);
-		expect(body.html).toContain('Armenian Parkour Union');
+		expect(body.html).toContain('Armenian Parkour Federation');
 		expect(body.html).toContain('<a href="https://x/verify?token=SECRET"');
 	});
 

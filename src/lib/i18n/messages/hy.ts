@@ -88,7 +88,7 @@ export const hy: Partial<Messages> = {
 	...hyCertificatesAdmin,
 	...hyStaffAdmin,
 	'site.description':
-		'Armenian Parkour Union՝ միջոցառումներ, նորություններ, անդամակցություն և ատեստավորում։',
+		'Armenian Parkour Federation՝ միջոցառումներ, նորություններ, անդամակցություն և ատեստավորում։',
 	'site.underConstruction': 'Կայքը մշակման փուլում է։',
 	'common.close': 'Փակել',
 

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Menu from '@lucide/svelte/icons/menu';
-	import logo from '#lib/assets/brand/logo-square-light.svg';
+	import logo from '#lib/assets/brand/logo-square-light.png';
 	import { currentLocale, localizePath, t, type MessageKey } from '#lib/i18n/index.svelte.ts';
 	import AccountLinks, { type Viewer } from './AccountLinks.svelte';
 	import Disclosure from './Disclosure.svelte';

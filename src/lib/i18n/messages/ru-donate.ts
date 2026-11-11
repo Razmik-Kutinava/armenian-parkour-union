@@ -25,7 +25,7 @@ export const ruDonate: Partial<Messages> = {
 	'donate.payment.description': 'Пожертвование Союзу паркура Армении',
 	'donate.mail.subject': 'Спасибо за пожертвование',
 	'donate.mail.text':
-		'Здравствуйте, {name}!\n\nСпасибо, что поддерживаете Союз паркура Армении.\n\nСумма: {amount}\nДата: {date}\nНазначение: {purpose}\nНомер платежа: {payment}',
+		'Здравствуйте, {name}!\n\nСпасибо, что поддерживаете Федерация паркура Армении.\n\nСумма: {amount}\nДата: {date}\nНазначение: {purpose}\nНомер платежа: {payment}',
 	'donate.mail.generalPurpose': 'общие нужды федерации',
 	'donate.mail.requisites': 'Реквизиты федерации:'
 };

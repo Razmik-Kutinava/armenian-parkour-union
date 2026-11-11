@@ -1,7 +1,7 @@
 import type { Messages } from '../translate';
 
 export const hyMembership: Partial<Messages> = {
-	'membership.payment.description': 'Armenian Parkour Union-ի անդամավճար',
+	'membership.payment.description': 'Armenian Parkour Federation-ի անդամավճար',
 	'membership.mail.paid.subject': 'Անդամավճարը ստացված է',
 	'membership.mail.paid.text':
 		'Բարև ձեզ, {name}։\n\nՄենք ստացել ենք ձեր անդամավճարը։ Շնորհակալություն։\n\nԳումար՝ {amount}\nԱմսաթիվ՝ {date}\nՆպատակ՝ անդամավճար, {from} – {to}\nՎճարման համար՝ {payment}\n\nՁեր անդամակցությունը՝ {url}',

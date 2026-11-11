@@ -87,8 +87,8 @@ export const en = {
 	...enExamsAdmin,
 	...enCertificatesAdmin,
 	...enStaffAdmin,
-	'site.name': 'Armenian Parkour Union',
-	'site.description': 'Armenian Parkour Union: events, news, membership and certification.',
+	'site.name': 'Armenian Parkour Federation',
+	'site.description': 'Armenian Parkour Federation: events, news, membership and certification.',
 	'site.underConstruction': 'Site under construction.',
 	'common.close': 'Close',
 

@@ -87,7 +87,7 @@ export const ru: Partial<Messages> = {
 	...ruExamsAdmin,
 	...ruCertificatesAdmin,
 	...ruStaffAdmin,
-	'site.description': 'Союз паркура Армении: события, новости, членство и аттестация.',
+	'site.description': 'Федерация паркура Армении: события, новости, членство и аттестация.',
 	'site.underConstruction': 'Сайт в разработке.',
 	'common.close': 'Закрыть',
 

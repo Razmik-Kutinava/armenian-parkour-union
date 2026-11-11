@@ -126,7 +126,7 @@ export const hyEvents: Partial<Messages> = {
 	'events.list.empty': 'Առաջիկա միջոցառումներ չկան',
 	'events.list.archive': 'Արխիվ',
 	'events.archive.title': 'Անցած միջոցառումներ',
-	'events.archive.description': 'Armenian Parkour Union-ի ավարտված միջոցառումները',
+	'events.archive.description': 'Armenian Parkour Federation-ի ավարտված միջոցառումները',
 	'events.archive.empty': 'Անցած միջոցառումներ դեռ չկան',
 	'events.all': 'Բոլոր միջոցառումները',
 	'events.earlier': 'Ավելի վաղ',

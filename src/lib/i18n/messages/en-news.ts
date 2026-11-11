@@ -47,7 +47,7 @@ export const enNews = {
 	'news.error.tags': 'Up to 10 tags of up to 32 characters',
 	'news.error.cover': 'Choose an image from the media library',
 	'news.error.author': 'Choose an editor or an administrator',
-	'news.list.description': 'News of the Armenian Parkour Union',
+	'news.list.description': 'News of the Armenian Parkour Federation',
 	'news.list.empty': 'No news yet',
 	'news.list.tag': 'Tag: {tag}',
 	'news.list.all': 'All news',

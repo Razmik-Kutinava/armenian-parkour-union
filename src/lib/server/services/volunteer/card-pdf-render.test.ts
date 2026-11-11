@@ -23,7 +23,7 @@ const JPEG: PdfImage = {
 
 const content = (partners: CardPdfContent['partners']): CardPdfContent => ({
 	title: 'Կամավորի գրքույկ',
-	union: 'Armenian Parkour Union',
+	union: 'Armenian Parkour Federation',
 	holder: 'Արամ Պետրոսյան',
 	number: { label: 'Համար', value: 'APU-V-2026-0007' },
 	validUntil: { label: 'Գործում է մինչև', value: '01.04.2027' },

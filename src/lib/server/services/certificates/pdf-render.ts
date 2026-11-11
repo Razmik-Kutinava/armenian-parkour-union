@@ -10,6 +10,7 @@ import {
 	drawQr,
 	drawRight,
 	embedFonts,
+	embedLogo,
 	fitSize
 } from './pdf-draw';
 
@@ -67,9 +68,14 @@ function block(
 	return y - restSize - 8;
 }
 
-function header(page: PDFPage, f: Fonts, c: CertificateContent) {
+function header(
+	page: PDFPage,
+	f: Fonts,
+	c: CertificateContent,
+	logoImg: Awaited<ReturnType<typeof embedLogo>>
+) {
 	const logo = 78;
-	drawLogo(page, CX - logo / 2, H - 44, logo);
+	drawLogo(page, logoImg, CX - logo / 2, H - 44, logo);
 	block(page, f, c.union, H - 44 - logo - 22, 13);
 	block(page, f, c.title, H - 210, 34, true);
 	const nameSize = fitSize(c.holder, f.bold, 36, W - 2 * MARGIN - 40);
@@ -118,11 +124,15 @@ export async function renderCertificatePdf(
 	doc.setTitle(content.number);
 	doc.setAuthor(content.union.main);
 	doc.setSubject(content.kind.main);
-	const [seal, signature] = [await doc.embedPng(images.seal), await doc.embedPng(images.signature)];
+	const [seal, signature, logo] = [
+		await doc.embedPng(images.seal),
+		await doc.embedPng(images.signature),
+		await embedLogo(doc)
+	];
 	const fonts = await embedFonts(doc);
 	const page = doc.addPage([W, H]);
 	frame(page);
-	header(page, fonts, content);
+	header(page, fonts, content, logo);
 	footer(page, fonts, content);
 	const sign = signature.scale(SIGNATURE_WIDTH / signature.width);
 	page.drawImage(signature, { x: CX - 30 - sign.width / 2, y: 92, ...sign });

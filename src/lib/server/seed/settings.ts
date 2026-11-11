@@ -7,7 +7,11 @@ import { siteSettings } from '../db/schema/service';
  * section 16): 0 until the owner sets it before stage 3.
  */
 export const SEED_SETTINGS = {
-	site_name: { en: 'Armenian Parkour Union' },
+	site_name: {
+		en: 'Armenian Parkour Federation',
+		hy: 'Հայաստանի պարկուրի ֆեդերացիա',
+		ru: 'Федерация паркура Армении'
+	},
 	contacts: {},
 	socials: {},
 	footer: {},

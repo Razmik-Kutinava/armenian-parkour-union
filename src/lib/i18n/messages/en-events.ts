@@ -122,7 +122,7 @@ export const enEvents = {
 	'events.list.empty': 'No upcoming events',
 	'events.list.archive': 'Archive',
 	'events.archive.title': 'Past events',
-	'events.archive.description': 'Finished events of the Armenian Parkour Union',
+	'events.archive.description': 'Finished events of the Armenian Parkour Federation',
 	'events.archive.empty': 'No past events yet',
 	'events.all': 'All events',
 	'events.earlier': 'Earlier',

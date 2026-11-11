@@ -29,5 +29,5 @@ export const enPayment = {
 	'payment.refresh': 'Refresh the page',
 	'payment.mail.refund.subject': 'Your payment has been refunded',
 	'payment.mail.refund.text':
-		'Hello, {name}!\n\nWe have refunded your payment to the Armenian Parkour Union.\n\nAmount: {amount}\nPayment number: {payment}\n\nWhen the money reaches your account depends on your bank, usually a few working days.'
+		'Hello, {name}!\n\nWe have refunded your payment to the Armenian Parkour Federation.\n\nAmount: {amount}\nPayment number: {payment}\n\nWhen the money reaches your account depends on your bank, usually a few working days.'
 } as const;

@@ -17,7 +17,7 @@ const cert = {
 const holder = { name: 'aram', firstName: 'Արամ', lastName: 'Պետրոսյան' };
 const options = {
 	languages: pdfLanguages({ pdfRussian: true }),
-	unionNames: ['Հայաստանի պարկուրի միություն', 'Armenian Parkour Union', 'Armenian Parkour Union'],
+	unionNames: ['Հայաստանի պարկուրի ֆեդերացիա', 'Armenian Parkour Federation', 'Armenian Parkour Federation'],
 	siteUrl: 'https://parkour.test/',
 	signer: null
 };
@@ -46,8 +46,8 @@ describe('certificates: PDF content', () => {
 			]
 		});
 		expect(c.union).toEqual({
-			main: 'Հայաստանի պարկուրի միություն',
-			rest: ['Armenian Parkour Union']
+			main: 'Հայաստանի պարկուրի ֆեդերացիա',
+			rest: ['Armenian Parkour Federation']
 		});
 		const noRu = certificateContent(cert, holder, { ...options, languages: ['hy', 'en'] });
 		expect(noRu.kind.rest).toEqual([translate('en', 'certificates.kind.level_pro')]);

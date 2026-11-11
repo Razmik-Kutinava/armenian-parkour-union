@@ -1,12 +1,22 @@
 import fontkit from '@pdf-lib/fontkit';
-import { rgb, type Color, type PDFDocument, type PDFFont, type PDFPage } from 'pdf-lib';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import {
+	rgb,
+	type Color,
+	type PDFDocument,
+	type PDFFont,
+	type PDFImage,
+	type PDFPage
+} from 'pdf-lib';
 import QRCode from 'qrcode';
-import logoSvg from '../../../../../static/brand/logo-square.svg?raw';
 import regularFont from '#lib/assets/fonts/apu-sans/apu-sans-400.ttf?inline';
 import boldFont from '#lib/assets/fonts/apu-sans/apu-sans-700.ttf?inline';
 
-/* docs/08 sections 2, 4, 10: the site's own font (Armenian, Cyrillic, Latin) embedded, the logo as
- * vectors, the QR as squares — nothing raster except the seal and the signature. */
+/* docs/08 sections 2, 4, 10: the site's own font (Armenian, Cyrillic, Latin) embedded; logo from
+ * designer raster in static/brand (no vector source); QR as squares; seal and signature are raster. */
+
+const LOGO_PNG = readFileSync(join(process.cwd(), 'static/brand/logo-square.png'));
 
 export const NAVY = rgb(0x1f / 255, 0x4e / 255, 0x78 / 255);
 export const INK = rgb(0x1c / 255, 0x22 / 255, 0x28 / 255);
@@ -39,19 +49,14 @@ export function drawRight(page: PDFPage, text: string, right: number, y: number,
 	page.drawText(text, { x: right - t.font.widthOfTextAtSize(text, t.size), y, ...t });
 }
 
-const LOGO_VIEWBOX = 1332;
-const LOGO_PATHS = [...logoSvg.matchAll(/<path\b([^>]*)>/g)].map(([, attrs]) => ({
-	fill: /fill="#([0-9a-fA-F]{6})"/.exec(attrs)?.[1] ?? '000000',
-	d: /\sd="([^"]+)"/.exec(attrs)?.[1] ?? ''
-}));
-
-const hex = (h: string) =>
-	rgb(...([0, 2, 4].map((i) => parseInt(h.slice(i, i + 2), 16) / 255) as [number, number, number]));
+export async function embedLogo(doc: PDFDocument): Promise<PDFImage> {
+	return doc.embedPng(LOGO_PNG);
+}
 
 /** The logo with its top-left corner at (x, top), `size` points square. */
-export function drawLogo(page: PDFPage, x: number, top: number, size: number) {
-	const scale = size / LOGO_VIEWBOX;
-	for (const p of LOGO_PATHS) page.drawSvgPath(p.d, { x, y: top, scale, color: hex(p.fill) });
+export function drawLogo(page: PDFPage, logo: PDFImage, x: number, top: number, size: number) {
+	const scaled = logo.scale(size / logo.width);
+	page.drawImage(logo, { x, y: top - scaled.height, width: scaled.width, height: scaled.height });
 }
 
 /** The QR code with its bottom-left corner at (x, y); dark runs of a row are one rectangle. */

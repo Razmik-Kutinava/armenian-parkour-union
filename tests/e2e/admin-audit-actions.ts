@@ -96,7 +96,7 @@ export async function adminActions(page: Page, sql: postgres.Sql, adminId: strin
 			const form = await field.evaluate((el: HTMLInputElement) =>
 				Object.fromEntries([...new FormData(el.form!)].map(([k, v]) => [k, String(v)]))
 			);
-			form['site_name.en'] ||= 'Armenian Parkour Union';
+			form['site_name.en'] ||= 'Armenian Parkour Federation';
 			form['seo_description.en'] ||= 'Parkour in Armenia';
 			const name = (await field.getAttribute('name'))!;
 			const phone = `+374 10 ${String(Math.floor(Math.random() * 1e6)).padStart(6, '0')}`;

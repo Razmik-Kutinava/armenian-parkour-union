@@ -11,7 +11,7 @@ export interface Sample {
 export const samples: Sample[] = [
 	{
 		lang: 'hy',
-		title: 'Հայաստանի պարկուրի միություն',
+		title: 'Հայաստանի պարկուրի ֆեդերացիա',
 		subtitle: 'Մարզումներ, մրցումներ և սերտիֆիկատներ',
 		body: 'Պարկուրը շարժման արվեստ է՝ վազք, ցատկ և մագլցում քաղաքային միջավայրում։ Միացե՛ք մեր մարզումներին Երևանում և մարզերում։',
 		action: 'Գրանցվել միջոցառմանը',
@@ -27,7 +27,7 @@ export const samples: Sample[] = [
 	},
 	{
 		lang: 'en',
-		title: 'Armenian Parkour Union',
+		title: 'Armenian Parkour Federation',
 		subtitle: 'Training, competitions and certificates',
 		body: 'Parkour is the art of movement: running, jumping and climbing in the city. Join our training sessions in Yerevan and the regions.',
 		action: 'Register for event',

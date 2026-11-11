@@ -55,7 +55,7 @@ describe.skipIf(!url)('footer settings from site_settings', () => {
 				telegram: 'https://t.me/apu',
 				instagram: 'https://instagram.com/apu'
 			});
-			await put(tx, 'site_name', { en: 'Armenian Parkour Union', ru: 'Союз паркура Армении' });
+			await put(tx, 'site_name', { en: 'Armenian Parkour Federation', ru: 'Федерация паркура Армении' });
 			await put(tx, 'footer', {
 				text: { en: 'Since 2010', ru: 'С 2010 года' },
 				links: [
@@ -66,7 +66,7 @@ describe.skipIf(!url)('footer settings from site_settings', () => {
 			await put(tx, 'requisites', { text: { en: 'Tax ID 000' } });
 
 			expect(await getFooterSettings(tx, 'ru')).toEqual({
-				siteName: 'Союз паркура Армении',
+				siteName: 'Федерация паркура Армении',
 				links: [
 					{ label: 'Тренеры', href: '/ru/pages/coaches', external: false },
 					{ label: 'Partners', href: 'https://partners.example', external: true }

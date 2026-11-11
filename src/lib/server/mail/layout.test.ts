@@ -8,7 +8,7 @@ describe('letterHtml (task 8.2, one branded template)', () => {
 	it('wraps the text in the brand header and a footer linking to the site', () => {
 		const html = letterHtml(mail('Hello'), SITE);
 		expect(html).toMatch(/^<!doctype html>/i);
-		expect(html).toContain('Armenian Parkour Union');
+		expect(html).toContain('Armenian Parkour Federation');
 		expect(html).toContain('#1F4E78');
 		expect(html).toContain('<a href="https://parkour.am"');
 		expect(html).toContain('Hello');
@@ -16,7 +16,7 @@ describe('letterHtml (task 8.2, one branded template)', () => {
 
 	it('without a site address the footer has no link', () => {
 		const html = letterHtml(mail('Hello'), undefined);
-		expect(html).toContain('Armenian Parkour Union');
+		expect(html).toContain('Armenian Parkour Federation');
 		expect(html).not.toContain('<a ');
 	});
 

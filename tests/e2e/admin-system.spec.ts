@@ -77,7 +77,7 @@ test('settings: saved, logged with before and after, shown in the site footer', 
 	const phone = `+374 10 ${String(Math.floor(Math.random() * 1e6)).padStart(6, '0')}`;
 	await page.goto('/admin/settings');
 	await hydrated(page);
-	await page.getByLabel('Federation name (English)').fill('Armenian Parkour Union');
+	await page.getByLabel('Federation name (English)').fill('Armenian Parkour Federation');
 	await page.getByLabel('Description for search engines (English)').fill('Parkour in Armenia');
 	await page.getByLabel('Phone', { exact: true }).fill(phone);
 	await page.getByRole('button', { name: 'Save' }).click();
@@ -105,8 +105,8 @@ test('settings: footer links and the site name in the header come from the datab
 		.evaluateAll((els) => els.forEach((el) => ((el as HTMLInputElement).value = '')));
 	await page
 		.locator('input[name="site_name.ru"]')
-		.evaluate((el) => ((el as HTMLInputElement).value = 'Союз паркура Армении'));
-	await page.getByLabel('Federation name (English)').fill('Armenian Parkour Union');
+		.evaluate((el) => ((el as HTMLInputElement).value = 'Федерация паркура Армении'));
+	await page.getByLabel('Federation name (English)').fill('Armenian Parkour Federation');
 	await page.getByLabel('Description for search engines (English)').fill('Parkour in Armenia');
 	await page.locator('input[name="footer.links.0.label.en"]').fill(`Link ${tag}`);
 	await page.locator('input[name="footer.links.0.url"]').fill(`/pages/e2e-${tag}`);
@@ -115,7 +115,7 @@ test('settings: footer links and the site name in the header come from the datab
 
 	await page.goto('/ru');
 	await expect(
-		page.getByRole('banner').getByRole('link', { name: 'Союз паркура Армении' })
+		page.getByRole('banner').getByRole('link', { name: 'Федерация паркура Армении' })
 	).toBeVisible();
 	await expect(
 		page.getByRole('contentinfo').getByRole('link', { name: `Link ${tag}` })

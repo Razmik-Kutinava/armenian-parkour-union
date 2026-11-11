@@ -84,5 +84,5 @@ export const hyUsers: Partial<Messages> = {
 
 	'mail.setup.subject': 'Սահմանեք ձեր հաշվի գաղտնաբառը',
 	'mail.setup.text':
-		'Armenian Parkour Union կայքում ձեզ համար հաշիվ է ստեղծվել։ Բացեք հղումը՝ գաղտնաբառ սահմանելու համար (գործում է 1 ժամ)՝ {url}'
+		'Armenian Parkour Federation կայքում ձեզ համար հաշիվ է ստեղծվել։ Բացեք հղումը՝ գաղտնաբառ սահմանելու համար (գործում է 1 ժամ)՝ {url}'
 };

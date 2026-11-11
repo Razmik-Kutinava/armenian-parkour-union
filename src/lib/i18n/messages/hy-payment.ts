@@ -30,5 +30,5 @@ export const hyPayment: Partial<Messages> = {
 	'payment.refresh': 'Թարմացնել էջը',
 	'payment.mail.refund.subject': 'Ձեր վճարումը վերադարձվել է',
 	'payment.mail.refund.text':
-		'Բարև ձեզ, {name}։\n\nՄենք վերադարձրել ենք Armenian Parkour Union-ին կատարված ձեր վճարումը։\n\nԳումար՝ {amount}\nՎճարման համար՝ {payment}\n\nԵրբ գումարը կհասնի ձեր հաշվին, կախված է ձեր բանկից, սովորաբար՝ մի քանի աշխատանքային օր։'
+		'Բարև ձեզ, {name}։\n\nՄենք վերադարձրել ենք Armenian Parkour Federation-ին կատարված ձեր վճարումը։\n\nԳումար՝ {amount}\nՎճարման համար՝ {payment}\n\nԵրբ գումարը կհասնի ձեր հաշվին, կախված է ձեր բանկից, սովորաբար՝ մի քանի աշխատանքային օր։'
 };
