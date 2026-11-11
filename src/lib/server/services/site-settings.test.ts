@@ -55,7 +55,10 @@ describe.skipIf(!url)('footer settings from site_settings', () => {
 				telegram: 'https://t.me/apu',
 				instagram: 'https://instagram.com/apu'
 			});
-			await put(tx, 'site_name', { en: 'Armenian Parkour Federation', ru: 'Федерация паркура Армении' });
+			await put(tx, 'site_name', {
+				en: 'Armenian Parkour Federation',
+				ru: 'Федерация паркура Армении'
+			});
 			await put(tx, 'footer', {
 				text: { en: 'Since 2010', ru: 'С 2010 года' },
 				links: [

@@ -17,7 +17,11 @@ const cert = {
 const holder = { name: 'aram', firstName: 'Արամ', lastName: 'Պետրոսյան' };
 const options = {
 	languages: pdfLanguages({ pdfRussian: true }),
-	unionNames: ['Հայաստանի պարկուրի ֆեդերացիա', 'Armenian Parkour Federation', 'Armenian Parkour Federation'],
+	unionNames: [
+		'Հայաստանի պարկուրի ֆեդերացիա',
+		'Armenian Parkour Federation',
+		'Armenian Parkour Federation'
+	],
 	siteUrl: 'https://parkour.test/',
 	signer: null
 };

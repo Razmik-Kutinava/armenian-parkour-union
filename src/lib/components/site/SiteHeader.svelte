@@ -51,10 +51,11 @@
 	<div class="mx-auto flex max-w-page items-center gap-2 px-4 py-2">
 		<a
 			href={href('/')}
-			class="mr-auto flex items-center gap-3 rounded-sm py-1 text-lg font-bold whitespace-nowrap focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-500 xl:mr-4"
+			class="mr-auto flex max-w-[min(100%,14rem)] min-w-0 items-center gap-3 rounded-sm py-1 text-lg font-bold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-500 sm:max-w-[18rem] xl:mr-4 xl:max-w-xs"
+			title={siteName ?? t('site.name')}
 		>
-			<img src={logo} alt="" width="44" height="44" class="size-11" />
-			{siteName ?? t('site.name')}
+			<img src={logo} alt="" width="44" height="44" class="size-11 shrink-0" />
+			<span class="truncate">{siteName ?? t('site.name')}</span>
 		</a>
 
 		<!-- The full row from xl: narrower, the hy menu runs into the site name. -->

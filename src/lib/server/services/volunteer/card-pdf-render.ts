@@ -7,6 +7,7 @@ import {
 	drawQr,
 	drawRight,
 	embedFonts,
+	embedLogo,
 	fitSize
 } from '../certificates/pdf-draw';
 import type { CardPdfContent } from './card-pdf-content';
@@ -65,8 +66,8 @@ export function wrap(text: string, font: PDFFont, size: number, width: number): 
 	return lines;
 }
 
-function head(page: PDFPage, f: Fonts, c: CardPdfContent, photo: PDFImage | null) {
-	drawLogo(page, M, H - M + 8, 52);
+function head(page: PDFPage, f: Fonts, c: CardPdfContent, photo: PDFImage | null, brand: PDFImage) {
+	drawLogo(page, brand, M, H - M + 8, 52);
 	page.drawText(c.union, { x: M + 64, y: H - M - 14, font: f.bold, size: 11, color: NAVY });
 	const titleSize = fitSize(c.title, f.bold, 24, W - 2 * M - 64);
 	page.drawText(c.title, { x: M + 64, y: H - M - 40, font: f.bold, size: titleSize, color: NAVY });
@@ -109,11 +110,12 @@ export async function renderCardPdf(
 	doc.setAuthor(content.union);
 	doc.setSubject(content.title);
 	const f = await embedFonts(doc);
+	const brand = await embedLogo(doc);
 	const logos = new Map<string, PDFImage | null>();
 	for (const key of images.logos.keys()) logos.set(key, await embed(doc, images.logos.get(key)));
 
 	let page = doc.addPage([W, H]);
-	let y = head(page, f, content, await embed(doc, images.photo));
+	let y = head(page, f, content, await embed(doc, images.photo), brand);
 	const room = (need: number) => {
 		if (y - need >= BOTTOM) return;
 		page = doc.addPage([W, H]);
