@@ -14,7 +14,7 @@
 | Параметр | Значение |
 |---|---|
 | Текущий этап | 3 — в работе (3.13); остальные закрыты |
-| Последнее обновление | 2026-11-11, бренд Federation + новые логотипы |
+| Последнее обновление | 2026-11-11, деплой Federation + логотипы (Fly v33) |
 | База REVIEW этапа | `d01ba2d` (после REVIEW долга заявки на экзамен) |
 | Ветка | `master` (единственная, другие ветки не создаём) |
 | Адрес сайта | https://parkour.am (заглушка; запасной — https://armenian-parkour-union.fly.dev) |
@@ -57,7 +57,8 @@
 
 ## Сделано (последние 5)
 Формат: `дата | задача | итог | коммит`, одной строкой. Полные записи — `docs/archive/done-stage-N.md`.
-- 2026-11-11 | бренд Federation + логотипы | Union→Federation (i18n, mail, seed, pages); лого PNG/favicon/og; PDF на PNG; site_name в dev | `c11a51b`
+- 2026-11-11 | деплой Federation + логотипы | Fly v33, CI green; prod site_name/pages/requisites; favicon+лого 200 | `d812d75`
+- 2026-11-11 | бренд Federation + логотипы | Union→Federation (i18n, mail, seed, pages); лого PNG/favicon/og; PDF на PNG | `c11a51b`
 - 2026-11-04 | журнал действий: подписи кодов | перевод + код в фильтре, списке, карточке и истории пользователя; CSV без изменений | `8bcaed1`
 - 2026-11-03 | деплой долга заявки на экзамен | Fly v32, миграция 0019; сайт 200, routes → login; health ok | `f5d836a`
 - 2026-11-03 | долг 6: заявка на экзамен | 0019 + REVIEW (без bugbot/security), crit-audit CLEAN | `cf52732`
