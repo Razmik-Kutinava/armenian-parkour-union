@@ -5,7 +5,7 @@ import base64
 import io
 from pathlib import Path
 
-from PIL import Image
+from PIL import Image, ImageDraw
 
 ROOT = Path(__file__).resolve().parents[1]
 BRAND = ROOT / 'src' / 'lib' / 'assets' / 'brand'
@@ -27,8 +27,43 @@ def flatten_white(img: Image.Image) -> Image.Image:
 	return bg
 
 
+def circular_mark(img_rgb: Image.Image) -> Image.Image:
+	"""Crop to the round seal and clear corners so the tab icon reads as a circle."""
+	rgba = img_rgb.convert('RGBA')
+	pixels = rgba.load()
+	w, h = rgba.size
+	xs: list[int] = []
+	ys: list[int] = []
+	for y in range(h):
+		for x in range(w):
+			r, g, b, _a = pixels[x, y]
+			if r < 245 or g < 245 or b < 245:
+				xs.append(x)
+				ys.append(y)
+	if not xs:
+		raise SystemExit('favicon: empty logo')
+	# Seal is circular; horizontal span is the diameter (URL under the ring is secondary).
+	left, right = min(xs), max(xs)
+	cx = (left + right) / 2
+	radius = (right - left) / 2
+	cy = min(ys) + radius
+	side = int(round(radius * 2))
+	box = (
+		int(round(cx - radius)),
+		int(round(cy - radius)),
+		int(round(cx - radius)) + side,
+		int(round(cy - radius)) + side,
+	)
+	crop = rgba.crop(box)
+	mask = Image.new('L', (side, side), 0)
+	ImageDraw.Draw(mask).ellipse((0, 0, side - 1, side - 1), fill=255)
+	out = Image.new('RGBA', (side, side), (0, 0, 0, 0))
+	out.paste(crop, (0, 0), mask)
+	return out
+
+
 def write_favicon(img_rgb: Image.Image, size: int = 128) -> None:
-	fav = img_rgb.resize((size, size), Image.Resampling.LANCZOS)
+	fav = circular_mark(img_rgb).resize((size, size), Image.Resampling.LANCZOS)
 	buf = io.BytesIO()
 	fav.save(buf, 'PNG', optimize=True)
 	b64 = base64.b64encode(buf.getvalue()).decode('ascii')
