@@ -104,12 +104,13 @@ type MemberOptions = Parameters<typeof insertUser>[1] & { member?: boolean };
 export async function applicant(tx: LimitDb, { member = true, ...values }: MemberOptions = {}) {
 	const user = await insertUser(tx, { birthDate: '1990-01-01', level: 'advanced', ...values });
 	if (member) {
-		const day = 86_400_000;
+		/* Fixed window: listAccess tests pass a frozen `now` (2026-10-27); Date.now()-relative
+		 * starts would slip past that day after wall-clock moves into November. */
 		await tx.insert(memberships).values({
 			userId: user.id,
 			status: 'active',
-			startsAt: new Date(Date.now() - 10 * day),
-			endsAt: new Date(Date.now() + 300 * day)
+			startsAt: new Date('2026-01-01T00:00:00Z'),
+			endsAt: new Date('2027-12-31T00:00:00Z')
 		});
 	}
 	return user;
