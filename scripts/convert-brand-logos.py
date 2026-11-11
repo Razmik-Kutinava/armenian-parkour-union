@@ -41,20 +41,20 @@ def write_favicon(img_rgb: Image.Image, size: int = 128) -> None:
 
 
 def main() -> None:
+	# Primary mark is always designer logo 3 (full color). Mono variants stay as sources only.
 	color = BRAND / 'designer-logo-3.jpg'
-	mono = BRAND / 'designer-logo-2.jpg'
-	if not color.exists() or not mono.exists():
-		raise SystemExit(f'missing source logos in {BRAND}')
+	if not color.exists():
+		raise SystemExit(f'missing {color}')
 	print('color', color.name)
-	print('mono', mono.name)
 
 	STATIC.mkdir(parents=True, exist_ok=True)
 	color_rgb = flatten_white(square(Image.open(color)).resize((512, 512), Image.Resampling.LANCZOS))
 	color_rgb.save(STATIC / 'logo-square.png', 'PNG', optimize=True)
 	color_rgb.save(BRAND / 'logo-square.png', 'PNG', optimize=True)
-
-	mono_img = square(Image.open(mono)).resize((256, 256), Image.Resampling.LANCZOS)
-	mono_img.save(BRAND / 'logo-square-light.png', 'PNG', optimize=True)
+	# Header used to import *-light; keep the same color mark so dark UI never gets mono.
+	color_rgb.resize((256, 256), Image.Resampling.LANCZOS).save(
+		BRAND / 'logo-square-light.png', 'PNG', optimize=True
+	)
 
 	write_favicon(color_rgb)
 

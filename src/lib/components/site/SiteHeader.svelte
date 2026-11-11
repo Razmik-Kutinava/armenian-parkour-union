@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Menu from '@lucide/svelte/icons/menu';
-	import logo from '#lib/assets/brand/logo-square-light.png';
+	import logo from '#lib/assets/brand/logo-square.png';
 	import { currentLocale, localizePath, t, type MessageKey } from '#lib/i18n/index.svelte.ts';
 	import AccountLinks, { type Viewer } from './AccountLinks.svelte';
 	import Disclosure from './Disclosure.svelte';
@@ -54,7 +54,13 @@
 			class="mr-auto flex max-w-[min(100%,14rem)] min-w-0 items-center gap-3 rounded-sm py-1 text-lg font-bold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-500 sm:max-w-[18rem] xl:mr-4 xl:max-w-xs"
 			title={siteName ?? t('site.name')}
 		>
-			<img src={logo} alt="" width="44" height="44" class="size-11 shrink-0" />
+			<img
+				src={logo}
+				alt=""
+				width="44"
+				height="44"
+				class="size-11 shrink-0 rounded-full bg-surface ring-1 ring-navy-700"
+			/>
 			<span class="truncate">{siteName ?? t('site.name')}</span>
 		</a>
 
